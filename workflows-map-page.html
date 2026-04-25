@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI PM Workflows Map · Noam Sheffi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0e1a;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    font-size: 14px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+  header { margin-bottom: 48px; }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: #64748b; font-size: 16px; }
+  .counters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 32px 0 48px; }
+  .counter {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .counter .num { font-size: 32px; font-weight: 700; color: #60a5fa; }
+  .counter .num.green { color: #10b981; }
+  .counter .num.amber { color: #f59e0b; }
+  .counter .num.purple { color: #a855f7; }
+  .counter .lbl { text-transform: uppercase; font-size: 11px; color: #64748b; letter-spacing: 0.05em; margin-top: 6px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .pill {
+    background: #111827;
+    border: 1px solid #1e293b;
+    color: #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .pill:hover { border-color: #3b82f6; }
+  .pill.active { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #60a5fa; }
+  .pill .badge { color: #64748b; margin-left: 6px; font-size: 11px; }
+  .pill.active .badge { color: #60a5fa; }
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: #3b82f6;
+    border-radius: 2px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .card {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.15s;
+  }
+  .card:hover { background: #1a2332; border-color: #334155; transform: translateY(-2px); }
+  .card .num {
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 8px; color: #e2e8f0; }
+  .card .desc { color: #94a3b8; font-size: 13px; margin-bottom: 12px; }
+  .chain {
+    background: #0f172a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    overflow-x: auto;
+  }
+  .chain code { color: #60a5fa; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .tag.core { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+  .tag.feedback { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+  .tag.ops { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; }
+  .tag.content { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+  .tag.review { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+  .tag.release { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+  .callout {
+    background: rgba(59, 130, 246, 0.08);
+    border-left: 3px solid #3b82f6;
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .callout.warn { background: rgba(245, 158, 11, 0.08); border-left-color: #f59e0b; }
+  .callout.danger { background: rgba(239, 68, 68, 0.08); border-left-color: #ef4444; }
+  .callout h4 { font-size: 14px; margin-bottom: 6px; color: #e2e8f0; }
+  .callout p, .callout li { color: #94a3b8; font-size: 13px; }
+  .callout ul { padding-left: 20px; margin-top: 6px; }
+  .callout li { margin-bottom: 4px; }
+  pre.diagram {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 24px;
+    color: #94a3b8;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #1e293b;
+    color: #475569;
+    font-size: 12px;
+    text-align: center;
+  }
+  @media (max-width: 640px) {
+    h1 { font-size: 24px; }
+    .counters { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns: 1fr; }
+    pre.diagram { font-size: 10px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>AI PM Workflows Map</h1>
+  <p class="subtitle">How I actually use the agent. 13 workflows, ~80 skills, mapped end-to-end.</p>
+</header>
+
+<section class="counters" aria-label="Summary stats">
+  <div class="counter"><div class="num">13</div><div class="lbl">Workflows</div></div>
+  <div class="counter"><div class="num green">~80</div><div class="lbl">Skills Wired</div></div>
+  <div class="counter"><div class="num amber">5</div><div class="lbl">Orphans</div></div>
+  <div class="counter"><div class="num purple">4</div><div class="lbl">Visible Gaps</div></div>
+</section>
+
+<section>
+  <h2>Filter</h2>
+  <nav class="filters" aria-label="Filter workflows">
+    <button class="pill active" data-cat="all" aria-label="All">All <span class="badge">13</span></button>
+    <button class="pill" data-cat="core" aria-label="Core">Core <span class="badge">3</span></button>
+    <button class="pill" data-cat="feedback" aria-label="Feedback">Feedback <span class="badge">1</span></button>
+    <button class="pill" data-cat="ops" aria-label="Ops">Ops <span class="badge">3</span></button>
+    <button class="pill" data-cat="review" aria-label="Review">Review <span class="badge">2</span></button>
+    <button class="pill" data-cat="content" aria-label="Content">Content <span class="badge">1</span></button>
+    <button class="pill" data-cat="release" aria-label="Release">Release <span class="badge">1</span></button>
+    <button class="pill" data-cat="meta" aria-label="Meta">Meta <span class="badge">2</span></button>
+  </nav>
+</section>
+
+<section>
+  <h2>Workflows</h2>
+  <div class="grid" id="workflow-grid">
+
+    <article class="card" data-cat="core">
+      <div class="num">01</div>
+      <h3>Initiative Lifecycle</h3>
+      <p class="desc">The spine. Raw signal to shipped feature. Most skills hang off this chain.</p>
+      <div class="chain">/problem-discover → /problem-boundary → /pre-mortem → /prd → /spec-review → /plt-review → /spec-to-team-epic → /initiative-review</div>
+      <div class="tags"><span class="tag core">Core</span><span class="tag core">Discovery</span><span class="tag core">Definition</span></div>
+    </article>
+
+    <article class="card" data-cat="release">
+      <div class="num">02</div>
+      <h3>Release &amp; Distribution</h3>
+      <p class="desc">Triggered when a feature ships. Orchestrated by /release-distribute.</p>
+      <div class="chain">/release-distribute → doc-review · slide · image · slack · sales-enablement · notify · remotion</div>
+      <div class="tags"><span class="tag release">Release</span><span class="tag release">Comms</span></div>
+    </article>
+
+    <article class="card" data-cat="core">
+      <div class="num">03</div>
+      <h3>Roadmap Management</h3>
+      <p class="desc">Monthly prioritization, quarterly planning, new card requests.</p>
+      <div class="chain">/roadmap-review · /roadmap-create · /roadmap-sync (forward only)</div>
+      <div class="tags"><span class="tag core">Core</span><span class="tag core">Planning</span></div>
+    </article>
+
+    <article class="card" data-cat="feedback">
+      <div class="num">04</div>
+      <h3>Customer Feedback Pipelines</h3>
+      <p class="desc">Three independent collectors → aggregated view → discovery.</p>
+      <div class="chain">gong + intercom + pipev2 + competitive → /feedback-aggregate → /problem-discover → /discover</div>
+      <div class="tags"><span class="tag feedback">Feedback</span><span class="tag feedback">NotebookLM</span></div>
+    </article>
+
+    <article class="card" data-cat="ops">
+      <div class="num">05</div>
+      <h3>Daily Operations</h3>
+      <p class="desc">Start of day, live tag work, end of day rituals.</p>
+      <div class="chain">/today → /tag-prep → /tag-execute → /tag-close · /follow-up · /todoist-sync · /session-close</div>
+      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Daily</span></div>
+    </article>
+
+    <article class="card" data-cat="ops">
+      <div class="num">06</div>
+      <h3>Weekly Operations</h3>
+      <p class="desc">Monday plan, Friday retro. Goals tracked in weekly-goals/current.md.</p>
+      <div class="chain">/weekly-plan · /sprint-prep · /sprint-health · /weekly-feedback-sweep-teams · /weekly-retro · /vibe-pm-weekly</div>
+      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Weekly</span></div>
+    </article>
+
+    <article class="card" data-cat="ops">
+      <div class="num">07</div>
+      <h3>Meetings</h3>
+      <p class="desc">Pre-brief, in-meeting lookup, post-meeting capture.</p>
+      <div class="chain">/meeting-prep · /meeting-lookup · /meeting-absorb · /meeting-summary · /meeting-item · /aviv · /harel</div>
+      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Meetings</span></div>
+    </article>
+
+    <article class="card" data-cat="ops">
+      <div class="num">08</div>
+      <h3>Slack Triage &amp; Routing</h3>
+      <p class="desc">Mention-first scan, channel sweep, message → action.</p>
+      <div class="chain">/slack-triage · /slack-pm-assist · /thread-harvest · /slack-to-ticket · /slack-followup-sync</div>
+      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Slack</span></div>
+    </article>
+
+    <article class="card" data-cat="content">
+      <div class="num">09</div>
+      <h3>Content &amp; Thought Leadership</h3>
+      <p class="desc">Daily AI/PM scanning → weekly LinkedIn post → ad-hoc visuals.</p>
+      <div class="chain">/vibe-pm-daily · /ai-pm-daily → /vibe-pm-weekly · /generate-post-image · /html-page · /remotion</div>
+      <div class="tags"><span class="tag content">Content</span><span class="tag content">LinkedIn</span></div>
+    </article>
+
+    <article class="card" data-cat="review">
+      <div class="num">10</div>
+      <h3>Document Review</h3>
+      <p class="desc">Reviewing someone else's work. Cross-cutting domain check.</p>
+      <div class="chain">/doc-review · /marketing-review · /spec-review · /plt-review · /dataset-review · /pre-mortem · /grammarly</div>
+      <div class="tags"><span class="tag review">Review</span><span class="tag review">QA</span></div>
+    </article>
+
+    <article class="card" data-cat="ops">
+      <div class="num">11</div>
+      <h3>Sprint &amp; Team Operations</h3>
+      <p class="desc">Cross-team sprint readiness and demo prep.</p>
+      <div class="chain">/sprint-prep · /sprint-health · /create-sprints · /sprint-demo-html · /note-to-ticket</div>
+      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Sprints</span></div>
+    </article>
+
+    <article class="card" data-cat="meta">
+      <div class="num">12</div>
+      <h3>Feature-Map Classification</h3>
+      <p class="desc">Workplan frontmatter (ibm/marketing tier) drives release readiness.</p>
+      <div class="chain">/ibm-feature-map · /marketing-feature-map</div>
+      <div class="tags"><span class="tag review">Meta</span><span class="tag review">Tagging</span></div>
+    </article>
+
+    <article class="card" data-cat="meta">
+      <div class="num">13</div>
+      <h3>Decision &amp; Knowledge Capture</h3>
+      <p class="desc">Structured decisions, formatting, link indexing, canary QA.</p>
+      <div class="chain">/decision-log · /note-prettifier · /link-index · /canary-qa</div>
+      <div class="tags"><span class="tag review">Meta</span><span class="tag review">Capture</span></div>
+    </article>
+
+  </div>
+</section>
+
+<section>
+  <h2>Master Diagram</h2>
+  <pre class="diagram">                ┌─────────────────────────────────────┐
+                │  Customer Feedback                  │
+                │  Gong · Intercom · PIPEV2 · Compete │
+                └────────────────┬────────────────────┘
+                                 │
+                  ┌──────────────▼──────────────┐
+                  │ /feedback-aggregate         │
+                  │ /intelligence-brief         │
+                  └──────────────┬──────────────┘
+                                 │
+            ┌────────────────────▼─────────────────────┐
+            │              DISCOVERY                    │
+            │  /problem-discover → /problem-boundary    │
+            │           → /business-case                │
+            └────────────────────┬─────────────────────┘
+                                 │
+            ┌────────────────────▼─────────────────────┐
+            │              DEFINITION                   │
+            │  /pre-mortem → /prd → /spec-review        │
+            │           → /plt-review                   │
+            └────────────────────┬─────────────────────┘
+                                 │
+            ┌────────────────────▼─────────────────────┐
+            │              EXECUTION                    │
+            │  /spec-to-team-epic → /sprint-prep        │
+            │   /sprint-health → /initiative-review     │
+            └────────────────────┬─────────────────────┘
+                                 │
+            ┌────────────────────▼─────────────────────┐
+            │               RELEASE                     │
+            │  /release-distribute → doc · slide · img  │
+            │   slack · sales-enablement · notify       │
+            └────────────────────┬─────────────────────┘
+                                 │
+            ┌────────────────────▼─────────────────────┐
+            │              ROADMAP LOOP                 │
+            │  /roadmap-sync → /roadmap-review → top    │
+            └──────────────────────────────────────────┘
+
+   Cross-cutting daily: /today /follow-up /tag-* /session-close
+   Cross-cutting weekly: /weekly-plan /weekly-retro /sprint-health /pm-mentor</pre>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Core spine</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#a855f7"></span>Feedback</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Release</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#14b8a6"></span>Ops</div>
+  </div>
+</section>
+
+<section>
+  <h2>Pre-Built Chains</h2>
+  <div class="grid">
+    <article class="card">
+      <h3>/discover</h3>
+      <p class="desc">End-to-end discovery in one command.</p>
+      <div class="chain">/problem-discover → /problem-boundary → /business-case</div>
+    </article>
+    <article class="card">
+      <h3>/feedback-cycle</h3>
+      <p class="desc">Refresh feedback then immediately discover patterns.</p>
+      <div class="chain">/gong-insights ∥ /intercom-insights → /problem-discover</div>
+    </article>
+    <article class="card">
+      <h3>/release-distribute</h3>
+      <p class="desc">Full release comms (replaces legacy /launch).</p>
+      <div class="chain">doc-review → slide → image → slack → sales-enablement → notify</div>
+    </article>
+  </div>
+</section>
+
+<section>
+  <h2>Orphans &amp; Underused</h2>
+  <div class="callout warn">
+    <h4>Built but not exercised in real flow</h4>
+    <ul>
+      <li><strong>/pre-mortem</strong>, <strong>/plt-review</strong>, <strong>/spec-review</strong> — built, no real-world runs yet</li>
+      <li><strong>/note-to-ticket</strong> — dual-mode, untested</li>
+      <li><strong>/action-sweep</strong> — alternative to /tag-execute, untested</li>
+      <li><strong>cx-board-competitive</strong>, <strong>cx-pmm-review</strong>, <strong>calendar-insights</strong>, <strong>poc-prioritizer</strong> — passive skills, hard to invoke</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Visible Gaps</h2>
+  <div class="callout danger">
+    <h4>1. /spec-to-team-epic → /initiative-review has no closing loop</h4>
+    <p>Once epics land in Jira, tracking depends on workplan + roadmap-sync. A scheduled epic-health check could fill the gap.</p>
+  </div>
+  <div class="callout danger">
+    <h4>2. /release-distribute doesn't loop back to roadmap</h4>
+    <p>After release, /roadmap-sync should run automatically to mark Notion cards Done.</p>
+  </div>
+  <div class="callout danger">
+    <h4>3. /intelligence-brief → /problem-discover not auto-triggered</h4>
+    <p>Brief surfaces patterns weekly; discovery runs quarterly. Consider a monthly auto-trigger.</p>
+  </div>
+  <div class="callout danger">
+    <h4>4. /pm-mentor runs are passive</h4>
+    <p>No clear weekly review loop tying coaching notes back to growth dimensions in ai-pm-reference.md.</p>
+  </div>
+</section>
+
+<footer>
+  Generated from: <code>AI PM/workflows-map.md</code> · 2026-04-25
+</footer>
+
+</div>
+
+<script>
+  const pills = document.querySelectorAll('.pill');
+  const cards = document.querySelectorAll('#workflow-grid .card');
+  pills.forEach(p => {
+    p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      const cat = p.dataset.cat;
+      cards.forEach(c => {
+        c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
