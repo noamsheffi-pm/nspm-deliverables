@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started with Obsidian — Omer's Onboarding</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a22;
+      --surface-2: #0f1118;
+      --border: #252a35;
+      --border-light: #333a48;
+      --text: #e2e8f0;
+      --text-secondary: #8a94a8;
+      --text-muted: #7a8599;
+      --accent: #00d4aa;
+      --accent-muted: rgba(0,212,170,0.12);
+      --accent-glow: rgba(0,212,170,0.25);
+      --success: #10b981;
+      --success-muted: rgba(16,185,129,0.12);
+      --warning: #f59e0b;
+      --warning-muted: rgba(245,158,11,0.12);
+      --error: #ef4444;
+      --error-muted: rgba(239,68,68,0.1);
+      --purple: #a855f7;
+      --purple-muted: rgba(168,85,247,0.12);
+      --teal: #00d4aa;
+      --teal-muted: rgba(0,212,170,0.12);
+      --indigo: #6366f1;
+      --indigo-muted: rgba(99,102,241,0.12);
+      --radius: 12px;
+      --radius-sm: 6px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0d0f14 0%, #0e1a17 50%, #0d0f14 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 24px 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(0,212,170,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(0,212,170,0.12);
+      border: 1px solid rgba(0,212,170,0.35);
+      color: #00d4aa;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 999px; margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d4aa, #7ee8d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1.15; margin-bottom: 14px;
+    }
+    header p { color: var(--text-secondary); font-size: 16px; }
+
+    /* ── Layout ── */
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+    main { padding: 56px 0 80px; }
+    section { margin-bottom: 60px; }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 20px;
+    }
+    .section-label span { display: inline-block; width: 20px; height: 2px; background: var(--border-light); border-radius: 2px; }
+
+    h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+    h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+
+    /* ── Stat counters ── */
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      margin-bottom: 56px; padding-bottom: 56px; border-bottom: 1px solid var(--border);
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px 20px; text-align: center;
+    }
+    .stat-card .num { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+    .stat-card .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .stat-card:nth-child(1) .num { color: var(--accent); }
+    .stat-card:nth-child(2) .num { color: var(--success); }
+    .stat-card:nth-child(3) .num { color: var(--warning); }
+    .stat-card:nth-child(4) .num { color: var(--purple); }
+
+    /* ── Callout ── */
+    .callout {
+      background: var(--accent-muted); border: 1px solid rgba(59,130,246,0.25);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+      padding: 16px 20px; color: var(--text-secondary); font-size: 14px; line-height: 1.7;
+    }
+    .callout strong { color: var(--text); }
+    .callout code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: #7dd3fc; }
+    .callout.success { background: var(--success-muted); border-color: rgba(16,185,129,0.25); border-left-color: var(--success); }
+    .callout.warning { background: var(--warning-muted); border-color: rgba(245,158,11,0.25); border-left-color: var(--warning); }
+    .callout.purple { background: var(--purple-muted); border-color: rgba(168,85,247,0.25); border-left-color: var(--purple); }
+    .callout.teal { background: var(--teal-muted); border-color: rgba(20,184,166,0.25); border-left-color: var(--teal); }
+    .callout.indigo { background: var(--indigo-muted); border-color: rgba(99,102,241,0.25); border-left-color: var(--indigo); }
+
+    /* ── Icon grid ── */
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .icon-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; display: flex; gap: 14px; align-items: flex-start;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .icon-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+    .icon-card .ico { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .icon-card h3 { font-size: 14px; margin-bottom: 4px; }
+    .icon-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── Comparison table ── */
+    .compare-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table thead th {
+      background: var(--surface-2); color: var(--text-secondary);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .compare-table thead th:nth-child(2) { color: var(--success); }
+    .compare-table thead th:nth-child(3) { color: var(--text-muted); }
+    .compare-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    .compare-table tbody tr:last-child { border-bottom: none; }
+    .compare-table tbody tr:nth-child(even) { background: var(--surface-2); }
+    .compare-table tbody tr:hover { background: #1a2332; }
+    .compare-table tbody td { padding: 12px 18px; }
+    .compare-table tbody td:first-child { color: var(--text-secondary); font-size: 13px; }
+    .compare-table tbody td:nth-child(2) { color: var(--success); font-weight: 600; font-size: 13px; }
+    .compare-table tbody td:nth-child(3) { color: var(--text-muted); font-size: 13px; }
+
+    /* ── Flow diagram (vault → claude → output) ── */
+    .flow-diagram {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px;
+    }
+    .flow-node {
+      background: var(--surface); border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap;
+    }
+    .flow-node.vault { border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+    .flow-node.cmd { border-color: rgba(59,130,246,0.4); color: #93c5fd; }
+    .flow-node.out { border-color: rgba(16,185,129,0.4); color: #6ee7b7; }
+    .flow-arrow { color: var(--text-muted); font-size: 16px; }
+
+    /* ── Two-col split ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .split-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .split-card .split-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .split-card .split-label .dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .split-card pre {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 16px;
+      font-family: 'SF Mono','Fira Code',monospace; font-size: 12px;
+      line-height: 1.8; color: var(--text-muted); overflow-x: auto; white-space: pre;
+    }
+    .split-card .rendered { font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
+    .split-card .rendered h4 { color: var(--text); font-size: 15px; margin-bottom: 8px; font-weight: 700; }
+    .split-card .rendered table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+    .split-card .rendered th { color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    .split-card .rendered td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; }
+    .split-card .rendered .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .pill-green { background: var(--success-muted); color: var(--success); }
+    .pill-yellow { background: var(--warning-muted); color: var(--warning); }
+
+    /* ── Card grid (plugins) ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+    .plugin-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .plugin-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+    .plugin-card .ico {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .plugin-card .details h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .plugin-card .details p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .plugin-card .tag {
+      display: inline-block; margin-top: 8px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.04em;
+    }
+    .tag-day1 { background: var(--success-muted); color: var(--success); }
+    .tag-week2 { background: var(--warning-muted); color: var(--warning); }
+
+    /* ── Flow steps ── */
+    .flow-steps { display: flex; flex-direction: column; }
+    .flow-step { display: flex; gap: 20px; padding-bottom: 28px; }
+    .flow-step:last-child { padding-bottom: 0; }
+    .step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,212,170,0.1); border: 2px solid #00d4aa; color: #00d4aa;
+      font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; z-index: 1;
+    }
+    .step-line { width: 2px; flex: 1; background: var(--border); margin: 6px 0; min-height: 20px; }
+    .flow-step:last-child .step-line { display: none; }
+    .step-content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 18px; flex: 1;
+    }
+    .step-content h3 { font-size: 15px; margin-bottom: 4px; }
+    .step-content p { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      background: var(--surface-2); color: var(--text-secondary);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--surface-2); }
+    tbody tr:hover { background: #1a2332; }
+    tbody td { padding: 11px 16px; color: var(--text); }
+    tbody td:first-child { color: var(--text-secondary); }
+
+    kbd {
+      display: inline-block; background: var(--surface-2); border: 1px solid var(--border-light);
+      border-bottom-width: 2px; border-radius: 5px; padding: 2px 7px;
+      font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--text); white-space: nowrap;
+    }
+
+    pre {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px 24px; overflow-x: auto;
+      font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.7; color: #94a3b8;
+    }
+    pre .key { color: #7dd3fc; }
+    pre .val { color: #86efac; }
+    pre .cmt { color: #475569; }
+    pre .sym { color: #c084fc; }
+
+    .tag-demo {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px 24px; font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 2;
+    }
+    .tag-demo .line { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .tag-demo .text { color: #94a3b8; }
+    .tag-task { color: #34d399; font-weight: 700; }
+    .tag-followup { color: #60a5fa; font-weight: 700; }
+    .tag-decision { color: #c084fc; font-weight: 700; }
+    .tag-open { color: #fbbf24; font-weight: 700; }
+    .tag-figma { color: #f472b6; font-weight: 700; }
+
+    .timeline { display: flex; flex-direction: column; gap: 4px; }
+    .tl-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 22px; display: flex; align-items: flex-start; gap: 18px;
+      transition: border-color 0.15s;
+    }
+    .tl-item:hover { border-color: var(--border-light); }
+    .tl-dot {
+      width: 40px; height: 40px; border-radius: 10px;
+      font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; letter-spacing: -0.02em;
+    }
+    .tl-dot.d1 { background: var(--success-muted); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+    .tl-dot.d23 { background: var(--accent-muted); color: var(--accent); border: 1px solid rgba(59,130,246,0.3); }
+    .tl-dot.w2 { background: var(--warning-muted); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
+    .tl-item h3 { font-size: 15px; margin-bottom: 4px; }
+    .tl-item p { font-size: 13px; color: var(--text-secondary); }
+
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+    .file-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px; transition: border-color 0.15s, transform 0.15s;
+    }
+    .file-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+    .file-card .file-ico { font-size: 24px; margin-bottom: 10px; }
+    .file-card .file-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 6px; word-break: break-all; }
+    .file-card .file-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 28px 24px; text-align: center;
+    }
+    footer .ask { font-size: 16px; color: var(--text-secondary); }
+    footer .ask strong { color: var(--text); }
+    footer .source { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-5 { margin-top: 20px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mb-5 { margin-bottom: 20px; }
+    .mb-6 { margin-bottom: 28px; }
+
+    .future-badge {
+      display: inline-block; background: var(--indigo-muted); border: 1px solid rgba(99,102,241,0.3);
+      color: var(--indigo); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 14px;
+    }
+
+    .fade-in { opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Quick Nav ── */
+    #quick-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,0.97);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: center; gap: 2px; padding: 0 20px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    #quick-nav::-webkit-scrollbar { display: none; }
+    #quick-nav a {
+      display: inline-flex; align-items: center;
+      padding: 11px 13px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+      color: var(--text-muted); text-decoration: none;
+      border-bottom: 2px solid transparent;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #quick-nav a:hover { color: #00d4aa; }
+    #quick-nav a.active { color: #00d4aa; border-bottom-color: #00d4aa; }
+
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .icon-grid, .card-grid { grid-template-columns: 1fr; }
+      .file-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">Omer · April 2026</div>
+  <h1>Getting Started with Obsidian</h1>
+  <p>A personal setup walkthrough from Noam &mdash; 45 min to be up and running</p>
+</header>
+
+<nav id="quick-nav"></nav>
+
+<main>
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats fade-in">
+    <div class="stat-card"><div class="num">45</div><div class="label">Min setup</div></div>
+    <div class="stat-card"><div class="num">7</div><div class="label">Must plugins</div></div>
+    <div class="stat-card"><div class="num">15</div><div class="label">Hotkeys</div></div>
+    <div class="stat-card"><div class="num">5</div><div class="label">Kit files</div></div>
+  </div>
+
+  <!-- ── The Problem ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> The Problem <span></span></div>
+    <h2>Where design context goes to die</h2>
+    <div class="icon-grid">
+      <div class="icon-card"><div class="ico">💬</div><div><h3>Figma comments</h3><p>Decisions buried in threads nobody rereads after the review</p></div></div>
+      <div class="icon-card"><div class="ico">📱</div><div><h3>Slack threads</h3><p>Meeting outcomes evaporate between syncs</p></div></div>
+      <div class="icon-card"><div class="ico">🧠</div><div><h3>Memory</h3><p>Open questions that live in your head until they don't</p></div></div>
+      <div class="icon-card"><div class="ico">📂</div><div><h3>Scattered files</h3><p>No single place to track what was decided per project</p></div></div>
+    </div>
+  </section>
+
+  <!-- ── Second Brain ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> The Concept <span></span></div>
+    <h2>Obsidian as a second brain</h2>
+    <div class="icon-grid mb-6">
+      <div class="icon-card"><div class="ico">🗺️</div><div><h3>Offload context</h3><p>Stop keeping project state in your head. Write it once, find it in seconds.</p></div></div>
+      <div class="icon-card"><div class="ico">🔗</div><div><h3>Connected notes</h3><p>Meeting notes link to decisions. Decisions link to specs. Context compounds over time.</p></div></div>
+      <div class="icon-card"><div class="ico">📈</div><div><h3>Compounds with use</h3><p>Week 1 you're building it. Month 3 you have a year of design decisions, searchable in seconds.</p></div></div>
+      <div class="icon-card"><div class="ico">🔒</div><div><h3>You own it</h3><p>A local folder of Markdown. No account, no vendor, no internet required.</p></div></div>
+    </div>
+    <div class="callout purple" style="margin-bottom:12px;">
+      <strong>Not another app to manage.</strong> Obsidian is just a folder of text files with a good UI on top. If you stop using it, your files are still there &mdash; readable in any editor, forever.
+    </div>
+    <div class="callout warning">
+      <strong>Local means you need a backup.</strong> Since the vault lives on your machine, losing your laptop = losing your notes. Noam's solution: put the vault folder inside Google Drive. Drive syncs it to the cloud automatically, zero config. Create your vault at <code>~/Google Drive/My Drive/Obsidian/</code> and you're covered from day one.
+    </div>
+  </section>
+
+  <!-- ── Obsidian + Claude ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Why It Pairs With Claude <span></span></div>
+    <h2>Your vault is Claude's memory</h2>
+    <div class="icon-grid mb-6">
+      <div class="icon-card"><div class="ico">📖</div><div><h3>Direct file access</h3><p>Claude reads vault files instantly via filesystem. No API, no cost, no latency.</p></div></div>
+      <div class="icon-card"><div class="ico">🧩</div><div><h3>Context without re-explaining</h3><p>Write a meeting note once. Claude uses it as context for summaries, follow-ups, and specs automatically.</p></div></div>
+      <div class="icon-card"><div class="ico">⚙️</div><div><h3>Commands write back</h3><p>Claude outputs land in the vault as rendered Markdown. Better than reading raw terminal text.</p></div></div>
+      <div class="icon-card"><div class="ico">🪪</div><div><h3>CLAUDE.md as identity</h3><p>One file at vault root. Claude reads it every session and already knows your role, your projects, your preferences.</p></div></div>
+    </div>
+
+    <div class="callout teal">
+      The more you write in the vault, the smarter Claude's responses &mdash; because more context is already there. You stop re-explaining your projects at the start of every conversation.
+    </div>
+  </section>
+
+  <!-- ── Local vs Notion ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Why Not Notion <span></span></div>
+    <h2>Local files vs Notion + MCP</h2>
+    <div class="compare-wrap mb-5">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Consideration</th>
+            <th>✦ Obsidian (local)</th>
+            <th>Notion via MCP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Claude reads a note</td><td>Direct filesystem read &mdash; free</td><td>MCP API call &mdash; latency + token cost</td></tr>
+          <tr><td>Cost per Claude session</td><td>Zero</td><td>Grows with vault size &amp; reads</td></tr>
+          <tr><td>Works offline</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Data ownership</td><td>Your files, your machine</td><td>Vendor-hosted</td></tr>
+          <tr><td>File format</td><td>Open Markdown &mdash; any editor</td><td>Proprietary, export-only</td></tr>
+          <tr><td>Search across 100 notes</td><td>Instant (local grep)</td><td>Paginated API calls</td></tr>
+          <tr><td>Works if Notion is down</td><td>Yes</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warning">
+      <strong>Every Notion page Claude reads via MCP costs tokens and a round-trip.</strong> In a single Claude session that reads 20 context files, a local vault does it in one tool call for free. Notion MCP is useful for write-back workflows &mdash; not for Claude's reading context.
+    </div>
+  </section>
+
+  <!-- ── Viewing Claude outputs ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Viewing Outputs <span></span></div>
+    <h2>Claude writes Markdown — Obsidian renders it</h2>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">
+      Claude's outputs land in your vault as <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#7dd3fc;">.md</code> files. In the terminal they're raw text. In Obsidian they render — tables, callouts, headers, wikilinks, code blocks — the way they were meant to be read.
+    </p>
+    <div class="two-col mb-5">
+      <div class="split-card">
+        <div class="split-label" style="color:var(--text-muted);"><div class="dot" style="background:var(--text-muted);"></div>Raw terminal output</div>
+        <pre style="padding:14px 16px;font-size:11px;line-height:1.6;">## Meeting Summary
+
+**Decisions**
+- Use 16px base font #decision
+- Modal stays full-screen #decision
+
+**Actions**
+- Omer: update spacing tokens #Task
+
+| Status | Owner |
+|--------|-------|
+| done   | Omer  |</pre>
+      </div>
+      <div class="split-card">
+        <div class="split-label" style="color:var(--success);"><div class="dot" style="background:var(--success);"></div>Rendered in Obsidian</div>
+        <div class="rendered">
+          <h4>Meeting Summary</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Decisions</p>
+          <p style="font-size:13px;margin-bottom:4px;">&#x2022; Use 16px base font <span class="pill pill-green">#decision</span></p>
+          <p style="font-size:13px;margin-bottom:12px;">&#x2022; Modal stays full-screen <span class="pill pill-green">#decision</span></p>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Actions</p>
+          <p style="font-size:13px;margin-bottom:12px;">&#x2022; Omer: update spacing tokens <span class="pill pill-yellow">#Task</span></p>
+          <table>
+            <tr><th>Status</th><th>Owner</th></tr>
+            <tr><td><span class="pill pill-green">done</span></td><td>Omer</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="callout success">
+      <strong>Especially useful for:</strong> PRDs, spec reviews, meeting summaries, design review notes. These are documents. Reading them in Obsidian's reading view (<kbd>Cmd+E</kbd>) is the intended experience &mdash; not scrolling through a terminal.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── Setup ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Setup <span></span></div>
+    <h2>Five steps, one sitting</h2>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content"><h3>Install Obsidian</h3><p>obsidian.md &rarr; download &rarr; create a new vault at <kbd>~/Design</kbd> or <kbd>~/Notes</kbd></p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content"><h3>Run vault-scaffold.sh</h3><p>Creates the full folder structure. <kbd>bash vault-scaffold.sh /path/to/vault</kbd></p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content"><h3>Drop hotkeys.json</h3><p>Copy to <kbd>{vault}/.obsidian/hotkeys.json</kbd> before first open. All 13 bindings apply instantly.</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content"><h3>Install 7 plugins</h3><p>Settings &rarr; Community plugins &rarr; Turn off Safe mode &rarr; Browse. Install the Must list in order.</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content"><h3>Flip settings &amp; take first note</h3><p><kbd>Cmd+0</kbd> opens today's daily note. Write one thing. Setup done.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Must plugins ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Plugins <span></span></div>
+    <h2>Start here — Noam's most-used</h2>
+    <div class="card-grid mb-6">
+      <div class="plugin-card"><div class="ico" style="background:rgba(99,102,241,0.15);">📝</div><div class="details"><h3>Templater</h3><p>New note with a pre-filled structured header. Install first — others reference it.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(59,130,246,0.15);">🔍</div><div class="details"><h3>Omnisearch</h3><p>Fast full-text search across all notes. <kbd>Cmd+Shift+O</kbd> — you'll use this constantly.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(168,85,247,0.15);">🕐</div><div class="details"><h3>Recent Files</h3><p>Quick access panel in the sidebar. Pin it — replaces hunting through the file tree.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(16,185,129,0.15);">📋</div><div class="details"><h3>Dataview</h3><p>Query-driven tables from frontmatter. Powers Noam's dashboards, trackers, and status views.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(168,85,247,0.15);">✏️</div><div class="details"><h3>Excalidraw</h3><p>Inline whiteboard sketches and diagrams — especially useful for design flow notes.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(20,184,166,0.15);">📑</div><div class="details"><h3>Table of Contents</h3><p>Auto-generates a TOC for long notes. Useful for PRDs, spec reviews, design docs.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(59,130,246,0.15);">💻</div><div class="details"><h3>Terminal</h3><p>Embedded terminal pane inside Obsidian. Run scripts without switching apps.</p><span class="tag tag-day1">Essential</span></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(168,85,247,0.15);">⚡</div><div class="details"><h3>Shell Commands</h3><p>Run shell scripts from the command palette. Powers Noam's prettify-note shortcut (<kbd>Alt+Cmd+G</kbd>). Requires Claude Code CLI for full power.</p><span class="tag tag-day1">Essential</span></div></div>
+    </div>
+
+    <h2 class="mb-4">Also installed on Noam's vault</h2>
+    <div class="card-grid">
+      <div class="plugin-card"><div class="ico" style="background:rgba(16,185,129,0.15);">✅</div><div class="details"><h3>Tasks</h3><p>Query <code style="font-size:12px;color:#34d399;">#Task</code> and <code style="font-size:12px;color:#60a5fa;">#follow-up</code> tags across the vault.</p></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(20,184,166,0.15);">📁</div><div class="details"><h3>Folder Notes</h3><p>Click a folder &rarr; opens its <code style="font-size:12px;color:#7dd3fc;">00-overview.md</code> landing note.</p></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(239,68,68,0.15);">⏰</div><div class="details"><h3>Reminder</h3><p>Date-based reminders on task lines. Format: <code style="font-size:11px;color:#86efac;">📅 2026-05-01</code></p></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(245,158,11,0.15);">📊</div><div class="details"><h3>Mermaid Tools</h3><p>Toolbar for inserting flow diagrams and sequence diagrams in notes.</p></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(99,102,241,0.15);">🎨</div><div class="details"><h3>Iconic + Iconize</h3><p>Add icons to folders and files in the sidebar for visual navigation.</p></div></div>
+      <div class="plugin-card"><div class="ico" style="background:rgba(20,184,166,0.15);">🔎</div><div class="details"><h3>QMD Semantic Search</h3><p>Obsidian UI for semantic vault search. Requires QMD CLI install — useful once vault is large.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ── Settings ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Settings <span></span></div>
+    <h2>Flip these before using</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>Value</th><th>Where</th></tr></thead>
+        <tbody>
+          <tr><td>New link format</td><td>Shortest path when possible</td><td>Files &amp; Links</td></tr>
+          <tr><td>Use [[Wikilinks]]</td><td><span style="color:var(--success);font-weight:700;">ON</span></td><td>Files &amp; Links</td></tr>
+          <tr><td>Default view for new tabs</td><td>Live Preview</td><td>Editor</td></tr>
+          <tr><td>Show line numbers</td><td><span style="color:var(--text-muted);">OFF</span></td><td>Editor</td></tr>
+          <tr><td>Readable line length</td><td><span style="color:var(--text-muted);">OFF</span></td><td>Editor</td></tr>
+          <tr><td>Default attachment location</td><td><kbd>System/Attachments</kbd></td><td>Files &amp; Links</td></tr>
+          <tr><td>Always update internal links</td><td><span style="color:var(--success);font-weight:700;">ON</span></td><td>Files &amp; Links</td></tr>
+          <tr><td>Theme</td><td><strong>Things</strong> (dark)</td><td>Appearance</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Hotkeys ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Hotkeys <span></span></div>
+    <h2>From Noam's setup — drop hotkeys.json to apply all at once</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Keys</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Cmd+0</kbd></td><td>Open today's daily note</td></tr>
+          <tr><td><kbd>Cmd+.</kbd></td><td>Open Properties panel</td></tr>
+          <tr><td><kbd>Cmd+R</kbd></td><td>Open File Explorer</td></tr>
+          <tr><td><kbd>Cmd+H</kbd></td><td>Highlight selected text</td></tr>
+          <tr><td><kbd>Cmd+Shift+O</kbd></td><td>Omnisearch (full-text search)</td></tr>
+          <tr><td><kbd>Ctrl+Shift+F</kbd></td><td>Omnisearch (alternate)</td></tr>
+          <tr><td><kbd>Cmd+Shift+B</kbd></td><td>Open Bookmarks</td></tr>
+          <tr><td><kbd>Cmd+Shift+G</kbd></td><td>Reveal current file in explorer</td></tr>
+          <tr><td><kbd>Cmd+Shift+P</kbd></td><td>Copy full file path</td></tr>
+          <tr><td><kbd>Alt+A</kbd></td><td>Toggle fold (collapse/expand section)</td></tr>
+          <tr><td><kbd>Alt+.</kbd></td><td>Toggle bullet list</td></tr>
+          <tr><td><kbd>Alt+Cmd+T</kbd></td><td>Insert tag</td></tr>
+          <tr><td><kbd>Alt+Cmd+E</kbd></td><td>Quick Explorer browse vault</td></tr>
+          <tr><td><kbd>Alt+Shift+G</kbd></td><td>Reveal in Finder</td></tr>
+          <tr><td><kbd>Cmd+Alt+G</kbd></td><td>Shell commands: Grammly (Claude)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Vault structure ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Vault Structure <span></span></div>
+    <h2>Folder layout</h2>
+    <pre>vault/
+├── Daily Notes/                  <span class="cmt"># Cmd+0 opens today's note here</span>
+├── Meetings/
+│   └── {Person}/
+│       └── {YYYY}/{MM}/          <span class="cmt"># e.g. Meetings/Noam/2026/04/</span>
+├── Projects/
+│   └── {ProjectName}/
+│       ├── 00-overview.md        <span class="cmt"># click folder → opens this</span>
+│       ├── Design/               <span class="cmt"># design decisions, Figma links</span>
+│       └── Feedback/             <span class="cmt"># review feedback from eng/PM</span>
+├── Reviews/                      <span class="cmt"># cross-project design reviews</span>
+├── System/
+│   ├── Templates/                <span class="cmt"># Templater templates</span>
+│   └── Attachments/              <span class="cmt"># screenshots auto-saved here</span>
+└── Archive/</pre>
+    <div class="callout success mt-3">
+      Run <code>bash vault-scaffold.sh /path/to/vault</code> &mdash; creates every folder in one command.
+    </div>
+  </section>
+
+  <!-- ── Conventions ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Conventions <span></span></div>
+    <h2>Frontmatter, tags, naming</h2>
+
+    <h3 class="mb-4">Frontmatter — every note starts with this</h3>
+    <pre class="mb-4"><span class="sym">---</span>
+<span class="key">type</span>: <span class="val">meeting</span> | design-review | decision | daily
+<span class="key">project</span>: <span class="val">Data Usage</span>
+<span class="key">status</span>: <span class="val">draft</span> | in-review | done
+<span class="key">figma</span>: <span class="val">https://figma.com/...</span>      <span class="cmt"># Omer-specific field</span>
+<span class="key">created</span>: <span class="val">2026-04-26</span>
+<span class="sym">---</span></pre>
+    <div class="callout mb-6"><kbd>Cmd+.</kbd> opens the Properties panel &mdash; fill frontmatter visually without writing YAML manually.</div>
+
+    <h3 class="mb-4">Tags — always at the end of the line</h3>
+    <div class="tag-demo mb-4">
+      <div class="line"><span class="text">- Review header treatment in the modal</span><span class="tag-task">#Task</span></div>
+      <div class="line"><span class="text">- Waiting on eng answer on hover state</span><span class="tag-followup">#follow-up</span></div>
+      <div class="line"><span class="text">- Decision: 16px base font everywhere</span><span class="tag-decision">#decision</span></div>
+      <div class="line"><span class="text">- Empty state UX is unclear</span><span class="tag-open">#open-question</span></div>
+      <div class="line"><span class="text">- This section needs a Figma frame link</span><span class="tag-figma">#figma-needed</span></div>
+    </div>
+    <div class="callout warning mb-6"><strong>Position matters.</strong> Tags must be at the end of the line. Noam's vault tools extract data by tag position. Always.</div>
+
+    <h3 class="mb-4">File naming</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Pattern</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Meeting note</td><td><kbd>YYYY-MM-DD Person Topic.md</kbd></td><td>2026-04-26 Noam Data Usage nav.md</td></tr>
+          <tr><td>Design review</td><td><kbd>YYYY-MM-DD design-review Feature.md</kbd></td><td>2026-04-26 design-review quota.md</td></tr>
+          <tr><td>Daily note</td><td><kbd>YYYY-MM-DD.md</kbd></td><td>auto-created by <kbd>Cmd+0</kbd></td></tr>
+          <tr><td>Attachment</td><td><kbd>YYYY-MM-DD-description.png</kbd></td><td>2026-04-26-quota-empty-state.png</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Example Workflows ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Example Workflows <span></span></div>
+    <h2>See it in action</h2>
+
+    <!-- Workflow 1 -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="background:var(--purple-muted);border:1px solid rgba(168,85,247,0.3);color:var(--purple);font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:4px 12px;border-radius:999px;">Workflow 1</div>
+        <span style="font-size:15px;font-weight:700;color:var(--text);">Tag-based task loop</span>
+      </div>
+      <!-- Command chain -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <div style="background:var(--surface-2);border:1px solid rgba(168,85,247,0.35);border-radius:var(--radius-sm);padding:8px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#c4b5fd;">/tag-prep omer</div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(59,130,246,0.35);border-radius:var(--radius-sm);padding:8px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#93c5fd;">/tag-close omer</div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-sm);padding:8px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#6ee7b7;">/tag-close --apply omer</div>
+      </div>
+      <!-- Step breakdown -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:var(--surface-2);border:1px solid rgba(168,85,247,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#c4b5fd;margin-bottom:8px;">/tag-prep omer</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Scans vault for all notes tagged <code style="font-size:11px;color:#c084fc;">#omer</code>. Collects open tasks, follow-ups, and pending items. Writes a prioritized action list.</p>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">📖 reads vault &nbsp;·&nbsp; 📝 writes agenda</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#93c5fd;margin-bottom:8px;">/tag-close omer</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Reviews each tagged item. Suggests resolution for each: done, defer, delegate, or drop. Shows you a draft of changes before touching anything.</p>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">📖 reads agenda &nbsp;·&nbsp; 📋 drafts resolutions</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#6ee7b7;margin-bottom:8px;">/tag-close --apply omer</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Applies the resolutions: updates status in the original notes, removes resolved tags, logs closed items. Vault is cleaned up.</p>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">✏️ writes back to vault &nbsp;·&nbsp; 🗂️ updates originals</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow 2 -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="background:var(--accent-muted);border:1px solid rgba(59,130,246,0.3);color:var(--accent);font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:4px 12px;border-radius:999px;">Workflow 2</div>
+        <span style="font-size:15px;font-weight:700;color:var(--text);">Meeting loop</span>
+      </div>
+      <!-- Command chain -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <div style="background:var(--surface-2);border:1px solid rgba(59,130,246,0.35);border-radius:var(--radius-sm);padding:8px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#93c5fd;">/meeting-prep yotpo</div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="color:var(--text-muted);font-size:13px;font-style:italic;padding:0 4px;">[ the meeting ]</div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-sm);padding:8px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#6ee7b7;">/meeting-summary</div>
+      </div>
+      <!-- Step breakdown -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#93c5fd;margin-bottom:8px;">/meeting-prep yotpo</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Before the meeting: scans vault for past Yotpo notes, open follow-ups, and relevant project context. Pulls Jira tickets and Slack threads. Outputs a one-page briefing so you walk in with context.</p>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">📖 reads vault + Jira + Slack &nbsp;·&nbsp; 📝 writes briefing</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#6ee7b7;margin-bottom:8px;">/meeting-summary</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;">After the meeting: reads your raw notes. Extracts decisions, action items, open questions, and follow-ups. Writes a structured summary back to the vault with tags applied.</p>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">📖 reads your notes &nbsp;·&nbsp; ✅ writes structured summary</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <strong>The vault is the thread.</strong> Each command reads what previous commands wrote. The more you use them in sequence, the less you re-explain context between sessions.
+    </div>
+  </section>
+
+  <!-- ── Shell Commands ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Shell Commands <span></span></div>
+    <h2>One keystroke — Claude runs on your note</h2>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">
+      The Shell Commands plugin bridges Obsidian and the terminal. You register a shell script as a named Obsidian command, bind it to a hotkey, and it runs against whatever note is open — passing the file path automatically via <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#7dd3fc;">{{file_path:absolute}}</code>.
+    </p>
+
+    <!-- How it works flow -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px;">How Noam uses it</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+        <div style="background:var(--surface-2);border:1px solid rgba(168,85,247,0.35);border-radius:var(--radius-sm);padding:10px 16px;text-align:center;">
+          <div style="font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#c4b5fd;">Cmd+Alt+G</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">hotkey in Obsidian</div>
+        </div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(59,130,246,0.35);border-radius:var(--radius-sm);padding:10px 16px;text-align:center;">
+          <div style="font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#93c5fd;">grammarly.sh</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">shell script fires</div>
+        </div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(245,158,11,0.35);border-radius:var(--radius-sm);padding:10px 16px;text-align:center;">
+          <div style="font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#fcd34d;">claude -p ...</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Claude Code runs</div>
+        </div>
+        <div style="color:var(--text-muted);font-size:18px;">→</div>
+        <div style="background:var(--surface-2);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-sm);padding:10px 16px;text-align:center;">
+          <div style="font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:700;color:#6ee7b7;">note updated</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Obsidian reloads</div>
+        </div>
+      </div>
+
+      <!-- Script pattern -->
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">The script pattern</div>
+      <pre style="margin-bottom:0;font-size:12px;">#!/bin/zsh
+<span class="cmt"># Called from Shell Commands plugin — Obsidian passes the file path</span>
+FILE_PATH=$(echo "$1" | sed 's/\\//g')
+
+<span class="cmt"># Build prompt from a Claude command file, inject the file path</span>
+TMPFILE=$(mktemp)
+sed 's|\$ARGUMENTS|'"$FILE_PATH"'|g' ~/.claude/commands/grammarly.md > "$TMPFILE"
+
+<span class="cmt"># Run Claude non-interactively on the note</span>
+cat "$TMPFILE" | claude -p --allowedTools "Edit,Read,Write"
+
+rm -f "$TMPFILE"</pre>
+    </div>
+
+    <!-- Register a command -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px;">Register a new command — 3 steps</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-left"><div class="step-num" style="font-size:12px;">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h3>Add the command</h3>
+            <p>Settings → Shell Commands → <strong>+ New shell command</strong><br>
+            Command: <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#7dd3fc;">/path/to/your/script.sh "{{file_path:absolute}}"</code><br>
+            Alias: anything — this is what appears in the command palette.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-left"><div class="step-num" style="font-size:12px;">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h3>Bind a hotkey</h3>
+            <p>Settings → Hotkeys → search <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#7dd3fc;">Execute: {your alias}</code> → click + and press your key combo.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-left"><div class="step-num" style="font-size:12px;">3</div></div>
+          <div class="step-content">
+            <h3>Use it</h3>
+            <p>Open any note, press the hotkey. The script receives the file path, runs Claude on it, and Obsidian picks up the changes. No terminal switching needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actual registered commands -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Noam's registered commands</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Run via <kbd>Cmd+P</kbd> → "Execute: …" — or bind a hotkey to any of them</div>
+
+      <!-- Note processing -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Note processing</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:20px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span style="font-size:13px;font-weight:700;color:var(--text);">✨ Prettify Note</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Add TL;DR, fix formatting, clean up structure. Pass current file → Claude edits in place.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">prettify-note.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <span style="font-size:13px;font-weight:700;color:var(--text);">✍️ Grammly</span>
+            <kbd style="font-size:10px;">Cmd+Alt+G</kbd>
+          </div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Fix tone, grammar, and clarity on the open note. The only command with a hotkey — use it constantly.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">grammarly.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">📋 Meeting Summary</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Structured summary from raw meeting notes — decisions, actions, open questions — without leaving Obsidian.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">meeting-summary.sh {{file_path}}</div>
+        </div>
+      </div>
+
+      <!-- Jira & linking -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Jira &amp; linking</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:20px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">🎫 Note to Jira Ticket</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Convert a vault note into a Jira ticket draft. Reads the note, outputs structured ticket content.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">note-to-ticket.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">🔗 Link Index</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Builds a link index for a note — scans outgoing and incoming links, writes a reference map.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">link-index.sh {{file_path}}</div>
+        </div>
+      </div>
+
+      <!-- Tag management -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Tag management</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:20px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">🏷️ Tag-close</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Resolve tagged items in the vault. Same as <code style="font-size:11px;color:#7dd3fc;">/tag-close</code> CLI command, runs from Obsidian directly.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">tag-close.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">⚡ Exec action sweep</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Sweeps the current note for action tags and executes them — bulk-resolve items in one run.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">action-sweep.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">🔍 Follow-up Check</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Scans vault for open <code style="font-size:11px;color:#60a5fa;">#follow-up</code> items, checks for replies and updates, surfaces what still needs a nudge.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">follow-up.sh</div>
+        </div>
+      </div>
+
+      <!-- Terminal launchers -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Terminal launchers</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">👻 Open Ghostty Here</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Opens a Ghostty terminal window pointed at the current file's folder. Jump to terminal in one keystroke.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">ghostty-open.sh {{file_path}}</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text);">⚙️ Open Claude Code with File</div>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Opens Ghostty with Claude Code CLI already loaded on the current file. Jump from note to agent in one step.</p>
+          <div style="margin-top:8px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;color:var(--text-muted);">ghostty-claude.sh {{file_path}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <strong>Requires Claude Code CLI.</strong> The <code>claude</code> binary must be installed (<code>npm install -g @anthropic-ai/claude-code</code>) and authenticated. Without it, Shell Commands can still run any shell script — just not Claude-powered ones.
+    </div>
+  </section>
+
+  <!-- ── Week 1 ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> The Ask <span></span></div>
+    <h2>Week 1 — don't customize, just use it</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot d1">D1</div>
+        <div><h3>Day 1</h3><p>Install Obsidian. Run vault-scaffold.sh. Drop hotkeys.json. Install the 7 must plugins. Open daily note with Cmd+0.</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d23">D2–3</div>
+        <div><h3>Days 2–3</h3><p>Use it for every meeting. One note per sync, with frontmatter filled. Let the habit form before adding anything new.</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot w2">W2</div>
+        <div><h3>Week 2</h3><p>Add Excalidraw. Start a design review note per active project. Check in with Noam &mdash; debug whatever broke.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Starter Kit ── -->
+  <section class="fade-in">
+    <div class="section-label"><span></span> Starter Kit <span></span></div>
+    <h2>Everything is in <code style="font-size:16px;color:var(--accent);">AI PM/starter-kit-omer/</code></h2>
+    <div class="file-grid">
+      <div class="file-card"><div class="file-ico">📋</div><div class="file-name">README.md</div><div class="file-desc">8-step quick start, 1 min read</div></div>
+      <div class="file-card"><div class="file-ico">⚙️</div><div class="file-name">obsidian-setup.md</div><div class="file-desc">Full plugin + settings guide with checklist</div></div>
+      <div class="file-card"><div class="file-ico">📐</div><div class="file-name">conventions.md</div><div class="file-desc">Frontmatter, tags, naming — 1-page ref</div></div>
+      <div class="file-card"><div class="file-ico">🗂️</div><div class="file-name">vault-scaffold.sh</div><div class="file-desc">Creates full folder structure in one command</div></div>
+      <div class="file-card"><div class="file-ico">⌨️</div><div class="file-name">hotkeys.json</div><div class="file-desc">Drop into .obsidian/ — all bindings applied</div></div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="ask">Questions? <strong>Ping Noam on Slack</strong> &mdash; faster than a ticket.</div>
+  <div class="source">Generated from: AI PM/starter-kit-omer/ · April 2026</div>
+</footer>
+
+<script>
+  // ── Fade-in on scroll ──
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
+    });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+
+  // ── Quick Nav ──
+  const labelMap = {
+    'The Problem':              'Problem',
+    'The Concept':              'Second Brain',
+    'Why It Pairs With Claude': 'Claude',
+    'Why Not Notion':           'vs Notion',
+    'Commands':                 'Commands',
+    'Viewing Outputs':          'Outputs',
+    'Setup':                    'Setup',
+    'Plugins':                  'Plugins',
+    'Settings':                 'Settings',
+    'Hotkeys':                  'Hotkeys',
+    'Vault Structure':          'Vault',
+    'Conventions':              'Conventions',
+    'Example Workflows':        'Workflows',
+    'Shell Commands':           'Shell Commands',
+    'The Ask':                  'Week 1',
+    'Starter Kit':              'Kit',
+  };
+
+  const nav = document.getElementById('quick-nav');
+  const sections = document.querySelectorAll('section.fade-in');
+
+  sections.forEach((section, i) => {
+    const labelEl = section.querySelector('.section-label');
+    if (!labelEl) return;
+    const rawText = labelEl.textContent.trim();
+    const id = 'sec-' + i;
+    section.id = id;
+    let label = rawText;
+    for (const [key, val] of Object.entries(labelMap)) {
+      if (rawText.includes(key)) { label = val; break; }
+    }
+    const a = document.createElement('a');
+    a.href = '#' + id;
+    a.textContent = label;
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    nav.appendChild(a);
+  });
+
+  // Active section tracking
+  const navLinks = nav.querySelectorAll('a');
+  const NAV_H = 44;
+
+  function updateActive() {
+    let current = '';
+    sections.forEach(s => {
+      if (s.id && s.getBoundingClientRect().top <= NAV_H + 16) current = s.id;
+    });
+    navLinks.forEach(a => {
+      const isActive = a.getAttribute('href') === '#' + current;
+      a.classList.toggle('active', isActive);
+      if (isActive) a.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>
