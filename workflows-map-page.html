@@ -293,7 +293,7 @@
   <div class="stat"><div class="num accent">14</div><div class="label">Workflows</div></div>
   <div class="stat"><div class="num purple">100+</div><div class="label">Skills</div></div>
   <div class="stat"><div class="num success">3</div><div class="label">Workplan writers</div></div>
-  <div class="stat"><div class="num warning">3</div><div class="label">Open gaps</div></div>
+  <div class="stat"><div class="num success">0</div><div class="label">Open gaps</div></div>
 </section>
 
 <nav class="filters" aria-label="Filter workflows">
@@ -525,22 +525,23 @@ Visuals:    <span class="skill">/generate-post-image</span>, <span class="skill"
 </section>
 
 <section class="gaps">
-  <h2>⚠️ Visible Gaps</h2>
+  <h2>✅ Closed Loops <span style="color: #64748b; font-size: 13px; font-weight: normal;">(formerly: Visible Gaps)</span></h2>
+  <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">All four gaps closed in the 2026-05-01 sweep. History kept for audit.</p>
   <div class="gap-item partial">
-    <strong>Closing loop between /spec-to-team-epic and /initiative-review<span class="status partial-tag">Partially closed</span></strong>
-    Resolved 2026-05-01: <code>/roadmap-review</code> Step 5c.1 reconciles workplan's in-body Tickets table against live Jira. Still open: no scheduled epic-health check; relies on PM running <code>/roadmap-review</code> weekly.
+    <strong>Loop between /spec-to-team-epic and /initiative-review<span class="status partial-tag">Closed</span></strong>
+    Two-part fix: <code>/roadmap-review</code> Step 5c.1 reconciles workplan's in-body Tickets table weekly + <code>/spec-to-team-epic</code> Step 13 schedules a one-time <code>/initiative-review {parent}</code> 7 days post-creation.
   </div>
-  <div class="gap-item">
-    <strong>/release-distribute doesn't loop back to roadmap<span class="status open">Open</span></strong>
-    After release, <code>/roadmap-sync</code> should run to mark Notion cards Done.
+  <div class="gap-item partial">
+    <strong>/release-distribute → roadmap loop<span class="status partial-tag">Already closed</span></strong>
+    <code>/release-distribute</code> Step 9 (post-Slack-announcement) writes the Notion card to <code>🏁 Released</code> directly via MCP. No loop-back needed; this skill owns the write.
   </div>
-  <div class="gap-item">
-    <strong>No automated trigger from /intelligence-brief → /problem-discover<span class="status open">Open</span></strong>
-    Brief surfaces patterns weekly; discovery runs quarterly. Consider monthly auto-trigger.
+  <div class="gap-item partial">
+    <strong>/intelligence-brief → /problem-discover trigger<span class="status partial-tag">Closed</span></strong>
+    <code>/intelligence-brief</code> Step 5a now scans previous 3 briefs and flags signals recurring 3+ weeks as <strong>"⬆️ Promote to Discovery"</strong> with a <code>/problem-discover --topic "{signal}"</code> recommendation. PM owns the trigger.
   </div>
-  <div class="gap-item">
-    <strong>/pm-mentor runs are passive<span class="status open">Open</span></strong>
-    No clear weekly review loop tying coaching notes back to growth dimensions in <code>ai-pm-reference.md</code>.
+  <div class="gap-item partial">
+    <strong>/pm-mentor weekly review loop<span class="status partial-tag">Closed</span></strong>
+    <code>/weekly-retro</code> Step 2c reads <code>Automation/PM-Mentor/</code> entries from the past week, classifies events per G1-G8 dimension, feeds the Growth Review section with per-dim event counts + direction + most-actionable nudge. Read-only on <code>growth-tracker.md</code>; PM updates scores manually.
   </div>
 </section>
 
