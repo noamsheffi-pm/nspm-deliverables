@@ -358,7 +358,8 @@
   <h2><span class="num-badge">01</span> Initiative Lifecycle (Discovery → Ship)</h2>
   <div class="lead"><strong>The spine.</strong> Goes from raw signal to shipped feature. Most skills hang off this chain.</div>
   <pre class="code"><span class="skill">Signals</span> <span class="arrow">→</span> <span class="skill">/problem-discover</span> <span class="arrow">→</span> <span class="skill">/problem-boundary</span> <span class="arrow">→</span> <span class="skill">/pre-mortem</span> <span class="arrow">→</span> <span class="skill">/prd</span>
-        <span class="arrow">→</span> <span class="skill">/spec-review</span> <span class="arrow">→</span> <span class="skill">/plt-review</span> <span class="arrow">→</span> <span class="skill">/spec-to-team-epic</span> <span class="arrow">→</span> <span class="skill">/initiative-review</span>
+        <span class="arrow">→</span> <span class="skill">/spec-review</span> <span class="arrow">→</span> <span class="skill">/plt-review</span> ‖ <span class="skill">/persona-review</span> <span class="arrow">→</span> <span class="skill">/spec-to-team-epic</span> <span class="arrow">→</span> <span class="skill">/initiative-review</span>
+                            <span class="comment">↑ inside-out    ↑ outside-in (Piper SRE, Ward Gov, Penny FinOps)</span>
         <span class="arrow">→</span> (Release workflow)</pre>
   <div class="tbl-wrap"><table>
     <thead><tr><th>Step</th><th>Skill</th><th>Output</th></tr></thead>
@@ -369,13 +370,14 @@
       <tr><td>Build business case</td><td><code>/business-case</code></td><td>Investment case</td></tr>
       <tr><td>Write the PRD</td><td><code>/prd</code></td><td>PRD with workflows, ACs, smoke tests, team routing</td></tr>
       <tr><td>Cross-cutting check</td><td><code>/spec-review</code></td><td>Pipeline × Governance × Billing impact</td></tr>
-      <tr><td>Leadership simulation</td><td><code>/plt-review</code></td><td>PLT-style stress test</td></tr>
+      <tr><td>Leadership simulation <em>(inside-out)</em></td><td><code>/plt-review</code></td><td>PLT-style stress test</td></tr>
+      <tr><td>User advisory panel <em>(outside-in)</em></td><td><code>/persona-review</code></td><td>3-persona simulation (Piper / Ward / Penny): alignment, divergence, ship-iterate-rework verdict</td></tr>
       <tr><td>Push to R&amp;D</td><td><code>/spec-to-team-epic</code></td><td>Team-scoped Jira epics + design/docs tasks</td></tr>
       <tr><td>Track delivery</td><td><code>/initiative-review</code></td><td>Risk + readiness snapshot, syncs to workplan</td></tr>
     </tbody>
   </table></div>
   <div class="callout"><strong>Pre-built chains:</strong> <code>/discover</code> = <code>/problem-discover</code> → <code>/problem-boundary</code> → <code>/business-case</code>. <code>/feedback-cycle</code> = <code>/gong-insights</code> ∥ <code>/intercom-insights</code> → <code>/problem-discover</code>.</div>
-  <div class="callout warn"><strong>Gaps:</strong> <code>/pre-mortem</code>, <code>/plt-review</code>, <code>/spec-review</code> not yet exercised in real flow.</div>
+  <div class="callout warn"><strong>Gaps:</strong> <code>/pre-mortem</code>, <code>/plt-review</code>, <code>/persona-review</code>, <code>/spec-review</code> not yet exercised in real flow.</div>
 </section>
 
 <section class="workflow" data-cat="initiative">
@@ -561,10 +563,11 @@ Visuals:    <span class="skill">/generate-post-image</span>, <span class="skill"
                 │  /problem-discover → /problem-boundary → /business-case│
                 └─────────────────────────────┬─────────────────────────┘
                                               │
-                ┌─────────────────────────────▼──────────────────────┐
-                │                    DEFINITION                      │
-                │   /pre-mortem → /prd → /spec-review → /plt-review  │
-                └─────────────────────────────┬──────────────────────┘
+                ┌─────────────────────────────▼─────────────────────────────┐
+                │                       DEFINITION                          │
+                │  /pre-mortem → /prd → /spec-review                        │
+                │                          → /plt-review ‖ /persona-review  │
+                └─────────────────────────────┬─────────────────────────────┘
                                               │
                 ┌─────────────────────────────▼──────────────────────┐
                 │                    EXECUTION                       │
