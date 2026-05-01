@@ -3,435 +3,635 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI PM Workflows Map · Noam Sheffi</title>
+<title>AI PM Workflows Map</title>
 <style>
-  :root {
-    --bg: #0d0f14;
-    --surface: #161a22;
-    --surface-2: #0f1118;
-    --border: #252a35;
-    --border-light: #333a48;
-    --text: #e2e8f0;
-    --text-secondary: #8a94a8;
-    --text-muted: #7a8599;
-    --accent: #00d4aa;
-    --accent-soft: #7ee8d4;
-    --accent-muted: rgba(0,212,170,0.12);
-    --accent-glow: rgba(0,212,170,0.25);
-    --success: #10b981;
-    --warning: #fbbf24;
-    --error: #ef4444;
-    --indigo: #6366f1;
-    --purple: #c084fc;
-    --radius: 12px;
-    --radius-sm: 6px;
-  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body {
-    background: linear-gradient(135deg, #0d0f14 0%, #0e1a17 50%, #0d0f14 100%);
-    background-attachment: fixed;
-    color: var(--text);
+    background: #0a0e1a;
+    color: #e2e8f0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.5;
+    line-height: 1.6;
     font-size: 14px;
   }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+
   header { margin-bottom: 48px; }
   h1 {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
     margin-bottom: 8px;
+    letter-spacing: -0.02em;
   }
-  .subtitle { color: var(--text-secondary); font-size: 16px; }
-  .counters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 32px 0 48px; }
-  .counter {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  header .subtitle { color: #64748b; font-size: 16px; }
+  header .meta { margin-top: 16px; color: #475569; font-size: 13px; }
+  header .meta code { font-size: 12px; }
+
+  .counters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .stat {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
     padding: 20px;
-    text-align: center;
   }
-  .counter .num { font-size: 32px; font-weight: 700; color: var(--accent); }
-  .counter .num.green { color: var(--success); }
-  .counter .num.amber { color: var(--warning); }
-  .counter .num.purple { color: var(--purple); }
-  .counter .lbl { text-transform: uppercase; font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; margin-top: 6px; }
-  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .stat .num { font-size: 32px; font-weight: 700; line-height: 1; }
+  .stat .num.accent { color: #60a5fa; }
+  .stat .num.success { color: #10b981; }
+  .stat .num.warning { color: #f59e0b; }
+  .stat .num.purple { color: #a78bfa; }
+  .stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-top: 8px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
   .pill {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
+    background: #111827;
+    border: 1px solid #1e293b;
+    color: #cbd5e1;
     padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 13px;
+    border-radius: 999px;
     cursor: pointer;
+    font-size: 13px;
     transition: all 0.15s;
     font-family: inherit;
   }
-  .pill:hover { border-color: var(--accent); }
-  .pill.active { background: var(--accent-muted); border-color: var(--accent); color: var(--accent); }
-  .pill .badge { color: var(--text-muted); margin-left: 6px; font-size: 11px; }
-  .pill.active .badge { color: var(--accent); }
-  section { margin-bottom: 48px; }
-  h2 {
-    font-size: 20px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .pill:hover { border-color: #475569; }
+  .pill.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #60a5fa;
   }
-  h2::before {
-    content: '';
-    width: 4px;
-    height: 18px;
-    background: var(--accent);
-    border-radius: 2px;
+  .pill .badge {
+    display: inline-block;
+    background: #1e293b;
+    color: #94a3b8;
+    border-radius: 8px;
+    padding: 1px 7px;
+    font-size: 11px;
+    margin-left: 6px;
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  .pill.active .badge { background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+
+  .featured {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.04));
+    border: 1px solid #312e81;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .featured > .badge {
+    display: inline-block;
+    background: rgba(168, 85, 247, 0.15);
+    color: #c4b5fd;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .featured h2 {
+    font-size: 24px;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+  }
+  .featured .lead {
+    color: #94a3b8;
+    margin-bottom: 24px;
+    max-width: 720px;
+  }
+  .ascii {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
     padding: 20px;
+    font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    color: #cbd5e1;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  section.workflow {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
     transition: all 0.15s;
   }
-  .card:hover { border-color: var(--border-light); transform: translateY(-2px); }
-  .card .num {
-    color: var(--text-muted);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+  section.workflow:hover { border-color: #334155; }
+  section.workflow h2 {
+    font-size: 20px;
+    color: #e2e8f0;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .card h3 { font-size: 16px; margin-bottom: 8px; color: var(--text); }
-  .card .desc { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
-  .chain {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    font-family: 'SF Mono', Monaco, monospace;
-    font-size: 11px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 12px;
-    overflow-x: auto;
-  }
-  .chain code { color: var(--accent); }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag {
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  section.workflow h2 .num-badge {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 13px;
     font-weight: 600;
   }
-  .tag.core { background: var(--accent-muted); color: var(--accent); }
-  .tag.feedback { background: rgba(192, 132, 252, 0.15); color: var(--purple); }
-  .tag.ops { background: rgba(125, 211, 252, 0.15); color: #7dd3fc; }
-  .tag.content { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
-  .tag.review { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; }
-  .tag.release { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-  .callout {
-    background: var(--accent-muted);
-    border: 1px solid rgba(0,212,170,0.25);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
+  section.workflow .lead {
+    color: #94a3b8;
     margin-bottom: 16px;
+    font-size: 14px;
   }
-  .callout.warn { background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.25); border-left-color: var(--warning); }
-  .callout.danger { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.25); border-left-color: var(--error); }
-  .callout h4 { font-size: 14px; margin-bottom: 6px; color: var(--text); }
-  .callout p, .callout li { color: var(--text-secondary); font-size: 13px; }
-  .callout ul { padding-left: 20px; margin-top: 6px; }
-  .callout li { margin-bottom: 4px; }
-  pre.diagram {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    color: var(--text-secondary);
-    font-family: 'SF Mono', Monaco, monospace;
-    font-size: 12px;
-    line-height: 1.5;
+
+  pre.code {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+    font-size: 12.5px;
+    color: #cbd5e1;
     overflow-x: auto;
+    line-height: 1.7;
+    margin: 12px 0;
+    white-space: pre;
   }
-  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  pre.code .skill { color: #60a5fa; }
+  pre.code .arrow { color: #64748b; }
+  pre.code .comment { color: #475569; }
+
+  code {
+    background: #0f172a;
+    color: #93c5fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 12.5px;
+  }
+
+  .tbl-wrap { overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th, table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #1e293b;
+  }
+  table th {
+    background: #0f172a;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  table tr:nth-child(even) td { background: rgba(15, 23, 42, 0.4); }
+
+  .callout {
+    border-left: 3px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    color: #cbd5e1;
+  }
+  .callout.warn { border-color: #f59e0b; background: rgba(245, 158, 11, 0.08); }
+  .callout.success { border-color: #10b981; background: rgba(16, 185, 129, 0.08); }
+  .callout strong { color: #e2e8f0; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag {
+    background: rgba(99, 102, 241, 0.12);
+    color: #a5b4fc;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+  }
+  .tag.green { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; }
+
+  .gaps {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 28px;
+    margin: 32px 0 16px;
+  }
+  .gaps h2 { font-size: 20px; margin-bottom: 16px; color: #e2e8f0; }
+  .gap-item {
+    border-left: 3px solid #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 0 6px 6px 0;
+  }
+  .gap-item.partial { border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
+  .gap-item strong { color: #e2e8f0; display: block; margin-bottom: 4px; }
+  .gap-item .status {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+  .gap-item .status.open { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+  .gap-item .status.partial-tag { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
   footer {
     margin-top: 64px;
     padding-top: 24px;
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
+    border-top: 1px solid #1e293b;
+    color: #475569;
     font-size: 12px;
     text-align: center;
   }
-  @media (max-width: 640px) {
-    h1 { font-size: 24px; }
+  footer code { font-size: 11px; }
+
+  @media (max-width: 768px) {
+    .page { padding: 24px 16px; }
+    h1 { font-size: 28px; }
     .counters { grid-template-columns: repeat(2, 1fr); }
-    .grid { grid-template-columns: 1fr; }
-    pre.diagram { font-size: 10px; padding: 12px; }
+    section.workflow { padding: 20px; }
+    .featured { padding: 24px; }
+    .ascii { font-size: 10.5px; padding: 14px; }
   }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
 <header>
   <h1>AI PM Workflows Map</h1>
-  <p class="subtitle">How I actually use the agent. 13 workflows, ~80 skills, mapped end-to-end.</p>
+  <div class="subtitle">How I actually use the agent. Each workflow is a chain of skills that produce a real artifact.</div>
+  <div class="meta">Owner: Noam Sheffi · Status: living · Per-skill maturity: <code>ai-pm-reference.md</code> · Sessions: <code>session-log.md</code></div>
 </header>
 
-<section class="counters" aria-label="Summary stats">
-  <div class="counter"><div class="num">13</div><div class="lbl">Workflows</div></div>
-  <div class="counter"><div class="num green">~80</div><div class="lbl">Skills Wired</div></div>
-  <div class="counter"><div class="num amber">4</div><div class="lbl">Visible Gaps</div></div>
-  <div class="counter"><div class="num purple">3</div><div class="lbl">Pre-Built Chains</div></div>
+<section class="counters" aria-label="Stats">
+  <div class="stat"><div class="num accent">14</div><div class="label">Workflows</div></div>
+  <div class="stat"><div class="num purple">100+</div><div class="label">Skills</div></div>
+  <div class="stat"><div class="num success">3</div><div class="label">Workplan writers</div></div>
+  <div class="stat"><div class="num warning">3</div><div class="label">Open gaps</div></div>
 </section>
 
-<section>
-  <h2>Filter</h2>
-  <nav class="filters" aria-label="Filter workflows">
-    <button class="pill active" data-cat="all" aria-label="All">All <span class="badge">13</span></button>
-    <button class="pill" data-cat="core" aria-label="Core">Core <span class="badge">3</span></button>
-    <button class="pill" data-cat="feedback" aria-label="Feedback">Feedback <span class="badge">1</span></button>
-    <button class="pill" data-cat="ops" aria-label="Ops">Ops <span class="badge">3</span></button>
-    <button class="pill" data-cat="review" aria-label="Review">Review <span class="badge">2</span></button>
-    <button class="pill" data-cat="content" aria-label="Content">Content <span class="badge">1</span></button>
-    <button class="pill" data-cat="release" aria-label="Release">Release <span class="badge">1</span></button>
-    <button class="pill" data-cat="meta" aria-label="Meta">Meta <span class="badge">2</span></button>
-  </nav>
+<nav class="filters" aria-label="Filter workflows">
+  <button class="pill active" data-filter="all">All <span class="badge">14</span></button>
+  <button class="pill" data-filter="initiative">Initiative <span class="badge">3</span></button>
+  <button class="pill" data-filter="customer">Customer <span class="badge">1</span></button>
+  <button class="pill" data-filter="cadence">Daily/Weekly <span class="badge">2</span></button>
+  <button class="pill" data-filter="meeting">Meetings/Slack <span class="badge">2</span></button>
+  <button class="pill" data-filter="content">Content/Review <span class="badge">2</span></button>
+  <button class="pill" data-filter="ops">Ops <span class="badge">3</span></button>
+  <button class="pill" data-filter="workplan">Workplan loop <span class="badge">1</span></button>
+</nav>
+
+<section class="featured" data-cat="workplan ops">
+  <span class="badge">Section 14 · Updated 2026-05-01</span>
+  <h2>📄 Workplan Maintenance Loop</h2>
+  <div class="lead">The state-keeping mechanism for <code>00-workplan.md</code>. Every initiative has one. Three writers + one reader keep it current. Each owns specific sections.</div>
+
+  <div class="ascii">Sources                      Writers (manual)              Workplan sections owned
+
+💬 Session work        ─┐                                ┌─ Where I Left Off
+                        ├─→  /session-close              ├─ Session Log
+📝 New meeting notes   ─┘    (per session,               ├─ Decisions ledger
+   (since last-reviewed)     end of work)                ├─ Open Items / Resolved
+                                                         ├─ Watch List
+                                                         ├─ Blockers
+                                                         └─ Lifecycle phase tables
+
+🎫 Jira (parent only) ─┐                                 ┌─ Tickets table (single row)
+                        ├─→  /roadmap-review             ├─ frontmatter status
+📋 Notion roadmap     ─┘    (weekly portfolio)           ├─ frontmatter urgency
+                            Step 5c + 5c.1               └─ frontmatter last-reviewed
+                            (deep walk for opt-in
+                             workplans with ## Tickets)
+
+🎫 Jira (full hierarchy: ─→  /initiative-review {KEY}    ┌─ Tickets table (full reconciled)
+   Initiative→Feature       (on-demand per initiative)   ├─ Key Files: tracker back-link
+   →Epic→Task)              Step 5b cross-link           ├─ frontmatter status (advance only)
+                                                         └─ frontmatter last-reviewed
+
+📄 00-workplan.md  ─→  /today  ─→  ⚠️ Workplan Drift section in dashboard
+                       (daily, read-only)                (nudges user to run a writer)</div>
+
+  <h3 style="font-size: 14px; color: #cbd5e1; margin: 24px 0 10px;">Cadence + section ownership</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Skill</th><th>Trigger</th><th>Writes</th></tr></thead>
+      <tbody>
+        <tr><td><code>/session-close</code></td><td>End of session that touched an initiative</td><td>Where I Left Off, Session Log, Decisions, Open Items, Watch List, Blockers, Lifecycle, last-reviewed</td></tr>
+        <tr><td><code>/roadmap-review</code></td><td>Weekly portfolio sweep</td><td>In-body Tickets table (opt-in deep walk via parent = X), frontmatter status / urgency / last-reviewed</td></tr>
+        <tr><td><code>/initiative-review {KEY}</code></td><td>On-demand per initiative</td><td>Step 5b cross-link: workplan ↔ tracker, frontmatter status (advance only), Key Files back-link, full Tickets table</td></tr>
+        <tr><td><code>/today</code></td><td>Daily morning</td><td>Read-only. Surfaces ## Workplan Drift section</td></tr>
+        <tr><td><code>/roadmap-sync</code></td><td>Manual on Jira state change</td><td>Does NOT touch workplans. Stays focused on Jira → Notion.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout success"><strong>Triggering policy:</strong> All manual. No SessionStop hook for <code>/session-close</code> (heavy at $0.05–0.50/run). The drift surface in <code>/today</code> is the reminder mechanism.</div>
 </section>
 
-<section>
-  <h2>Workflows</h2>
-  <div class="grid" id="workflow-grid">
+<section class="workflow" data-cat="initiative">
+  <h2><span class="num-badge">01</span> Initiative Lifecycle (Discovery → Ship)</h2>
+  <div class="lead"><strong>The spine.</strong> Goes from raw signal to shipped feature. Most skills hang off this chain.</div>
+  <pre class="code"><span class="skill">Signals</span> <span class="arrow">→</span> <span class="skill">/problem-discover</span> <span class="arrow">→</span> <span class="skill">/problem-boundary</span> <span class="arrow">→</span> <span class="skill">/pre-mortem</span> <span class="arrow">→</span> <span class="skill">/prd</span>
+        <span class="arrow">→</span> <span class="skill">/spec-review</span> <span class="arrow">→</span> <span class="skill">/plt-review</span> <span class="arrow">→</span> <span class="skill">/spec-to-team-epic</span> <span class="arrow">→</span> <span class="skill">/initiative-review</span>
+        <span class="arrow">→</span> (Release workflow)</pre>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Step</th><th>Skill</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td>Find problems worth framing</td><td><code>/problem-discover</code></td><td>Clustered problems from Gong+Intercom+PIPEV2+Competitive</td></tr>
+      <tr><td>Frame one problem</td><td><code>/problem-boundary</code></td><td>Problem brief, scope, governance questions</td></tr>
+      <tr><td>Stress-test early</td><td><code>/pre-mortem</code></td><td>5-7 failure modes, kill criteria</td></tr>
+      <tr><td>Build business case</td><td><code>/business-case</code></td><td>Investment case</td></tr>
+      <tr><td>Write the PRD</td><td><code>/prd</code></td><td>PRD with workflows, ACs, smoke tests, team routing</td></tr>
+      <tr><td>Cross-cutting check</td><td><code>/spec-review</code></td><td>Pipeline × Governance × Billing impact</td></tr>
+      <tr><td>Leadership simulation</td><td><code>/plt-review</code></td><td>PLT-style stress test</td></tr>
+      <tr><td>Push to R&amp;D</td><td><code>/spec-to-team-epic</code></td><td>Team-scoped Jira epics + design/docs tasks</td></tr>
+      <tr><td>Track delivery</td><td><code>/initiative-review</code></td><td>Risk + readiness snapshot, syncs to workplan</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><strong>Pre-built chains:</strong> <code>/discover</code> = <code>/problem-discover</code> → <code>/problem-boundary</code> → <code>/business-case</code>. <code>/feedback-cycle</code> = <code>/gong-insights</code> ∥ <code>/intercom-insights</code> → <code>/problem-discover</code>.</div>
+  <div class="callout warn"><strong>Gaps:</strong> <code>/pre-mortem</code>, <code>/plt-review</code>, <code>/spec-review</code> not yet exercised in real flow.</div>
+</section>
 
-    <article class="card" data-cat="core">
-      <div class="num">01</div>
-      <h3>Initiative Lifecycle</h3>
-      <p class="desc">The spine. Raw signal to shipped feature. Most skills hang off this chain.</p>
-      <div class="chain">/problem-discover → /problem-boundary → /pre-mortem → /prd → /spec-review → /plt-review → /spec-to-team-epic → /initiative-review</div>
-      <div class="tags"><span class="tag core">Core</span><span class="tag core">Discovery</span><span class="tag core">Definition</span></div>
-    </article>
-
-    <article class="card" data-cat="release">
-      <div class="num">02</div>
-      <h3>Release &amp; Distribution</h3>
-      <p class="desc">Triggered when a feature ships. Orchestrated by /release-distribute.</p>
-      <div class="chain">/release-distribute → doc-review · slide · image · slack · sales-enablement · notify · remotion</div>
-      <div class="tags"><span class="tag release">Release</span><span class="tag release">Comms</span></div>
-    </article>
-
-    <article class="card" data-cat="core">
-      <div class="num">03</div>
-      <h3>Roadmap Management</h3>
-      <p class="desc">Monthly prioritization, quarterly planning, new card requests.</p>
-      <div class="chain">/roadmap-review · /roadmap-create · /roadmap-sync (forward only)</div>
-      <div class="tags"><span class="tag core">Core</span><span class="tag core">Planning</span></div>
-    </article>
-
-    <article class="card" data-cat="feedback">
-      <div class="num">04</div>
-      <h3>Customer Feedback Pipelines</h3>
-      <p class="desc">Three independent collectors → aggregated view → discovery.</p>
-      <div class="chain">gong + intercom + pipev2 + competitive → /feedback-aggregate → /problem-discover → /discover</div>
-      <div class="tags"><span class="tag feedback">Feedback</span><span class="tag feedback">NotebookLM</span></div>
-    </article>
-
-    <article class="card" data-cat="ops">
-      <div class="num">05</div>
-      <h3>Daily Operations</h3>
-      <p class="desc">Start of day, live tag work, end of day rituals.</p>
-      <div class="chain">/today → /tag-prep → /tag-execute → /tag-close · /follow-up · /todoist-sync · /session-close</div>
-      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Daily</span></div>
-    </article>
-
-    <article class="card" data-cat="ops">
-      <div class="num">06</div>
-      <h3>Weekly Operations</h3>
-      <p class="desc">Monday plan, Friday retro. Goals tracked in weekly-goals/current.md.</p>
-      <div class="chain">/weekly-plan · /sprint-prep · /sprint-health · /weekly-feedback-sweep-teams · /weekly-retro · /vibe-pm-weekly</div>
-      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Weekly</span></div>
-    </article>
-
-    <article class="card" data-cat="ops">
-      <div class="num">07</div>
-      <h3>Meetings</h3>
-      <p class="desc">Pre-brief, in-meeting lookup, post-meeting capture.</p>
-      <div class="chain">/meeting-prep · /meeting-lookup · /meeting-absorb · /meeting-summary · /meeting-item · /aviv · /harel</div>
-      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Meetings</span></div>
-    </article>
-
-    <article class="card" data-cat="ops">
-      <div class="num">08</div>
-      <h3>Slack Triage &amp; Routing</h3>
-      <p class="desc">Mention-first scan, channel sweep, message → action.</p>
-      <div class="chain">/slack-triage · /slack-pm-assist · /thread-harvest · /slack-to-ticket · /slack-followup-sync</div>
-      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Slack</span></div>
-    </article>
-
-    <article class="card" data-cat="content">
-      <div class="num">09</div>
-      <h3>Content &amp; Thought Leadership</h3>
-      <p class="desc">Daily AI/PM scanning → weekly LinkedIn post → ad-hoc visuals.</p>
-      <div class="chain">/vibe-pm-daily · /ai-pm-daily → /vibe-pm-weekly · /generate-post-image · /html-page · /remotion</div>
-      <div class="tags"><span class="tag content">Content</span><span class="tag content">LinkedIn</span></div>
-    </article>
-
-    <article class="card" data-cat="review">
-      <div class="num">10</div>
-      <h3>Document Review</h3>
-      <p class="desc">Reviewing someone else's work. Cross-cutting domain check.</p>
-      <div class="chain">/doc-review · /marketing-review · /spec-review · /plt-review · /dataset-review · /pre-mortem · /grammarly</div>
-      <div class="tags"><span class="tag review">Review</span><span class="tag review">QA</span></div>
-    </article>
-
-    <article class="card" data-cat="ops">
-      <div class="num">11</div>
-      <h3>Sprint &amp; Team Operations</h3>
-      <p class="desc">Cross-team sprint readiness and demo prep.</p>
-      <div class="chain">/sprint-prep · /sprint-health · /create-sprints · /sprint-demo-html · /note-to-ticket</div>
-      <div class="tags"><span class="tag ops">Ops</span><span class="tag ops">Sprints</span></div>
-    </article>
-
-    <article class="card" data-cat="meta">
-      <div class="num">12</div>
-      <h3>Feature-Map Classification</h3>
-      <p class="desc">Workplan frontmatter (ibm/marketing tier) drives release readiness.</p>
-      <div class="chain">/ibm-feature-map · /marketing-feature-map</div>
-      <div class="tags"><span class="tag review">Meta</span><span class="tag review">Tagging</span></div>
-    </article>
-
-    <article class="card" data-cat="meta">
-      <div class="num">13</div>
-      <h3>Decision &amp; Knowledge Capture</h3>
-      <p class="desc">Structured decisions, formatting, link indexing, canary QA.</p>
-      <div class="chain">/decision-log · /note-prettifier · /link-index · /canary-qa</div>
-      <div class="tags"><span class="tag review">Meta</span><span class="tag review">Capture</span></div>
-    </article>
-
+<section class="workflow" data-cat="initiative">
+  <h2><span class="num-badge">02</span> Release &amp; Distribution</h2>
+  <div class="lead"><strong>Trigger:</strong> Feature ships or is about to ship.</div>
+  <pre class="code"><span class="skill">/release-distribute</span> (orchestrator)
+   ├── <span class="skill">/doc-review</span>                <span class="arrow">→</span> doc quality gate
+   ├── <span class="skill">/release-slide</span>             <span class="arrow">→</span> stakeholder slide
+   ├── <span class="skill">/generate-post-image</span>       <span class="arrow">→</span> branded image
+   ├── <span class="skill">/release-slack</span>             <span class="arrow">→</span> company-wide announcement
+   ├── <span class="skill">/sales-enablement</span>          <span class="arrow">→</span> SE/AE one-pager
+   ├── <span class="skill">/release-notify</span>            <span class="arrow">→</span> personalized TAM/AM DMs
+   └── <span class="skill">/remotion</span>                  <span class="arrow">→</span> product video (optional)</pre>
+  <div class="tags">
+    <span class="tag">/marketing-review</span>
+    <span class="tag">/battlecard</span>
+    <span class="tag">/feature-competitive</span>
   </div>
 </section>
 
-<section>
-  <h2>Master Diagram</h2>
-  <pre class="diagram">                ┌─────────────────────────────────────┐
-                │  Customer Feedback                  │
-                │  Gong · Intercom · PIPEV2 · Compete │
-                └────────────────┬────────────────────┘
-                                 │
-                  ┌──────────────▼──────────────┐
-                  │ /feedback-aggregate         │
-                  │ /intelligence-brief         │
-                  └──────────────┬──────────────┘
-                                 │
-            ┌────────────────────▼─────────────────────┐
-            │              DISCOVERY                    │
-            │  /problem-discover → /problem-boundary    │
-            │           → /business-case                │
-            └────────────────────┬─────────────────────┘
-                                 │
-            ┌────────────────────▼─────────────────────┐
-            │              DEFINITION                   │
-            │  /pre-mortem → /prd → /spec-review        │
-            │           → /plt-review                   │
-            └────────────────────┬─────────────────────┘
-                                 │
-            ┌────────────────────▼─────────────────────┐
-            │              EXECUTION                    │
-            │  /spec-to-team-epic → /sprint-prep        │
-            │   /sprint-health → /initiative-review     │
-            └────────────────────┬─────────────────────┘
-                                 │
-            ┌────────────────────▼─────────────────────┐
-            │               RELEASE                     │
-            │  /release-distribute → doc · slide · img  │
-            │   slack · sales-enablement · notify       │
-            └────────────────────┬─────────────────────┘
-                                 │
-            ┌────────────────────▼─────────────────────┐
-            │              ROADMAP LOOP                 │
-            │  /roadmap-sync → /roadmap-review → top    │
-            └──────────────────────────────────────────┘
+<section class="workflow" data-cat="initiative">
+  <h2><span class="num-badge">03</span> Roadmap Management</h2>
+  <div class="lead"><strong>Trigger:</strong> Monthly prioritization, quarterly planning, or new card request.</div>
+  <pre class="code"><span class="skill">/roadmap-review</span>   <span class="comment">— re-prioritize PRDs against roadmap + signals</span>
+<span class="skill">/roadmap-create</span>   <span class="comment">— new sales-facing Notion card from vault idea</span>
+<span class="skill">/roadmap-sync</span>     <span class="comment">— Jira → Notion status sync (forward only)</span></pre>
+  <div class="callout"><strong>Cadence:</strong> <code>/problem-discover</code> quarterly, <code>/roadmap-review</code> monthly. <strong>Source of truth:</strong> workplan frontmatter (<code>urgency / team / notion-card / last-reviewed</code>) drives the Dataview triage table.</div>
+</section>
 
-   Cross-cutting daily: /today /follow-up /tag-* /session-close
-   Cross-cutting weekly: /weekly-plan /weekly-retro /sprint-health /pm-mentor</pre>
-  <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:#00d4aa"></span>Core spine</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#c084fc"></span>Feedback</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Release</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#7dd3fc"></span>Ops</div>
+<section class="workflow" data-cat="customer">
+  <h2><span class="num-badge">04</span> Customer Feedback Pipelines</h2>
+  <div class="lead">Three independent collectors → one aggregated view → discovery.</div>
+  <pre class="code"><span class="skill">/gong-insights</span>     ─┐
+<span class="skill">/intercom-insights</span> ─┼─<span class="arrow">→</span> <span class="skill">/feedback-aggregate</span> <span class="arrow">→</span> <span class="skill">/problem-discover</span> <span class="arrow">→</span> <span class="skill">/discover</span>
+<span class="skill">/pipev2-insights</span>   ─┘
+<span class="skill">/competitive-insights</span> (parallel track)
+
+<span class="comment">Per-pipeline deep analysis (NotebookLM-backed):</span>
+  <span class="skill">/gong-analyze</span>   <span class="skill">/intercom-analyze</span>   <span class="skill">/pipev2-analyze</span>   <span class="skill">/competitive-analyze</span>
+
+<span class="comment">Per-pipeline follow-up:</span>
+  <span class="skill">/gong-dispatch</span>  <span class="skill">/intercom-dispatch</span></pre>
+  <div class="callout"><strong>Weekly orchestrator:</strong> <code>/weekly-feedback-sweep-teams</code> — 4 collectors + 4 analyzers in parallel. <strong>Leadership feed:</strong> <code>/intelligence-brief</code>.</div>
+</section>
+
+<section class="workflow" data-cat="cadence">
+  <h2><span class="num-badge">05</span> Daily Operations</h2>
+  <div class="lead"><strong>Trigger:</strong> Start of day / end of day / live tag work.</div>
+  <pre class="code">Morning:  <span class="skill">/today</span>          <span class="arrow">→</span>  reads calendar + Jira + Slack + tags + goals + workplans
+Live:     <span class="skill">/tag-prep</span>       <span class="arrow">→</span> <span class="skill">/tag-execute</span> <span class="arrow">→</span> <span class="skill">/tag-close</span>
+          <span class="skill">/follow-up</span>      (check open threads)
+          <span class="skill">/todoist-sync</span>   (sync Coralogix project)
+Evening:  <span class="skill">/session-close</span>  <span class="arrow">→</span> appends to <span class="comment">AI PM/session-log.md</span> + writes growth log</pre>
+  <div class="callout"><strong>Cross-cutting passive:</strong> <code>/pm-mentor</code> watches for over-engineering, under-delegation, automation gaps.</div>
+</section>
+
+<section class="workflow" data-cat="cadence">
+  <h2><span class="num-badge">06</span> Weekly Operations</h2>
+  <div class="lead"><strong>Trigger:</strong> Monday plan / Friday retro.</div>
+  <pre class="code">Monday:    <span class="skill">/weekly-plan</span>       <span class="comment">— read weekly-goals/current.md → plan the week</span>
+Wed-Thu:   <span class="skill">/sprint-prep</span>       <span class="comment">— next sprint readiness across teams</span>
+           <span class="skill">/sprint-health</span>     <span class="comment">— current sprint scan</span>
+Friday:    <span class="skill">/weekly-feedback-sweep-teams</span> (orchestrator)
+           <span class="skill">/gong-weekly</span>       <span class="comment">— ranked Gong digest to Slack</span>
+           <span class="skill">/weekly-retro</span>      <span class="comment">— goals eval → archive → suggest new</span>
+           <span class="skill">/vibe-pm-weekly</span>    <span class="comment">— LinkedIn post from week's signals</span></pre>
+</section>
+
+<section class="workflow" data-cat="meeting">
+  <h2><span class="num-badge">07</span> Meetings</h2>
+  <div class="lead"><strong>Trigger:</strong> Calendar event approaching, or post-meeting capture.</div>
+  <pre class="code">Before:  <span class="skill">/meeting-prep</span>   <span class="comment">— briefing from Jira + Slack + vault + Notion</span>
+         <span class="skill">/meeting-lookup</span> <span class="comment">— fast in-meeting fact lookup (&lt;30s)</span>
+After:   <span class="skill">/meeting-absorb</span> <span class="comment">— turn raw transcript into structured note</span>
+         <span class="skill">/meeting-summary</span> <span class="comment">— decisions, opens, action items, publish</span>
+         <span class="skill">/meeting-item</span>   <span class="comment">— add action item to next person's note</span></pre>
+  <div class="tags">
+    <span class="tag green">/aviv</span>
+    <span class="tag green">/harel</span>
+    <span class="tag green">/aviv-prep</span>
   </div>
 </section>
 
-<section>
-  <h2>Pre-Built Chains</h2>
-  <div class="grid">
-    <article class="card">
-      <h3>/discover</h3>
-      <p class="desc">End-to-end discovery in one command.</p>
-      <div class="chain">/problem-discover → /problem-boundary → /business-case</div>
-    </article>
-    <article class="card">
-      <h3>/feedback-cycle</h3>
-      <p class="desc">Refresh feedback then immediately discover patterns.</p>
-      <div class="chain">/gong-insights ∥ /intercom-insights → /problem-discover</div>
-    </article>
-    <article class="card">
-      <h3>/release-distribute</h3>
-      <p class="desc">Full release comms (replaces legacy /launch).</p>
-      <div class="chain">doc-review → slide → image → slack → sales-enablement → notify</div>
-    </article>
+<section class="workflow" data-cat="meeting">
+  <h2><span class="num-badge">08</span> Slack Triage &amp; Routing</h2>
+  <div class="lead"><strong>Trigger:</strong> Mentions backlog, channel digest, message → action.</div>
+  <pre class="code">Inbound:    <span class="skill">/slack-triage</span>         <span class="comment">— mention-first scan + domain heat map</span>
+            <span class="skill">/slack-pm-assist</span>      <span class="comment">— feedback channel scan + reply drafts</span>
+            <span class="skill">/thread-harvest</span>       <span class="comment">— extract proposals/decisions from thread</span>
+Outbound:   <span class="skill">/slack-to-ticket</span>      <span class="comment">— Slack message → Jira ticket</span>
+            <span class="skill">/slack-followup-sync</span>  <span class="comment">— sync sent messages → vault #follow-up</span>
+            <span class="skill">/follow-up</span>            <span class="comment">— check open threads for replies</span></pre>
+</section>
+
+<section class="workflow" data-cat="content">
+  <h2><span class="num-badge">09</span> Content &amp; Thought Leadership</h2>
+  <div class="lead"><strong>Trigger:</strong> Daily AI/PM scanning, weekly LinkedIn post, ad-hoc visuals.</div>
+  <pre class="code">Scan:       <span class="skill">/vibe-pm-daily</span>   <span class="comment">— daily AI+PM content scan (NotebookLM lake)</span>
+            <span class="skill">/ai-pm-daily</span>     <span class="comment">— Claude Code/MCP/Obsidian intel</span>
+Synthesize: <span class="skill">/vibe-pm-weekly</span>  <span class="comment">— weekly LinkedIn post</span>
+Visuals:    <span class="skill">/generate-post-image</span>, <span class="skill">/html-page</span>, <span class="skill">/html-diagram</span>
+            <span class="skill">/excalidraw-diagram</span>, <span class="skill">/sprint-demo-html</span>, <span class="skill">/marp</span>
+            <span class="skill">/remotion</span> (videos)</pre>
+</section>
+
+<section class="workflow" data-cat="content">
+  <h2><span class="num-badge">10</span> Document Review (Cross-cutting)</h2>
+  <div class="lead">Triggered when reviewing someone else's work.</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Skill</th><th>What it reviews</th></tr></thead>
+    <tbody>
+      <tr><td><code>/doc-review</code></td><td>Tech writer drafts, Jira/Notion docs, GitHub PRs</td></tr>
+      <tr><td><code>/marketing-review</code></td><td>Notion marketing pages, blog, landing pages</td></tr>
+      <tr><td><code>/spec-review</code></td><td>Architecture/design docs (cross-cutting impact)</td></tr>
+      <tr><td><code>/plt-review</code></td><td>Simulated PLT review</td></tr>
+      <tr><td><code>/dataset-review</code></td><td>New dataset registration requests (Citadel)</td></tr>
+      <tr><td><code>/pre-mortem</code></td><td>Early-stage ideas before spec</td></tr>
+      <tr><td><code>/grammarly</code></td><td>English + PM tone polish</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="workflow" data-cat="ops">
+  <h2><span class="num-badge">11</span> Sprint &amp; Team Operations</h2>
+  <pre class="code"><span class="skill">/sprint-prep</span>         <span class="comment">— pre-planning readiness across all R&amp;D teams + design</span>
+<span class="skill">/sprint-health</span>       <span class="comment">— active sprint health scan</span>
+<span class="skill">/create-sprints</span>      <span class="comment">— extend team sprint timeline in Jira</span>
+<span class="skill">/sprint-demo-html</span>    <span class="comment">— branded HTML demo deck from vault note</span>
+<span class="skill">/note-to-ticket</span>      <span class="comment">— vault note → single Jira ticket</span></pre>
+</section>
+
+<section class="workflow" data-cat="ops">
+  <h2><span class="num-badge">12</span> Feature-Map (IBM + Marketing)</h2>
+  <div class="lead">Workplan frontmatter (<code>ibm: T0-T4</code>, <code>marketing: T0-T4</code>) drives release readiness.</div>
+  <pre class="code"><span class="skill">/ibm-feature-map</span>        <span class="comment">— mark workplans for IBM relevance review</span>
+<span class="skill">/marketing-feature-map</span>  <span class="comment">— mark workplans for marketing tier review</span></pre>
+</section>
+
+<section class="workflow" data-cat="ops">
+  <h2><span class="num-badge">13</span> Decision &amp; Knowledge Capture</h2>
+  <pre class="code"><span class="skill">/decision-log</span>     <span class="comment">— structured decision record (governance check)</span>
+<span class="skill">/note-prettifier</span>  <span class="comment">— formatting + TL;DR</span>
+<span class="skill">/link-index</span>       <span class="comment">— extract + dedupe links across folder</span>
+<span class="skill">/canary-qa</span>        <span class="comment">— Playwright pre-prod QA from Jira ACs</span></pre>
+</section>
+
+<section class="gaps">
+  <h2>⚠️ Visible Gaps</h2>
+  <div class="gap-item partial">
+    <strong>Closing loop between /spec-to-team-epic and /initiative-review<span class="status partial-tag">Partially closed</span></strong>
+    Resolved 2026-05-01: <code>/roadmap-review</code> Step 5c.1 reconciles workplan's in-body Tickets table against live Jira. Still open: no scheduled epic-health check; relies on PM running <code>/roadmap-review</code> weekly.
+  </div>
+  <div class="gap-item">
+    <strong>/release-distribute doesn't loop back to roadmap<span class="status open">Open</span></strong>
+    After release, <code>/roadmap-sync</code> should run to mark Notion cards Done.
+  </div>
+  <div class="gap-item">
+    <strong>No automated trigger from /intelligence-brief → /problem-discover<span class="status open">Open</span></strong>
+    Brief surfaces patterns weekly; discovery runs quarterly. Consider monthly auto-trigger.
+  </div>
+  <div class="gap-item">
+    <strong>/pm-mentor runs are passive<span class="status open">Open</span></strong>
+    No clear weekly review loop tying coaching notes back to growth dimensions in <code>ai-pm-reference.md</code>.
   </div>
 </section>
 
-<section>
-  <h2>Visible Gaps</h2>
-  <div class="callout danger">
-    <h4>1. /spec-to-team-epic → /initiative-review has no closing loop</h4>
-    <p>Once epics land in Jira, tracking depends on workplan + roadmap-sync. A scheduled epic-health check could fill the gap.</p>
-  </div>
-  <div class="callout danger">
-    <h4>2. /release-distribute doesn't loop back to roadmap</h4>
-    <p>After release, /roadmap-sync should run automatically to mark Notion cards Done.</p>
-  </div>
-  <div class="callout danger">
-    <h4>3. /intelligence-brief → /problem-discover not auto-triggered</h4>
-    <p>Brief surfaces patterns weekly; discovery runs quarterly. Consider a monthly auto-trigger.</p>
-  </div>
-  <div class="callout danger">
-    <h4>4. /pm-mentor runs are passive</h4>
-    <p>No clear weekly review loop tying coaching notes back to growth dimensions in ai-pm-reference.md.</p>
-  </div>
+<section class="featured" style="margin-top: 32px;">
+  <span class="badge">Master Diagram</span>
+  <h2>End-to-End Lifecycle</h2>
+  <div class="lead">From customer feedback to roadmap loop. Each box is owned by a workflow above.</div>
+  <div class="ascii">                                ┌─────────────────────────────────────┐
+                                │  Customer Feedback (Gong/Intercom/  │
+                                │   PIPEV2/Competitive/Slack)         │
+                                └─────────────┬───────────────────────┘
+                                              │
+                                  ┌───────────▼────────────┐
+                                  │ /feedback-aggregate    │
+                                  │ /intelligence-brief    │
+                                  └───────────┬────────────┘
+                                              │
+                ┌─────────────────────────────▼─────────────────────────┐
+                │                   DISCOVERY                            │
+                │  /problem-discover → /problem-boundary → /business-case│
+                └─────────────────────────────┬─────────────────────────┘
+                                              │
+                ┌─────────────────────────────▼──────────────────────┐
+                │                    DEFINITION                      │
+                │   /pre-mortem → /prd → /spec-review → /plt-review  │
+                └─────────────────────────────┬──────────────────────┘
+                                              │
+                ┌─────────────────────────────▼──────────────────────┐
+                │                    EXECUTION                       │
+                │  /spec-to-team-epic → /sprint-prep/-health →       │
+                │  /initiative-review → /workplan tracking           │
+                └─────────────────────────────┬──────────────────────┘
+                                              │
+                ┌─────────────────────────────▼──────────────────────┐
+                │                      RELEASE                       │
+                │  /release-distribute (doc-review, slide, image,    │
+                │  slack, sales-enablement, notify, remotion)        │
+                └─────────────────────────────┬──────────────────────┘
+                                              │
+                ┌─────────────────────────────▼──────────────────────┐
+                │             ROADMAP &amp; FEEDBACK LOOP                │
+                │  /roadmap-sync → /roadmap-review → back to top     │
+                └────────────────────────────────────────────────────┘
+
+Daily/Weekly cross-cutting:
+  /today  /session-close  /follow-up  /tag-prep/-execute/-close
+  /weekly-plan  /weekly-retro  /sprint-health  /pm-mentor</div>
 </section>
 
 <footer>
-  Generated from: <code>AI PM/workflows-map.md</code> · 2026-04-25
+  <div>Generated from: <code>/Users/noam.sheffi/CX/AI PM/workflows-map.md</code></div>
+  <div style="margin-top: 6px;">2026-05-01 · NSPM</div>
 </footer>
 
 </div>
 
 <script>
   const pills = document.querySelectorAll('.pill');
-  const cards = document.querySelectorAll('#workflow-grid .card');
-  pills.forEach(p => {
-    p.addEventListener('click', () => {
-      pills.forEach(x => x.classList.remove('active'));
-      p.classList.add('active');
-      const cat = p.dataset.cat;
-      cards.forEach(c => {
-        c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+  const filterables = document.querySelectorAll('section[data-cat]');
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const filter = pill.getAttribute('data-filter');
+      filterables.forEach(s => {
+        const cats = (s.getAttribute('data-cat') || '').split(/\s+/);
+        if (filter === 'all' || cats.includes(filter)) {
+          s.classList.remove('hidden');
+        } else {
+          s.classList.add('hidden');
+        }
       });
     });
   });
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    document.querySelectorAll('section.workflow, .featured, .gaps').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(10px)';
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      io.observe(el);
+    });
+  }
 </script>
 </body>
 </html>
