@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Initiative Tracking — Workplan Frontmatter as Source of Truth</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  body {
+    background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+    padding: 32px 24px 48px;
+  }
+  header { max-width: 1400px; margin: 0 auto 24px; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .brand-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #22dd92;
+    box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+  }
+  .brand-label { font-size: 13px; letter-spacing: 0.08em; color: #ffffff; font-weight: 500; }
+  h1 { font-size: 28px; font-weight: 600; margin-bottom: 6px; }
+  .subtitle { color: #a1a1aa; font-size: 15px; line-height: 1.5; max-width: 920px; }
+  main {
+    max-width: 1400px; margin: 0 auto;
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+  }
+  svg { width: 100%; height: auto; min-width: 1100px; display: block; }
+  .node rect {
+    transition: stroke-width 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
+  }
+  .node text { pointer-events: none; user-select: none; }
+  .node:hover rect {
+    stroke-width: 3;
+    filter: url(#mint-glow);
+  }
+  .dimmed { opacity: 0.18; transition: opacity 0.3s ease; }
+  .highlighted { opacity: 1; transition: opacity 0.3s ease; }
+  .edge { transition: opacity 0.3s ease; }
+  .edge-label { font-size: 11px; fill: #a1a1aa; pointer-events: none; user-select: none; }
+  footer { max-width: 1400px; margin: 24px auto 0; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    padding: 16px 20px;
+    background: #0a0a0a;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #d4d4d8; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .source-line { color: #52525b; font-size: 12px; padding: 0 4px; }
+  .key-insight {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: #0c2419;
+    border-left: 3px solid #22dd92;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #d4d4d8;
+    line-height: 1.55;
+  }
+  .key-insight strong { color: #22dd92; }
+  @media (max-width: 768px) {
+    h1 { font-size: 22px; }
+    .subtitle { font-size: 13px; }
+    main { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-label">Coralogix · NSPM</div>
+  </div>
+  <h1>Initiative Tracking — Workplan Frontmatter as Source of Truth</h1>
+  <p class="subtitle">
+    Every initiative lives in a <code>00-workplan.md</code>. Skills write fields into the frontmatter; views render
+    from it. Click any node to isolate its connections.
+  </p>
+</header>
+
+<main>
+  <svg viewBox="0 0 1400 820" xmlns="http://www.w3.org/2000/svg" aria-label="Initiative tracking flow diagram">
+    <defs>
+      <!-- Arrowhead markers, one per edge color so marker-end inherits visually -->
+      <marker id="arrow-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#22dd92"/>
+      </marker>
+      <marker id="arrow-mintdim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#1ab677"/>
+      </marker>
+      <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#F59E0B"/>
+      </marker>
+      <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+      </marker>
+      <marker id="arrow-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#6366F1"/>
+      </marker>
+      <!-- Mint glow on hover -->
+      <filter id="mint-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feFlood flood-color="#22dd92" flood-opacity="0.6"/>
+        <feComposite in2="blur" operator="in" result="glow"/>
+        <feMerge>
+          <feMergeNode in="glow"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Column headers -->
+    <text x="160" y="32" font-size="13" font-weight="600" fill="#22dd92" letter-spacing="0.08em">WRITERS</text>
+    <text x="640" y="32" font-size="13" font-weight="600" fill="#6366F1" letter-spacing="0.08em">SOURCE OF TRUTH</text>
+    <text x="1100" y="32" font-size="13" font-weight="600" fill="#EF4444" letter-spacing="0.08em">VIEWS / READERS</text>
+
+    <!-- ====== WRITERS (left column) ====== -->
+
+    <!-- /today -->
+    <g class="node" data-id="today" role="img" aria-label="/today: writes phase, blocker, next-action">
+      <rect x="40" y="60" width="220" height="64" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+      <text x="150" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/today</text>
+      <text x="150" y="106" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Morning scan · phase + blocker + next-action</text>
+    </g>
+
+    <!-- /session-close -->
+    <g class="node" data-id="session-close" role="img" aria-label="/session-close: writes 6 fields end of session">
+      <rect x="40" y="148" width="220" height="64" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+      <text x="150" y="174" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/session-close</text>
+      <text x="150" y="194" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">End of session · all 6 operational fields</text>
+    </g>
+
+    <!-- /workplan -->
+    <g class="node" data-id="workplan" role="img" aria-label="/workplan: creates new workplan with full frontmatter">
+      <rect x="40" y="236" width="220" height="64" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+      <text x="150" y="262" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/workplan</text>
+      <text x="150" y="282" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Creation · all fields (new initiative)</text>
+    </g>
+
+    <!-- /spec-to-team-epic -->
+    <g class="node" data-id="spec-to-team-epic" role="img" aria-label="/spec-to-team-epic post-flight: writes ibm, marketing, notion-card, ticket">
+      <rect x="40" y="324" width="220" height="64" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+      <text x="150" y="350" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/spec-to-team-epic</text>
+      <text x="150" y="370" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Post-flight · ibm, marketing, notion-card, ticket</text>
+    </g>
+
+    <!-- /roadmap-review -->
+    <g class="node" data-id="roadmap-review-skill" role="img" aria-label="/roadmap-review: writes status and last-reviewed weekly">
+      <rect x="40" y="412" width="220" height="64" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+      <text x="150" y="438" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/roadmap-review</text>
+      <text x="150" y="458" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Weekly Step 5c · status, last-reviewed</text>
+    </g>
+
+    <!-- /roadmap-sync -->
+    <g class="node" data-id="roadmap-sync" role="img" aria-label="/roadmap-sync: writes status from Notion-Jira diff">
+      <rect x="40" y="500" width="220" height="64" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+      <text x="150" y="526" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/roadmap-sync</text>
+      <text x="150" y="546" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">On demand · Notion ↔ Jira status diff</text>
+    </g>
+
+    <!-- /initiative-review -->
+    <g class="node" data-id="initiative-review" role="img" aria-label="/initiative-review: writes status, last-reviewed per initiative">
+      <rect x="40" y="588" width="220" height="64" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+      <text x="150" y="614" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/initiative-review</text>
+      <text x="150" y="634" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Deep dive · status, last-reviewed</text>
+    </g>
+
+    <!-- Manual edit -->
+    <g class="node" data-id="manual" role="img" aria-label="Manual Obsidian edit: any field, anytime">
+      <rect x="40" y="676" width="220" height="64" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+      <text x="150" y="702" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">Manual (Obsidian)</text>
+      <text x="150" y="722" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Any field · anytime · you in editor</text>
+    </g>
+
+    <!-- ====== SOURCE OF TRUTH (center) ====== -->
+    <g class="node" data-id="workplan-fm" role="img" aria-label="Workplan frontmatter: 00-workplan.md, source of truth">
+      <rect x="540" y="320" width="280" height="120" rx="14" fill="#1a1a2e" stroke="#6366F1" stroke-width="3"/>
+      <text x="680" y="356" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">00-workplan.md</text>
+      <text x="680" y="378" text-anchor="middle" font-size="13" font-weight="500" fill="#a5b4fc">frontmatter</text>
+      <text x="680" y="404" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.75">phase · urgency · status</text>
+      <text x="680" y="422" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.75">blocker · next-action · last-reviewed</text>
+    </g>
+
+    <!-- ====== READERS (right column) ====== -->
+
+    <!-- initiative-dashboard.md -->
+    <g class="node" data-id="dashboard" role="img" aria-label="initiative-dashboard.md: live operational cockpit, Dataview-rendered">
+      <rect x="1100" y="180" width="260" height="86" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+      <text x="1230" y="208" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">initiative-dashboard.md</text>
+      <text x="1230" y="228" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Live cockpit · "What do I act on today?"</text>
+      <text x="1230" y="246" text-anchor="middle" font-size="10" fill="#fca5a5" opacity="0.85">Dataview · read-only · active only</text>
+    </g>
+
+    <!-- /orchestrate -->
+    <g class="node" data-id="orchestrate" role="img" aria-label="/orchestrate: cmux workspace selector, reads frontmatter only">
+      <rect x="1100" y="334" width="260" height="86" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+      <text x="1230" y="362" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">/orchestrate</text>
+      <text x="1230" y="382" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">cmux selector · top-N triage</text>
+      <text x="1230" y="400" text-anchor="middle" font-size="10" fill="#fca5a5" opacity="0.85">Reads frontmatter · never writes</text>
+    </g>
+
+    <!-- roadmap-review-DD-MM-YYYY.md -->
+    <g class="node" data-id="roadmap-review-doc" role="img" aria-label="roadmap-review-DD-MM-YYYY: weekly snapshot, strategic audit">
+      <rect x="1100" y="488" width="260" height="86" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+      <text x="1230" y="516" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">roadmap-review-DD-MM-YYYY</text>
+      <text x="1230" y="536" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.7">Weekly audit · "Is portfolio healthy?"</text>
+      <text x="1230" y="554" text-anchor="middle" font-size="10" fill="#fca5a5" opacity="0.85">Frozen snapshot · Warnings + Delta + Top 3</text>
+    </g>
+
+    <!-- ====== EDGES: writers → workplan ====== -->
+
+    <!-- /today → workplan -->
+    <g class="edge" data-from="today" data-to="workplan-fm">
+      <path d="M 260 92 C 380 92, 460 360, 540 370" stroke="#22dd92" stroke-width="1.6" fill="none" marker-end="url(#arrow-mint)"/>
+      <text class="edge-label" x="380" y="200" text-anchor="middle">phase, blocker, next-action</text>
+    </g>
+
+    <!-- /session-close → workplan -->
+    <g class="edge" data-from="session-close" data-to="workplan-fm">
+      <path d="M 260 180 C 400 180, 460 370, 540 380" stroke="#22dd92" stroke-width="1.6" fill="none" marker-end="url(#arrow-mint)"/>
+      <text class="edge-label" x="395" y="270" text-anchor="middle">all 6 operational fields</text>
+    </g>
+
+    <!-- /workplan → workplan -->
+    <g class="edge" data-from="workplan" data-to="workplan-fm">
+      <path d="M 260 268 C 380 268, 460 380, 540 390" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#arrow-mintdim)"/>
+      <text class="edge-label" x="395" y="333" text-anchor="middle">creates frontmatter</text>
+    </g>
+
+    <!-- /spec-to-team-epic → workplan -->
+    <g class="edge" data-from="spec-to-team-epic" data-to="workplan-fm">
+      <path d="M 260 356 L 540 395" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#arrow-mintdim)"/>
+      <text class="edge-label" x="400" y="368" text-anchor="middle">ibm, marketing, ticket</text>
+    </g>
+
+    <!-- /roadmap-review → workplan -->
+    <g class="edge" data-from="roadmap-review-skill" data-to="workplan-fm">
+      <path d="M 260 444 L 540 410" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#arrow-mintdim)"/>
+      <text class="edge-label" x="400" y="420" text-anchor="middle">status (Step 5c writeback)</text>
+    </g>
+
+    <!-- /roadmap-sync → workplan -->
+    <g class="edge" data-from="roadmap-sync" data-to="workplan-fm">
+      <path d="M 260 532 C 400 532, 460 420, 540 415" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#arrow-mintdim)"/>
+      <text class="edge-label" x="395" y="478" text-anchor="middle">status (Notion ↔ Jira diff)</text>
+    </g>
+
+    <!-- /initiative-review → workplan -->
+    <g class="edge" data-from="initiative-review" data-to="workplan-fm">
+      <path d="M 260 620 C 400 620, 460 430, 540 425" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#arrow-mintdim)"/>
+      <text class="edge-label" x="395" y="540" text-anchor="middle">status, last-reviewed</text>
+    </g>
+
+    <!-- Manual → workplan -->
+    <g class="edge" data-from="manual" data-to="workplan-fm">
+      <path d="M 260 708 C 400 708, 460 440, 540 432" stroke="#22dd92" stroke-width="1.6" fill="none" marker-end="url(#arrow-mint)"/>
+      <text class="edge-label" x="395" y="600" text-anchor="middle">any field</text>
+    </g>
+
+    <!-- ====== EDGES: workplan → readers ====== -->
+
+    <!-- workplan → dashboard -->
+    <g class="edge" data-from="workplan-fm" data-to="dashboard">
+      <path d="M 820 360 C 940 360, 980 220, 1100 222" stroke="#EF4444" stroke-width="1.8" fill="none" marker-end="url(#arrow-red)"/>
+      <text class="edge-label" x="965" y="282" text-anchor="middle">read · Dataview render</text>
+    </g>
+
+    <!-- workplan → /orchestrate -->
+    <g class="edge" data-from="workplan-fm" data-to="orchestrate">
+      <path d="M 820 380 L 1100 377" stroke="#EF4444" stroke-width="1.8" fill="none" marker-end="url(#arrow-red)"/>
+      <text class="edge-label" x="960" y="372" text-anchor="middle">read · top-N selection</text>
+    </g>
+
+    <!-- workplan → roadmap-review-doc -->
+    <g class="edge" data-from="workplan-fm" data-to="roadmap-review-doc">
+      <path d="M 820 400 C 940 400, 980 530, 1100 530" stroke="#EF4444" stroke-width="1.8" fill="none" marker-end="url(#arrow-red)"/>
+      <text class="edge-label" x="965" y="478" text-anchor="middle">read · weekly snapshot</text>
+    </g>
+
+  </svg>
+</main>
+
+<footer>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#22dd92"></div>Trigger / Manual (mint)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1ab677"></div>Processing skill (mint dim)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>Source of truth / Data store (indigo)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>View / Output (red)</div>
+  </div>
+
+  <div class="key-insight">
+    <strong>Rule of thumb:</strong> if you want a row to change, edit the <code>00-workplan.md</code> frontmatter.
+    Never edit <code>initiative-dashboard.md</code> directly — its body is rendered live from Dataview and your edits get overwritten.
+    The dashboard answers <em>"what do I act on today?"</em>; the weekly roadmap-review file answers <em>"is the portfolio healthy vs last week?"</em>.
+  </div>
+
+  <div class="source-line" style="margin-top: 12px;">
+    Generated from: AI PM/initiative-tracking-cheatsheet.md · 2026-05-02
+  </div>
+</footer>
+
+<script>
+  // Adjacency list: which nodes are connected to which (bidirectional for highlight purposes)
+  const graph = {
+    "today": ["workplan-fm"],
+    "session-close": ["workplan-fm"],
+    "workplan": ["workplan-fm"],
+    "spec-to-team-epic": ["workplan-fm"],
+    "roadmap-review-skill": ["workplan-fm"],
+    "roadmap-sync": ["workplan-fm"],
+    "initiative-review": ["workplan-fm"],
+    "manual": ["workplan-fm"],
+    "workplan-fm": [
+      "today", "session-close", "workplan", "spec-to-team-epic",
+      "roadmap-review-skill", "roadmap-sync", "initiative-review", "manual",
+      "dashboard", "orchestrate", "roadmap-review-doc"
+    ],
+    "dashboard": ["workplan-fm"],
+    "orchestrate": ["workplan-fm"],
+    "roadmap-review-doc": ["workplan-fm"]
+  };
+
+  const svg = document.querySelector("svg");
+  const allNodes = svg.querySelectorAll("g.node");
+  const allEdges = svg.querySelectorAll("g.edge");
+
+  function reset() {
+    allNodes.forEach(n => { n.classList.remove("dimmed"); n.classList.remove("highlighted"); });
+    allEdges.forEach(e => { e.classList.remove("dimmed"); e.classList.remove("highlighted"); });
+  }
+
+  function highlight(id) {
+    const connected = new Set([id, ...(graph[id] || [])]);
+    allNodes.forEach(n => {
+      const nid = n.getAttribute("data-id");
+      if (connected.has(nid)) n.classList.add("highlighted");
+      else n.classList.add("dimmed");
+    });
+    allEdges.forEach(e => {
+      const from = e.getAttribute("data-from");
+      const to = e.getAttribute("data-to");
+      if (from === id || to === id) e.classList.add("highlighted");
+      else e.classList.add("dimmed");
+    });
+  }
+
+  allNodes.forEach(node => {
+    node.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const id = node.getAttribute("data-id");
+      reset();
+      highlight(id);
+    });
+  });
+
+  svg.addEventListener("click", reset);
+</script>
+</body>
+</html>
