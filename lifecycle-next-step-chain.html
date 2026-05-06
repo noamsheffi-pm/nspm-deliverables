@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Initiative Lifecycle — Next-Step Chain Map</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: #000000;
+    background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 32px 20px 48px;
+  }
+  .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .brand-dot { width: 16px; height: 16px; border-radius: 50%; background: #22dd92;
+    box-shadow: 0 0 16px rgba(34, 221, 146, 0.5); }
+  .brand-label { color: #ffffff; font-weight: 500; letter-spacing: 0.05em; font-size: 13px; }
+  header h1 { font-size: 26px; font-weight: 700; margin: 0 0 6px; color: #fff; }
+  header p { color: #a1a1aa; margin: 0 0 24px; font-size: 13px; max-width: 1100px; line-height: 1.5; }
+  main { background: #0a0a0a; border-radius: 14px; padding: 18px; overflow-x: auto;
+    border: 1px solid #1a1a1a; }
+  svg { display: block; width: 100%; height: auto; max-width: 1500px; min-width: 1200px; }
+  g.node { cursor: pointer; transition: opacity 0.3s ease; }
+  g.node.dimmed { opacity: 0.18; }
+  g.node.highlighted .node-bg { stroke-width: 3; }
+  g.edge.dimmed { opacity: 0.08; }
+  .node-bg { transition: all 0.2s ease; }
+  g.node:hover .node-bg { filter: url(#mintGlow); stroke-width: 3; }
+  footer { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; background: #0a0a0a;
+    border: 1px solid #1a1a1a; border-radius: 12px; padding: 14px 18px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a1a1aa; }
+  .legend-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .legend-line { width: 24px; height: 2px; }
+  .legend-line.dashed { background-image: linear-gradient(90deg, #888 50%, transparent 50%);
+    background-size: 8px 2px; background-color: transparent; }
+  .source { color: #52525b; font-size: 11px; }
+  .source code { color: #a1a1aa; background: #0a0a0a; padding: 1px 5px; border-radius: 3px; }
+  @media (max-width: 768px) { body { padding: 16px 8px; } header h1 { font-size: 20px; } main { padding: 8px; } }
+</style>
+</head>
+<body>
+  <div class="brand-row">
+    <div class="brand-dot"></div>
+    <div class="brand-label">Coralogix · NSPM</div>
+  </div>
+  <header>
+    <h1>Initiative Lifecycle — Next-Step Chain Map</h1>
+    <p>Post-fix state (2026-05-06). After running any skill, the routed inline next-step it suggests. Solid edges = forward routes. Dashed edges = back-edges (re-edit / re-frame). Click any node to isolate its outgoing routes. Click background to reset.</p>
+  </header>
+
+  <main>
+    <svg viewBox="0 0 1500 1180" role="img" aria-label="Next-step chain across 14 lifecycle skills">
+      <defs>
+        <filter id="mintGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feFlood flood-color="#22dd92" flood-opacity="0.65"/>
+          <feComposite in2="blur" operator="in"/>
+          <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="arrow-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1ab677"/></marker>
+        <marker id="arrow-mintdim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1ab677"/></marker>
+        <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#A855F7"/></marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#F59E0B"/></marker>
+        <marker id="arrow-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6366F1"/></marker>
+        <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/></marker>
+      </defs>
+
+      <!-- Phase headers -->
+      <g font-family="system-ui, sans-serif" font-weight="700" letter-spacing="2">
+        <text x="40" y="60" font-size="13" fill="#22dd92">DISCOVERY</text>
+        <line x1="125" y1="56" x2="1100" y2="56" stroke="#1ab677" stroke-width="0.5" opacity="0.25"/>
+        <text x="40" y="320" font-size="13" fill="#22dd92">DEFINITION</text>
+        <line x1="135" y1="316" x2="1100" y2="316" stroke="#1ab677" stroke-width="0.5" opacity="0.25"/>
+        <text x="40" y="580" font-size="13" fill="#22dd92">EXECUTION</text>
+        <line x1="125" y1="576" x2="1100" y2="576" stroke="#1ab677" stroke-width="0.5" opacity="0.25"/>
+        <text x="40" y="850" font-size="13" fill="#22dd92">PUBLISHING</text>
+        <line x1="130" y1="846" x2="1100" y2="846" stroke="#1ab677" stroke-width="0.5" opacity="0.25"/>
+        <text x="1180" y="60" font-size="13" fill="#6366F1">TRACKING (cross-cutting)</text>
+      </g>
+
+      <!-- ==================== EDGES (drawn before nodes so nodes overlay) ==================== -->
+      <!-- Stroke colors: source-node-border. Dashed = back-edge. -->
+
+      <!-- /problem-discover (220,90) outgoing -->
+      <g class="edge" data-from="problem-discover">
+        <path d="M 380 105 L 440 105" stroke="#22dd92" stroke-width="1.5" fill="none" marker-end="url(#arrow-mint)"/>
+        <text x="385" y="98" font-size="9" fill="#a1a1aa">score 10–19 / governance</text>
+        <path d="M 380 115 Q 600 160 850 115" stroke="#22dd92" stroke-width="1.5" fill="none" marker-end="url(#arrow-mint)"/>
+        <text x="600" y="155" font-size="9" fill="#a1a1aa">score ≥ 20</text>
+      </g>
+
+      <!-- /problem-boundary (440,90) outgoing -->
+      <g class="edge" data-from="problem-boundary">
+        <path d="M 520 130 L 220 360" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="290" y="240" font-size="9" fill="#a1a1aa">default → /prd</text>
+        <path d="M 600 105 L 660 105" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="600" y="98" font-size="9" fill="#a1a1aa">sanity-check</text>
+        <path d="M 600 115 Q 720 160 870 115" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="700" y="148" font-size="9" fill="#a1a1aa">commercial → /business-case</text>
+        <path d="M 520 130 L 460 360" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="490" y="245" font-size="9" fill="#a1a1aa">external spec</text>
+      </g>
+
+      <!-- /pre-mortem (660,90) outgoing -->
+      <g class="edge" data-from="pre-mortem">
+        <path d="M 700 130 L 240 360" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="430" y="200" font-size="9" fill="#a1a1aa">Verdict: Proceed → /prd</text>
+        <path d="M 660 110 L 600 110" stroke="#A855F7" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
+        <text x="610" y="125" font-size="9" fill="#a1a1aa">Rethink (back)</text>
+        <path d="M 820 105 L 1060 130" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="850" y="100" font-size="9" fill="#a1a1aa">Kill → /decision-log</text>
+      </g>
+
+      <!-- /business-case (880,90) outgoing -->
+      <g class="edge" data-from="business-case">
+        <path d="M 920 130 L 260 360" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="540" y="220" font-size="9" fill="#a1a1aa">Proceed → /prd</text>
+        <path d="M 920 130 Q 600 500 220 615" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="540" y="430" font-size="9" fill="#a1a1aa">Proceed + PRD exists → /spec-to-team-epic</text>
+        <path d="M 1040 105 L 1060 130" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="1045" y="100" font-size="9" fill="#a1a1aa">Don't</text>
+        <path d="M 1040 120 L 1060 200" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="1045" y="170" font-size="9" fill="#a1a1aa">Conditional → /schedule</text>
+      </g>
+
+      <!-- /prd (200,360) outgoing -->
+      <g class="edge" data-from="prd">
+        <path d="M 360 390 L 440 390" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="365" y="384" font-size="9" fill="#a1a1aa">always → /spec-review</text>
+      </g>
+
+      <!-- /spec-review (440,360) outgoing -->
+      <g class="edge" data-from="spec-review">
+        <path d="M 600 390 L 660 390" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="605" y="384" font-size="9" fill="#a1a1aa">commercial</text>
+        <path d="M 600 405 Q 720 450 870 405" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="690" y="445" font-size="9" fill="#a1a1aa">customer-facing</text>
+        <path d="M 520 420 L 240 615" stroke="#1ab677" stroke-width="1.5" fill="none" marker-end="url(#arrow-mintdim)"/>
+        <text x="290" y="540" font-size="9" fill="#a1a1aa">neither</text>
+      </g>
+
+      <!-- /plt-review (660,360) outgoing -->
+      <g class="edge" data-from="plt-review">
+        <path d="M 820 390 L 880 390" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="822" y="384" font-size="9" fill="#a1a1aa">Proceed + user-facing</text>
+        <path d="M 700 420 Q 500 540 220 615" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="380" y="540" font-size="9" fill="#a1a1aa">Proceed internal → /spec-to-team-epic</text>
+        <path d="M 660 380 L 600 380" stroke="#A855F7" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
+        <text x="600" y="375" font-size="9" fill="#a1a1aa">Iterate (back)</text>
+        <path d="M 740 360 Q 900 220 1060 130" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="870" y="240" font-size="9" fill="#a1a1aa">Block → /decision-log</text>
+      </g>
+
+      <!-- /persona-review (880,360) outgoing -->
+      <g class="edge" data-from="persona-review">
+        <path d="M 920 420 Q 660 560 220 615" stroke="#A855F7" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)"/>
+        <text x="500" y="555" font-size="9" fill="#a1a1aa">Ship-ready → /spec-to-team-epic</text>
+        <path d="M 880 380 Q 720 350 600 380" stroke="#A855F7" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
+        <text x="700" y="345" font-size="9" fill="#a1a1aa">Iterate (back)</text>
+        <path d="M 880 360 Q 700 220 520 130" stroke="#A855F7" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
+        <text x="650" y="220" font-size="9" fill="#a1a1aa">Rework (back to /problem-boundary)</text>
+      </g>
+
+      <!-- /spec-to-team-epic (200,615) outgoing -->
+      <g class="edge" data-from="spec-to-team-epic">
+        <path d="M 220 685 L 220 870" stroke="#F59E0B" stroke-width="1.5" fill="none" marker-end="url(#arrow-amber)"/>
+        <text x="225" y="780" font-size="9" fill="#a1a1aa">after Jira → /roadmap-create</text>
+      </g>
+
+      <!-- /initiative-review (440,615) outgoing -->
+      <g class="edge" data-from="initiative-review">
+        <path d="M 600 645 L 660 645" stroke="#F59E0B" stroke-width="1.5" fill="none" marker-end="url(#arrow-amber)"/>
+        <text x="605" y="640" font-size="9" fill="#a1a1aa">No-Sprint</text>
+        <path d="M 600 660 Q 720 690 870 660" stroke="#F59E0B" stroke-width="1.5" fill="none" marker-end="url(#arrow-amber)"/>
+        <text x="700" y="700" font-size="9" fill="#a1a1aa">Notion stale → /roadmap-sync</text>
+        <path d="M 600 645 Q 800 600 1060 645" stroke="#F59E0B" stroke-width="1.5" fill="none" marker-end="url(#arrow-amber)"/>
+        <text x="800" y="595" font-size="9" fill="#a1a1aa">All Done → /feature-shipped</text>
+      </g>
+
+      <!-- /workplan (1240,90) outgoing — long edges -->
+      <g class="edge" data-from="workplan">
+        <path d="M 1240 130 Q 800 130 600 110" stroke="#6366F1" stroke-width="1.2" fill="none" stroke-dasharray="2,3" marker-end="url(#arrow-indigo)"/>
+        <text x="900" y="125" font-size="9" fill="#a1a1aa" opacity="0.85">status: signal/discovery</text>
+        <path d="M 1240 150 Q 700 280 360 390" stroke="#6366F1" stroke-width="1.2" fill="none" stroke-dasharray="2,3" marker-end="url(#arrow-indigo)"/>
+        <text x="780" y="280" font-size="9" fill="#a1a1aa" opacity="0.85">status: specification → /prd</text>
+        <path d="M 1240 170 Q 700 540 360 645" stroke="#6366F1" stroke-width="1.2" fill="none" stroke-dasharray="2,3" marker-end="url(#arrow-indigo)"/>
+        <text x="780" y="500" font-size="9" fill="#a1a1aa" opacity="0.85">status: execution-planning</text>
+        <path d="M 1240 190 Q 900 500 600 645" stroke="#6366F1" stroke-width="1.2" fill="none" stroke-dasharray="2,3" marker-end="url(#arrow-indigo)"/>
+        <text x="980" y="450" font-size="9" fill="#a1a1aa" opacity="0.85">status: build → /initiative-review</text>
+        <path d="M 1240 200 Q 1180 460 1080 615" stroke="#6366F1" stroke-width="1.2" fill="none" stroke-dasharray="2,3" marker-end="url(#arrow-indigo)"/>
+        <text x="1185" y="460" font-size="9" fill="#a1a1aa" opacity="0.85">status: released → /feature-shipped</text>
+      </g>
+
+      <!-- /roadmap-create (200,870) outgoing -->
+      <g class="edge" data-from="roadmap-create">
+        <path d="M 360 905 L 440 905" stroke="#EF4444" stroke-width="1.5" fill="none" marker-end="url(#arrow-red)"/>
+        <text x="365" y="898" font-size="9" fill="#a1a1aa">after Slack</text>
+        <path d="M 360 920 Q 500 970 660 920" stroke="#EF4444" stroke-width="1.5" fill="none" marker-end="url(#arrow-red)"/>
+        <text x="450" y="965" font-size="9" fill="#a1a1aa">if marketing set → /ibm-feature-map</text>
+      </g>
+
+      <!-- /marketing-feature-map (440,870) outgoing -->
+      <g class="edge" data-from="marketing-feature-map">
+        <path d="M 600 905 L 660 905" stroke="#EF4444" stroke-width="1.5" fill="none" marker-end="url(#arrow-red)"/>
+        <text x="605" y="898" font-size="9" fill="#a1a1aa">if ibm tbd</text>
+      </g>
+
+      <!-- /ibm-feature-map (660,870) outgoing -->
+      <g class="edge" data-from="ibm-feature-map">
+        <path d="M 660 920 Q 540 950 600 920" stroke="#EF4444" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-red)"/>
+        <text x="555" y="958" font-size="9" fill="#a1a1aa">if marketing tbd (back)</text>
+      </g>
+
+      <!-- ==================== NODES ==================== -->
+      <!-- Discovery row (y=90, height=40) -->
+      <g class="node" data-id="problem-discover" transform="translate(220, 90)">
+        <rect class="node-bg" width="160" height="40" rx="10" fill="#0c2419" stroke="#22dd92" stroke-width="1.5"/>
+        <text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/problem-discover</text>
+        <text x="80" y="32" text-anchor="middle" font-size="9" fill="#a1a1aa">routed by score + area</text>
+      </g>
+      <g class="node" data-id="problem-boundary" transform="translate(440, 90)">
+        <rect class="node-bg" width="160" height="40" rx="10" fill="#0c2419" stroke="#1ab677" stroke-width="1.5"/>
+        <text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/problem-boundary</text>
+        <text x="80" y="32" text-anchor="middle" font-size="9" fill="#a1a1aa">6-option menu</text>
+      </g>
+      <g class="node" data-id="pre-mortem" transform="translate(660, 90)">
+        <rect class="node-bg" width="160" height="40" rx="10" fill="#2e1a3d" stroke="#A855F7" stroke-width="1.5"/>
+        <text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/pre-mortem</text>
+        <text x="80" y="32" text-anchor="middle" font-size="9" fill="#a1a1aa">verdict-routed</text>
+      </g>
+      <g class="node" data-id="business-case" transform="translate(880, 90)">
+        <rect class="node-bg" width="160" height="40" rx="10" fill="#2e1a3d" stroke="#A855F7" stroke-width="1.5"/>
+        <text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/business-case</text>
+        <text x="80" y="32" text-anchor="middle" font-size="9" fill="#a1a1aa">recommendation-routed</text>
+      </g>
+      <!-- Exit nodes Discovery -->
+      <g class="node" data-id="decision-log" transform="translate(1060, 90)">
+        <rect class="node-bg" width="120" height="34" rx="8" fill="#3d1a1a" stroke="#EF4444" stroke-width="1.2"/>
+        <text x="60" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">/decision-log</text>
+        <text x="60" y="28" text-anchor="middle" font-size="8" fill="#a1a1aa">exit</text>
+      </g>
+      <g class="node" data-id="schedule" transform="translate(1060, 180)">
+        <rect class="node-bg" width="120" height="34" rx="8" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.2"/>
+        <text x="60" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">/schedule</text>
+        <text x="60" y="28" text-anchor="middle" font-size="8" fill="#a1a1aa">deferred</text>
+      </g>
+
+      <!-- /workplan node (top right) -->
+      <g class="node" data-id="workplan" transform="translate(1240, 80)">
+        <rect class="node-bg" width="200" height="140" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="1.8"/>
+        <text x="100" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/workplan</text>
+        <text x="100" y="36" text-anchor="middle" font-size="9" fill="#a1a1aa">status-routed</text>
+        <line x1="14" y1="46" x2="186" y2="46" stroke="#6366F1" stroke-width="0.4" opacity="0.4"/>
+        <text x="14" y="62" font-size="8" fill="#a1a1aa">→ signal: /problem-boundary</text>
+        <text x="14" y="76" font-size="8" fill="#a1a1aa">→ specification: /prd</text>
+        <text x="14" y="90" font-size="8" fill="#a1a1aa">→ exec-plan: /spec-to-team-epic</text>
+        <text x="14" y="104" font-size="8" fill="#a1a1aa">→ build: /initiative-review</text>
+        <text x="14" y="118" font-size="8" fill="#a1a1aa">→ released: /feature-shipped</text>
+        <text x="14" y="132" font-size="7" fill="#52525b" font-style="italic">cross-cuts every phase</text>
+      </g>
+
+      <!-- Definition row (y=360, height=60) -->
+      <g class="node" data-id="prd" transform="translate(200, 360)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#0c2419" stroke="#1ab677" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/prd</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">PLT-trigger checked</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">always → spec-review</text>
+      </g>
+      <g class="node" data-id="spec-review" transform="translate(440, 360)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#0c2419" stroke="#1ab677" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/spec-review</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">routes 4 ways</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">commercial / user / both / neither</text>
+      </g>
+      <g class="node" data-id="plt-review" transform="translate(660, 360)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#2e1a3d" stroke="#A855F7" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/plt-review</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">verdict-routed</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">proceed / iterate / block</text>
+      </g>
+      <g class="node" data-id="persona-review" transform="translate(880, 360)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#2e1a3d" stroke="#A855F7" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/persona-review</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">verdict-routed</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">ship / iterate / rework</text>
+      </g>
+
+      <!-- Execution row (y=615, height=70) -->
+      <g class="node" data-id="spec-to-team-epic" transform="translate(200, 615)">
+        <rect class="node-bg" width="160" height="70" rx="10" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="80" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/spec-to-team-epic</text>
+        <text x="80" y="38" text-anchor="middle" font-size="9" fill="#a1a1aa">★ user "push" gate</text>
+        <text x="80" y="56" text-anchor="middle" font-size="8" fill="#52525b">always → roadmap-create</text>
+      </g>
+      <g class="node" data-id="initiative-review" transform="translate(440, 615)">
+        <rect class="node-bg" width="160" height="70" rx="10" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="80" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/initiative-review</text>
+        <text x="80" y="38" text-anchor="middle" font-size="9" fill="#a1a1aa">risk-priority routed</text>
+        <text x="80" y="50" text-anchor="middle" font-size="8" fill="#52525b">blockers / sprint / sync / done</text>
+        <text x="80" y="62" text-anchor="middle" font-size="7" fill="#52525b" font-style="italic">blockers = surface only</text>
+      </g>
+      <!-- Execution exits -->
+      <g class="node" data-id="sprint-prep" transform="translate(660, 625)">
+        <rect class="node-bg" width="160" height="40" rx="8" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.2"/>
+        <text x="80" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">/sprint-prep</text>
+        <text x="80" y="32" text-anchor="middle" font-size="8" fill="#a1a1aa">exit · No-Sprint</text>
+      </g>
+      <g class="node" data-id="roadmap-sync" transform="translate(880, 625)">
+        <rect class="node-bg" width="160" height="40" rx="8" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.2"/>
+        <text x="80" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">/roadmap-sync</text>
+        <text x="80" y="32" text-anchor="middle" font-size="8" fill="#a1a1aa">exit · Notion stale</text>
+      </g>
+      <g class="node" data-id="feature-shipped" transform="translate(1060, 625)">
+        <rect class="node-bg" width="160" height="40" rx="8" fill="#3d2e1a" stroke="#F59E0B" stroke-width="1.2"/>
+        <text x="80" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">/feature-shipped</text>
+        <text x="80" y="32" text-anchor="middle" font-size="8" fill="#a1a1aa">exit · All Tasks Done</text>
+      </g>
+
+      <!-- Publishing row (y=870, height=60) -->
+      <g class="node" data-id="roadmap-create" transform="translate(200, 870)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#3d1a1a" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/roadmap-create</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">Notion + Slack</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">→ marketing or ibm</text>
+      </g>
+      <g class="node" data-id="marketing-feature-map" transform="translate(440, 870)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#3d1a1a" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/marketing-feature-map</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">★★ atomic gate</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">apply → ibm</text>
+      </g>
+      <g class="node" data-id="ibm-feature-map" transform="translate(660, 870)">
+        <rect class="node-bg" width="160" height="60" rx="10" fill="#3d1a1a" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="80" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">/ibm-feature-map</text>
+        <text x="80" y="40" text-anchor="middle" font-size="9" fill="#a1a1aa">★★ atomic gate</text>
+        <text x="80" y="52" text-anchor="middle" font-size="8" fill="#52525b">apply → marketing (back)</text>
+      </g>
+
+      <!-- Footnotes inside SVG -->
+      <g transform="translate(40, 1080)">
+        <rect width="1380" height="80" rx="10" fill="#0a0a0a" stroke="#1a1a1a"/>
+        <text x="20" y="22" font-size="11" font-weight="700" fill="#22dd92" letter-spacing="1.5">EDGE GRAMMAR</text>
+        <text x="20" y="42" font-size="11" fill="#fff">— Solid edge: forward route. Source-color stroke = the skill emitting the suggestion.</text>
+        <text x="20" y="58" font-size="11" fill="#fff">— Dashed edge: back-route (re-edit / re-frame). Iterate verdicts loop back to /spec-review or /problem-boundary.</text>
+        <text x="20" y="74" font-size="11" fill="#fff">— Indigo dashed edges from /workplan show status-routed picks across all four phases (cross-cutting, never overwrites).</text>
+      </g>
+    </svg>
+  </main>
+
+  <footer>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#22dd92"></span>Mint — Trigger / Discovery entry</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#1ab677"></span>Mint dim — Processing (Definition phase)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#A855F7"></span>Purple — Decision (verdict-routed skill)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Amber — Service / Execution</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Red — Output / Publishing</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#6366F1"></span>Indigo — Tracking (cross-cutting)</div>
+      <div class="legend-item"><span class="legend-line" style="background:#1ab677"></span>Solid: forward route</div>
+      <div class="legend-item"><span class="legend-line dashed"></span>Dashed: back-route / iterate</div>
+    </div>
+    <div class="source">Generated from: <code>/Users/noam.sheffi/CX/AI PM/lifecycle-next-step-chain-map.md</code> + 14 skill files in <code>System/Agents/Claude/commands/</code></div>
+  </footer>
+
+<script>
+(function(){
+  // Adjacency list: source skill → array of target skill IDs
+  const adj = {
+    'problem-discover': ['business-case', 'problem-boundary'],
+    'problem-boundary': ['prd', 'business-case', 'pre-mortem', 'spec-review'],
+    'pre-mortem': ['prd', 'problem-boundary', 'decision-log'],
+    'business-case': ['prd', 'spec-to-team-epic', 'decision-log', 'schedule'],
+    'prd': ['spec-review'],
+    'spec-review': ['plt-review', 'persona-review', 'spec-to-team-epic'],
+    'plt-review': ['persona-review', 'spec-to-team-epic', 'spec-review', 'decision-log'],
+    'persona-review': ['spec-to-team-epic', 'spec-review', 'problem-boundary'],
+    'spec-to-team-epic': ['roadmap-create'],
+    'initiative-review': ['sprint-prep', 'roadmap-sync', 'feature-shipped'],
+    'workplan': ['problem-boundary', 'prd', 'spec-to-team-epic', 'initiative-review', 'feature-shipped'],
+    'roadmap-create': ['marketing-feature-map', 'ibm-feature-map'],
+    'marketing-feature-map': ['ibm-feature-map'],
+    'ibm-feature-map': ['marketing-feature-map'],
+    'decision-log': [], 'schedule': [], 'sprint-prep': [], 'roadmap-sync': [], 'feature-shipped': []
+  };
+  // Reverse adjacency: who points TO this node
+  const rev = {};
+  Object.keys(adj).forEach(k => { rev[k] = []; });
+  Object.entries(adj).forEach(([src, targets]) => targets.forEach(t => { if (rev[t]) rev[t].push(src); }));
+
+  const nodes = document.querySelectorAll('g.node');
+  const edges = document.querySelectorAll('g.edge');
+  const svg = document.querySelector('svg');
+
+  function isolate(id) {
+    const outgoing = adj[id] || [];
+    const incoming = rev[id] || [];
+    const keep = new Set([id, ...outgoing, ...incoming]);
+    nodes.forEach(n => {
+      const nid = n.getAttribute('data-id');
+      n.classList.toggle('dimmed', !keep.has(nid));
+      n.classList.toggle('highlighted', nid === id);
+    });
+    edges.forEach(e => {
+      const efrom = e.getAttribute('data-from');
+      // dim edge unless it originates from the clicked node OR from one of the incoming nodes
+      const showEdge = (efrom === id) || incoming.includes(efrom);
+      e.classList.toggle('dimmed', !showEdge);
+    });
+  }
+
+  function reset() {
+    nodes.forEach(n => { n.classList.remove('dimmed'); n.classList.remove('highlighted'); });
+    edges.forEach(e => e.classList.remove('dimmed'));
+  }
+
+  nodes.forEach(node => {
+    node.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = node.getAttribute('data-id');
+      if (node.classList.contains('highlighted')) reset();
+      else isolate(id);
+    });
+  });
+
+  svg.addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>
