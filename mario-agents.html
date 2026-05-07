@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mario Agents — Noam's PM Operating System</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-alt: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #22dd92;
+    --mint-dim: #1ab677;
+    --mint-soft: rgba(34, 221, 146, 0.15);
+    --mint-faint: rgba(34, 221, 146, 0.06);
+    --warning: #f59e0b;
+    --code-bg: #050505;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  body {
+    background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  /* Brand row */
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text); font-size: 13px; font-weight: 500;
+    letter-spacing: 0.02em; margin-bottom: 24px;
+  }
+  .brand-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+  }
+
+  /* Header */
+  header { margin-bottom: 48px; }
+  h1 {
+    font-size: 38px; font-weight: 700; line-height: 1.15;
+    letter-spacing: -0.02em; color: var(--text);
+  }
+  h1 .accent { color: var(--mint); }
+  .subtitle {
+    color: var(--text-2); font-size: 16px; margin-top: 12px;
+    max-width: 720px;
+  }
+
+  /* Stat counters */
+  .counters {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 48px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .stat .num {
+    font-size: 32px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .stat .num.mint { color: var(--mint); }
+  .stat .label {
+    text-transform: uppercase; font-size: 11px;
+    letter-spacing: 0.08em; color: var(--text-muted);
+    margin-top: 8px;
+  }
+  .stat .sub {
+    font-size: 12px; color: var(--text-2); margin-top: 6px;
+  }
+
+  /* Section header */
+  section.block { margin-bottom: 48px; }
+  .section-header {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border); padding-bottom: 12px;
+  }
+  .section-header h2 {
+    font-size: 22px; font-weight: 600; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .section-header .count {
+    color: var(--mint); font-size: 13px; font-weight: 500;
+    background: var(--mint-soft); padding: 2px 10px; border-radius: 999px;
+  }
+
+  /* Agent cards grid */
+  .agent-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .agent {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .agent:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .agent.tbd {
+    border: 1px dashed var(--border-strong);
+    opacity: 0.7;
+    background: var(--surface-alt);
+  }
+  .agent .head {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .agent .emoji {
+    font-size: 32px; line-height: 1;
+  }
+  .agent .name-block { flex: 1; }
+  .agent .name {
+    font-size: 20px; font-weight: 700; color: var(--text);
+  }
+  .agent .role {
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 999px; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .badge.live {
+    background: var(--mint-soft); color: var(--mint);
+  }
+  .badge.tbd {
+    background: rgba(245, 158, 11, 0.12); color: var(--warning);
+  }
+  .agent .field { display: flex; flex-direction: column; gap: 6px; }
+  .agent .field-label {
+    text-transform: uppercase; font-size: 10px;
+    letter-spacing: 0.1em; color: var(--text-muted);
+    font-weight: 600;
+  }
+  .agent .field-body {
+    color: var(--text-2); font-size: 13px;
+  }
+  .agent .field-body strong { color: var(--text); font-weight: 500; }
+  .agent .field-body ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .agent .field-body ul li {
+    padding-left: 14px; position: relative;
+    margin-bottom: 4px;
+  }
+  .agent .field-body ul li::before {
+    content: "›"; color: var(--mint);
+    position: absolute; left: 0; top: 0;
+  }
+  code, .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px; color: var(--text);
+  }
+  .agent .field-body p + p { margin-top: 6px; }
+
+  /* Tag chip table for Yoshi taxonomy */
+  .tag-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tag-table td {
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .tag-table tr:last-child td { border-bottom: none; }
+  .tag-table td:first-child { width: 38%; padding-right: 8px; }
+  .chip {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; font-weight: 500;
+  }
+  .chip.active { background: var(--mint-soft); color: var(--mint); }
+  .chip.passive { background: rgba(34, 221, 146, 0.06); color: var(--mint-dim); border: 1px solid var(--mint-faint); }
+  .chip.closed { background: rgba(82, 82, 91, 0.2); color: var(--text-muted); }
+  .chip.other { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+  /* Schedule strip */
+  .schedule-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .sched-pill {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px;
+    font-family: ui-monospace, monospace; font-size: 11px;
+    color: var(--text-2); display: flex; flex-direction: column; gap: 2px;
+  }
+  .sched-pill .when { color: var(--text-muted); font-size: 10px; }
+  .sched-pill .cron { color: var(--mint); font-weight: 500; }
+
+  /* Pattern callout */
+  .callout {
+    background: var(--mint-faint); border-left: 3px solid var(--mint);
+    border-radius: 8px; padding: 16px 20px;
+    color: var(--text-2); font-size: 13px;
+  }
+  .callout strong { color: var(--text); }
+
+  /* Schedule overview block */
+  .sched-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;
+  }
+  .sched-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .sched-card .name {
+    font-weight: 600; color: var(--text); font-size: 13px;
+  }
+  .sched-card .owner {
+    color: var(--mint); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-top: 4px;
+  }
+  .sched-card .cron {
+    font-family: ui-monospace, monospace; font-size: 11px;
+    color: var(--text-2); margin-top: 8px;
+    background: var(--code-bg); padding: 4px 8px; border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px; padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px;
+  }
+  footer .src { margin-top: 8px; font-family: ui-monospace, monospace; }
+  footer code {
+    background: transparent; border: none; padding: 0;
+    color: var(--text-2);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .agent-grid { grid-template-columns: 1fr; }
+    .counters { grid-template-columns: repeat(2, 1fr); }
+    .sched-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px) {
+    h1 { font-size: 28px; }
+    body { padding: 32px 16px 64px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span>Coralogix · NSPM</span>
+  </div>
+
+  <header>
+    <h1>Mario Agents<span class="accent">.</span></h1>
+    <p class="subtitle">Named personas over scheduler, skills, and state files. Each agent runs autonomously and only interrupts Noam when there's a real signal. Naming convention: Super Mario characters.</p>
+  </header>
+
+  <!-- Stat counters -->
+  <section class="counters">
+    <div class="stat">
+      <div class="num mint">2</div>
+      <div class="label">Active agents</div>
+      <div class="sub">Luigi · Yoshi</div>
+    </div>
+    <div class="stat">
+      <div class="num">1</div>
+      <div class="label">Reserved slot</div>
+      <div class="sub">Mario (co-PM)</div>
+    </div>
+    <div class="stat">
+      <div class="num">5</div>
+      <div class="label">Scheduled tasks</div>
+      <div class="sub">4 cron + 1 launchd</div>
+    </div>
+    <div class="stat">
+      <div class="num mint">19</div>
+      <div class="label">Yoshi backfill</div>
+      <div class="sub">migrated 2026-05-07</div>
+    </div>
+  </section>
+
+  <!-- Agent cards -->
+  <section class="block">
+    <div class="section-header">
+      <h2>The Roster</h2>
+      <span class="count">3 agents</span>
+    </div>
+
+    <div class="agent-grid">
+
+      <!-- Mario (TBD) -->
+      <article class="agent tbd">
+        <div class="head">
+          <div class="emoji">🦸</div>
+          <div class="name-block">
+            <div class="name">Mario</div>
+            <div class="role">Co-PM</div>
+          </div>
+          <span class="badge tbd">🚧 TBD</span>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Status</div>
+          <div class="field-body">Not yet built. Reserved slot for the strategic co-PM.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Role (planned)</div>
+          <div class="field-body">
+            Portfolio-level decisions. Cross-initiative trade-offs. High-leverage prioritization. The agent that thinks about <em>what to work on</em>, not <em>how to track it</em>.
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Possible scope</div>
+          <div class="field-body">
+            <ul>
+              <li><code>/roadmap-review</code> augmentation</li>
+              <li>Business-case sparring partner</li>
+              <li><code>/problem-discover</code> loops</li>
+              <li>Weekly intelligence-brief curation</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Why the slot exists</div>
+          <div class="field-body">
+            Luigi handles execution discipline. Yoshi handles async waiting. Mario fills the strategic-direction layer that today still lives entirely in Noam's head.
+          </div>
+        </div>
+      </article>
+
+      <!-- Luigi -->
+      <article class="agent">
+        <div class="head">
+          <div class="emoji">🧑‍🔧</div>
+          <div class="name-block">
+            <div class="name">Luigi</div>
+            <div class="role">Scrum Master</div>
+          </div>
+          <span class="badge live">● Live</span>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Schedule</div>
+          <div class="field-body">
+            <div class="schedule-row">
+              <div class="sched-pill">
+                <span class="when">Mon–Fri 23:30 Lisbon</span>
+                <span class="cron">launchd nightly</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Voice</div>
+          <div class="field-body">Quiet competence. Action-first briefs. Signs off <code>— Luigi</code>.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Job</div>
+          <div class="field-body">Walk active-sprint and ship-candidate initiatives every night. Surface ships, risks, and what needs Noam's publish-button.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Commands</div>
+          <div class="field-body"><code>/scrum-chief</code> &nbsp; <code>luigi</code></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Inputs</div>
+          <div class="field-body">
+            <ul>
+              <li>Workplan frontmatter <code>**/00-workplan.md</code></li>
+              <li>Jira (CX project, sprint + team scope)</li>
+              <li><code>Automation/Initiative-Tracker/registry.md</code></li>
+              <li>Per-initiative state caches</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Outputs</div>
+          <div class="field-body">
+            <ul>
+              <li>Brief: <code>Automation/Scrum-Chief/{YYYY}/{MM}/luigi-...md</code></li>
+              <li>Slack DM-to-self with action queue</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Operating rules</div>
+          <div class="field-body">
+            <ul>
+              <li>Zero external writes (no Slack channels, no Jira, no Notion)</li>
+              <li>Idempotent — state file blocks re-flagging</li>
+              <li>Lifecycle filter is hard (skips draft/scoping/paused)</li>
+              <li>Action-first, ≤2 min read</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Memory</div>
+          <div class="field-body"><code>reference_luigi_agent.md</code></div>
+        </div>
+      </article>
+
+      <!-- Yoshi -->
+      <article class="agent">
+        <div class="head">
+          <div class="emoji">🦖</div>
+          <div class="name-block">
+            <div class="name">Yoshi</div>
+            <div class="role">Slack Follow-up</div>
+          </div>
+          <span class="badge live">● Live</span>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Schedule</div>
+          <div class="field-body">
+            <div class="schedule-row">
+              <div class="sched-pill">
+                <span class="when">Graze · nightly 23:00</span>
+                <span class="cron">0 23 * * *</span>
+              </div>
+              <div class="sched-pill">
+                <span class="when">Watch · 09–19 weekdays</span>
+                <span class="cron">0 9-19/2 * * 1-5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Voice</div>
+          <div class="field-body">Loyal sidekick. 🦖-prefix. Action-first, never narrative.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Job</div>
+          <div class="field-body">Swallow Slack asks tagged <code>#slack-track</code>, watch the threads, lay reply-eggs (DM Noam) when something substantive lands. Reconcile via <code>/yoshi</code> sweep.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Commands</div>
+          <div class="field-body">
+            <ul>
+              <li><code>/yoshi-graze</code> — capture (cron)</li>
+              <li><code>/yoshi-watch</code> — push (cron)</li>
+              <li><code>/yoshi</code> — sweep + reconcile (manual / from <code>/today</code>)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Tag taxonomy</div>
+          <div class="field-body">
+            <table class="tag-table">
+              <tr><td><span class="chip active">#slack-track</span></td><td>Active ask. Bumped at 3+ days stale.</td></tr>
+              <tr><td><span class="chip passive">#slack-track-watch</span></td><td>Passive monitor. Never bumped.</td></tr>
+              <tr><td><span class="chip closed">#slack-track-closed</span></td><td>Set by <code>/yoshi</code> after writing reply summary.</td></tr>
+              <tr><td><span class="chip other">#follow-up</span></td><td>Non-Slack tasks. Hard separation. Owned by <code>/follow-up</code>.</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">State files</div>
+          <div class="field-body">
+            <ul>
+              <li><code>Automation/Yoshi/yoshi-state.json</code></li>
+              <li><code>Automation/Yoshi/yoshi-inbox.md</code></li>
+              <li><code>Daily Notes/yoshi-{YYYY-MM-DD}.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Operating rules</div>
+          <div class="field-body">
+            <ul>
+              <li>Quiet hours 20:00–08:00 Lisbon (no DMs)</li>
+              <li>Weekends silent</li>
+              <li>One stale-nudge per item, ever</li>
+              <li>Hard separation from <code>#follow-up</code></li>
+              <li>Read-only on Slack except DM-to-self</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Current state</div>
+          <div class="field-body"><strong>19 items</strong> migrated from <code>#follow-up</code> to <code>#slack-track</code> on 2026-05-07. State file empty, will seed on first watch tick.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Memory</div>
+          <div class="field-body"><code>reference_yoshi_agent.md</code></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- Schedule overview -->
+  <section class="block">
+    <div class="section-header">
+      <h2>Scheduled Tasks</h2>
+      <span class="count">5 active</span>
+    </div>
+    <div class="sched-grid">
+      <div class="sched-card">
+        <div class="name">Morning Dashboard</div>
+        <div class="owner">Noam · /today</div>
+        <div class="cron">0 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Gong Insights</div>
+        <div class="owner">Noam · /gong-insights</div>
+        <div class="cron">5 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Yoshi Graze</div>
+        <div class="owner">Yoshi · capture</div>
+        <div class="cron">0 23 * * *</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Yoshi Watch</div>
+        <div class="owner">Yoshi · push</div>
+        <div class="cron">0 9-19/2 * * 1-5</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Luigi Brief</div>
+        <div class="owner">Luigi · launchd</div>
+        <div class="cron">30 23 * * 1-5</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pattern -->
+  <section class="block">
+    <div class="section-header">
+      <h2>Pattern</h2>
+    </div>
+    <div class="callout">
+      Each agent is a <strong>named persona</strong> over <strong>scheduler + skills + state files</strong>. Not a new runtime, not magic. Identity gives them a voice, scheduler gives them autonomy, state files give them memory across runs. New agents follow the same shape: pick a Mario character, pin a job nobody currently owns, wire a cron, write a memory entry.
+    </div>
+  </section>
+
+  <footer>
+    <div>Mario Agents · Noam's PM Operating System</div>
+    <div class="src">Generated from: <code>AI PM/yoshi-slack-followup-agent-plan.md</code> · <code>System/Agents/Claude/commands/scrum-chief.md</code></div>
+  </footer>
+
+</div>
+</body>
+</html>
