@@ -299,9 +299,9 @@ footer {
   <!-- Stat counters -->
   <section class="counters">
     <div class="stat mint">
-      <div class="num">4</div>
-      <div class="label">Sections</div>
-      <div class="sub">§1 Last run · §2 Pending · §3 Failures · §4 Activity</div>
+      <div class="num">2</div>
+      <div class="label">Visible blocks</div>
+      <div class="sub">Hero number · Agent roster · (failures + activity hidden)</div>
     </div>
     <div class="stat">
       <div class="num">3</div>
@@ -320,12 +320,42 @@ footer {
     </div>
   </section>
 
-  <!-- §1 Anatomy -->
+  <!-- Hero Anatomy -->
   <section>
-    <h2><span class="num">§1</span> Anatomy of "Last run per agent"</h2>
+    <h2>Anatomy of the hero number</h2>
     <p class="lede">
-      The most important section. One row per agent, latest run only. Read left to right —
-      the <span style="color:var(--mint);font-weight:600">"On me"</span> column is what matters.
+      The single most important pixel on the screen. Sums <span style="color:var(--mint);font-weight:600">items_actionable</span>
+      across every agent's latest run. <strong style="color:var(--text)">Zero = you're done. Non-zero = at least look.</strong>
+    </p>
+
+    <div class="anatomy">
+      <div style="background:var(--surface-alt);border:1px solid var(--mint-soft);border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-size:28px;font-weight:700;color:var(--text);line-height:1.2;">🟢 Inbox zero. Nothing on you.</div>
+        <div style="color:var(--text-2);font-size:14px;margin-top:8px;font-style:italic;">3 agents healthy. Last tick May 07 16:00.</div>
+      </div>
+      <div style="background:var(--surface-alt);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:24px;">
+        <div style="font-size:28px;font-weight:700;color:var(--text);line-height:1.2;">🔴 5 waiting on you</div>
+        <div style="color:var(--text-2);font-size:14px;margin-top:8px;font-style:italic;">yoshi-graze: 3 · luigi: 2. Last tick May 07 23:30.</div>
+      </div>
+
+      <div class="callouts" style="margin-top:24px;">
+        <div class="callout">
+          <strong>🟢 state</strong>
+          <p>Close the file. You're done. The 60-second ritual was 5 seconds today.</p>
+        </div>
+        <div class="callout warn">
+          <strong>🔴 state</strong>
+          <p>Subtitle tells you which agent owes you items. Scroll to the roster, click that agent's run-file link, see the detail.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roster Anatomy -->
+  <section>
+    <h2>Anatomy of the agent roster</h2>
+    <p class="lede">
+      One line per agent, latest run only. Includes agents that have <span class="key">never run yet</span> as ⚪ placeholders so you know they exist.
     </p>
 
     <div class="anatomy">
@@ -333,83 +363,85 @@ footer {
         <thead>
           <tr>
             <th>Agent</th>
-            <th>Status</th>
             <th>Last run</th>
             <th>When</th>
             <th>Took</th>
             <th>On me <span class="col-marker">KEY</span></th>
+            <th>Status</th>
             <th>Summary</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>yoshi-watch</td>
-            <td>✅ ok</td>
+            <td>🦖 yoshi-watch</td>
             <td><span class="link-mock">yoshi-watch-2026-05-07-1700</span></td>
-            <td>May 07 16:00</td>
+            <td>16:00</td>
             <td>23s</td>
             <td><strong style="color:var(--mint);font-size:16px">0</strong></td>
-            <td>Watched 3 items, 0 substantive, 0 nudges</td>
+            <td>✅</td>
+            <td>Watched 3 items, 0 substantive</td>
+          </tr>
+          <tr>
+            <td>🦖 yoshi-graze</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td>⚪ never run</td>
+            <td style="color:var(--text-muted)"></td>
+          </tr>
+          <tr>
+            <td>🍄 luigi</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td>⚪ never run</td>
+            <td style="color:var(--text-muted)"></td>
           </tr>
         </tbody>
       </table>
 
       <div class="callouts">
         <div class="callout">
-          <strong>On me</strong>
-          <p>Items waiting on you right now. <strong style="color:var(--text)">If 0, ignore this agent today.</strong> If non-zero, click "Last run" to see what.</p>
-        </div>
-        <div class="callout">
-          <strong>Status</strong>
-          <p>One glance at the icon column tells you health. ✅ = ignore. Anything else = look.</p>
+          <strong>⚪ never run</strong>
+          <p>Agent is registered in <code style="background:var(--code-bg);padding:1px 4px;border-radius:3px;color:var(--mint);">KNOWN_AGENTS</code> but hasn't emitted a run file yet. Will populate after its next scheduled tick.</p>
         </div>
         <div class="callout">
           <strong>Last run (link)</strong>
-          <p>Click to open the per-run detail file. Body explains what each watched item is, who's expected to reply, what's awaiting action.</p>
-        </div>
-        <div class="callout warn">
-          <strong>When + Took</strong>
-          <p>"When" trending old = agent didn't fire. "Took" trending up over weeks = something's getting bloated.</p>
+          <p>Click to drill into the full detail file. Run body explains what was watched/grazed/walked.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- §2 §3 §4 -->
+  <!-- Hidden under the fold -->
   <section>
-    <h2>The other three sections</h2>
-    <p class="lede">Each one zooms in on a different failure mode. You'll rarely need them — §1 is the canary.</p>
+    <h2>What's hidden under the fold</h2>
+    <p class="lede">Two collapsed callouts. You only open them when something needs attention.</p>
 
-    <div class="three-grid">
+    <div class="three-grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="card">
-        <div class="card-num">§2</div>
-        <h3>Pending — waiting on me</h3>
+        <div class="card-num">[!info]-</div>
+        <h3>🔴 Failures (last 7d)</h3>
         <p>
-          Sums "On me" across all agents and links to the source.
-          <span class="key">If §1 shows 0 across the board, this section is empty.</span>
-          When it has rows, click <code>[[yoshi-inbox]]</code> or <code>[[luigi-state]]</code> to act.
-        </p>
-      </div>
-      <div class="card">
-        <div class="card-num">§3</div>
-        <h3>Failures (last 7d)</h3>
-        <p>
-          Anything <span class="key">not</span> ✅ ok in the last week. Errors, warnings, skipped runs.
+          Anything <span class="key">not ✅ ok</span> in the last week. Errors, warnings, skipped runs.
           <span class="key">Empty = healthy.</span>
           Lights up only when an agent crashed, hit MCP outage, or tripped a guard rail.
         </p>
       </div>
       <div class="card">
-        <div class="card-num">§4</div>
-        <h3>Activity (30d)</h3>
+        <div class="card-num">[!info]-</div>
+        <h3>📊 Activity (last 30d)</h3>
         <p>
           Per-agent rollup: runs · processed · closed · pushed-to-me · success%.
-          <span class="key">Are they earning their keep?</span>
-          High "Pushed to me" relative to "Processed" = good filtering. Low success% = needs attention.
+          <span class="key">Are agents earning their keep?</span>
+          Open it weekly during retro, otherwise leave closed.
         </p>
       </div>
     </div>
   </section>
+
 
   <!-- Status legend -->
   <section>
