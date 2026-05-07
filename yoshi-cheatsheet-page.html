@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoshi Cheatsheet — Slack Follow-up Agent</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-alt: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --code-bg: #050505;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #22dd92;
+    --mint-dim: #1ab677;
+    --mint-soft: rgba(34, 221, 146, 0.15);
+    --mint-faint: rgba(34, 221, 146, 0.06);
+    --warning: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+    color: var(--text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 32px 24px 64px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Brand row */
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px; font-size: 13px; color: var(--text-2);
+  }
+  .brand-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+  }
+  .brand-name { color: var(--text); font-weight: 500; letter-spacing: 0.3px; }
+
+  /* Header */
+  header { margin-bottom: 48px; }
+  h1 {
+    font-size: 40px; line-height: 1.15;
+    font-weight: 700; letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  h1 .accent { color: var(--mint); }
+  .subtitle { color: var(--text-2); font-size: 17px; max-width: 700px; }
+  .subtitle code {
+    background: var(--mint-soft); color: var(--mint);
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 13px; font-family: ui-monospace, 'SF Mono', monospace;
+  }
+
+  /* Stat counters */
+  .counters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin-bottom: 48px;
+  }
+  .counter {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .counter .num { font-size: 32px; font-weight: 700; color: var(--mint); line-height: 1; margin-bottom: 8px; }
+  .counter .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .counter .sub { font-size: 12px; color: var(--text-2); margin-top: 6px; }
+
+  /* Sections */
+  section.block { margin-bottom: 48px; }
+  h2 {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.01em;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h-icon { font-size: 20px; }
+  h2 .h-num {
+    display: inline-block; min-width: 28px; height: 28px;
+    background: var(--mint-soft); color: var(--mint);
+    border-radius: 6px; text-align: center; line-height: 28px;
+    font-size: 13px; font-weight: 700;
+  }
+  h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+
+  /* Code blocks */
+  pre, code.inline {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 13px; color: var(--text);
+  }
+  pre { padding: 16px; overflow-x: auto; line-height: 1.55; }
+  code.inline { padding: 2px 6px; font-size: 12px; }
+  pre .tag-track { color: var(--mint); font-weight: 500; }
+  pre .tag-watch { color: var(--warning); font-weight: 500; }
+  pre .tag-closed { color: var(--text-muted); }
+  pre .comment { color: var(--text-muted); }
+  pre .string { color: #93c5fd; }
+
+  /* Callout */
+  .callout {
+    background: var(--mint-faint);
+    border-left: 3px solid var(--mint);
+    border-radius: 8px; padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .callout.warn { background: rgba(245, 158, 11, 0.06); border-left-color: var(--warning); }
+  .callout-title { font-weight: 600; color: var(--text); margin-bottom: 4px; font-size: 14px; }
+  .callout-body { color: var(--text-2); font-size: 13px; }
+
+  /* Card grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; transition: all 0.18s;
+  }
+  .card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .card-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .card-cmd {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    color: var(--mint); font-weight: 600; font-size: 14px;
+  }
+  .card-sched {
+    font-size: 11px; color: var(--text-muted);
+    background: var(--surface-alt); padding: 3px 8px;
+    border-radius: 4px; margin-left: auto;
+  }
+  .card-desc { color: var(--text-2); font-size: 13px; line-height: 1.55; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { padding: 12px 16px; text-align: left; font-size: 13px; }
+  th {
+    background: var(--surface-alt); color: var(--text-muted);
+    font-weight: 600; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; border-bottom: 1px solid var(--border);
+  }
+  td { border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.path { font-family: ui-monospace, 'SF Mono', monospace; font-size: 12px; color: var(--text); }
+  td strong { color: var(--text); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 36px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 12px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .step { position: relative; padding-bottom: 20px; }
+  .step::before {
+    content: ''; position: absolute; left: -30px; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--mint);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .step.you::before { background: var(--mint); }
+  .step-actor {
+    display: inline-block; font-size: 10px;
+    background: var(--mint-soft); color: var(--mint);
+    padding: 2px 8px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600; margin-bottom: 4px;
+  }
+  .step-actor.yoshi { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+  .step-actor.slack { background: rgba(147, 197, 253, 0.12); color: #93c5fd; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-detail { color: var(--text-2); font-size: 13px; }
+  .step-detail code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+  /* Comparison grid */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .compare .col {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .compare .col.subst { border-color: var(--mint-dim); background: var(--mint-faint); }
+  .compare h3 { margin-top: 0; font-size: 14px; }
+  .compare h3.label-subst { color: var(--mint); }
+  .compare h3.label-trivial { color: var(--text-muted); }
+  .compare ul { list-style: none; padding: 0; }
+  .compare li { font-size: 13px; color: var(--text-2); padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .compare li:last-child { border-bottom: 0; }
+  .compare li code {
+    background: var(--code-bg); padding: 1px 6px; border-radius: 3px;
+    font-size: 12px; color: var(--text);
+  }
+
+  /* Tag taxonomy pills */
+  .tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tag-pill {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 12px; padding: 5px 10px; border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .tag-pill.track { background: var(--mint-faint); color: var(--mint); border-color: var(--mint-dim); }
+  .tag-pill.watch { background: rgba(245, 158, 11, 0.06); color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
+  .tag-pill.closed { background: var(--surface-alt); color: var(--text-muted); }
+  .tag-pill.followup { background: var(--surface-alt); color: var(--text-2); border-style: dashed; }
+
+  /* Footer */
+  footer {
+    margin-top: 64px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px;
+  }
+  footer .source { font-family: ui-monospace, 'SF Mono', monospace; }
+  footer a { color: var(--mint); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    h1 { font-size: 28px; }
+    .compare { grid-template-columns: 1fr; }
+    body { padding: 24px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Coralogix · NSPM</span>
+    <span style="margin-left: auto; color: var(--text-muted);">2026-05-07</span>
+  </div>
+
+  <header>
+    <h1>🦖 Yoshi Cheatsheet<span class="accent">.</span></h1>
+    <p class="subtitle">
+      One-page reference for the Slack follow-up agent. Tag a Slack ask with
+      <code>#slack-track</code>, Yoshi watches the thread and DMs you when
+      something substantive lands.
+    </p>
+  </header>
+
+  <section class="counters" aria-label="Key facts">
+    <div class="counter">
+      <div class="num">1</div>
+      <div class="label">Manual step</div>
+      <div class="sub">paste vault line</div>
+    </div>
+    <div class="counter">
+      <div class="num">3</div>
+      <div class="label">Commands</div>
+      <div class="sub">graze · watch · sweep</div>
+    </div>
+    <div class="counter">
+      <div class="num">2h</div>
+      <div class="label">Watch cadence</div>
+      <div class="sub">09–19 weekdays</div>
+    </div>
+    <div class="counter">
+      <div class="num">3d</div>
+      <div class="label">Stale nudge</div>
+      <div class="sub">once per item, ever</div>
+    </div>
+    <div class="counter">
+      <div class="num">20–08</div>
+      <div class="label">Quiet hours</div>
+      <div class="sub">Lisbon · weekends silent</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">1</span> Your only manual step</h2>
+    <p style="color: var(--text-2); margin-bottom: 14px;">
+      Paste this line in any vault file after sending a Slack ask. Get the permalink
+      from Slack: right-click message → <strong>Copy link to message</strong>.
+    </p>
+<pre>- [ ] {1-line context}: {permalink} <span class="tag-track">#slack-track</span> #{Owner}</pre>
+
+    <h3>Tag taxonomy</h3>
+    <div class="tags-row">
+      <span class="tag-pill track">#slack-track</span>
+      <span class="tag-pill watch">#slack-track-watch</span>
+      <span class="tag-pill closed">#slack-track-closed</span>
+      <span class="tag-pill followup">#follow-up</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Tag</th><th>When to use</th><th>Yoshi behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">#slack-track</code></td>
+            <td>Active ask — you want a reply</td>
+            <td>DMs on substantive reply + bumps after 3 days stale</td>
+          </tr>
+          <tr>
+            <td><code class="inline">#slack-track-watch</code></td>
+            <td>Passive watch (FYI threads)</td>
+            <td>DMs on any reply, never bumps</td>
+          </tr>
+          <tr>
+            <td><code class="inline">#slack-track-closed</code></td>
+            <td>Auto-set after sweep</td>
+            <td>Stops watching</td>
+          </tr>
+          <tr>
+            <td><code class="inline">#follow-up</code></td>
+            <td>NON-Slack tasks</td>
+            <td><strong>Yoshi never touches this</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top: 14px;">
+      <div class="callout-title">Format flexibility</div>
+      <div class="callout-body">Only the <strong>tag</strong> and <strong>permalink</strong> are parsed. Free-form prose around them is fine. The <code class="inline">#Owner</code> tag is recommended (used in DM attribution) but not required.</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">2</span> What Yoshi runs and when</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-cmd">/yoshi-graze</span>
+          <span class="card-sched">23:00 nightly</span>
+        </div>
+        <div class="card-desc">
+          Scans last 24h <code class="inline">from:@me</code> Slack messages, proposes new
+          <code class="inline">#slack-track</code> entries → <code class="inline">yoshi-inbox.md</code>.
+          Catches asks you forgot to tag.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-cmd">/yoshi-watch</span>
+          <span class="card-sched">every 2h, 09–19 weekdays</span>
+        </div>
+        <div class="card-desc">
+          Polls every tagged thread, <strong>DMs you</strong> on substantive replies, fires
+          one-time bump on 3-day stale items. The only thing that pings.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-cmd">/yoshi</span>
+          <span class="card-sched">manual / from /today</span>
+        </div>
+        <div class="card-desc">
+          Closes resolved items, writes reply summary into source file, files inbox entries.
+          Read-only on Slack — no DMs from sweep.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top: 14px;">
+      <div class="callout-title">Quiet hours</div>
+      <div class="callout-body">20:00–08:00 Lisbon and weekends → no DMs. State still updates so nothing is lost; alerts deferred to the next active tick.</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">3</span> Where to look for what</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Question</th><th>File (Obsidian path)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>"Did Yoshi ping me?"</strong></td>
+            <td><strong>Slack DM-to-self</strong> (only alert surface)</td>
+          </tr>
+          <tr>
+            <td>Is Yoshi alive? What did the last tick do?</td>
+            <td class="path">Automation/Yoshi/yoshi-watch-log.md</td>
+          </tr>
+          <tr>
+            <td>What is Yoshi currently tracking?</td>
+            <td class="path">Automation/Yoshi/yoshi-state.json</td>
+          </tr>
+          <tr>
+            <td>What was resolved today?</td>
+            <td class="path">Daily Notes/yoshi-{YYYY-MM-DD}.md</td>
+          </tr>
+          <tr>
+            <td>Wrapper error?</td>
+            <td class="path">Automation/Yoshi/logs/yoshi-watch.log</td>
+          </tr>
+          <tr>
+            <td>Did launchd actually fire?</td>
+            <td class="path">Automation/Yoshi/logs/yoshi-watch.launchd.log</td>
+          </tr>
+          <tr>
+            <td>Last graze pick up new asks?</td>
+            <td class="path">Automation/Yoshi/yoshi-inbox.md</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">4</span> DM format</h2>
+    <h3>Substantive reply</h3>
+<pre>🦖 Yoshi: {Owner} replied on {your context}, "{first 120 chars of reply}…"
+{permalink}</pre>
+
+    <h3>Stale nudge (once per item, ever)</h3>
+<pre>🦖 Yoshi: {Owner} hasn't replied in {N} days on {context}. Bump?
+{permalink}</pre>
+
+    <p style="color: var(--text-2); margin-top: 8px; font-size: 13px;">
+      Click the permalink → Slack jumps directly to the thread.
+    </p>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">5</span> End-to-end timeline</h2>
+    <div class="timeline">
+      <div class="step you">
+        <span class="step-actor">You</span>
+        <div class="step-title">Send Slack ask + paste vault line</div>
+        <div class="step-detail">Add line with tag + permalink to any vault file.</div>
+      </div>
+      <div class="step">
+        <span class="step-actor yoshi">Yoshi · watch</span>
+        <div class="step-title">Detects new line, seeds state, polls thread</div>
+        <div class="step-detail">Updates <code>yoshi-state.json</code> and <code>yoshi-watch-log.md</code>.</div>
+      </div>
+      <div class="step">
+        <span class="step-actor slack">Slack</span>
+        <div class="step-title">Owner replies (silent — wait for next tick)</div>
+        <div class="step-detail">Reply just sits in the thread until next 2-hour tick.</div>
+      </div>
+      <div class="step">
+        <span class="step-actor yoshi">Yoshi · watch</span>
+        <div class="step-title">Polls thread, classifies substantive, DMs you</div>
+        <div class="step-detail">🦖 Yoshi DM lands in your self-DM. State updated.</div>
+      </div>
+      <div class="step you">
+        <span class="step-actor">You</span>
+        <div class="step-title">Click DM permalink, reply in Slack thread</div>
+        <div class="step-detail">No vault interaction needed at this step.</div>
+      </div>
+      <div class="step">
+        <span class="step-actor yoshi">Yoshi · sweep</span>
+        <div class="step-title">Closes item, writes resolution</div>
+        <div class="step-detail">Source line: <code>#slack-track</code> → <code>#slack-track-closed</code>. Adds <code>→ Reply</code> summary line. Writes daily digest.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">6</span> Substantive vs trivial classifier</h2>
+    <div class="compare">
+      <div class="col subst">
+        <h3 class="label-subst">Substantive (DM fires)</h3>
+        <ul>
+          <li>More than 2 sentences</li>
+          <li>Contains <code>I think</code>, <code>we should</code>, <code>concern</code>, <code>issue</code>, <code>but</code></li>
+          <li>References <code>RFC</code>, <code>CX-NNNN</code>, file path</li>
+          <li>Raises a clarifying question</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3 class="label-trivial">Trivial (state updates, no DM)</h3>
+        <ul>
+          <li>👍 / "ok" / "thanks" / "ack"</li>
+          <li>Single short sentence with no signal words</li>
+          <li>Emoji-only reactions</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">7</span> Force a reset or close manually</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Want to</th><th>Edit</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Close item without waiting for sweep</td>
+            <td>Change <code class="inline">#slack-track</code> → <code class="inline">#slack-track-closed</code> on the source line</td>
+          </tr>
+          <tr>
+            <td>Re-fire stale nudge that already fired</td>
+            <td><code class="inline">yoshi-state.json</code> → set <code class="inline">stale_pushed: false</code> on key</td>
+          </tr>
+          <tr>
+            <td>Stop tracking entirely</td>
+            <td>Remove <code class="inline">#slack-track*</code> tag OR delete state entry</td>
+          </tr>
+          <tr>
+            <td>Force full re-poll (ignore state)</td>
+            <td>Run <code class="inline">/yoshi --full</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">8</span> Hard separations</h2>
+    <div class="callout">
+      <div class="callout-title">Don't get confused</div>
+      <div class="callout-body">
+        <ul style="list-style: none; padding-left: 0;">
+          <li style="padding: 4px 0;">• <code>#slack-track*</code> is owned by <strong>Yoshi only</strong></li>
+          <li style="padding: 4px 0;">• <code>#follow-up</code> is for <strong>non-Slack tasks</strong> — Yoshi never touches it</li>
+          <li style="padding: 4px 0;">• <code>/yoshi-watch</code> is the <strong>only</strong> thing that sends DMs</li>
+          <li style="padding: 4px 0;">• <code>/yoshi</code> (sweep) is <strong>read-only</strong> on Slack, only edits vault</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2><span class="h-num">9</span> Files (so you know they exist)</h2>
+<pre><span class="comment"># State + logs</span>
+Automation/Yoshi/
+├── yoshi-state.json              <span class="comment">← memory between ticks</span>
+├── yoshi-watch-log.md            <span class="comment">← tick history (markdown)</span>
+├── yoshi-inbox.md                <span class="comment">← graze output, awaiting filing</span>
+├── last-sweep.json               <span class="comment">← sentinel for /yoshi --delta</span>
+├── usage.log                     <span class="comment">← token usage per run (JSONL)</span>
+└── logs/
+    ├── yoshi-watch.log           <span class="comment">← wrapper stderr</span>
+    ├── yoshi-watch-last.json     <span class="comment">← last claude -p result</span>
+    ├── yoshi-watch.launchd.log   <span class="comment">← launchd stdout</span>
+    └── yoshi-watch.launchd.error.log
+
+<span class="comment"># Skills</span>
+System/Agents/Claude/commands/
+├── yoshi.md                      <span class="comment">← sweep skill</span>
+├── yoshi-watch.md                <span class="comment">← watch skill</span>
+└── yoshi-graze.md                <span class="comment">← graze skill</span>
+
+<span class="comment"># Wrapper + schedules</span>
+System/Scripts/yoshi-wrapper.sh
+~/Library/LaunchAgents/com.claude.schedule.yoshi-{watch,graze}.plist</pre>
+  </section>
+
+  <footer>
+    <div class="source">Generated from: AI PM/Agents/yoshi-cheatsheet.md</div>
+    <div style="margin-top: 4px;">
+      Related: <a href="#">yoshi-plan.md</a> · Pattern: named persona over scheduler + skills + state
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
