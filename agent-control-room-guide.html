@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Control Room — How to Read It</title>
+<style>
+:root {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-alt: #111111;
+  --border: #1f1f1f;
+  --border-strong: #2a2a2a;
+  --text: #ffffff;
+  --text-2: #a1a1aa;
+  --text-muted: #52525b;
+  --mint: #22dd92;
+  --mint-dim: #1ab677;
+  --mint-soft: rgba(34, 221, 146, 0.15);
+  --mint-faint: rgba(34, 221, 146, 0.06);
+  --warn: #f59e0b;
+  --warn-soft: rgba(245, 158, 11, 0.12);
+  --fail: #ef4444;
+  --fail-soft: rgba(239, 68, 68, 0.12);
+  --code-bg: #050505;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+body {
+  background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+  padding: 48px 24px 64px;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* Brand row */
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-2); margin-bottom: 32px;
+}
+.brand .dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+}
+.brand strong { color: var(--text); font-weight: 600; letter-spacing: 0.06em; }
+
+/* Header */
+header { margin-bottom: 56px; }
+h1 {
+  font-size: 44px; font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1.1; margin-bottom: 16px;
+}
+h1 .accent { color: var(--mint); }
+.subtitle {
+  font-size: 17px; color: var(--text-2); max-width: 720px; line-height: 1.5;
+}
+.subtitle strong { color: var(--text); font-weight: 600; }
+
+/* Sections */
+section { margin-bottom: 56px; }
+h2 {
+  font-size: 22px; font-weight: 600; margin-bottom: 8px;
+  display: flex; align-items: baseline; gap: 12px;
+}
+h2 .num {
+  font-size: 13px; color: var(--mint); font-family: ui-monospace, monospace;
+  background: var(--mint-faint); padding: 3px 8px; border-radius: 4px;
+  border: 1px solid var(--mint-soft);
+}
+h2 + .lede {
+  color: var(--text-2); margin-bottom: 24px; font-size: 14px; max-width: 720px;
+}
+
+/* Stat counters */
+.counters {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-bottom: 56px;
+}
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
+.stat .num {
+  font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 6px;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+.stat.mint .num { color: var(--mint); }
+.stat .label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-2); font-weight: 600;
+}
+.stat .sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+/* Anatomy mock — annotated row */
+.anatomy {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; overflow-x: auto;
+}
+.mock-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  min-width: 720px;
+}
+.mock-table th {
+  text-align: left; padding: 8px 12px; color: var(--text-2);
+  font-weight: 500; border-bottom: 1px solid var(--border);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.mock-table td {
+  padding: 14px 12px; border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.mock-table tr:last-child td { border-bottom: none; }
+.col-marker {
+  display: inline-block; padding: 1px 6px; font-size: 10px;
+  background: var(--mint); color: var(--bg); border-radius: 3px;
+  font-weight: 700; letter-spacing: 0.04em; margin-left: 8px;
+  vertical-align: middle;
+}
+.link-mock { color: var(--mint); text-decoration: underline; cursor: pointer; }
+.callouts {
+  margin-top: 24px; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+.callout {
+  background: var(--surface-alt); border-left: 3px solid var(--mint);
+  padding: 12px 14px; border-radius: 6px; font-size: 13px;
+}
+.callout.warn { border-left-color: var(--warn); }
+.callout strong {
+  color: var(--mint); font-family: ui-monospace, monospace;
+  font-size: 12px; display: block; margin-bottom: 4px;
+}
+.callout.warn strong { color: var(--warn); }
+.callout p { color: var(--text-2); }
+
+/* 3-card grid for sections 2/3/4 */
+.three-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+.card .card-num {
+  font-family: ui-monospace, monospace; font-size: 11px; color: var(--mint);
+  background: var(--mint-faint); padding: 2px 6px; border-radius: 3px;
+  display: inline-block; margin-bottom: 10px;
+  border: 1px solid var(--mint-soft);
+}
+.card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.card p { color: var(--text-2); font-size: 13px; line-height: 1.55; }
+.card .key { color: var(--text); font-weight: 500; }
+
+/* Legend */
+.legend {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.legend table { width: 100%; border-collapse: collapse; }
+.legend th {
+  text-align: left; padding: 12px 18px; color: var(--text-2);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  font-weight: 600; background: var(--surface-alt);
+}
+.legend td {
+  padding: 14px 18px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-2); vertical-align: middle;
+}
+.legend td:first-child {
+  font-family: ui-monospace, monospace; color: var(--text); white-space: nowrap;
+  font-size: 14px; font-weight: 500;
+}
+.legend td .meaning { color: var(--text); font-weight: 500; }
+
+/* Daily ritual steps */
+.steps {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  position: relative;
+}
+.step {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; position: relative;
+}
+.step .n {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--mint); color: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px; margin-bottom: 12px;
+}
+.step h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.step p { color: var(--text-2); font-size: 13px; }
+.step.last .n { background: var(--text); color: var(--bg); }
+
+/* Data flow */
+.flow {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 24px;
+}
+.flow-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.flow-group {
+  flex: 1; min-width: 160px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.flow-box {
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; font-size: 13px;
+  font-family: ui-monospace, monospace; text-align: center;
+}
+.flow-box.agent { border-color: var(--mint-soft); color: var(--mint); }
+.flow-box.file {
+  border-color: var(--border-strong); color: var(--text);
+  font-size: 11px; word-break: break-all;
+}
+.flow-box.dash {
+  background: var(--mint-faint); border-color: var(--mint);
+  color: var(--text); font-weight: 600;
+}
+.flow-arrow {
+  color: var(--text-muted); font-size: 24px; flex: 0 0 auto;
+}
+.flow-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-muted); text-align: center; margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* Mario callout */
+.add-card {
+  background: var(--surface); border: 1px solid var(--mint-soft);
+  border-left: 3px solid var(--mint);
+  border-radius: var(--radius); padding: 24px;
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.add-card .icon {
+  font-size: 36px; flex: 0 0 auto;
+}
+.add-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.add-card p { color: var(--text-2); font-size: 13px; line-height: 1.6; }
+.add-card code {
+  background: var(--code-bg); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 3px; font-size: 12px; color: var(--mint);
+}
+
+/* Footer */
+footer {
+  margin-top: 80px; padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--text-muted);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { padding: 24px 16px 48px; }
+  h1 { font-size: 32px; }
+  .counters { grid-template-columns: repeat(2, 1fr); }
+  .three-grid, .steps { grid-template-columns: 1fr; }
+  .flow-arrow { transform: rotate(90deg); margin: 0 auto; }
+  .flow-row { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="brand">
+    <div class="dot"></div>
+    <strong>Coralogix</strong> · NSPM Operating System
+  </div>
+
+  <header>
+    <h1>Agent Control Room<span class="accent">.</span></h1>
+    <p class="subtitle">
+      Live state of every PM agent (Yoshi, Luigi, Mario, ...) in one place.
+      <strong>Open it once a day. Glance §1. Done.</strong>
+    </p>
+  </header>
+
+  <!-- Stat counters -->
+  <section class="counters">
+    <div class="stat mint">
+      <div class="num">4</div>
+      <div class="label">Sections</div>
+      <div class="sub">§1 Last run · §2 Pending · §3 Failures · §4 Activity</div>
+    </div>
+    <div class="stat">
+      <div class="num">3</div>
+      <div class="label">Live agents</div>
+      <div class="sub">yoshi-graze · yoshi-watch · luigi</div>
+    </div>
+    <div class="stat">
+      <div class="num">60s</div>
+      <div class="label">Daily ritual</div>
+      <div class="sub">Open · glance · click · done</div>
+    </div>
+    <div class="stat">
+      <div class="num">0</div>
+      <div class="label">External deps</div>
+      <div class="sub">Pure Obsidian + Dataview</div>
+    </div>
+  </section>
+
+  <!-- §1 Anatomy -->
+  <section>
+    <h2><span class="num">§1</span> Anatomy of "Last run per agent"</h2>
+    <p class="lede">
+      The most important section. One row per agent, latest run only. Read left to right —
+      the <span style="color:var(--mint);font-weight:600">"On me"</span> column is what matters.
+    </p>
+
+    <div class="anatomy">
+      <table class="mock-table">
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Status</th>
+            <th>Last run</th>
+            <th>When</th>
+            <th>Took</th>
+            <th>On me <span class="col-marker">KEY</span></th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>yoshi-watch</td>
+            <td>✅ ok</td>
+            <td><span class="link-mock">yoshi-watch-2026-05-07-1700</span></td>
+            <td>May 07 16:00</td>
+            <td>23s</td>
+            <td><strong style="color:var(--mint);font-size:16px">0</strong></td>
+            <td>Watched 3 items, 0 substantive, 0 nudges</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callouts">
+        <div class="callout">
+          <strong>On me</strong>
+          <p>Items waiting on you right now. <strong style="color:var(--text)">If 0, ignore this agent today.</strong> If non-zero, click "Last run" to see what.</p>
+        </div>
+        <div class="callout">
+          <strong>Status</strong>
+          <p>One glance at the icon column tells you health. ✅ = ignore. Anything else = look.</p>
+        </div>
+        <div class="callout">
+          <strong>Last run (link)</strong>
+          <p>Click to open the per-run detail file. Body explains what each watched item is, who's expected to reply, what's awaiting action.</p>
+        </div>
+        <div class="callout warn">
+          <strong>When + Took</strong>
+          <p>"When" trending old = agent didn't fire. "Took" trending up over weeks = something's getting bloated.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2 §3 §4 -->
+  <section>
+    <h2>The other three sections</h2>
+    <p class="lede">Each one zooms in on a different failure mode. You'll rarely need them — §1 is the canary.</p>
+
+    <div class="three-grid">
+      <div class="card">
+        <div class="card-num">§2</div>
+        <h3>Pending — waiting on me</h3>
+        <p>
+          Sums "On me" across all agents and links to the source.
+          <span class="key">If §1 shows 0 across the board, this section is empty.</span>
+          When it has rows, click <code>[[yoshi-inbox]]</code> or <code>[[luigi-state]]</code> to act.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-num">§3</div>
+        <h3>Failures (last 7d)</h3>
+        <p>
+          Anything <span class="key">not</span> ✅ ok in the last week. Errors, warnings, skipped runs.
+          <span class="key">Empty = healthy.</span>
+          Lights up only when an agent crashed, hit MCP outage, or tripped a guard rail.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-num">§4</div>
+        <h3>Activity (30d)</h3>
+        <p>
+          Per-agent rollup: runs · processed · closed · pushed-to-me · success%.
+          <span class="key">Are they earning their keep?</span>
+          High "Pushed to me" relative to "Processed" = good filtering. Low success% = needs attention.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Status legend -->
+  <section>
+    <h2>Status legend</h2>
+    <p class="lede">Five values an agent run can land on. Memorize the first two — the rest are rare.</p>
+
+    <div class="legend">
+      <table>
+        <thead>
+          <tr><th>Status</th><th>Meaning</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>✅ ok</td>
+            <td><span class="meaning">Ran clean. No errors.</span></td>
+            <td>Nothing — this is the goal state.</td>
+          </tr>
+          <tr>
+            <td>⚠️ stale</td>
+            <td><span class="meaning">Ran ok, but missed its next scheduled tick by &gt;1h.</span></td>
+            <td>Check launchd / scheduler. Agent may not be firing.</td>
+          </tr>
+          <tr>
+            <td>🟡 warn</td>
+            <td><span class="meaning">Ran with anomalies — partial walk, capped items, ambiguous classifier.</span></td>
+            <td>Open run file, read body, decide if it's recoverable.</td>
+          </tr>
+          <tr>
+            <td>❌ fail</td>
+            <td><span class="meaning">Threw or aborted partway. State may be inconsistent.</span></td>
+            <td>Check errors, fix root cause, re-run with --force.</td>
+          </tr>
+          <tr>
+            <td>⏸ skipped</td>
+            <td><span class="meaning">Guard rail fired — quiet hours, session-skip &lt;4h, MCP down.</span></td>
+            <td>Usually fine. Skipped is healthy on weekends.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Daily ritual -->
+  <section>
+    <h2>The 60-second morning routine</h2>
+    <p class="lede">Four steps. If steps 2 and 3 both come back clean, you're done in 10 seconds.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <h4>Open the dashboard</h4>
+        <p>Cmd-O → "Agent Control Room". Dataview re-renders on view, so it's always fresh.</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h4>Glance §1 "On me"</h4>
+        <p>Any non-zero number? Click that agent's "Last run" link to see what's waiting.</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h4>Check §1 Status</h4>
+        <p>Anything not ✅? Drop into §3 for the failure detail. Most days: nothing here.</p>
+      </div>
+      <div class="step last">
+        <div class="n">4</div>
+        <h4>Done</h4>
+        <p>Close the file. Trust the agents to wake you up only when there's signal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data flow -->
+  <section>
+    <h2>How the data gets there</h2>
+    <p class="lede">Every agent emits one frontmatter file per run. Dataview reads the folder. That's the whole pipeline.</p>
+
+    <div class="flow">
+      <div class="flow-row">
+        <div class="flow-group">
+          <div class="flow-label">Agents</div>
+          <div class="flow-box agent">🦖 yoshi-graze</div>
+          <div class="flow-box agent">🦖 yoshi-watch</div>
+          <div class="flow-box agent">🍄 luigi</div>
+          <div class="flow-box agent" style="opacity:0.5">🐢 mario (soon)</div>
+        </div>
+
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-group">
+          <div class="flow-label">Each run emits</div>
+          <div class="flow-box file">Automation/<br>Agent-Runs/<br>{YYYY}/{MM}/<br>&lt;agent&gt;-&lt;ts&gt;.md</div>
+          <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:6px;">
+            frontmatter: type, agent, status,<br>started, items_actionable, ...
+          </div>
+        </div>
+
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-group">
+          <div class="flow-label">Dataview reads</div>
+          <div class="flow-box dash">§1 Last run</div>
+          <div class="flow-box dash">§2 Pending</div>
+          <div class="flow-box dash">§3 Failures</div>
+          <div class="flow-box dash">§4 Activity</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Adding new agent -->
+  <section>
+    <h2>Adding a new agent (Mario, future)</h2>
+
+    <div class="add-card">
+      <div class="icon">🐢</div>
+      <div>
+        <h3>Mario joins the dashboard automatically</h3>
+        <p>
+          When you build Mario: add a final step in his skill that writes one file to
+          <code>Automation/Agent-Runs/{YYYY}/{MM}/mario-&lt;ts&gt;.md</code> using the schema in
+          <code>Automation/Agent-Runs/README.md</code>. <strong style="color:var(--text)">No dashboard changes needed.</strong>
+          Dataview sees the new <code>agent: mario</code> value and a Mario row appears in §1, §2, §3, §4 the next time the dashboard renders. Same pattern for every agent after that.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Companion to Automation/Agent-Control-Room.md · Generated 2026-05-07</div>
+    <div>NSPM · Coralogix Product Operations</div>
+  </footer>
+</div>
+</body>
+</html>
