@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bros Family — Agent Roadmap</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-2: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #22dd92;
+    --mint-dim: #1ab677;
+    --mint-soft: rgba(34, 221, 146, 0.15);
+    --mint-faint: rgba(34, 221, 146, 0.06);
+    --warning: #f59e0b;
+    --code-bg: #050505;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  /* Brand row */
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text-2); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; margin-bottom: 18px;
+  }
+  .brand-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+  }
+  .brand strong { color: var(--text); font-weight: 600; letter-spacing: .12em; }
+
+  /* Header */
+  header h1 {
+    font-size: 40px; font-weight: 700; margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  header h1 .accent { color: var(--mint); }
+  header p.lead {
+    color: var(--text-2); font-size: 16px; max-width: 760px; margin: 0;
+  }
+
+  /* Sections */
+  section { margin-top: 48px; }
+  h2 {
+    font-size: 22px; margin: 0 0 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .badge {
+    font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 8px; background: var(--mint-soft); color: var(--mint);
+    border-radius: 6px;
+  }
+
+  /* Stat counters */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 18px;
+  }
+  .stat .num {
+    font-size: 32px; font-weight: 700; color: var(--text);
+    line-height: 1;
+  }
+  .stat .num.mint { color: var(--mint); }
+  .stat .lbl {
+    margin-top: 8px; color: var(--text-muted);
+    font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  }
+
+  /* Filter pills */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .pill {
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-2);
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    font-size: 13px;
+    transition: all .15s ease;
+  }
+  .pill:hover { border-color: var(--border-strong); color: var(--text); }
+  .pill.active {
+    background: var(--mint); color: #000; border-color: var(--mint);
+    font-weight: 600;
+  }
+  .pill .count {
+    margin-left: 6px; font-size: 11px; opacity: .7;
+  }
+
+  /* Agent grid */
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    transition: transform .15s ease, border-color .15s ease;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .card.shipped { border-color: rgba(34, 221, 146, 0.3); }
+  .card .head {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .card .avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #000;
+    border: 2px solid var(--border-strong);
+    overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .card .name {
+    font-size: 18px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card .role {
+    color: var(--text-2); font-size: 13px;
+  }
+  .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 8px; border-radius: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .status.shipped { background: rgba(34, 221, 146, 0.12); color: var(--mint); }
+  .status.soak    { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+  .status.concept { background: rgba(161, 161, 170, 0.12); color: var(--text-2); }
+  .status.observe { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+  .status.future  { background: rgba(82, 82, 91, 0.18); color: var(--text-muted); }
+
+  .card .meta {
+    display: grid; grid-template-columns: 1fr; gap: 6px;
+    font-size: 12px; color: var(--text-2);
+  }
+  .card .meta-row { display: flex; gap: 8px; }
+  .card .meta-row .k {
+    color: var(--text-muted); text-transform: uppercase;
+    font-size: 10px; letter-spacing: .08em; padding-top: 2px;
+    min-width: 72px;
+  }
+  .card .meta-row .v { color: var(--text-2); flex: 1; }
+  .card code {
+    background: var(--code-bg); border: 1px solid var(--border);
+    color: var(--mint); padding: 1px 5px; border-radius: 4px;
+    font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* Coverage map */
+  .coverage {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .coverage .cell {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .coverage .cell .dir {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--mint); margin-bottom: 8px;
+  }
+  .coverage .cell .what { color: var(--text); font-weight: 600; margin-bottom: 8px; }
+  .coverage .cell .who { color: var(--text-2); font-size: 13px; }
+
+  /* Build sequence */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 9px; top: 6px; bottom: 6px;
+    width: 2px; background: var(--border);
+  }
+  .tl-item { position: relative; padding: 8px 0 14px; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -24px; top: 12px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--mint-dim);
+  }
+  .tl-item.now::before { background: var(--mint); box-shadow: 0 0 12px var(--mint-soft); }
+  .tl-item .when {
+    color: var(--mint); font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .tl-item .what { color: var(--text); margin-top: 2px; }
+
+  /* Principles */
+  .principles {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .principle {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+  }
+  .principle .num {
+    color: var(--mint); font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .principle .head2 { color: var(--text); font-weight: 600; margin: 4px 0 6px; }
+  .principle .body { color: var(--text-2); font-size: 12.5px; }
+
+  /* Callout */
+  .callout {
+    background: var(--mint-faint);
+    border-left: 3px solid var(--mint);
+    border-radius: 8px; padding: 14px 18px;
+    color: var(--text-2);
+  }
+  .callout strong { color: var(--text); }
+
+  /* Footer */
+  footer {
+    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px;
+  }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 28px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .coverage { grid-template-columns: 1fr; }
+    .card .meta-row .k { min-width: 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span><strong>Coralogix</strong> · NSPM</span>
+  </div>
+
+  <header>
+    <h1>Bros Family<span class="accent">.</span></h1>
+    <p class="lead">Single source of truth for the agents in Noam's PM operating system. Each agent owns one loop. Together they cover the four cardinal directions of PM work: downstream execution, upstream business signal, lateral stakeholder loops, and quality gates.</p>
+  </header>
+
+  <section class="counters">
+    <div class="stats">
+      <div class="stat"><div class="num mint">2</div><div class="lbl">Shipped</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">In soak / observe</div></div>
+      <div class="stat"><div class="num">1</div><div class="lbl">Concept</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Future slots</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Roster <span class="badge">8 agents</span></h2>
+    <nav class="filters" aria-label="Filter agents by status">
+      <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">8</span></button>
+      <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">2</span></button>
+      <button class="pill" data-filter="soak" aria-label="Show in soak">Soak <span class="count">1</span></button>
+      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">2</span></button>
+      <button class="pill" data-filter="concept" aria-label="Show concept">Concept <span class="count">1</span></button>
+      <button class="pill" data-filter="future" aria-label="Show future">Future <span class="count">2</span></button>
+    </nav>
+
+    <div class="grid">
+
+      <!-- Luigi -->
+      <article class="card shipped" data-cat="shipped">
+        <div class="head">
+          <div class="avatar"><img alt="Luigi" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/luigi.png"></div>
+          <div class="title-block">
+            <div class="name">🦗 Luigi</div>
+            <div class="role">Nightly Scrum Chief</div>
+            <span class="status shipped">Shipped</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Schedule</div><div class="v">23:30 Lisbon · Mon–Fri</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Walks Jira, surfaces blockers and ship candidates</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Scrum-Chief/{YYYY}/{MM}/luigi-…md</code></div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/scrum-chief</code></div></div>
+        </div>
+      </article>
+
+      <!-- Yoshi -->
+      <article class="card shipped" data-cat="shipped">
+        <div class="head">
+          <div class="avatar"><img alt="Yoshi" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/yoshi.png"></div>
+          <div class="title-block">
+            <div class="name">🦖 Yoshi</div>
+            <div class="role">Slack follow-up watcher</div>
+            <span class="status shipped">Shipped</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Schedule</div><div class="v">Graze 23:00 nightly · watch every 2h, 09–19 weekdays</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Tracks <code>#slack-track</code> permalinks, DMs on substantive replies</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v">Slack DM-to-self · <code>/yoshi</code> sweep</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/yoshi-graze</code> · <code>/yoshi-watch</code> · <code>/yoshi</code></div></div>
+        </div>
+      </article>
+
+      <!-- Mario -->
+      <article class="card" data-cat="soak">
+        <div class="head">
+          <div class="avatar"><img alt="Mario" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/mario.png"></div>
+          <div class="title-block">
+            <div class="name">🍄 Mario</div>
+            <div class="role">Vault ↔ reality bridge</div>
+            <span class="status soak">Phase 4 soak</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Schedule</div><div class="v">07:30 Lisbon · Sun–Thu</div></div>
+          <div class="meta-row"><div class="k">Soak</div><div class="v">Sun 2026-05-10 → Thu 2026-05-14 · decision day Thu EOD</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Mario/now.md</code> · <code>inbox/{slug}.md</code></div></div>
+          <div class="meta-row"><div class="k">Pass</div><div class="v">≥50% approval/day · ≥3 patches/day · ≥2 missed-signal items by Thu</div></div>
+        </div>
+      </article>
+
+      <!-- Daisy -->
+      <article class="card" data-cat="observe">
+        <div class="head">
+          <div class="avatar"><img alt="Daisy" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/daisy.png"></div>
+          <div class="title-block">
+            <div class="name">🌼 Daisy</div>
+            <div class="role">IBM tier loop (Kira)</div>
+            <span class="status observe">Phase 1 observe</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/daisy-observe</code> (no plist yet)</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Kira's Slack → propose <code>[would-do]</code> actions</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Daisy/observations/{date}.md</code></div></div>
+          <div class="meta-row"><div class="k">Promote</div><div class="v">≥2 substantive obs files + ≥50% would-do match this week</div></div>
+        </div>
+      </article>
+
+      <!-- Toad -->
+      <article class="card" data-cat="observe">
+        <div class="head">
+          <div class="avatar"><img alt="Toad" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/toad.png"></div>
+          <div class="title-block">
+            <div class="name">🍄 Toad</div>
+            <div class="role">Marketing tier loop (Micha)</div>
+            <span class="status observe">Phase 1 observe</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/toad-observe</code> (no plist yet)</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Micha's Slack → propose tier T0–T4</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Toad/observations/{date}.md</code></div></div>
+          <div class="meta-row"><div class="k">Promote</div><div class="v">Same gate as Daisy</div></div>
+        </div>
+      </article>
+
+      <!-- Princess Peach -->
+      <article class="card" data-cat="concept">
+        <div class="head">
+          <div class="avatar"><img alt="Princess Peach" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/princess-peach.png"></div>
+          <div class="title-block">
+            <div class="name">👑 Princess Peach</div>
+            <div class="role">Upstream customer signals</div>
+            <span class="status concept">Concept</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Wraps</div><div class="v"><code>/gong-insights</code> · <code>/intercom-insights</code> · <code>/pipev2-insights</code> · <code>/feedback-cycle</code></div></div>
+          <div class="meta-row"><div class="k">Earliest</div><div class="v">Fri 2026-05-15 (post Mario soak)</div></div>
+          <div class="meta-row"><div class="k">Shift</div><div class="v">Pre-drafts the dispatch (one-key approval) instead of just surfacing</div></div>
+          <div class="meta-row"><div class="k">Open</div><div class="v">7 questions: timing, dispatch authority, deal relevance, threshold, tracker, kill switch, Mario boundary</div></div>
+        </div>
+      </article>
+
+      <!-- Bowser -->
+      <article class="card" data-cat="future">
+        <div class="head">
+          <div class="avatar"><img alt="Bowser" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/bowser.png"></div>
+          <div class="title-block">
+            <div class="name">🐢 Bowser</div>
+            <div class="role">Pre-mortem skeptic</div>
+            <span class="status future">Future slot</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Stress-tests solo PRD reviews before R&D handoff. Inverse of supportive agents.</div></div>
+          <div class="meta-row"><div class="k">Note</div><div class="v">Challenge-mode, not loop-mode. May need different architecture.</div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Slot reserved, not drafted</div></div>
+        </div>
+      </article>
+
+      <!-- Birdo -->
+      <article class="card" data-cat="future">
+        <div class="head">
+          <div class="avatar"><img alt="Birdo" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/birdo.png"></div>
+          <div class="title-block">
+            <div class="name">🦴 Birdo</div>
+            <div class="role">Legal / compliance loop</div>
+            <span class="status future">Future slot</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Legal and compliance review pass.</div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Not yet relevant; slot reserved</div></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Coverage map <span class="badge">no overlap</span></h2>
+    <div class="coverage">
+      <div class="cell">
+        <div class="dir">Downstream — execution</div>
+        <div class="what">Active workplan drift · Jira state · Slack reply tracking</div>
+        <div class="who">Mario · Luigi · Yoshi</div>
+      </div>
+      <div class="cell">
+        <div class="dir">Upstream — business</div>
+        <div class="what">Sales calls (Gong) · Support (Intercom) · Backlog (PIPEV2)</div>
+        <div class="who">Princess Peach (concept)</div>
+      </div>
+      <div class="cell">
+        <div class="dir">Lateral — stakeholders</div>
+        <div class="what">IBM tier · Marketing tier</div>
+        <div class="who">Daisy · Toad (observe)</div>
+      </div>
+      <div class="cell">
+        <div class="dir">Quality gates</div>
+        <div class="what">Pre-mortem · Legal review</div>
+        <div class="who">Bowser · Birdo (future)</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Build sequence <span class="badge">precedence locked</span></h2>
+    <div class="timeline">
+      <div class="tl-item now">
+        <div class="when">Sun 2026-05-10 → Thu 2026-05-14</div>
+        <div class="what">Mario Phase 4 soak · decision Thu EOD</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Fri 2026-05-15</div>
+        <div class="what">Mario Phase 5 delta plist (if soak passes) → Phase 6 memory + <code>/today</code> injection</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Fri 2026-05-15</div>
+        <div class="what">Princess Peach concept → plan</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Mon 2026-05-18 → Thu 2026-05-21</div>
+        <div class="what">Princess Peach build</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Sun 2026-05-24 → Thu 2026-05-28</div>
+        <div class="what">Princess Peach soak</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Week of 2026-06-01</div>
+        <div class="what">Daisy + Toad plan</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Week of 2026-06-08</div>
+        <div class="what">Daisy + Toad build</div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="callout"><strong>Hard rule:</strong> never run two new agents in soak simultaneously. Can't isolate failures, token budget bloats, kill criteria become ambiguous.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Operating principles <span class="badge">L1 → L12</span></h2>
+    <div class="principles">
+      <div class="principle"><div class="num">L1</div><div class="head2">Inherit the proven shape</div><div class="body">Yoshi's wrapper, plist, mcp-config-empty, state-file pattern, JSONL token logging, atomic writes. Copy and adjust.</div></div>
+      <div class="principle"><div class="num">L2</div><div class="head2">Absolute paths in headless</div><div class="body"><code>claude -p</code> doesn't propagate cwd. Every path starts with <code>/Users/noam.sheffi/CX/</code>.</div></div>
+      <div class="principle"><div class="num">L3</div><div class="head2">Token tracking from day 1</div><div class="body">JSONL to <code>Automation/{Agent}/usage.log</code>. Without it, you can't tell when an agent gets expensive.</div></div>
+      <div class="principle"><div class="num">L4</div><div class="head2">First-tick state seeding</div><div class="body">On first sight: set <code>last_seen_ts = current latest_ts</code>. Don't classify pre-existing backlog as new on heartbeat 1.</div></div>
+      <div class="principle"><div class="num">L5</div><div class="head2">DM-to-self target</div><div class="body">Slack user ID <code>U080G5KHZQB</code>, not hardcoded <code>D…</code> channel ID.</div></div>
+      <div class="principle"><div class="num">L6</div><div class="head2">Quiet hours and weekends</div><div class="body">20:00–08:00 Lisbon and Sat/Sun: state still updates, only DMs silenced.</div></div>
+      <div class="principle"><div class="num">L7</div><div class="head2">Atomic state writes</div><div class="body">Temp file + rename. Never partial. State corruption = false positives next tick.</div></div>
+      <div class="principle"><div class="num">L8</div><div class="head2">Memory-aware filter</div><div class="body">Every patch through memory rules: no em dashes, no "align with Aviv", no other-team estimates, plain action items, "our portfolio" voice.</div></div>
+      <div class="principle"><div class="num">L9</div><div class="head2">One-key approval gate</div><div class="body">Never write directly to canonical artifacts. Inbox + <code>y</code> approval — always.</div></div>
+      <div class="principle"><div class="num">L10</div><div class="head2">Kill criteria in the plan</div><div class="body">Approval &lt;50% any day = freeze. Inbox flood &gt;N = tighten. Filter rewrites &gt;50% = iterate. Lock BEFORE soak.</div></div>
+      <div class="principle"><div class="num">L11</div><div class="head2">One agent per loop</div><div class="body">Don't merge agents to save boilerplate. Independent state + schedule + kill switch &gt; DRY.</div></div>
+      <div class="principle"><div class="num">L12</div><div class="head2">Concept → plan → build → soak → memory</div><div class="body">Every agent passes through these gates. Never skip soak; never write memory before soak passes.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Open meta-questions</h2>
+    <div class="callout">
+      <strong>1. When do we stop adding agents?</strong> When daily review of all agents takes &gt;15 min. Re-evaluate at agent #5.<br><br>
+      <strong>2. Does Agent Control Room become necessary?</strong> Currently shelved. Re-open once ≥4 active agents.<br><br>
+      <strong>3. Does Bowser fit?</strong> Pre-mortem is qualitatively different (challenge-mode, not loop-mode). May need a different architecture.
+    </div>
+  </section>
+
+  <footer>
+    Generated from: <code>AI PM/Agents/00-roadmap.md</code> · Coralogix · NSPM
+  </footer>
+
+</div>
+
+<script>
+  const pills = document.querySelectorAll('.pill');
+  const cards = document.querySelectorAll('.card[data-cat]');
+  pills.forEach(p => {
+    p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      const f = p.dataset.filter;
+      cards.forEach(c => {
+        c.style.display = (f === 'all' || c.dataset.cat === f) ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
