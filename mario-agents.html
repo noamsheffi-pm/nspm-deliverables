@@ -287,9 +287,9 @@
       <div class="sub">Mario classifier</div>
     </div>
     <div class="stat">
-      <div class="num">7</div>
+      <div class="num">13</div>
       <div class="label">Scheduled tasks</div>
-      <div class="sub">6 cron + 1 launchd</div>
+      <div class="sub">5 agent + 8 personal</div>
     </div>
     <div class="stat">
       <div class="num mint">19</div>
@@ -577,22 +577,27 @@
     </div>
   </section>
 
-  <!-- Schedule overview -->
+  <!-- Agent schedule -->
   <section class="block">
     <div class="section-header">
-      <h2>Scheduled Tasks</h2>
-      <span class="count">7 active</span>
+      <h2>Agent Schedule</h2>
+      <span class="count">5 runs</span>
     </div>
     <div class="sched-grid">
       <div class="sched-card">
-        <div class="name">Morning Dashboard</div>
-        <div class="owner">Noam · /today</div>
-        <div class="cron">0 7 * * 0-4</div>
+        <div class="name">Mario Main</div>
+        <div class="owner">Mario · /mario</div>
+        <div class="cron">30 7 * * 1-5</div>
       </div>
       <div class="sched-card">
-        <div class="name">Gong Insights</div>
-        <div class="owner">Noam · /gong-insights</div>
-        <div class="cron">5 7 * * 0-4</div>
+        <div class="name">Mario Delta</div>
+        <div class="owner">Mario · /mario --mode=delta</div>
+        <div class="cron">0 14 * * 1-5</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Luigi Brief</div>
+        <div class="owner">Luigi · /scrum-chief</div>
+        <div class="cron">30 23 * * 1-5</div>
       </div>
       <div class="sched-card">
         <div class="name">Yoshi Graze</div>
@@ -604,20 +609,56 @@
         <div class="owner">Yoshi · push</div>
         <div class="cron">0 9-19/2 * * 1-5</div>
       </div>
+    </div>
+  </section>
+
+  <!-- Other scheduled tasks (Noam's autonomous workflow) -->
+  <section class="block">
+    <div class="section-header">
+      <h2>Other Scheduled Tasks</h2>
+      <span class="count">8 runs</span>
+    </div>
+    <p class="subtitle" style="margin-bottom:16px;">Recurring commands Noam runs himself, not Mario-agent personas. Daily intelligence sweeps, dashboard, end-of-day capture, weekly retro. All under <code>com.claude.schedule.*</code> launchd jobs.</p>
+    <div class="sched-grid">
       <div class="sched-card">
-        <div class="name">Luigi Brief</div>
-        <div class="owner">Luigi · launchd</div>
-        <div class="cron">30 23 * * 1-5</div>
+        <div class="name">AI PM Daily</div>
+        <div class="owner">Noam · /ai-pm-daily</div>
+        <div class="cron">30 6 * * 0-4</div>
       </div>
       <div class="sched-card">
-        <div class="name">Mario Main</div>
-        <div class="owner">Mario · /mario</div>
-        <div class="cron">30 7 * * 1-5</div>
+        <div class="name">Gong Insights</div>
+        <div class="owner">Noam · /gong-insights</div>
+        <div class="cron">45 6 * * 0-4</div>
       </div>
       <div class="sched-card">
-        <div class="name">Mario Delta</div>
-        <div class="owner">Mario · /mario --mode=delta</div>
-        <div class="cron">0 14 * * 1-5</div>
+        <div class="name">Morning Dashboard</div>
+        <div class="owner">Noam · /today</div>
+        <div class="cron">0 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Intercom Insights</div>
+        <div class="owner">Noam · /intercom-insights</div>
+        <div class="cron">7 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Competitive Insights</div>
+        <div class="owner">Noam · /competitive-insights</div>
+        <div class="cron">15 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Vibe PM Daily</div>
+        <div class="owner">Noam · /vibe-pm-daily</div>
+        <div class="cron">30 7 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">EOD Wrap</div>
+        <div class="owner">Noam · /today --eod</div>
+        <div class="cron">0 18 * * 0-4</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Weekly Retro</div>
+        <div class="owner">Noam · /weekly-retro</div>
+        <div class="cron">0 15 * * 5</div>
       </div>
     </div>
   </section>
