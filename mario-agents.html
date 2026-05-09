@@ -121,6 +121,12 @@
   .agent .emoji {
     font-size: 32px; line-height: 1;
   }
+  .agent .avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--code-bg); border: 1px solid var(--border-strong);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
   .agent .name-block { flex: 1; }
   .agent .name {
     font-size: 20px; font-weight: 700; color: var(--text);
@@ -271,19 +277,19 @@
   <!-- Stat counters -->
   <section class="counters">
     <div class="stat">
-      <div class="num mint">2</div>
+      <div class="num mint">3</div>
       <div class="label">Active agents</div>
-      <div class="sub">Luigi · Yoshi</div>
+      <div class="sub">Mario · Luigi · Yoshi</div>
     </div>
     <div class="stat">
-      <div class="num">1</div>
-      <div class="label">Reserved slot</div>
-      <div class="sub">Mario (co-PM)</div>
+      <div class="num">6</div>
+      <div class="label">Drift patterns</div>
+      <div class="sub">Mario classifier</div>
     </div>
     <div class="stat">
-      <div class="num">5</div>
+      <div class="num">7</div>
       <div class="label">Scheduled tasks</div>
-      <div class="sub">4 cron + 1 launchd</div>
+      <div class="sub">6 cron + 1 launchd</div>
     </div>
     <div class="stat">
       <div class="num mint">19</div>
@@ -301,53 +307,104 @@
 
     <div class="agent-grid">
 
-      <!-- Mario (TBD) -->
-      <article class="agent tbd">
+      <!-- Mario -->
+      <article class="agent">
         <div class="head">
-          <div class="emoji">🦸</div>
+          <img class="avatar" src="visuals/mario-agents/mario.png" alt="Mario">
           <div class="name-block">
             <div class="name">Mario</div>
-            <div class="role">Co-PM</div>
+            <div class="role">Co-PM · Vault↔Reality Bridge</div>
           </div>
-          <span class="badge tbd">🚧 TBD</span>
+          <span class="badge live">● Live</span>
         </div>
 
         <div class="field">
-          <div class="field-label">Status</div>
-          <div class="field-body">Not yet built. Reserved slot for the strategic co-PM.</div>
-        </div>
-
-        <div class="field">
-          <div class="field-label">Role (planned)</div>
+          <div class="field-label">Schedule</div>
           <div class="field-body">
-            Portfolio-level decisions. Cross-initiative trade-offs. High-leverage prioritization. The agent that thinks about <em>what to work on</em>, not <em>how to track it</em>.
+            <div class="schedule-row">
+              <div class="sched-pill">
+                <span class="when">Main · weekdays 07:30</span>
+                <span class="cron">30 7 * * 1-5</span>
+              </div>
+              <div class="sched-pill">
+                <span class="when">Delta · weekdays 14:00</span>
+                <span class="cron">0 14 * * 1-5</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="field">
-          <div class="field-label">Possible scope</div>
+          <div class="field-label">Voice</div>
+          <div class="field-body">🍄 Mario. Decisive, action-oriented, no filler. Drafts patches for <code>y</code> approval, never auto-applies.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Job</div>
+          <div class="field-body">Read workplan-linked Slack channels since last cursor, classify against six drift patterns, draft patches into <code>inbox/</code>, render <code>now.md</code>, push HOT DMs only when something actionable lands.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Commands</div>
           <div class="field-body">
             <ul>
-              <li><code>/roadmap-review</code> augmentation</li>
-              <li>Business-case sparring partner</li>
-              <li><code>/problem-discover</code> loops</li>
-              <li>Weekly intelligence-brief curation</li>
+              <li><code>/mario</code> — full main run (cron)</li>
+              <li><code>/mario --mode=delta</code> — HOT-only afternoon tick</li>
+              <li><code>/mario --dry</code> — verify without writes / DMs</li>
+              <li><code>/mario --workplan=&lt;slug&gt;</code> — single-workplan debug</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Drift patterns</div>
+          <div class="field-body">
+            <table class="tag-table">
+              <tr><td><span class="chip active">launch-update</span></td><td>"shipped", "deployed", "live in", "data flowing"</td></tr>
+              <tr><td><span class="chip other">counter-signal</span></td><td>"how do we stop", "concern", "blocker", "broken"</td></tr>
+              <tr><td><span class="chip passive">strategic-redirect</span></td><td>"move to #", "talk to {person}", "owns this"</td></tr>
+              <tr><td><span class="chip active">structured-meeting-recap</span></td><td>&gt;500 chars + "Decisions:" / "Action items:"</td></tr>
+              <tr><td><span class="chip other">arch-question</span></td><td>&gt;80 chars, ends "?", mentions ingest / pipeline / schema</td></tr>
+              <tr><td><span class="chip closed">lost-dm-decision</span></td><td>DM channel + "let's go with", "decision is", "agreed"</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">State files</div>
+          <div class="field-body">
+            <ul>
+              <li><code>Automation/Mario/state.json</code></li>
+              <li><code>Automation/Mario/now.md</code></li>
+              <li><code>Automation/Mario/inbox/{slug}.md</code></li>
+              <li><code>Automation/Agent-Runs/{YYYY}/{MM}/mario-*.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Operating rules</div>
+          <div class="field-body">
+            <ul>
+              <li>Quiet hours 20:00–08:00 Lisbon (no DMs)</li>
+              <li>Weekends silent</li>
+              <li>First-sight seed: no patches drafted from pre-existing backlog</li>
+              <li>Memory-aware filter on every patch (em-dash, voice, brevity)</li>
+              <li>Read-only on Slack except DM-to-self</li>
             </ul>
           </div>
         </div>
 
         <div class="field">
           <div class="field-label">Why the slot exists</div>
-          <div class="field-body">
-            Luigi handles execution discipline. Yoshi handles async waiting. Mario fills the strategic-direction layer that today still lives entirely in Noam's head.
-          </div>
+          <div class="field-body">Luigi handles execution discipline (sprint state). Yoshi handles async waiting (Slack replies). Mario fills the strategic layer: surfacing the moments where vault declarations diverge from what's actually happening in the channels.</div>
         </div>
       </article>
 
       <!-- Luigi -->
       <article class="agent">
         <div class="head">
-          <div class="emoji">🧑‍🔧</div>
+          <img class="avatar" src="visuals/mario-agents/luigi.png" alt="Luigi">
           <div class="name-block">
             <div class="name">Luigi</div>
             <div class="role">Scrum Master</div>
@@ -425,7 +482,7 @@
       <!-- Yoshi -->
       <article class="agent">
         <div class="head">
-          <div class="emoji">🦖</div>
+          <img class="avatar" src="visuals/mario-agents/yoshi.png" alt="Yoshi">
           <div class="name-block">
             <div class="name">Yoshi</div>
             <div class="role">Slack Follow-up</div>
@@ -524,7 +581,7 @@
   <section class="block">
     <div class="section-header">
       <h2>Scheduled Tasks</h2>
-      <span class="count">5 active</span>
+      <span class="count">7 active</span>
     </div>
     <div class="sched-grid">
       <div class="sched-card">
@@ -552,6 +609,16 @@
         <div class="owner">Luigi · launchd</div>
         <div class="cron">30 23 * * 1-5</div>
       </div>
+      <div class="sched-card">
+        <div class="name">Mario Main</div>
+        <div class="owner">Mario · /mario</div>
+        <div class="cron">30 7 * * 1-5</div>
+      </div>
+      <div class="sched-card">
+        <div class="name">Mario Delta</div>
+        <div class="owner">Mario · /mario --mode=delta</div>
+        <div class="cron">0 14 * * 1-5</div>
+      </div>
     </div>
   </section>
 
@@ -567,7 +634,7 @@
 
   <footer>
     <div>Mario Agents · Noam's PM Operating System</div>
-    <div class="src">Generated from: <code>AI PM/yoshi-slack-followup-agent-plan.md</code> · <code>System/Agents/Claude/commands/scrum-chief.md</code></div>
+    <div class="src">Generated from: <code>System/Agents/Claude/commands/mario.md</code> · <code>scrum-chief.md</code> · <code>AI PM/yoshi-slack-followup-agent-plan.md</code></div>
   </footer>
 
 </div>
