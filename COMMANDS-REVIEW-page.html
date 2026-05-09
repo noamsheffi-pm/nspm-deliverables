@@ -3,37 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commands Arsenal — 11 April 2026</title>
+  <title>Commands Arsenal — 9 May 2026</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #0a0e1a;
-      color: #e2e8f0;
+      background: #000000;
+      background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+      color: #ffffff;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 14px;
       line-height: 1.6;
+      min-height: 100vh;
     }
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
     header {
-      text-align: center;
+      text-align: left;
       padding: 56px 24px 40px;
-      background: linear-gradient(180deg, rgba(59,130,246,0.08) 0%, transparent 100%);
+    }
+    .brand-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #22dd92;
+      box-shadow: 0 0 16px rgba(34, 221, 146, 0.5);
+    }
+    .brand-name {
+      color: #ffffff; font-weight: 600; font-size: 16px;
+      letter-spacing: -0.01em;
     }
     header h1 {
-      font-size: 36px;
+      font-size: 42px;
       font-weight: 700;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
       margin-bottom: 8px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
+    header h1 .accent { color: #22dd92; }
     header .subtitle {
-      color: #64748b;
+      color: #a1a1aa;
       font-size: 16px;
     }
     header .subtitle span {
-      color: #3b82f6;
+      color: #22dd92;
       font-weight: 600;
     }
     section { padding: 24px 0; }
@@ -64,8 +78,8 @@
       margin-bottom: 8px;
     }
     .stat-card {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: #0a0a0a;
+      border: 1px solid #1f1f1f;
       border-radius: 12px;
       padding: 24px 20px;
       text-align: center;
@@ -73,7 +87,7 @@
     }
     .stat-card:hover {
       transform: translateY(-2px);
-      border-color: #334155;
+      border-color: #2a2a2a;
     }
     .stat-card .number {
       font-size: 40px;
@@ -85,9 +99,9 @@
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
-      color: #64748b;
+      color: #a1a1aa;
     }
-    .stat-card.accent .number { color: #3b82f6; }
+    .stat-card.accent .number { color: #22dd92; }
     .stat-card.green .number { color: #10b981; }
     .stat-card.red .number { color: #ef4444; }
     .stat-card.yellow .number { color: #f59e0b; }
@@ -95,8 +109,8 @@
 
     /* Change Banner */
     .change-banner {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: #0a0a0a;
+      border: 1px solid #1f1f1f;
       border-radius: 12px;
       padding: 20px 24px;
       display: flex;
@@ -116,7 +130,7 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .change-banner .change-label { color: #64748b; }
+    .change-banner .change-label { color: #a1a1aa; }
     .change-banner .change-value { color: #e2e8f0; font-weight: 600; }
 
     /* Filter Pills */
@@ -129,8 +143,8 @@
     .pill {
       padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid #1e293b;
-      background: #111827;
+      border: 1px solid #1f1f1f;
+      background: #0a0a0a;
       color: #94a3b8;
       font-size: 12px;
       cursor: pointer;
@@ -139,8 +153,8 @@
       align-items: center;
       gap: 6px;
     }
-    .pill:hover { border-color: #334155; color: #e2e8f0; }
-    .pill.active { background: rgba(59,130,246,0.15); border-color: #3b82f6; color: #60a5fa; }
+    .pill:hover { border-color: #2a2a2a; color: #e2e8f0; }
+    .pill.active { background: rgba(34, 221, 146, 0.15); border-color: #22dd92; color: #22dd92; }
     .pill .count {
       background: rgba(255,255,255,0.08);
       padding: 1px 7px;
@@ -148,7 +162,7 @@
       font-size: 11px;
       font-weight: 600;
     }
-    .pill.active .count { background: rgba(59,130,246,0.25); }
+    .pill.active .count { background: rgba(34, 221, 146, 0.2); }
 
     /* Category Grid */
     .cat-grid {
@@ -157,8 +171,8 @@
       gap: 14px;
     }
     .cat-card {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: #0a0a0a;
+      border: 1px solid #1f1f1f;
       border-radius: 12px;
       padding: 18px 20px;
       transition: transform 0.2s, border-color 0.2s;
@@ -166,7 +180,7 @@
     }
     .cat-card:hover {
       transform: translateY(-2px);
-      border-color: #334155;
+      border-color: #2a2a2a;
     }
     .cat-card .cat-header {
       display: flex;
@@ -183,7 +197,7 @@
       font-size: 20px;
       font-weight: 700;
     }
-    .cat-card[data-cat="ops"] .cat-count { color: #60a5fa; }
+    .cat-card[data-cat="ops"] .cat-count { color: #22dd92; }
     .cat-card[data-cat="feedback"] .cat-count { color: #2dd4bf; }
     .cat-card[data-cat="product"] .cat-count { color: #fbbf24; }
     .cat-card[data-cat="visual"] .cat-count { color: #c084fc; }
@@ -224,7 +238,7 @@
     }
     .cat-card .cmd-desc {
       font-size: 11px;
-      color: #64748b;
+      color: #a1a1aa;
       line-height: 1.4;
     }
     /* Color-coded left borders per group */
@@ -245,7 +259,7 @@
       margin-top: 20px;
       margin-bottom: 4px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #1e293b;
+      border-bottom: 1px solid #1f1f1f;
     }
     .group-header:first-child { margin-top: 0; }
     .group-header .group-dot {
@@ -346,8 +360,8 @@
 
     /* Growth Trend */
     .trend-container {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: #0a0a0a;
+      border: 1px solid #1f1f1f;
       border-radius: 12px;
       padding: 28px 32px;
     }
@@ -391,7 +405,7 @@
     .trend-bar.active { background: linear-gradient(180deg, #10b981, #059669); }
     .trend-label {
       font-size: 12px;
-      color: #64748b;
+      color: #a1a1aa;
       text-align: center;
     }
     .trend-legend {
@@ -415,7 +429,7 @@
     .arrow-connector {
       display: flex;
       align-items: center;
-      color: #334155;
+      color: #2a2a2a;
       font-size: 24px;
       padding-bottom: 24px;
     }
@@ -427,8 +441,8 @@
       gap: 16px;
     }
     .arch-card {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: #0a0a0a;
+      border: 1px solid #1f1f1f;
       border-radius: 12px;
       padding: 22px 24px;
     }
@@ -497,7 +511,7 @@
     footer {
       text-align: center;
       padding: 40px 24px 32px;
-      color: #475569;
+      color: #52525b;
       font-size: 12px;
     }
 
@@ -522,8 +536,12 @@
 <body>
 
 <header>
-  <h1>Commands Arsenal</h1>
-  <div class="subtitle">11 April 2026 &mdash; <span>87 commands</span> powering AI-augmented product management</div>
+  <div class="brand-row">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Coralogix · NSPM</div>
+  </div>
+  <h1>Commands Arsenal<span class="accent">.</span></h1>
+  <div class="subtitle">9 May 2026 &mdash; <span>96 commands</span> powering AI-augmented product management</div>
 </header>
 
 <div class="container">
@@ -532,24 +550,24 @@
   <section>
     <div class="stats">
       <div class="stat-card accent">
-        <div class="number">87</div>
+        <div class="number">96</div>
         <div class="label">Total Commands</div>
       </div>
       <div class="stat-card green">
-        <div class="number">66</div>
-        <div class="label">Keep</div>
+        <div class="number">94</div>
+        <div class="label">Active</div>
       </div>
       <div class="stat-card red">
         <div class="number">9</div>
-        <div class="label">Delete</div>
+        <div class="label">Cleanup Debt</div>
       </div>
       <div class="stat-card yellow">
-        <div class="number">2</div>
-        <div class="label">Deprecate</div>
+        <div class="number">5</div>
+        <div class="label">Agent Tier</div>
       </div>
       <div class="stat-card purple">
         <div class="number">5</div>
-        <div class="label">New Since 31-Mar</div>
+        <div class="label">New Since 05-May</div>
       </div>
     </div>
   </section>
@@ -558,19 +576,19 @@
   <section>
     <div class="change-banner">
       <div class="change-item">
-        <div class="dot" style="background:#ef4444;"></div>
-        <span class="change-label">Deleted:</span>
-        <span class="change-value">None (cleanup debt growing)</span>
+        <div class="dot" style="background:#a855f7;"></div>
+        <span class="change-label">Added 09-May (5):</span>
+        <span class="change-value">scrum-chief (Luigi), yoshi, yoshi-graze, yoshi-watch, mario, dataset-approve</span>
       </div>
       <div class="change-item">
-        <div class="dot" style="background:#a855f7;"></div>
-        <span class="change-label">Added:</span>
-        <span class="change-value">orchestrate, release-distribute, release-notify, sales-enablement, slack-triage-deprecated</span>
+        <div class="dot" style="background:#22dd92;"></div>
+        <span class="change-label">Pre/post-flight gates:</span>
+        <span class="change-value">/problem-discover, /problem-boundary, /business-case now self-stitch via Automation/initiative-dashboard.md. /today reads it.</span>
       </div>
       <div class="change-item">
         <div class="dot" style="background:#f59e0b;"></div>
-        <span class="change-label">Pending cleanup:</span>
-        <span class="change-value">7 commands from 31-Mar still not deleted</span>
+        <span class="change-label">Cleanup debt (9):</span>
+        <span class="change-value">note-to-ticket, canary-qa, slack-pm-assist, grammarly, launch, opportunity-brief, daily-prettify, weekly-feedback-sweep, tag-close-all — flagged 5 cycles</span>
       </div>
     </div>
   </section>
@@ -578,12 +596,15 @@
   <!-- New Commands Callout -->
   <section>
     <div class="new-callout">
-      <h3>New Commands Since 31-Mar</h3>
+      <h3>Autonomous Agent Tier &mdash; new 09-May</h3>
       <div class="new-cmd-list">
-        <div class="new-cmd">orchestrate<span class="desc">cmux workspace launcher per initiative</span></div>
-        <div class="new-cmd">release-distribute<span class="desc">Full release pipeline (supersedes /launch)</span></div>
-        <div class="new-cmd">release-notify<span class="desc">TAM/AM outreach for customer-requested features</span></div>
-        <div class="new-cmd">sales-enablement<span class="desc">Feature one-pager for SEs/AEs</span></div>
+        <div class="new-cmd">scrum-chief (Luigi)<span class="desc">Nightly autonomous Scrum Master. 23:30 Lisbon Mon-Fri. Walks active-sprint + ship-candidate initiatives, produces 2-min action brief. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">yoshi<span class="desc">Slack follow-up sweep. Reads watch state, auto-closes #slack-track items with reply summaries, surfaces what needs Noam. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">yoshi-graze<span class="desc">Nightly graze of last 24h Slack messages I sent. Classifies as ask/watch/info, proposes #slack-track entries. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">yoshi-watch<span class="desc">2h polling tick on #slack-track threads. Pushes DM-to-self on substantive replies. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">mario<span class="desc">Continuous co-PM. Reads workplan-linked Slack channels, Luigi state, Gong/Intercom matches; drafts patches for `y` approval. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">dataset-approve<span class="desc">Convert ratified dataset-review into Citadel-bot-ready approval doc. Publishes to Notion, posts closing-loop Slack. <strong>NEW 9-May</strong></span></div>
+        <div class="new-cmd">/discover chain self-stitches<span class="desc">/problem-discover (Step 0 freshness, Step 8 dashboard append) → /problem-boundary (mode auto-detect, dashboard append) → /business-case (source reuse, dashboard append). All write to Automation/initiative-dashboard.md, which /today reads. No manual handoff. <strong>UPDATED 9-May</strong></span></div>
       </div>
     </div>
   </section>
@@ -592,10 +613,10 @@
 
   <!-- Category Breakdown -->
   <section>
-    <div class="section-title">Category Breakdown <span class="badge" style="background:rgba(59,130,246,0.15);color:#60a5fa;">24 categories</span></div>
+    <div class="section-title">Category Breakdown <span class="badge" style="background:rgba(34, 221, 146, 0.15);color:#22dd92;">24 categories</span></div>
 
     <nav class="filters" aria-label="Filter by category">
-      <button class="pill active" data-filter="all" aria-label="Show all categories">All <span class="count">87</span></button>
+      <button class="pill active" data-filter="all" aria-label="Show all categories">All <span class="count">86</span></button>
       <button class="pill" data-filter="ops" data-color="#3b82f6" aria-label="Show operations commands"><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#3b82f6;margin-right:2px;"></span> Operations <span class="count">16</span></button>
       <button class="pill" data-filter="feedback" data-color="#14b8a6" aria-label="Show feedback commands"><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#14b8a6;margin-right:2px;"></span> Feedback <span class="count">16</span></button>
       <button class="pill" data-filter="product" data-color="#f59e0b" aria-label="Show product work commands"><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#f59e0b;margin-right:2px;"></span> Product Work <span class="count">19</span></button>
@@ -608,36 +629,33 @@
       <div class="group-header"><div class="group-dot" style="background:#3b82f6;"></div><div class="group-label">Operations</div></div>
 
       <div class="cat-card" data-cat="ops">
-        <div class="cat-header"><div class="cat-name">Daily Operations</div><div class="cat-count">5</div></div>
+        <div class="cat-header"><div class="cat-name">Daily Operations</div><div class="cat-count">4</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">today</span><span class="cmd-desc">Morning dashboard: calendar + tasks + goals + tags</span></div>
           <div class="cmd-row"><span class="cmd-name">session-close</span><span class="cmd-desc">Capture session outcomes, update session log</span></div>
-          <div class="cmd-row"><span class="cmd-name">daily-prettify</span><span class="cmd-desc">Batch-prettify vault notes touched today</span></div>
           <div class="cmd-row"><span class="cmd-name">todoist-claude-sync</span><span class="cmd-desc">Sync Todoist tasks by label to vault</span></div>
           <div class="cmd-row"><span class="cmd-name">goal</span><span class="cmd-desc">Add goal to weekly tracker</span></div>
         </div>
       </div>
 
       <div class="cat-card" data-cat="ops">
-        <div class="cat-header"><div class="cat-name">Weekly Cadence</div><div class="cat-count">5</div></div>
+        <div class="cat-header"><div class="cat-name">Weekly Cadence</div><div class="cat-count">4</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">weekly-plan</span><span class="cmd-desc">Plan upcoming week from goals + Jira + calendar</span></div>
-          <div class="cmd-row"><span class="cmd-name new">weekly-retro</span><span class="cmd-desc">Evaluate week, archive goals, generate next goals</span></div>
-          <div class="cmd-row"><span class="cmd-name">weekly-feedback-sweep</span><span class="cmd-desc">Sequential feedback collection + analysis</span></div>
-          <div class="cmd-row"><span class="cmd-name">weekly-feedback-sweep-teams</span><span class="cmd-desc">Parallel version with 8 agents</span></div>
-          <div class="cmd-row"><span class="cmd-name new">workplan</span><span class="cmd-desc">Initiative lifecycle tracker (phases 0-7)</span></div>
+          <div class="cmd-row"><span class="cmd-name">weekly-retro</span><span class="cmd-desc">Evaluate week, archive goals, generate next goals</span></div>
+          <div class="cmd-row"><span class="cmd-name">weekly-feedback-sweep-teams</span><span class="cmd-desc">Parallel feedback collection + analysis (8 agents)</span></div>
+          <div class="cmd-row"><span class="cmd-name">workplan</span><span class="cmd-desc">Initiative lifecycle tracker (phases 0-7)</span></div>
         </div>
       </div>
 
       <div class="cat-card" data-cat="ops">
-        <div class="cat-header"><div class="cat-name">Meeting Management</div><div class="cat-count">7</div></div>
+        <div class="cat-header"><div class="cat-name">Meeting Management</div><div class="cat-count">6</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">meeting-prep</span><span class="cmd-desc">Pre-meeting briefing from Jira + Slack + vault</span></div>
           <div class="cmd-row"><span class="cmd-name">meeting-summary</span><span class="cmd-desc">Post-meeting: decisions, actions, open items</span></div>
           <div class="cmd-row"><span class="cmd-name">meeting-absorb</span><span class="cmd-desc">Ingest raw transcript into structured notes</span></div>
           <div class="cmd-row"><span class="cmd-name">meeting-item</span><span class="cmd-desc">Add item to next meeting note for a person</span></div>
-          <div class="cmd-row"><span class="cmd-name">aviv</span><span class="cmd-desc">Shortcut for meeting-item Aviv</span></div>
-          <div class="cmd-row"><span class="cmd-name">harel</span><span class="cmd-desc">Shortcut for meeting-item Harel</span></div>
+          <div class="cmd-row"><span class="cmd-name new">meeting-lookup</span><span class="cmd-desc">Fast vault search for in-meeting questions (&lt;30s)</span></div>
           <div class="cmd-row"><span class="cmd-name">aviv-prep</span><span class="cmd-desc">Prepare weekly 1:1 agenda for Aviv</span></div>
         </div>
       </div>
@@ -646,28 +664,28 @@
         <div class="cat-header"><div class="cat-name">Slack Operations</div><div class="cat-count">5</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">slack-triage</span><span class="cmd-desc">Scan channels, classify urgency, draft responses</span></div>
-          <div class="cmd-row"><span class="cmd-name">slack-pm-assist</span><span class="cmd-desc">Scan feedback channels for unanswered questions</span></div>
           <div class="cmd-row"><span class="cmd-name">slack-to-ticket</span><span class="cmd-desc">Convert Slack message to Jira ticket</span></div>
           <div class="cmd-row"><span class="cmd-name">thread-harvest</span><span class="cmd-desc">Extract decisions and proposals from thread</span></div>
           <div class="cmd-row"><span class="cmd-name">follow-up</span><span class="cmd-desc">Check open follow-ups via vault tags + Slack</span></div>
+          <div class="cmd-row"><span class="cmd-name new">slack-followup-sync</span><span class="cmd-desc">Reverse-sync sent Slack messages into vault #follow-up</span></div>
         </div>
       </div>
 
       <div class="cat-card" data-cat="ops">
-        <div class="cat-header"><div class="cat-name">Sprint Management</div><div class="cat-count">3</div></div>
+        <div class="cat-header"><div class="cat-name">Sprint Management</div><div class="cat-count">4</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">sprint-health</span><span class="cmd-desc">Cross-team active sprint health check</span></div>
           <div class="cmd-row"><span class="cmd-name">sprint-prep</span><span class="cmd-desc">Next sprint readiness scan</span></div>
           <div class="cmd-row"><span class="cmd-name">create-sprints</span><span class="cmd-desc">Create future sprints in Jira</span></div>
+          <div class="cmd-row"><span class="cmd-name">team-daily</span><span class="cmd-desc">Per-team daily digest: closed today/yesterday, in-review, blockers (sprint-scoped) → appends to daily note</span></div>
         </div>
       </div>
 
       <div class="cat-card" data-cat="ops">
-        <div class="cat-header"><div class="cat-name">Vault / Tag System</div><div class="cat-count">5</div></div>
+        <div class="cat-header"><div class="cat-name">Vault / Tag System</div><div class="cat-count">4</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">tag-prep</span><span class="cmd-desc">Search vault for tag, prepare action items</span></div>
           <div class="cmd-row"><span class="cmd-name">tag-close</span><span class="cmd-desc">Post-meeting reconciliation of tag-prep file</span></div>
-          <div class="cmd-row"><span class="cmd-name">tag-close-all</span><span class="cmd-desc">Broken symlink (delete candidate)</span></div>
           <div class="cmd-row"><span class="cmd-name">tag-execute</span><span class="cmd-desc">Search vault for tag, classify and execute items</span></div>
           <div class="cmd-row"><span class="cmd-name">action-sweep</span><span class="cmd-desc">Sweep single file for actionable tags</span></div>
         </div>
@@ -762,22 +780,20 @@
       </div>
 
       <div class="cat-card" data-cat="product">
-        <div class="cat-header"><div class="cat-name">Product Planning</div><div class="cat-count">4</div></div>
+        <div class="cat-header"><div class="cat-name">Product Planning</div><div class="cat-count">3</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">business-case</span><span class="cmd-desc">Build business case for initiative</span></div>
-          <div class="cmd-row"><span class="cmd-name">opportunity-brief</span><span class="cmd-desc">One-page problem + business justification</span></div>
           <div class="cmd-row"><span class="cmd-name">decision-log</span><span class="cmd-desc">Capture structured decision</span></div>
           <div class="cmd-row"><span class="cmd-name">plt-review</span><span class="cmd-desc">Simulate Product Leadership Team review</span></div>
         </div>
       </div>
 
       <div class="cat-card" data-cat="product">
-        <div class="cat-header"><div class="cat-name">Product Execution</div><div class="cat-count">4</div></div>
+        <div class="cat-header"><div class="cat-name">Product Execution</div><div class="cat-count">3</div></div>
         <div class="cat-commands">
           <div class="cmd-row"><span class="cmd-name">spec-to-team-epic</span><span class="cmd-desc">Convert spec &rarr; Jira Epics + Tasks</span></div>
           <div class="cmd-row"><span class="cmd-name">note-to-ticket</span><span class="cmd-desc">Create Jira ticket from vault note</span></div>
           <div class="cmd-row"><span class="cmd-name">initiative-review</span><span class="cmd-desc">Release-readiness dashboard with risks</span></div>
-          <div class="cmd-row"><span class="cmd-name">launch</span><span class="cmd-desc">Chain: doc-review &rarr; slide &rarr; Slack announce</span></div>
         </div>
       </div>
 
@@ -791,14 +807,13 @@
       </div>
 
       <div class="cat-card" data-cat="product">
-        <div class="cat-header"><div class="cat-name">Release &amp; Sales</div><div class="cat-count">7</div></div>
+        <div class="cat-header"><div class="cat-name">Release &amp; Sales</div><div class="cat-count">6</div></div>
         <div class="cat-commands">
-          <div class="cmd-row"><span class="cmd-name new">release-distribute</span><span class="cmd-desc">Full release pipeline (supersedes /launch)</span></div>
-          <div class="cmd-row"><span class="cmd-name new">release-notify</span><span class="cmd-desc">TAM/AM outreach for customer-requested features</span></div>
+          <div class="cmd-row"><span class="cmd-name">release-distribute</span><span class="cmd-desc">Full release pipeline (doc &rarr; slide &rarr; image &rarr; Notion &rarr; TAM &rarr; Slack)</span></div>
+          <div class="cmd-row"><span class="cmd-name">release-notify</span><span class="cmd-desc">TAM/AM outreach for customer-requested features</span></div>
           <div class="cmd-row"><span class="cmd-name">release-slack</span><span class="cmd-desc">Slack announcement (sub-step)</span></div>
           <div class="cmd-row"><span class="cmd-name">release-slide</span><span class="cmd-desc">Single-slide summary (sub-step)</span></div>
-          <div class="cmd-row"><span class="cmd-name">launch</span><span class="cmd-desc">Legacy pipeline (deprecated by release-distribute)</span></div>
-          <div class="cmd-row"><span class="cmd-name new">sales-enablement</span><span class="cmd-desc">Feature one-pager for SEs/AEs</span></div>
+          <div class="cmd-row"><span class="cmd-name">sales-enablement</span><span class="cmd-desc">Feature one-pager for SEs/AEs</span></div>
           <div class="cmd-row"><span class="cmd-name">battlecard</span><span class="cmd-desc">Competitor-focused sales battlecard</span></div>
         </div>
       </div>
@@ -806,12 +821,27 @@
       <div class="cat-card" data-cat="product">
         <div class="cat-header"><div class="cat-name">Orchestration</div><div class="cat-count">1</div></div>
         <div class="cat-commands">
-          <div class="cmd-row"><span class="cmd-name new">orchestrate</span><span class="cmd-desc">cmux workspace launcher per initiative</span></div>
+          <div class="cmd-row"><span class="cmd-name">orchestrate</span><span class="cmd-desc">cmux workspace launcher per initiative</span></div>
+        </div>
+      </div>
+
+      <div class="cat-card" data-cat="product">
+        <div class="cat-header"><div class="cat-name">Feature Mapping</div><div class="cat-count">2</div></div>
+        <div class="cat-commands">
+          <div class="cmd-row"><span class="cmd-name new">ibm-feature-map</span><span class="cmd-desc">Mark workplans for IBM relevance, push to IBM sheet</span></div>
+          <div class="cmd-row"><span class="cmd-name new">marketing-feature-map</span><span class="cmd-desc">Mark workplans for marketing tier, push to marketing sheet</span></div>
         </div>
       </div>
 
       <!-- VISUAL & QA -->
       <div class="group-header"><div class="group-dot" style="background:#a855f7;"></div><div class="group-label">Visual &amp; QA</div></div>
+
+      <div class="cat-card" data-cat="visual">
+        <div class="cat-header"><div class="cat-name">Video Intelligence</div><div class="cat-count">1</div></div>
+        <div class="cat-commands">
+          <div class="cmd-row"><span class="cmd-name new">watch-to-file</span><span class="cmd-desc">Screen recording → frames + local transcription → user story in cwd</span></div>
+        </div>
+      </div>
 
       <div class="cat-card" data-cat="visual">
         <div class="cat-header"><div class="cat-name">Visual Output</div><div class="cat-count">5</div></div>
@@ -857,43 +887,27 @@
 
   <!-- Delete Now -->
   <section>
-    <div class="section-title" style="color:#fca5a5;">Delete Now <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">9</span></div>
+    <div class="section-title" style="color:#fca5a5;">Delete Pending <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">5</span></div>
     <div class="delete-grid">
       <div class="delete-card">
-        <div class="del-name">tag-close-all <span class="tag">broken</span></div>
-        <div class="del-reason">Broken self-referencing symlink. Confirmed still broken.</div>
-      </div>
-      <div class="delete-card">
-        <div class="del-name">weekly-feedback-sweep <span class="tag">superseded</span></div>
-        <div class="del-reason">Replaced by weekly-feedback-sweep-teams (parallel, faster). Rename teams version after deletion.</div>
-      </div>
-      <div class="delete-card">
         <div class="del-name">aviv <span class="tag">redundant</span></div>
-        <div class="del-reason">Just <code style="color:#fca5a5;">meeting-item Aviv</code>. Person-specific shortcuts don't scale.</div>
+        <div class="del-reason">Just <code style="color:#fca5a5;">meeting-item Aviv</code>. Person-specific shortcuts don't scale. Pending since 31-Mar.</div>
       </div>
       <div class="delete-card">
         <div class="del-name">harel <span class="tag">redundant</span></div>
-        <div class="del-reason">Just <code style="color:#fca5a5;">meeting-item Harel</code>. Person-specific shortcuts don't scale.</div>
+        <div class="del-reason">Just <code style="color:#fca5a5;">meeting-item Harel</code>. Person-specific shortcuts don't scale. Pending since 31-Mar.</div>
       </div>
       <div class="delete-card">
         <div class="del-name">slack-pm-assist <span class="tag">duplicate</span></div>
-        <div class="del-reason">Overlaps slack-triage. Both scan channels and draft responses. Merge channel list into slack-triage.</div>
+        <div class="del-reason">Overlaps slack-triage. Merge channel list into slack-triage. Pending since 31-Mar.</div>
       </div>
       <div class="delete-card">
         <div class="del-name">grammarly <span class="tag">duplicate</span></div>
-        <div class="del-reason">Overlaps note-prettifier. Merge grammar + professional tone into note-prettifier.</div>
+        <div class="del-reason">Overlaps note-prettifier. Merge grammar + professional tone into note-prettifier. Pending since 31-Mar.</div>
       </div>
       <div class="delete-card">
         <div class="del-name">link-index <span class="tag">unused</span></div>
-        <div class="del-reason">Rarely used niche utility. No active workflow depends on it.</div>
-      </div>
-      <div class="delete-card">
-        <div class="del-name">slack-triage -deprecated <span class="tag">superseded</span></div>
-        <div class="del-reason">Old version kept alongside the new slack-triage. Just delete it.</div>
-      </div>
-      <div class="delete-card">
-        <div class="del-name">launch <span class="tag">superseded</span></div>
-        <div class="del-reason">Superseded by release-distribute (broader pipeline with same sub-steps).</div>
+        <div class="del-reason">Rarely used niche utility. No active workflow depends on it. Pending since 31-Mar.</div>
       </div>
     </div>
   </section>
@@ -902,15 +916,31 @@
 
   <!-- Deprecate -->
   <section>
-    <div class="section-title" style="color:#fcd34d;">Deprecate <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;">2</span></div>
+    <div class="section-title" style="color:#10b981;">Cleaned Up Since 11-Apr <span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;">6</span></div>
     <div class="deprecate-grid">
-      <div class="deprecate-card">
-        <div class="dep-name">opportunity-brief <span class="tag">overlap</span></div>
-        <div class="dep-reason">Overlaps problem-boundary + business-case. The /discover pipeline is more rigorous for the same use case.</div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">tag-close-all <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Broken symlink. Removed.</div>
       </div>
-      <div class="deprecate-card">
-        <div class="dep-name">daily-prettify <span class="tag">low usage</span></div>
-        <div class="dep-reason">Cosmetic batch operation. Consider auto-triggering via session-close hook instead of standalone command.</div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">weekly-feedback-sweep <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Superseded by weekly-feedback-sweep-teams. Removed.</div>
+      </div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">launch <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Superseded by release-distribute. Removed.</div>
+      </div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">daily-prettify <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Low usage cosmetic batch op. Removed.</div>
+      </div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">opportunity-brief <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Overlapped problem-boundary + business-case. Removed.</div>
+      </div>
+      <div class="deprecate-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.15);">
+        <div class="dep-name" style="color:#6ee7b7;">slack-triage-deprecated <span class="tag" style="background:rgba(16,185,129,0.15);color:#10b981;">deleted</span></div>
+        <div class="dep-reason">Old version kept alongside new slack-triage. Removed.</div>
       </div>
     </div>
   </section>
@@ -925,49 +955,90 @@
         <div class="trend-bar-group">
           <div class="trend-bar-stack">
             <div class="trend-bar total" style="height:120px;">
-              <span class="bar-val" style="color:#60a5fa;">81</span>
+              <span class="bar-val" style="color:#22dd92;">81</span>
             </div>
             <div class="trend-bar active" style="height:117px;">
               <span class="bar-val" style="color:#34d399;">79</span>
             </div>
           </div>
-          <div class="trend-label">29 Mar<br><span style="font-size:10px;color:#475569;">First review</span></div>
+          <div class="trend-label">29 Mar<br><span style="font-size:10px;color:#52525b;">First review</span></div>
         </div>
         <div class="arrow-connector">&rarr;</div>
         <div class="trend-bar-group">
           <div class="trend-bar-stack">
             <div class="trend-bar total" style="height:122px;">
-              <span class="bar-val" style="color:#60a5fa;">82</span>
+              <span class="bar-val" style="color:#22dd92;">82</span>
             </div>
             <div class="trend-bar active" style="height:119px;">
               <span class="bar-val" style="color:#34d399;">80</span>
             </div>
           </div>
-          <div class="trend-label">31 Mar<br><span style="font-size:10px;color:#475569;">+6 new, -2 del</span></div>
+          <div class="trend-label">31 Mar<br><span style="font-size:10px;color:#52525b;">+6 new, -2 del</span></div>
         </div>
         <div class="arrow-connector">&rarr;</div>
         <div class="trend-bar-group">
           <div class="trend-bar-stack">
             <div class="trend-bar total" style="height:140px;">
-              <span class="bar-val" style="color:#60a5fa;">87</span>
+              <span class="bar-val" style="color:#22dd92;">87</span>
             </div>
             <div class="trend-bar active" style="height:135px;">
               <span class="bar-val" style="color:#34d399;">84</span>
             </div>
           </div>
-          <div class="trend-label">11 Apr<br><span style="font-size:10px;color:#475569;">Today (no cleanup)</span></div>
+          <div class="trend-label">11 Apr<br><span style="font-size:10px;color:#52525b;">+5 new, 0 deleted</span></div>
+        </div>
+        <div class="arrow-connector">&rarr;</div>
+        <div class="trend-bar-group">
+          <div class="trend-bar-stack">
+            <div class="trend-bar total" style="height:136px;">
+              <span class="bar-val" style="color:#22dd92;">88</span>
+            </div>
+            <div class="trend-bar active" style="height:130px;">
+              <span class="bar-val" style="color:#34d399;">86</span>
+            </div>
+          </div>
+          <div class="trend-label">27 Apr<br><span style="font-size:10px;color:#52525b;">+1 team-daily</span></div>
+        </div>
+        <div class="arrow-connector">&rarr;</div>
+        <div class="trend-bar-group">
+          <div class="trend-bar-stack">
+            <div class="trend-bar total" style="height:140px;">
+              <span class="bar-val" style="color:#22dd92;">89</span>
+            </div>
+            <div class="trend-bar active" style="height:135px;">
+              <span class="bar-val" style="color:#34d399;">87</span>
+            </div>
+          </div>
+          <div class="trend-label">29 Apr<br><span style="font-size:10px;color:#52525b;">+1 watch-to-file</span></div>
+        </div>
+        <div class="trend-bar">
+          <div class="bar-row">
+            <span class="bar-label">Total</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="background:#22dd92; width:100%;"></div>
+            </div>
+              <span class="bar-val" style="color:#22dd92;">91</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Active</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="background:#34d399; width:97%;"></div>
+            </div>
+              <span class="bar-val" style="color:#34d399;">89</span>
+          </div>
+          <div class="trend-label">5 May<br><span style="font-size:10px;color:#52525b;">+2 (concept-feedback, feature-shipped)</span></div>
         </div>
         <div class="arrow-connector">&rarr;</div>
         <div class="trend-bar-group">
           <div class="trend-bar-stack">
             <div class="trend-bar total" style="height:115px; opacity:0.5; border: 1px dashed #3b82f6; background: transparent;">
-              <span class="bar-val" style="color:#60a5fa;">76</span>
+              <span class="bar-val" style="color:#22dd92;">84</span>
             </div>
             <div class="trend-bar active" style="height:115px; opacity:0.5; border: 1px dashed #10b981; background: transparent;">
-              <span class="bar-val" style="color:#34d399;">76</span>
+              <span class="bar-val" style="color:#34d399;">84</span>
             </div>
           </div>
-          <div class="trend-label">Target<br><span style="font-size:10px;color:#475569;">After cleanup</span></div>
+          <div class="trend-label">Target<br><span style="font-size:10px;color:#52525b;">After 5 remaining deleted</span></div>
         </div>
       </div>
       <div class="trend-legend">
@@ -998,11 +1069,10 @@
       <div class="arch-card risks">
         <div class="arch-title"><span style="color:#f59e0b;">&#9679;</span> Risks</div>
         <ul>
-          <li><span class="icon">&#9888;</span> Sprawl accelerating &mdash; 87 commands (+5 in 11 days). Each competes for AI context in skill listing</li>
-          <li><span class="icon">&#9888;</span> Zero cleanup executed &mdash; 7 of 9 deletions already recommended 31-Mar. Debt growing</li>
+          <li><span class="icon">&#9888;</span> 5 delete candidates still live &mdash; aviv, harel, slack-pm-assist, grammarly, link-index. All recommended since 31-Mar</li>
           <li><span class="icon">&#9888;</span> Person-specific shortcuts &mdash; aviv, harel don't scale. meeting-item handles this generically</li>
-          <li><span class="icon">&#9888;</span> Duplicate coverage &mdash; slack-pm-assist vs slack-triage, grammarly vs note-prettifier, launch vs release-distribute</li>
-          <li><span class="icon">&#9888;</span> Release fragmentation &mdash; launch, release-distribute, release-notify, release-slack, release-slide overlap. Need clear hierarchy</li>
+          <li><span class="icon">&#9888;</span> Duplicate coverage &mdash; slack-pm-assist vs slack-triage, grammarly vs note-prettifier still not merged</li>
+          <li><span class="icon">&#9888;</span> tag-execute overlap &mdash; should merge into tag-prep with --execute flag</li>
         </ul>
       </div>
     </div>
@@ -1011,7 +1081,7 @@
 </div>
 
 <footer>
-  <div class="source">Generated from: AI PM/COMMANDS-REVIEW.md &mdash; 11 April 2026</div>
+  <div class="source">Generated from: AI PM/COMMANDS-REVIEW.md &mdash; 9 May 2026</div>
 </footer>
 
 <script>

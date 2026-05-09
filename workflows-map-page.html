@@ -409,7 +409,12 @@
 <section class="workflow" data-cat="initiative">
   <h2><span class="num-badge">01</span> Initiative Lifecycle (Discovery → Ship)</h2>
   <div class="lead"><strong>The spine.</strong> Goes from raw signal to shipped feature. Most skills hang off this chain.</div>
-  <pre class="code"><span class="skill">Signals</span> <span class="arrow">→</span> <span class="skill">/problem-discover</span> <span class="arrow">→</span> <span class="skill">/problem-boundary</span> <span class="arrow">→</span> <span class="skill">/pre-mortem</span> <span class="arrow">→</span> <span class="skill">/prd</span>
+  <pre class="code"><span class="skill">Signals</span> <span class="arrow">→</span> <span class="skill">/problem-discover</span> <span class="arrow">→</span> <span class="skill">/problem-boundary</span> <span class="arrow">→</span> <span class="skill">/business-case</span> <span class="arrow">→</span> <span class="skill">/pre-mortem</span> <span class="arrow">→</span> <span class="skill">/prd</span>
+              │                  │                  │
+              ▼                  ▼                  ▼
+        <span class="comment">Automation/initiative-dashboard.md  ◄──  /today</span>
+        <span class="comment">(Pending Discovery / Awaiting Decision / Active Business Cases)</span>
+
         <span class="arrow">→</span> <span class="skill">/spec-review</span> <span class="arrow">→</span> <span class="skill">/plt-review</span> ‖ <span class="skill">/persona-review</span> <span class="arrow">→</span> <span class="skill">/spec-to-team-epic</span> <span class="arrow">→</span> <span class="skill">/initiative-review</span>
                             <span class="comment">↑ inside-out    ↑ outside-in (Piper SRE, Ward Gov, Penny FinOps)</span>
         <span class="arrow">→</span> (Release workflow)</pre>
@@ -429,7 +434,8 @@
     </tbody>
   </table></div>
   <div class="callout"><strong>Pre-built chains:</strong> <code>/discover</code> = <code>/problem-discover</code> → <code>/problem-boundary</code> → <code>/business-case</code>. <code>/feedback-cycle</code> = <code>/gong-insights</code> ∥ <code>/intercom-insights</code> → <code>/problem-discover</code>.</div>
-  <div class="callout warn"><strong>Gaps:</strong> <code>/pre-mortem</code>, <code>/plt-review</code>, <code>/persona-review</code>, <code>/spec-review</code> not yet exercised in real flow.</div>
+  <div class="callout"><strong>Pre/post-flight gates:</strong> each skill in the <code>/discover</code> chain pre-checks tracker freshness or source reuse and post-writes to <code>Automation/initiative-dashboard.md</code> (<code>## Pending Discovery</code> / <code>## Active Problems Awaiting Decision</code> / <code>## Active Business Cases</code>). <code>/today</code> reads that dashboard, so the chain stitches itself: no manual handoff between steps.</div>
+  <div class="callout"><strong>Review skills exercised:</strong> <code>/pre-mortem</code>, <code>/plt-review</code>, <code>/persona-review</code>, <code>/spec-review</code> all run on real initiatives multiple times.</div>
 </section>
 
 <section class="workflow" data-cat="initiative">
