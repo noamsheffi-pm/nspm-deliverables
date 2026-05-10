@@ -368,6 +368,26 @@
         </div>
       </article>
 
+      <!-- DK -->
+      <article class="card" data-cat="observe">
+        <div class="head">
+          <div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:#7c3aed;">🦍</div>
+          <div class="title-block">
+            <div class="name">🦍 DK</div>
+            <div class="role">Bug-validation watcher (#agent-bug-validation-group)</div>
+            <span class="status observe">Phase 1 observe</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/dk-observe</code> (no plist yet)</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Filter Owner PM = Noam → classify domain → validate / redirect / escalate</div></div>
+          <div class="meta-row"><div class="k">Hot rule</div><div class="v">IBM env + no workaround + regression → same-day escalate</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/DK/observations/{date}.md</code></div></div>
+          <div class="meta-row"><div class="k">Model</div><div class="v">Haiku 4.5 (mechanical parsing)</div></div>
+          <div class="meta-row"><div class="k">Promote</div><div class="v">≥80% classifier accuracy + would-do match actual response</div></div>
+        </div>
+      </article>
+
       <!-- Princess Peach -->
       <article class="card" data-cat="concept">
         <div class="head">
@@ -427,8 +447,8 @@
     <div class="coverage">
       <div class="cell">
         <div class="dir">Downstream — execution</div>
-        <div class="what">Active workplan drift · Jira state · Slack reply tracking</div>
-        <div class="who">Mario · Luigi · Yoshi</div>
+        <div class="what">Active workplan drift · Jira state · Slack reply tracking · Bug validation</div>
+        <div class="who">Mario · Luigi · Yoshi · DK</div>
       </div>
       <div class="cell">
         <div class="dir">Upstream — business</div>
