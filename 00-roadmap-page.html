@@ -271,8 +271,8 @@
       <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">8</span></button>
       <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">2</span></button>
       <button class="pill" data-filter="soak" aria-label="Show in soak">Soak <span class="count">1</span></button>
-      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">2</span></button>
-      <button class="pill" data-filter="concept" aria-label="Show concept">Concept <span class="count">1</span></button>
+      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">4</span></button>
+      <button class="pill" data-filter="concept" aria-label="Show concept">Concept <span class="count">0</span></button>
       <button class="pill" data-filter="future" aria-label="Show future">Future <span class="count">2</span></button>
     </nav>
 
@@ -389,20 +389,23 @@
       </article>
 
       <!-- Princess Peach -->
-      <article class="card" data-cat="concept">
+      <article class="card" data-cat="observe">
         <div class="head">
           <div class="avatar"><img alt="Princess Peach" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/princess-peach.png"></div>
           <div class="title-block">
             <div class="name">👑 Princess Peach</div>
-            <div class="role">Upstream customer signals</div>
-            <span class="status concept">Concept</span>
+            <div class="role">Upstream enablement loop (misconception detection)</div>
+            <span class="status observe">Phase 1.0 observe</span>
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Wraps</div><div class="v"><code>/gong-insights</code> · <code>/intercom-insights</code> · <code>/pipev2-insights</code> · <code>/feedback-cycle</code></div></div>
-          <div class="meta-row"><div class="k">Earliest</div><div class="v">Fri 2026-05-15 (post Mario soak)</div></div>
-          <div class="meta-row"><div class="k">Shift</div><div class="v">Pre-drafts the dispatch (one-key approval) instead of just surfacing</div></div>
-          <div class="meta-row"><div class="k">Open</div><div class="v">7 questions: timing, dispatch authority, deal relevance, threshold, tracker, kill switch, Mario boundary</div></div>
+          <div class="meta-row"><div class="k">Scope (v1)</div><div class="v">Enablement-only. Misconception + knowledge gap + process question on Gong/Intercom. Product flow stays manual in <code>/gong-insights</code> until v2.</div></div>
+          <div class="meta-row"><div class="k">Skill</div><div class="v"><code>/peach-observe [--date YYYY-MM-DD]</code> (manual, no plist)</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/peach.md</code></div></div>
+          <div class="meta-row"><div class="k">Canonical test</div><div class="v">✅ Acxiom / Gregory Galaida PAYG-cap case classified MISCONCEPTION-high on 2026-05-11 run</div></div>
+          <div class="meta-row"><div class="k">Phase 1.0 gate</div><div class="v">Misconception-only this week. 0 high-conf false positives required. Promotion to 1.1 (knowledge gap + process question) Fri 2026-05-15.</div></div>
+          <div class="meta-row"><div class="k">Phase 2 (build)</div><div class="v">Mon 2026-05-18 → Thu 2026-05-21. DM drafting + seller resolution + one-key approval + release-trigger orchestration.</div></div>
+          <div class="meta-row"><div class="k">Failure model</div><div class="v">Type I backlog inflation (misconceptions filed as FRs) + Type II deal loss to ignorance (seller didn't know feature exists)</div></div>
         </div>
       </article>
 
@@ -451,9 +454,14 @@
         <div class="who">Mario · Luigi · Yoshi · DK</div>
       </div>
       <div class="cell">
-        <div class="dir">Upstream — business</div>
-        <div class="what">Sales calls (Gong) · Support (Intercom) · Backlog (PIPEV2)</div>
-        <div class="who">Princess Peach (concept)</div>
+        <div class="dir">Upstream — enablement (v1)</div>
+        <div class="what">Gong + Intercom classification: misconception, knowledge gap, process question</div>
+        <div class="who">Princess Peach (Phase 1.0 observe)</div>
+      </div>
+      <div class="cell">
+        <div class="dir">Upstream — product (v2 deferred)</div>
+        <div class="what">Cross-source product gap synthesis · Deal-relevance ranking</div>
+        <div class="who">Princess Peach v2 (post-v1 soak)</div>
       </div>
       <div class="cell">
         <div class="dir">Lateral — stakeholders</div>
@@ -479,17 +487,25 @@
         <div class="when">Fri 2026-05-15</div>
         <div class="what">Mario Phase 5 delta plist (if soak passes) → Phase 6 memory + <code>/today</code> injection</div>
       </div>
+      <div class="tl-item now">
+        <div class="when">Tue 2026-05-12 → Thu 2026-05-14</div>
+        <div class="what">Princess Peach Phase 1.0 observe runs · Acxiom canonical test ✅ passed 2026-05-11</div>
+      </div>
       <div class="tl-item">
         <div class="when">Fri 2026-05-15</div>
-        <div class="what">Princess Peach concept → plan</div>
+        <div class="what">Peach Phase 1.0 → 1.1 gate review · Phase 2 plan day · Daisy/Toad Phase 2 plan day</div>
       </div>
       <div class="tl-item">
         <div class="when">Mon 2026-05-18 → Thu 2026-05-21</div>
-        <div class="what">Princess Peach build</div>
+        <div class="what">Princess Peach Phase 2 build: seller resolver · DM drafter · approval gate · release-trigger sweep</div>
       </div>
       <div class="tl-item">
         <div class="when">Sun 2026-05-24 → Thu 2026-05-28</div>
-        <div class="what">Princess Peach soak</div>
+        <div class="what">Princess Peach Phase 2 soak</div>
+      </div>
+      <div class="tl-item">
+        <div class="when">Mon 2026-06-01</div>
+        <div class="what">Princess Peach Phase 3 plist + memory write (if soak passes)</div>
       </div>
       <div class="tl-item">
         <div class="when">Week of 2026-06-01</div>
