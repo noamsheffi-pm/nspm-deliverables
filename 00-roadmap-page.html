@@ -258,21 +258,21 @@
 
   <section class="counters">
     <div class="stats">
-      <div class="stat"><div class="num mint">2</div><div class="lbl">Shipped</div></div>
-      <div class="stat"><div class="num">3</div><div class="lbl">In soak / observe</div></div>
-      <div class="stat"><div class="num">1</div><div class="lbl">Concept</div></div>
+      <div class="stat"><div class="num mint">3</div><div class="lbl">Shipped</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">In observe</div></div>
+      <div class="stat"><div class="num">1</div><div class="lbl">In build (Boo)</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Wired pairs</div></div>
       <div class="stat"><div class="num">2</div><div class="lbl">Future slots</div></div>
     </div>
   </section>
 
   <section>
-    <h2>Roster <span class="badge">8 agents</span></h2>
+    <h2>Roster <span class="badge">10 agents</span></h2>
     <nav class="filters" aria-label="Filter agents by status">
-      <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">8</span></button>
-      <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">2</span></button>
-      <button class="pill" data-filter="soak" aria-label="Show in soak">Soak <span class="count">1</span></button>
-      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">4</span></button>
-      <button class="pill" data-filter="concept" aria-label="Show concept">Concept <span class="count">0</span></button>
+      <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">10</span></button>
+      <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">3</span></button>
+      <button class="pill" data-filter="build" aria-label="Show in build">Build <span class="count">1</span></button>
+      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">5</span></button>
       <button class="pill" data-filter="future" aria-label="Show future">Future <span class="count">2</span></button>
     </nav>
 
@@ -289,7 +289,7 @@
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Schedule</div><div class="v">23:30 Lisbon · Mon–Fri</div></div>
+          <div class="meta-row"><div class="k">Schedule</div><div class="v">23:30 Lisbon · Sun–Thu</div></div>
           <div class="meta-row"><div class="k">Loop</div><div class="v">Walks Jira, surfaces blockers and ship candidates</div></div>
           <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/luigi.md</code></div></div>
           <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/scrum-chief</code></div></div>
@@ -315,20 +315,42 @@
       </article>
 
       <!-- Mario -->
-      <article class="card" data-cat="soak">
+      <article class="card shipped" data-cat="shipped">
         <div class="head">
           <div class="avatar"><img alt="Mario" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/mario.png"></div>
           <div class="title-block">
             <div class="name">🍄 Mario</div>
             <div class="role">Vault ↔ reality bridge</div>
-            <span class="status soak">Phase 4 soak</span>
+            <span class="status shipped">Shipped</span>
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Schedule</div><div class="v">07:30 Lisbon · Sun–Thu</div></div>
-          <div class="meta-row"><div class="k">Soak</div><div class="v">Sun 2026-05-10 → Thu 2026-05-14 · decision day Thu EOD</div></div>
+          <div class="meta-row"><div class="k">Schedule</div><div class="v">07:30 main + 15:30 delta · Sun–Thu Lisbon</div></div>
+          <div class="meta-row"><div class="k">Soak result</div><div class="v">Passed 2026-05-14 — 4.6 patches/day avg · ≥5 missed signals surfaced · no flood</div></div>
           <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/mario-now.md</code> · <code>mario-inbox/{slug}.md</code></div></div>
-          <div class="meta-row"><div class="k">Pass</div><div class="v">≥50% approval/day · ≥3 patches/day · ≥2 missed-signal items by Thu</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/mario</code> · <code>/mario --mode=delta</code></div></div>
+          <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/mario-retro</code> · <code>--weekly</code> · <code>--apply</code></div></div>
+          <div class="meta-row"><div class="k">Wiring</div><div class="v">Emits unanswered @-mentions → Yoshi inbox (live)</div></div>
+        </div>
+      </article>
+
+      <!-- Boo -->
+      <article class="card" data-cat="build">
+        <div class="head">
+          <div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:#1f1f1f;">👻</div>
+          <div class="title-block">
+            <div class="name">👻 Boo</div>
+            <div class="role">Meeting-output reconciliation (junior PM delegate)</div>
+            <span class="status soak">Phase 1 — manual mode</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Mode</div><div class="v">Manual single-file (Phase 1). Scheduled Sun–Thu 12:30 + 17:30 gated on soak (Phase 4).</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/boo {path-to-meeting-summary}</code> · <code>/boo execute</code> · <code>/boo --dry</code></div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/boo-inbox.md</code> (drafted DMs in <code>&gt;</code> blockquote, copy-ready)</div></div>
+          <div class="meta-row"><div class="k">Dispatch types (v1)</div><div class="v">Slack DM to person · entry in person's next 1:1 note</div></div>
+          <div class="meta-row"><div class="k">What it fills</div><div class="v">Meeting-file action items that pile up when Noam moves to the next meeting without processing. Junior-PM delegate pattern.</div></div>
+          <div class="meta-row"><div class="k">Wiring (Phase 5)</div><div class="v">Boo → Yoshi on approved Slack DMs (auto-track replies)</div></div>
         </div>
       </article>
 
@@ -409,20 +431,40 @@
         </div>
       </article>
 
+      <!-- Koopa -->
+      <article class="card" data-cat="observe">
+        <div class="head">
+          <div class="avatar"><img alt="Koopa" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/koopa.png"></div>
+          <div class="title-block">
+            <div class="name">🐢 Koopa</div>
+            <div class="role">Inbound mention guardian (twin to Yoshi)</div>
+            <span class="status observe">Observe</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Every 2h Sun-Thu (07:30→19:30, 7 ticks/day): scan all Slack for <code>@noam</code> mentions, classify reply state, surface waiting + repeat pings.</div></div>
+          <div class="meta-row"><div class="k">Engine</div><div class="v">Reuses <code>/slack-triage</code> via <code>--auto --mentions-only</code> (~70-80% cheaper per tick)</div></div>
+          <div class="meta-row"><div class="k">Push threshold</div><div class="v">B: Waiting ≥ 1 OR repeat-ping event</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v">Phase 1: state + run-file only · Phase 2: Slack DM to <code>D080G86FAAW</code></div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/koopa-watch</code> · launchd <code>com.claude.schedule.koopa-watch</code></div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Phase 1 observe-only shipped 2026-05-18 · first active tick Tue 2026-05-19 07:30</div></div>
+        </div>
+      </article>
+
       <!-- Bowser -->
       <article class="card" data-cat="future">
         <div class="head">
           <div class="avatar"><img alt="Bowser" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/bowser.png"></div>
           <div class="title-block">
             <div class="name">🐢 Bowser</div>
-            <div class="role">Pre-mortem skeptic</div>
-            <span class="status future">Future slot</span>
+            <div class="role">Slack-to-Agent Bridge (DM router)</div>
+            <span class="status future">Concept</span>
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Loop</div><div class="v">Stress-tests solo PRD reviews before R&D handoff. Inverse of supportive agents.</div></div>
-          <div class="meta-row"><div class="k">Note</div><div class="v">Challenge-mode, not loop-mode. May need different architecture.</div></div>
-          <div class="meta-row"><div class="k">Status</div><div class="v">Slot reserved, not drafted</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Routes Slack DMs to Mario/DK/Yoshi/Peach. Lets Noam talk to agents from phone without Claude Code cold-start tokens per turn.</div></div>
+          <div class="meta-row"><div class="k">Note</div><div class="v">Concept doc only · see <code>bowser-bridge-concept.md</code></div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Phase 0 signal · promote to plan after Peach Phase 2 ships</div></div>
         </div>
       </article>
 
@@ -477,15 +519,65 @@
   </section>
 
   <section>
+    <h2>Cross-agent plumbing <span class="badge">wiring + join</span></h2>
+    <p style="color: var(--text-2); margin-bottom: 18px; max-width: 820px;">
+      Two distinct mechanisms wire the family together. <strong style="color:#f59e0b">Wiring</strong> = typed handoff Agent A → Agent B with action contract. <strong style="color:#a78bfa">Join</strong> = read-only aggregator across all agents into one morning view. Don't conflate.
+    </p>
+
+    <div class="coverage" style="grid-template-columns: 1fr 1fr;">
+      <div class="cell" style="border-left: 3px solid #f59e0b;">
+        <div class="dir" style="color: #f59e0b;">Wiring (A → B)</div>
+        <div class="what">Point-to-point. Agent A emits typed signal to <code>Automation/Agents/Wiring/{from}-to-{to}.md</code>; Agent B drains and acts. Stable <code>dedup_key</code> + kill switch (<code>enabled: false</code>).</div>
+        <div class="who">Spec: <code>Automation/Agents/cross-agent-wiring-spec.md</code></div>
+      </div>
+      <div class="cell" style="border-left: 3px solid #a78bfa;">
+        <div class="dir" style="color: #a78bfa;">Join (aggregator)</div>
+        <div class="what">Many-to-one read. <code>/cross-agent-join</code> correlates today's per-agent files via 5 rules → <code>cross-agent.md</code>. Called by <code>/today</code> Step 1g. Canonical morning read.</div>
+        <div class="who">Skill: <code>System/Agents/Claude/commands/cross-agent-join.md</code></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 28px; font-size: 16px; color: var(--text-2); font-weight: 600;">Live wired pairs</h3>
+    <div class="coverage" style="grid-template-columns: 1fr 1fr; margin-top: 12px;">
+      <div class="cell">
+        <div class="dir">🍄 Mario → 🦖 Yoshi</div>
+        <div class="what">Unanswered @-mention threads in workplan-linked channels → Yoshi inbox. Drained at <code>yoshi-graze</code> Step 1.0, treated as <code>#slack-track-watch</code>.</div>
+        <div class="who">Live since 2026-05-13</div>
+      </div>
+      <div class="cell">
+        <div class="dir">🌼 Daisy → 🦍 DK</div>
+        <div class="what">User-confirmed routing intent contradicting current Jira state (Daisy Phase C.6) → DK Phase A0 triggers <code>/dk-validate</code> re-route proposal.</div>
+        <div class="who">Reference pair</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <div class="callout">
+        <strong>Decision rule:</strong> wire when Agent B must take a typed action on Agent A's signal. Rely on join when humans just need to see correlated signals in one place. Polling another agent's daily file is a wiring smell — promote to a pair.
+        <br><br>
+        <strong>Diagram:</strong> <code><a href="cross-agent-plumbing-diagram.html" style="color: var(--mint); text-decoration: underline;">cross-agent-plumbing-diagram.html</a></code> · <strong>Full notes:</strong> <code>cross-agent-plumbing.md</code>
+      </div>
+    </div>
+  </section>
+
+  <section>
     <h2>Build sequence <span class="badge">precedence locked</span></h2>
     <div class="timeline">
-      <div class="tl-item now">
+      <div class="tl-item">
         <div class="when">Sun 2026-05-10 → Thu 2026-05-14</div>
-        <div class="what">Mario Phase 4 soak · decision Thu EOD</div>
+        <div class="what">Mario Phase 4 soak ✅ passed · 4.6 patches/day · ≥5 missed signals surfaced</div>
       </div>
       <div class="tl-item">
+        <div class="when">Thu 2026-05-14</div>
+        <div class="what">Mario Phase 5 delta plist ✅ loaded (15:30 Sun-Thu) · Phase 6 memory + <code>/today</code> injection ✅ live</div>
+      </div>
+      <div class="tl-item now">
         <div class="when">Fri 2026-05-15</div>
-        <div class="what">Mario Phase 5 delta plist (if soak passes) → Phase 6 memory + <code>/today</code> injection</div>
+        <div class="what">👻 Boo Phase 1 ✅ shipped (manual mode) · Luigi work-week label drift fixed Sun-Thu</div>
+      </div>
+      <div class="tl-item now">
+        <div class="when">Mon 2026-05-18</div>
+        <div class="what">🐢 Koopa Phase 1 ✅ shipped (observe-only) · inbound mention guardian, twin to Yoshi · Sun-Thu 7 ticks/day · first active tick Tue 07:30</div>
       </div>
       <div class="tl-item now">
         <div class="when">Tue 2026-05-12 → Thu 2026-05-14</div>
@@ -522,7 +614,7 @@
   </section>
 
   <section>
-    <h2>Operating principles <span class="badge">L1 → L12</span></h2>
+    <h2>Operating principles <span class="badge">L1 → L13</span></h2>
     <div class="principles">
       <div class="principle"><div class="num">L1</div><div class="head2">Inherit the proven shape</div><div class="body">Yoshi's wrapper, plist, mcp-config-empty, state-file pattern, JSONL token logging, atomic writes. Copy and adjust.</div></div>
       <div class="principle"><div class="num">L2</div><div class="head2">Absolute paths in headless</div><div class="body"><code>claude -p</code> doesn't propagate cwd. Every path starts with <code>/Users/noam.sheffi/CX/</code>.</div></div>
@@ -536,6 +628,7 @@
       <div class="principle"><div class="num">L10</div><div class="head2">Kill criteria in the plan</div><div class="body">Approval &lt;50% any day = freeze. Inbox flood &gt;N = tighten. Filter rewrites &gt;50% = iterate. Lock BEFORE soak.</div></div>
       <div class="principle"><div class="num">L11</div><div class="head2">One agent per loop</div><div class="body">Don't merge agents to save boilerplate. Independent state + schedule + kill switch &gt; DRY.</div></div>
       <div class="principle"><div class="num">L12</div><div class="head2">Concept → plan → build → soak → memory</div><div class="body">Every agent passes through these gates. Never skip soak; never write memory before soak passes.</div></div>
+      <div class="principle"><div class="num">L13</div><div class="head2">Model selection by cadence</div><div class="body">Haiku 4.5 for 2h loops · Sonnet 4.6 default for scheduled · Opus 4.7 only for one-shot reasoning skills.</div></div>
     </div>
   </section>
 
@@ -549,7 +642,7 @@
   </section>
 
   <footer>
-    Generated from: <code>AI PM/Agents/00-roadmap.md</code> · Coralogix · NSPM
+    Generated from: <code>AI PM/Agents/00-roadmap.md</code> · Coralogix · NSPM · Last updated 2026-05-15
   </footer>
 
 </div>
