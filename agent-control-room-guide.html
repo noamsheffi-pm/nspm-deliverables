@@ -288,12 +288,15 @@ footer {
     <strong>Coralogix</strong> · NSPM Operating System
   </div>
 
-  <header>
-    <h1>Agent Control Room<span class="accent">.</span></h1>
-    <p class="subtitle">
-      Live state of every PM agent (Yoshi, Luigi, Mario, ...) in one place.
-      <strong>Open it once a day. Glance §1. Done.</strong>
-    </p>
+  <header style="display:flex;align-items:center;gap:24px;justify-content:space-between;flex-wrap:wrap;">
+    <div style="flex:1;min-width:300px;">
+      <h1>Agent Control Room<span class="accent">.</span></h1>
+      <p class="subtitle">
+        Live state of every PM agent (Yoshi, Luigi, Mario, Koopa, ...) in one place.
+        <strong>Open it once a day. Glance §1. Done.</strong>
+      </p>
+    </div>
+    <img src="https://nspm-deliverables.vercel.app/visuals/mario-agents/koopa.png" alt="Koopa — newest agent" style="height:140px;width:auto;flex:0 0 auto;" title="🐢 Koopa — inbound mention guardian, shipped 2026-05-18">
   </header>
 
   <!-- Stat counters -->
@@ -398,6 +401,15 @@ footer {
             <td style="color:var(--text-muted)">—</td>
             <td>⚪ never run</td>
             <td style="color:var(--text-muted)"></td>
+          </tr>
+          <tr>
+            <td><img src="https://nspm-deliverables.vercel.app/visuals/mario-agents/koopa.png" alt="Koopa" style="height:24px;width:auto;vertical-align:middle;margin-right:6px;">koopa-watch</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td style="color:var(--text-muted)">—</td>
+            <td>⚪ never run</td>
+            <td style="color:var(--text-muted)">Phase 1 observe-only · first tick Tue 07:30</td>
           </tr>
         </tbody>
       </table>
