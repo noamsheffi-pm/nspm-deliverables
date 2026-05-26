@@ -258,22 +258,25 @@
 
   <section class="counters">
     <div class="stats">
-      <div class="stat"><div class="num mint">3</div><div class="lbl">Shipped</div></div>
-      <div class="stat"><div class="num">5</div><div class="lbl">In observe</div></div>
-      <div class="stat"><div class="num">1</div><div class="lbl">In build (Boo)</div></div>
-      <div class="stat"><div class="num">2</div><div class="lbl">Wired pairs</div></div>
-      <div class="stat"><div class="num">2</div><div class="lbl">Future slots</div></div>
+      <div class="stat"><div class="num mint">3</div><div class="lbl">Shipped (Luigi · Yoshi · Mario)</div></div>
+      <div class="stat"><div class="num mint">5</div><div class="lbl">Live on plist (Daisy P2 · Toad · DK · Peach · Koopa)</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Build / scaffold (Boo · Lakitu)</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Wired pairs (Mario→Yoshi · Daisy→DK · Peach→DK*)</div></div>
+      <div class="stat"><div class="num mint">8</div><div class="lbl">Retro skills shipped</div></div>
+    </div>
+    <div class="callout" style="margin-top: 16px;">
+      <strong>2026-05-23 fleet pressure test:</strong> 18 fixes shipped across all 8 agents + cross-agent join. Highlights: Phase B.5 multi-agent consolidation (kills parallel-duplicate drafts), Patch E permalink-inline render contract, Patch F three-bucket agents_missing semantics (kills weekend false-fleet-alarms), Koopa promotion gate TUNE-FIRST with Hebrew casual filter + null-permalink fallback, Mario Phase A.4 discovery-drift detection + Phase A.5 closure-check + <code>noam :</code> inline correction parser. Next promotion checks: 2026-05-30.
     </div>
   </section>
 
   <section>
     <h2>Roster <span class="badge">10 agents</span></h2>
     <nav class="filters" aria-label="Filter agents by status">
-      <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">10</span></button>
+      <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">11</span></button>
       <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">3</span></button>
-      <button class="pill" data-filter="build" aria-label="Show in build">Build <span class="count">1</span></button>
-      <button class="pill" data-filter="observe" aria-label="Show observe-only">Observe <span class="count">5</span></button>
-      <button class="pill" data-filter="future" aria-label="Show future">Future <span class="count">2</span></button>
+      <button class="pill" data-filter="build" aria-label="Show in build">Build <span class="count">2</span></button>
+      <button class="pill" data-filter="observe" aria-label="Show observe-only">Live on plist <span class="count">5</span></button>
+      <button class="pill" data-filter="future" aria-label="Show future">Future <span class="count">1</span></button>
     </nav>
 
     <div class="grid">
@@ -331,6 +334,7 @@
           <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/mario</code> · <code>/mario --mode=delta</code></div></div>
           <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/mario-retro</code> · <code>--weekly</code> · <code>--apply</code></div></div>
           <div class="meta-row"><div class="k">Wiring</div><div class="v">Emits unanswered @-mentions → Yoshi inbox (live)</div></div>
+          <div class="meta-row"><div class="k">2026-05-23/24 patches</div><div class="v">Phase A.4 discovery-drift detector (catches pre-Jira workplan/Slack divergence) · Phase A.5 closure-check on prior HOT items · <code>noam : &lt;text&gt;</code> inline correction parser → <code>noam-corrections/{date}.jsonl</code> feeds <code>/mario-retro</code></div></div>
         </div>
       </article>
 
@@ -361,14 +365,16 @@
           <div class="title-block">
             <div class="name">🌼 Daisy</div>
             <div class="role">IBM tier loop (Kira)</div>
-            <span class="status observe">Phase 1 observe</span>
+            <span class="status shipped">Phase 2 assisted-write</span>
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/daisy-observe</code> (no plist yet)</div></div>
-          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Kira's Slack → propose <code>[would-do]</code> actions</div></div>
-          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/daisy.md</code></div></div>
-          <div class="meta-row"><div class="k">Promote</div><div class="v">≥2 substantive obs files + ≥50% would-do match this week</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/daisy</code> (assisted-write) · <code>/daisy-observe</code> (read-only) · launchd <code>com.claude.schedule.daisy-observe</code> 08:00 Sun-Thu</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Kira's Slack → propose workplan ibm: writes, IBM Feature Map sheet push, Slack DM to Noam on Kira asks. Every write batch requires explicit approval.</div></div>
+          <div class="meta-row"><div class="k">Phase C.6</div><div class="v">Jira drift detection — when user-confirmed routing contradicts current Jira, surfaces 🚨 + proposes <code>/dk-validate</code> re-route</div></div>
+          <div class="meta-row"><div class="k">INFOSEC sweep</div><div class="v">Processes IBM Updates digest each run: P0/P1 → current sprint, P2/P3 → next, Fixed/Pending → @assignee close</div></div>
+          <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/daisy-retro</code> daily/weekly · gates Phase 2 → 3 promotion</div></div>
+          <div class="meta-row"><div class="k">Wiring</div><div class="v">Daisy → DK (live) · forward plan at <code>AI PM/Agents/daisy-plan.md</code></div></div>
         </div>
       </article>
 
@@ -383,10 +389,10 @@
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/toad-observe</code> (no plist yet)</div></div>
-          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Micha's Slack → propose tier T0–T4</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/toad-observe</code> · launchd <code>com.claude.schedule.toad-observe</code> 08:00 Sun-Thu</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Workplans + Micha's Slack → propose tier T0–T5+n (n = never reaches customer; T5 = tech gap / parity, not marketing-eligible)</div></div>
           <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/toad.md</code></div></div>
-          <div class="meta-row"><div class="k">Promote</div><div class="v">Same gate as Daisy</div></div>
+          <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/toad-retro</code> daily/weekly · gates Phase 1 → 2 promotion</div></div>
         </div>
       </article>
 
@@ -401,12 +407,12 @@
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Trigger</div><div class="v">Manual <code>/dk-observe</code> (no plist yet)</div></div>
-          <div class="meta-row"><div class="k">Loop</div><div class="v">Filter Owner PM = Noam → classify domain → validate / redirect / escalate</div></div>
-          <div class="meta-row"><div class="k">Hot rule</div><div class="v">IBM env + no workaround + regression → same-day escalate</div></div>
-          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/dk.md</code></div></div>
-          <div class="meta-row"><div class="k">Model</div><div class="v">Haiku 4.5 (mechanical parsing)</div></div>
-          <div class="meta-row"><div class="k">Promote</div><div class="v">≥80% classifier accuracy + would-do match actual response</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/dk-observe</code> (Phase 1) · <code>/dk-validate</code> (Phase 2: full Jira + Slack thread fetch + drafted triage; <code>--execute</code> applies writes) · launchd <code>com.claude.schedule.dk-observe</code> 08:00 Sun-Thu</div></div>
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Filter Owner PM = Noam → classify domain → validate / redirect / escalate (Rule 11 service→team map · Rule 12 workplan known-gap grep · Rule 14 cross-agent prior art)</div></div>
+          <div class="meta-row"><div class="k">Hot rule</div><div class="v">IBM env + no workaround + regression → same-day escalate · cluster + severity-anomaly detection in Phase 2</div></div>
+          <div class="meta-row"><div class="k">Comment attribution</div><div class="v"><code>**DK triage by NoamS_bot:**</code> prefix on Jira comments</div></div>
+          <div class="meta-row"><div class="k">Wiring</div><div class="v">Daisy → DK (live) · Peach → DK (<code>enabled: false</code> until Peach 1→2)</div></div>
+          <div class="meta-row"><div class="k">Plan</div><div class="v">Forward plan at <code>AI PM/Agents/dk-plan.md</code> · Phase 2 → 3 scorecard tracking</div></div>
         </div>
       </article>
 
@@ -421,13 +427,12 @@
           </div>
         </div>
         <div class="meta">
-          <div class="meta-row"><div class="k">Scope (v1)</div><div class="v">Enablement-only. Misconception + knowledge gap + process question on Gong/Intercom. Product flow stays manual in <code>/gong-insights</code> until v2.</div></div>
-          <div class="meta-row"><div class="k">Skill</div><div class="v"><code>/peach-observe [--date YYYY-MM-DD]</code> (manual, no plist)</div></div>
-          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/peach.md</code></div></div>
-          <div class="meta-row"><div class="k">Canonical test</div><div class="v">✅ Acxiom / Gregory Galaida PAYG-cap case classified MISCONCEPTION-high on 2026-05-11 run</div></div>
-          <div class="meta-row"><div class="k">Phase 1.0 gate</div><div class="v">Misconception-only this week. 0 high-conf false positives required. Promotion to 1.1 (knowledge gap + process question) Fri 2026-05-15.</div></div>
-          <div class="meta-row"><div class="k">Phase 2 (build)</div><div class="v">Mon 2026-05-18 → Thu 2026-05-21. DM drafting + seller resolution + one-key approval + release-trigger orchestration.</div></div>
-          <div class="meta-row"><div class="k">Failure model</div><div class="v">Type I backlog inflation (misconceptions filed as FRs) + Type II deal loss to ignorance (seller didn't know feature exists)</div></div>
+          <div class="meta-row"><div class="k">Scope (v1)</div><div class="v">Enablement-only with friction triage. 7 classes incl. SUPPORT_MISCONCEPTION (routes to support coaching, not seller DM).</div></div>
+          <div class="meta-row"><div class="k">Skill</div><div class="v"><code>/peach-observe</code> · launchd <code>com.claude.schedule.peach-observe</code> 08:00 Sun-Thu</div></div>
+          <div class="meta-row"><div class="k">Phase 1.1+ buckets</div><div class="v">A: workaround exists → reclassify knowledge-gap · B: workplan in flight → release-anticipation tracker · C: genuinely missing → <code>/problem-discover</code></div></div>
+          <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/peach-retro</code> daily/weekly/<code>--promotion-check</code> · gates Phase 1 → 2</div></div>
+          <div class="meta-row"><div class="k">Wiring</div><div class="v">Peach → DK (Bucket C, 3d streak + ≥2 customers + bug-shape sub-classifier; <code>enabled: false</code> until promotion)</div></div>
+          <div class="meta-row"><div class="k">Enrichment</div><div class="v">Act-in-30s contract (Patch 2026-05-15) · seller/admin ID resolution with retry_count chronic-failure tracking</div></div>
         </div>
       </article>
 
@@ -447,7 +452,48 @@
           <div class="meta-row"><div class="k">Push threshold</div><div class="v">B: Waiting ≥ 1 OR repeat-ping event</div></div>
           <div class="meta-row"><div class="k">Output</div><div class="v">Phase 1: state + run-file only · Phase 2: Slack DM to <code>D080G86FAAW</code></div></div>
           <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/koopa-watch</code> · launchd <code>com.claude.schedule.koopa-watch</code></div></div>
-          <div class="meta-row"><div class="k">Status</div><div class="v">Phase 1 observe-only shipped 2026-05-18 · first active tick Tue 2026-05-19 07:30</div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Phase 1 observe-only shipped 2026-05-18 · 2026-05-23 promo check = <strong>TUNE-FIRST</strong> (P1 Hebrew casual filter + P2 null-permalink fallback applied) · flip phase.txt → 2 after next live tick validates</div></div>
+          <div class="meta-row"><div class="k">Retro</div><div class="v"><code>/koopa-retro</code> daily/weekly/<code>--promotion-check</code> · scores would-push vs Noam-reply/Jira-move</div></div>
+          <div class="meta-row"><div class="k">Known gap</div><div class="v">Permalink coverage 3/32 today (9%) — P4 migration backfill pending for older items</div></div>
+        </div>
+      </article>
+
+      <!-- Lakitu -->
+      <article class="card" data-cat="future">
+        <div class="head">
+          <div class="avatar"><img alt="Lakitu" src="https://nspm-deliverables.vercel.app/visuals/mario-agents/lakitu.png"></div>
+          <div class="title-block">
+            <div class="name">🎥 Lakitu</div>
+            <div class="role">Internal release manager</div>
+            <span class="status future">Phase 0 scaffold (2026-05-22)</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Watches shipped initiatives from above. Drafts level-appropriate internal distribution bundle (L0 skip · L1 Slack-only · L2 +Q&amp;A +sales doc · L3 +slide +TAM DMs · L4 +sprint demo +AE all-hands) to <code>{initiative}/05-release/</code>. Executes via per-artifact sub-skills (<code>/release-slack</code>, <code>/release-slide</code>, <code>/release-notify</code>, <code>/sprint-demo-publish</code>) — NOT <code>/release-distribute</code>. NotebookLM <code>All Signals - QN</code> for audience matching (zero unit cost). Reconciliation handed to Yoshi via <code>#slack-track</code> wiring for L3/L4.</div></div>
+          <div class="meta-row"><div class="k">Boundary</div><div class="v">Internal CX-side only (TAMs · AMs · sales · CS · support). External marketing = Toad/Micha. IBM = Daisy/Kira. No wiring to either.</div></div>
+          <div class="meta-row"><div class="k">Lifecycle</div><div class="v">5 phases: 1 Observe (detect only) → 2-draft (assisted-write, no sends) → 2-execute (sends approved, no Yoshi handoff) → 3 Reconciliation (Yoshi handoff + cycle close) → 5 Autonomous (reserved indefinitely).</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v">Luigi C.8 (release-ready detector + suggested-level compute) → cross-agent.md React L0-L4 → <code>/cross-agent-close</code> routes → queue.jsonl → <code>/lakitu</code> pops</div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Phase 0 scaffolded (concept + skill + state + wirings) · phase.txt=1 observe-only · Luigi C.8 still in scrum-chief-plan.md Future Extensions · L2 dry run validated on CX-43361 Parsing Rules View as Code</div></div>
+        </div>
+      </article>
+
+      <!-- Cross-agent join (infrastructure, not an agent but shipped) -->
+      <article class="card shipped" data-cat="shipped">
+        <div class="head">
+          <div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:#1f1f1f;">🎯</div>
+          <div class="title-block">
+            <div class="name">🎯 Cross-agent</div>
+            <div class="role">Read-only join + standup loop (infrastructure)</div>
+            <span class="status shipped">Shipped</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/cross-agent-join</code> · launchd <code>com.claude.schedule.cross-agent</code> 08:15 Sun-Thu · <code>/cross-agent-close</code> on standup completion</div></div>
+          <div class="meta-row"><div class="k">Rules</div><div class="v">A bug-pressure · B stuck+cluster · C knowledge-gap on shipped · D tier-ready (Toad+Luigi) · E Yoshi anti-dup · F Peach handoff SLA · G Koopa-waiting · H Lakitu queue · I Boo pending</div></div>
+          <div class="meta-row"><div class="k">Phase B.5 (2026-05-23)</div><div class="v">Multi-agent consolidation pass: when ≥2 agents surface same workplan, merge into 🤝 N-agent consensus with one primary draft + collapsed footnotes. Kills parallel-duplicate rendering.</div></div>
+          <div class="meta-row"><div class="k">Patch E (2026-05-24)</div><div class="v">Permalink-inline render contract: every Signals bullet must include <code>[source](permalink)</code> or render <code>⚠️ no-permalink</code> at draft time</div></div>
+          <div class="meta-row"><div class="k">Patch F (2026-05-24)</div><div class="v">Three-bucket agents_missing: consumed / expected_absent / unexpected_absent. Phase D.5 DM only on unexpected. Kills weekend false-fleet-alarms.</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Automation/Agents/Daily/{date}/cross-agent.md</code> · top-3 inlined into <code>/today</code></div></div>
         </div>
       </article>
 
@@ -511,6 +557,11 @@
         <div class="who">Daisy · Toad (observe)</div>
       </div>
       <div class="cell">
+        <div class="dir">Release distribution — internal</div>
+        <div class="what">Shipped feature → internal CX team brief (Slack, Q&amp;A, sales doc, TAM DMs, sprint demo). Levels L0–L4.</div>
+        <div class="who">Lakitu (Phase 0 scaffold 2026-05-22)</div>
+      </div>
+      <div class="cell">
         <div class="dir">Quality gates</div>
         <div class="what">Pre-mortem · Legal review</div>
         <div class="who">Bowser · Birdo (future)</div>
@@ -547,7 +598,12 @@
       <div class="cell">
         <div class="dir">🌼 Daisy → 🦍 DK</div>
         <div class="what">User-confirmed routing intent contradicting current Jira state (Daisy Phase C.6) → DK Phase A0 triggers <code>/dk-validate</code> re-route proposal.</div>
-        <div class="who">Reference pair</div>
+        <div class="who">Live since 2026-05-15</div>
+      </div>
+      <div class="cell">
+        <div class="dir">👑 Peach → 🦍 DK</div>
+        <div class="what">Bucket C (genuinely missing, 3d streak + ≥2 customers + bug-shape sub-classifier) → DK files ticket. Spec at <code>peach-to-dk.yaml</code>.</div>
+        <div class="who"><code>enabled: false</code> until Peach 1 → 2 promotion</div>
       </div>
     </div>
 
@@ -587,25 +643,25 @@
         <div class="when">Fri 2026-05-15</div>
         <div class="what">Peach Phase 1.0 → 1.1 gate review · Phase 2 plan day · Daisy/Toad Phase 2 plan day</div>
       </div>
-      <div class="tl-item">
-        <div class="when">Mon 2026-05-18 → Thu 2026-05-21</div>
-        <div class="what">Princess Peach Phase 2 build: seller resolver · DM drafter · approval gate · release-trigger sweep</div>
+      <div class="tl-item now">
+        <div class="when">Wed 2026-05-21</div>
+        <div class="what">🎥 Lakitu Phase 0 scaffold (skill + state + wirings + workplan patch) · L2 dry run validated on CX-43361 · Daisy Phase 2 assisted-write live since 2026-05-14</div>
+      </div>
+      <div class="tl-item now">
+        <div class="when">Sat 2026-05-23 — fleet pressure test</div>
+        <div class="what"><strong>18 fixes shipped across all 8 agents + cross-agent.</strong> Highlights: Phase B.5 multi-agent consolidation · Patch E permalink-inline · Patch F three-bucket agents_missing · Koopa promo TUNE-FIRST (Hebrew filter + null-permalink fallback) · DK Rules 11/12/14 · Daisy INFOSEC sweep + Phase C.6 drift</div>
+      </div>
+      <div class="tl-item now">
+        <div class="when">Sun 2026-05-24</div>
+        <div class="what">🍄 Mario Phase A.4 (discovery-drift) + Phase A.5 (closure-check + <code>noam :</code> inline correction parser) · cross-agent retro Patch E/F applied · team-lead-assignee handoff suppression</div>
       </div>
       <div class="tl-item">
-        <div class="when">Sun 2026-05-24 → Thu 2026-05-28</div>
-        <div class="what">Princess Peach Phase 2 soak</div>
-      </div>
-      <div class="tl-item">
-        <div class="when">Mon 2026-06-01</div>
-        <div class="what">Princess Peach Phase 3 plist + memory write (if soak passes)</div>
+        <div class="when">Sat 2026-05-30</div>
+        <div class="what">Promotion checks unblock: Koopa Phase 1 → 2 validation · Daisy Phase 2 → 3 scorecard · DK Phase 2 → 3 scorecard · Peach Phase 1 → 2 promo-check</div>
       </div>
       <div class="tl-item">
         <div class="when">Week of 2026-06-01</div>
-        <div class="what">Daisy + Toad plan</div>
-      </div>
-      <div class="tl-item">
-        <div class="when">Week of 2026-06-08</div>
-        <div class="what">Daisy + Toad build</div>
+        <div class="what">Lakitu Phase 1 → 2-draft (assisted-write, no sends) if Phase 0 scaffold soaks clean</div>
       </div>
     </div>
     <div style="margin-top: 16px;">
@@ -642,7 +698,7 @@
   </section>
 
   <footer>
-    Generated from: <code>AI PM/Agents/00-roadmap.md</code> · Coralogix · NSPM · Last updated 2026-05-15
+    Generated from: <code>AI PM/Agents/00-roadmap.md</code> · Coralogix · NSPM · Last updated 2026-05-25
   </footer>
 
 </div>
