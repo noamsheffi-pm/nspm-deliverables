@@ -445,59 +445,89 @@ footer a:hover { color: var(--mint); }
 
 <nav class="toc">
   <div class="container">
-    <a href="#why">1. Why &amp; what's changing</a>
-    <a href="#flow">2. The flow</a>
-    <a href="#newvsexisting">3. New vs. existing</a>
+    <a href="#problem">1. The problem</a>
+    <a href="#solution">2. The solution</a>
+    <a href="#flow">3. The flow</a>
+    <a href="#newvsexisting">4. New vs. existing</a>
     <span class="timer">~12 min + Q&amp;A</span>
   </div>
 </nav>
 
 <main class="container">
 
-  <!-- 1. WHY -->
-  <section class="block" id="why">
+  <!-- 1. PROBLEM -->
+  <section class="block" id="problem">
     <div class="section-head">
       <span class="section-num">1</span>
-      <h2>Why &amp; what's changing</h2>
+      <h2>The problem</h2>
       <span class="section-time">3 min</span>
     </div>
     <p class="lead">
-      Today every customer's archive bucket trusts the <em>same</em> shared Coralogix role.
-      Shauli flagged this as a security risk — the role ARN isn't a secret, so a hostile actor
-      could ask Coralogix to act against another tenant's bucket (the AWS "confused deputy" pattern).
-      This change closes that gap by giving each customer their own IAM role gated by an External ID.
+      Today every Coralogix customer's archive bucket trusts the <strong>same shared role</strong>
+      (<code>coralogix-archive-stg1</code>). That role's ARN is not a secret — and that is the entire issue.
     </p>
 
-    <div class="callout">
-      <strong>The change in one line:</strong> Two new fields appear in the Setup Archive Physical Location form.
-      Customer does the AWS-side work <em>first</em>, then enters two values into our UI.
+    <div class="callout danger">
+      <strong>The "confused deputy" pattern.</strong> An actor who knows or guesses the shared role's ARN can ask Coralogix to "act on their behalf" against another tenant's bucket.
+      Coralogix, holding the shared role, can't tell a legitimate request from a malicious one. We are the deputy; the bucket policy can't distinguish whose request we're carrying.
     </div>
+
+    <div class="fields-row">
+      <div class="field-card">
+        <div class="label">Surfaced by</div>
+        <div class="name">Shauli</div>
+        <div class="desc">Raised as a security exposure. AWS-textbook problem with a textbook fix that has existed for years — we've been the outlier.</div>
+      </div>
+      <div class="field-card">
+        <div class="label">Customer-visible symptom today</div>
+        <div class="name">None</div>
+        <div class="desc">That is precisely the problem. The gap is invisible until it's exploited. Closing it is security parity, not a feature.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. SOLUTION -->
+  <section class="block" id="solution">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>The solution</h2>
+      <span class="section-time">3 min</span>
+    </div>
+    <p class="lead">
+      Replace the shared role with a <strong>per-customer IAM role + External ID</strong> on every <code>AssumeRole</code> call.
+      Two new fields appear in the Setup Archive → Physical Location form.
+    </p>
 
     <div class="fields-row">
       <div class="field-card">
         <div class="label">New field 1</div>
         <div class="name">Role ARN</div>
-        <div class="desc">The ARN of the IAM role the customer created in their AWS account. We use it on every <code>AssumeRole</code> call when writing to their bucket.</div>
+        <div class="desc">The ARN of an IAM role the <strong>customer creates</strong> in their AWS account. We store it and use it on every <code>AssumeRole</code> call to that customer's bucket.</div>
       </div>
       <div class="field-card">
         <div class="label">New field 2</div>
         <div class="name">External ID</div>
-        <div class="desc">A free-text string the <strong>customer invents</strong> and places in both their IAM trust policy and our form. Not Coralogix-issued. Acts as a per-customer secret on every <code>AssumeRole</code>.</div>
+        <div class="desc">A free-text string the <strong>customer invents</strong> and places in <em>both</em> their IAM trust policy and our form. We send it on every <code>AssumeRole</code> call.</div>
       </div>
     </div>
 
     <div class="callout">
-      <strong>Security parity, not differentiation.</strong> No marketing story here — this is an AWS best-practice closeout.
-      Customer obligation goes <em>up</em> (they own role + bucket policy), which is the CS impact surface.
+      <strong>The mechanism:</strong> the customer's IAM trust policy adds a <code>StringEquals</code> condition requiring <code>sts:ExternalId</code> to match the string they chose.
+      If a different customer hands us the same ARN, our request still carries <em>their</em> External ID — so the trust policy denies it. Confused deputy closed.
+    </div>
+
+    <div class="callout">
+      <strong>What changes for the customer:</strong> their obligation goes <em>up</em> — they now own a role + bucket policy on their side.
+      This is the CS impact surface. AWS work happens <em>first</em>; entering the two values in our UI is the final step.
     </div>
   </section>
 
-  <!-- 2. FLOW -->
+  <!-- 3. FLOW -->
   <section class="block" id="flow">
     <div class="section-head">
-      <span class="section-num">2</span>
-      <h2>The flow — three lanes</h2>
-      <span class="section-time">5 min</span>
+      <span class="section-num">3</span>
+      <h2>The flow</h2>
+      <span class="section-time">3 min</span>
     </div>
     <p class="lead">
       AWS work happens <strong>first</strong>. Coralogix UI is the final step — we just store and use values the customer gives us.
@@ -528,10 +558,10 @@ flowchart LR
     </div>
   </section>
 
-  <!-- 3. NEW VS EXISTING -->
+  <!-- 4. NEW VS EXISTING -->
   <section class="block" id="newvsexisting">
     <div class="section-head">
-      <span class="section-num">3</span>
+      <span class="section-num">4</span>
       <h2>New customer vs. existing customer</h2>
       <span class="section-time">4 min</span>
     </div>
@@ -573,11 +603,6 @@ flowchart LR
       <div class="caption">The <strong>new primitive both customer types configure</strong> — the IAM role's trust policy with <code>sts:AssumeRole</code> + <code>StringEquals</code> on <code>sts:ExternalId</code>. This is the line that gates the whole flow.</div>
     </div>
 
-    <div class="callout">
-      <strong>Volume context:</strong> 393 customers across all regions have &gt;1 physical location on default/logs.
-      90% have 2 locations; long tail of 4 customers with 4–6 locations.
-      AP1 + EU2 + CX820 = 75% of volume. We'll need a bucket-inventory UI surface — customers can't track this themselves.
-    </div>
   </section>
 
 </main>
