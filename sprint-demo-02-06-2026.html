@@ -270,10 +270,9 @@
     <button class="slide-dot" onclick="scrollToSection(1)" aria-label="Streaming Datasets"></button>
     <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Preview"></button>
     <button class="slide-dot" onclick="scrollToSection(3)" aria-label="TCO Quota Routing & Events"></button>
-    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Quota Rules"></button>
-    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Org Quota"></button>
-    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Pipeline"></button>
-    <button class="slide-dot" onclick="scrollToSection(7)" aria-label="Thank You"></button>
+    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
+    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Pipeline"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Thank You"></button>
   </nav>
 
   <!-- Hero -->
@@ -298,16 +297,12 @@
     <!-- Stats -->
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-number">7</div>
+        <div class="stat-number">6</div>
         <div class="stat-label">Features Shipped</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">3</div>
         <div class="stat-label">TCO</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number">1</div>
-        <div class="stat-label">Quota Rules</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">1</div>
@@ -327,7 +322,6 @@
     <nav class="filters" aria-label="Feature category filter">
       <button class="pill active" data-filter="all" aria-label="Show all">All</button>
       <button class="pill" data-filter="tco" aria-label="TCO">TCO</button>
-      <button class="pill" data-filter="quota" aria-label="Quota Rules">Quota Rules</button>
       <button class="pill" data-filter="orgquota" aria-label="Org Quota">Org Quota</button>
       <button class="pill" data-filter="pipeline" aria-label="Pipeline">Pipeline</button>
       <button class="pill" data-filter="datasets" aria-label="Datasets">Datasets</button>
@@ -525,63 +519,8 @@
       </div>
     </div>
 
-    <!-- ═══════════════ Quota Rules — Unit-Based ═══════════════ -->
-    <div class="feature-section accent-quota" data-cat="quota" id="sec-4">
-      <div class="section-header">
-        <span class="section-badge">Quota Rules</span>
-        <h2 class="section-title">Guarantee Capacity for Any entityType</h2>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-title">
-          <span>Unit-Based Quota Reservations &mdash; Absolute Locks, Admin-Managed</span>
-        </div>
-        <p class="feature-subtitle">
-          Reserve a fixed number of units for any entityType within your quota &mdash; so critical workloads always have guaranteed capacity, no matter how the rest of your pipeline behaves. Unlike percentage-based rules that shift when plans change, unit locks hold their value absolutely. Admins can mark rules organization-managed, preventing users from overriding reserved capacity.
-        </p>
-        <a class="notion-link" href="https://www.notion.so/347c048defad81809d3ec8f0c44f802a" target="_blank" rel="noopener">↗ Roadmap card</a>
-        <div class="bullet-grid">
-          <div class="bullet-item">
-            <h4>Absolute Unit Locks</h4>
-            <p>Reserve a fixed unit count for any entityType. Unlike % rules that drift when the plan changes, a unit lock holds its value absolutely.</p>
-          </div>
-          <div class="bullet-item">
-            <h4>Guaranteed Capacity Under Pressure</h4>
-            <p>Critical workloads keep their reserved units no matter how the rest of the pipeline behaves &mdash; no contention, no starvation.</p>
-          </div>
-          <div class="bullet-item">
-            <h4>Admin / Org-Managed Locks</h4>
-            <p>Mark a rule organization-managed so users can't override reserved capacity. Enforcement is code-level, not policy-level.</p>
-          </div>
-          <div class="bullet-item">
-            <h4>Plan-Aware &amp; Transfer-Safe</h4>
-            <p>The system rejects reservations that exceed the plan, and org-team unit transfers respect locks &mdash; reserved units are excluded from what can be moved.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quota Roadmap -->
-      <div class="roadmap">
-        <div class="roadmap-label">Quota Rules Journey</div>
-        <div class="timeline">
-          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Quota Rules entityType Model</div></div>
-          <div class="tl-connector"></div>
-          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">System Insights Quota (reserved system datasets)</div></div>
-          <div class="tl-connector"></div>
-          <div class="tl-node">
-            <div class="tl-here">WE ARE HERE</div>
-            <div class="tl-dot current"></div>
-            <div class="tl-label">Unit-Based Reservations + Locked Units</div>
-          </div>
-          <div class="tl-connector upcoming"></div>
-          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Monthly Quota Enforcement</div></div>
-          <div class="tl-connector arrow"></div>
-        </div>
-      </div>
-    </div>
-
     <!-- ═══════════════ Org Quota — Export Reporting ═══════════════ -->
-    <div class="feature-section accent-orgquota" data-cat="orgquota" id="sec-5">
+    <div class="feature-section accent-orgquota" data-cat="orgquota" id="sec-4">
       <div class="section-header">
         <span class="section-badge">Org Quota</span>
         <h2 class="section-title">Org-Wide Quota Reporting</h2>
@@ -617,7 +556,7 @@
     </div>
 
     <!-- ═══════════════ Pipeline — Parsing Rules as Code ═══════════════ -->
-    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-6">
+    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-5">
       <div class="section-header">
         <span class="section-badge">Pipeline</span>
         <h2 class="section-title">Manage Parsing Rules the Way You Manage Everything Else</h2>
@@ -653,7 +592,7 @@
     </div>
 
     <!-- ═══════════════ Thank You ═══════════════ -->
-    <div class="teams-section" id="sec-7">
+    <div class="teams-section" id="sec-6">
       <h2 class="teams-title">Thank You</h2>
       <p class="teams-subtitle">This sprint's delivery was powered by these amazing teams</p>
 
