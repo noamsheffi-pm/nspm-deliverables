@@ -336,24 +336,24 @@
       <div class="feature-card">
         <div class="feature-title">
           <span>Streaming Datasets &mdash; Enrichment, Templating &amp; Multi-Priority Routing</span>
-          <span class="followup-chip">Follow-up</span>
+          <span class="followup-chip">Follow-up · Rolling out</span>
         </div>
         <p class="feature-subtitle">
-          Last sprint you could carve your own streaming datasets under <code>default/</code> and route TCO traffic into them. Now those datasets are a full processing target: apply enrichment and templating to data as it streams in, and route multiple priorities into a single target dataset &mdash; a streaming dataset now behaves like any first-class Coralogix destination.
+          Last sprint you could carve your own streaming datasets under <code>default/</code> and route TCO traffic into them. Now we're making them a full processing target: enrichment and templating move in-stream into the Traffic Processor, and a single policy can route multiple priorities into the same target dataset. The backend foundation shipped this sprint &mdash; the UI is rolling out next.
         </p>
         <a class="notion-link" href="https://www.notion.so/2adc048defad800d941aeb9c6221931a" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Enrichment on Streaming Datasets</h4>
-            <p>Enrichment rules now apply to data routed into user-defined streaming datasets &mdash; augment records on the way in, scoped per dataset.</p>
+            <p>Enrichment rules now apply in-stream to data routed into user-defined streaming datasets &mdash; augment records on the way in, scoped per dataset. BE foundation shipped; matcher UI rolling out.</p>
           </div>
           <div class="bullet-item">
-            <h4>Templating in Streaming Datasets</h4>
-            <p>Reusable templates for routing and enrichment &mdash; configure a streaming dataset once and apply it consistently.</p>
+            <h4>In-Stream Templating</h4>
+            <p>Routing and enrichment templates evaluate inside the Traffic Processor as data lands &mdash; via DataPrime, with no downstream post-processing step.</p>
           </div>
           <div class="bullet-item">
-            <h4>Multi-Priority per Target</h4>
-            <p>Route more than one TCO priority into the same target dataset &mdash; a target is no longer limited to a single priority.</p>
+            <h4>Multi-Priority per Target Dataset</h4>
+            <p>A single TCO policy can route more than one priority into the same target dataset &mdash; no longer one-priority-per-target.</p>
           </div>
         </div>
       </div>
@@ -365,7 +365,7 @@
           <div class="tl-node">
             <div class="tl-here">WE ARE HERE</div>
             <div class="tl-dot current"></div>
-            <div class="tl-label">Enrichment + Templating + Multi-Priority</div>
+            <div class="tl-label">In-Stream Enrichment + Templating + Multi-Priority (foundation)</div>
           </div>
           <div class="tl-connector upcoming"></div>
           <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Dynamic Streaming Datasets</div></div>
