@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Demo — 02/06/2026 | Noam Sheffi</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d0f14;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at center, rgba(0,212,170,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-chip {
+      display: inline-block;
+      background: transparent;
+      color: #00d4aa;
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,212,170,0.4);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .hero h1 .accent { color: #00d4aa; }
+    .hero .subtitle { font-size: 20px; color: #7a8599; font-weight: 400; }
+    .hero .divider { width: 48px; height: 3px; background: #00d4aa; margin: 20px auto; border-radius: 2px; }
+    .hero .author { margin-top: 8px; font-size: 15px; color: #c0c8d8; font-weight: 600; }
+    .hero .author-role { font-size: 13px; color: #7a8599; font-weight: 400; margin-top: 4px; }
+
+    /* ── Container ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Stats Row ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+    .stat-card {
+      background: #161a22;
+      border: 1px solid #252a35;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-number { font-size: 36px; font-weight: 700; line-height: 1.1; color: #00d4aa; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #7a8599; margin-top: 8px; }
+
+    /* ── Filter Pills ── */
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; justify-content: center; }
+    .pill {
+      background: #161a22;
+      border: 1px solid #252a35;
+      color: #7a8599;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .pill:hover { border-color: #00d4aa; color: #e2e8f0; }
+    .pill.active { background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #00d4aa; }
+
+    /* ── Feature Sections ── */
+    .feature-section { margin-bottom: 56px; opacity: 1; transition: opacity 0.3s; }
+    .feature-section.hidden { display: none; }
+
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .section-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .section-title { font-size: 24px; font-weight: 600; }
+
+    /* ── Feature Card ── */
+    .feature-card {
+      background: #161a22;
+      border: 1px solid #252a35;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 20px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-2px); border-color: #333a48; }
+    .feature-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 20px; max-width: 800px; }
+
+    /* ── Bullet Grid ── */
+    .bullet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .bullet-item {
+      background: #0f1118;
+      border-radius: 10px;
+      padding: 18px 20px;
+      border-left: 3px solid #00d4aa;
+    }
+    .bullet-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #ffffff; }
+    .bullet-item p { font-size: 13px; color: #8a94a8; line-height: 1.5; }
+
+    /* ── Color Variants ── */
+    .section-badge { background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .accent-datasets .bullet-item { border-left-color: #00e6b8; }
+    .accent-tco .bullet-item { border-left-color: #00d4aa; }
+    .accent-quota .bullet-item { border-left-color: #00b88e; }
+    .accent-orgquota .bullet-item { border-left-color: #00c49a; }
+    .accent-pipeline .bullet-item { border-left-color: #00e6b8; }
+    .accent-usage .bullet-item { border-left-color: #00d4aa; }
+    .accent-schema .bullet-item { border-left-color: #00e6b8; }
+    .accent-next .bullet-item { border-left-color: #00c49a; }
+
+    /* Highlight visual cue (deferral-now-shipped) */
+    .feature-card.highlight {
+      border-color: rgba(0,212,170,0.35);
+      background: linear-gradient(180deg, #161a22 0%, #131820 100%);
+    }
+    .ea-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #00d4aa;
+      background: rgba(0,212,170,0.12);
+      border: 1px solid rgba(0,212,170,0.3);
+      padding: 2px 8px;
+      border-radius: 8px;
+      margin-left: 10px;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+
+    /* ── Teams Section ── */
+    .teams-section { margin-top: 64px; margin-bottom: 64px; }
+    .teams-title { text-align: center; font-size: 28px; font-weight: 600; margin-bottom: 8px; color: #ffffff; }
+    .teams-subtitle { text-align: center; color: #7a8599; font-size: 14px; margin-bottom: 32px; }
+    .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .team-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 20px; text-align: center; }
+    .team-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    .team-icon svg { width: 20px; height: 20px; fill: none; stroke: #00d4aa; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .team-name { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+    .team-members { font-size: 12px; color: #7a8599; line-height: 1.5; }
+
+    /* ── Slide Nav ── */
+    .slide-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    .slide-dot { width: 10px; height: 10px; border-radius: 50%; background: #252a35; cursor: pointer; transition: all 0.2s; border: none; }
+    .slide-dot:hover, .slide-dot.active { background: #00d4aa; transform: scale(1.3); }
+
+    /* ── Footer ── */
+    footer { text-align: center; padding: 32px 24px; color: #7a8599; font-size: 12px; border-top: 1px solid #252a35; }
+    .footer-logo { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #c0c8d8; }
+    .footer-logo .dot { width: 10px; height: 10px; border-radius: 50%; background: #00d4aa; display: inline-block; }
+
+    /* ── Channel CTA ── */
+    @keyframes cta-pulse {
+      0%, 100% { border-color: rgba(0,212,170,0.2); box-shadow: 0 0 0 0 rgba(0,212,170,0); }
+      50% { border-color: rgba(0,212,170,0.6); box-shadow: 0 0 20px 2px rgba(0,212,170,0.15); }
+    }
+    .cta-banner {
+      background: rgba(0,212,170,0.06);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 56px;
+      animation: cta-pulse 2.5s ease-in-out infinite;
+    }
+    .cta-banner p { font-size: 18px; font-weight: 500; }
+    .cta-banner .channel { color: #00d4aa; font-weight: 700; }
+
+    /* ── Roadmap Timeline ── */
+    .roadmap {
+      background: #161a22;
+      border: 1px solid #252a35;
+      border-radius: 12px;
+      padding: 28px 32px 36px;
+      margin-top: 8px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00d4aa33 transparent;
+    }
+    .roadmap::-webkit-scrollbar { height: 6px; }
+    .roadmap::-webkit-scrollbar-track { background: transparent; }
+    .roadmap::-webkit-scrollbar-thumb { background: rgba(0,212,170,0.25); border-radius: 3px; }
+    .roadmap::-webkit-scrollbar-thumb:hover { background: rgba(0,212,170,0.45); }
+    .roadmap-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #7a8599; margin-bottom: 20px; }
+    .timeline { display: flex; align-items: center; padding: 36px 0 70px; position: relative; min-width: max-content; }
+    .tl-node { display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; }
+    .tl-dot { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #00d4aa; background: transparent; position: relative; z-index: 2; }
+    .tl-dot.shipped { background: #00d4aa; }
+    .tl-dot.current { background: #00d4aa; box-shadow: 0 0 0 6px rgba(0,212,170,0.25), 0 0 16px rgba(0,212,170,0.4); }
+    .tl-dot.upcoming { background: transparent; border-color: #7a8599; }
+    .tl-connector { flex: 1; min-width: 70px; height: 3px; background: #00d4aa; }
+    .tl-connector.upcoming { background: #252a35; background-image: repeating-linear-gradient(90deg, #7a8599 0, #7a8599 8px, transparent 8px, transparent 16px); background-size: 16px 3px; }
+    .tl-connector.arrow {
+      flex: 0.5; min-width: 30px; position: relative;
+      background: transparent;
+      background-image: repeating-linear-gradient(90deg, #7a8599 0, #7a8599 8px, transparent 8px, transparent 16px);
+      background-size: 16px 3px; background-repeat: repeat-x; background-position: center;
+    }
+    .tl-connector.arrow::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-left: 10px solid #7a8599; }
+    .tl-label { position: absolute; top: 30px; font-size: 11px; color: #8a94a8; font-weight: 500; width: 90px; text-align: center; white-space: normal; line-height: 1.35; left: 50%; transform: translateX(-50%); }
+    .tl-here { position: absolute; top: -28px; font-size: 11px; font-weight: 700; color: #00d4aa; white-space: nowrap; letter-spacing: 0.5px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 28px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .bullet-grid { grid-template-columns: 1fr !important; }
+      .slide-nav { display: none; }
+      .teams-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav dots -->
+  <nav class="slide-nav" aria-label="Section navigation">
+    <button class="slide-dot active" onclick="scrollToSection(0)" aria-label="Top"></button>
+    <button class="slide-dot" onclick="scrollToSection(1)" aria-label="TCO Preview"></button>
+    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Multi-Threshold"></button>
+    <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Quota Rules"></button>
+    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
+    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Pipeline"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Thank You"></button>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="sec-0">
+    <div class="hero-chip">Sprint Demo</div>
+    <h1>Data Pipeline</h1>
+    <h1><span class="accent">What We Shipped</span></h1>
+    <div class="divider"></div>
+    <p class="author">Noam Sheffi</p>
+    <p class="author-role">Product Manager, Pipeline · Governance · Monetization</p>
+    <p class="subtitle" style="margin-top:24px">02-06-2026</p>
+  </header>
+
+  <div class="container">
+
+    <!-- CTA -->
+    <div class="cta-banner">
+      <p><span style="font-size:12px;background:rgba(0,212,170,0.15);color:#00d4aa;padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:0.5px;margin-right:8px;">THEME</span> This sprint went deep on <span class="channel">cost control &amp; quota governance</span></p>
+      <p style="font-size:13px;color:#7a8599;margin-top:8px;">Roadmap updates post to <span class="channel">#i-love-roadmap</span> &mdash; join <span class="channel">#i-love-dataflow</span> for ongoing pipeline &amp; governance discussions</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Features Shipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">2</div>
+        <div class="stat-label">TCO</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Quota Rules</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Org Quota</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Pipeline</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <nav class="filters" aria-label="Feature category filter">
+      <button class="pill active" data-filter="all" aria-label="Show all">All</button>
+      <button class="pill" data-filter="tco" aria-label="TCO">TCO</button>
+      <button class="pill" data-filter="quota" aria-label="Quota Rules">Quota Rules</button>
+      <button class="pill" data-filter="orgquota" aria-label="Org Quota">Org Quota</button>
+      <button class="pill" data-filter="pipeline" aria-label="Pipeline">Pipeline</button>
+    </nav>
+
+    <!-- ═══════════════ TCO — DPXL Preview Panel ═══════════════ -->
+    <div class="feature-section accent-tco" data-cat="tco" id="sec-1">
+      <div class="section-header">
+        <span class="section-badge">TCO</span>
+        <h2 class="section-title">See the Cost Before You Commit</h2>
+      </div>
+
+      <!-- DPXL TCO Preview (the 05-05 deferral, now shipped) -->
+      <div class="feature-card highlight">
+        <div class="feature-title">
+          <span>DPXL TCO Preview &mdash; Live Traffic &amp; Quota Impact</span>
+          <span class="ea-chip">Now Shipped</span>
+        </div>
+        <p class="feature-subtitle">
+          Preview the traffic volume, quota impact, and priority distribution of a DPXL-based TCO policy before you save &mdash; and after. The editor now shows total data sent, % of daily quota consumed, and total units, plus over-time charts of volume and unit cost by priority tier. DPXL policies finally preview like app/sub/severity policies always have.
+        </p>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Live Counters Before You Save</h4>
+            <p>Total data sent, % of daily quota consumed, and total units &mdash; over the last 24h or 7d, pulled from real aggregates, not mocks.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Volume &amp; Unit-Cost Over Time</h4>
+            <p>Stacked time-series charts break traffic down by priority tier, so you see the cost shape, not just a single number.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Quota-Aware Simulation</h4>
+            <p>For quota-based policies the preview marks the exact High &rarr; Block transition point in the day, so you tune the split against the real boundary.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Parity for DPXL Expressions</h4>
+            <p>Custom DPXL expressions can match any schema field; they now preview like the legacy app/sub/severity path. Breakdown tab adapts to policy type.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TCO Roadmap -->
+      <div class="roadmap">
+        <div class="roadmap-label">TCO Optimizer Journey</div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">New TCO Screen</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">DPXL Routing</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Quota-Based Routing</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Bulk Migration</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node">
+            <div class="tl-here">WE ARE HERE</div>
+            <div class="tl-dot current"></div>
+            <div class="tl-label">DPXL Preview Panel</div>
+          </div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">New-Policy Preview (DataPrime)</div></div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Default TCO Fallback Rule</div></div>
+          <div class="tl-connector arrow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ TCO — Multi-Threshold ═══════════════ -->
+    <div class="feature-section accent-tco" data-cat="tco" id="sec-2">
+      <div class="section-header">
+        <span class="section-badge">TCO</span>
+        <h2 class="section-title">Quota-Based Routing &mdash; No More Cliffs</h2>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Gradual TCO Priority Management &mdash; Multi-Step Quota Routing</span>
+        </div>
+        <p class="feature-subtitle">
+          Define up to three priority tiers that automatically activate as your team's daily quota fills. Instead of all data dropping to Block at a single threshold, route the first 50% of quota as High, the next 30% as Medium, and only block as you approach the limit &mdash; fine-grained control over cost and availability without losing critical signals.
+        </p>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Up to 3 Priority Tiers Per Policy</h4>
+            <p>High &rarr; Medium &rarr; Low &rarr; Block as quota fills. Block is terminal. Keep medium-value data flowing while shedding low-value first.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Configurable Default Priority</h4>
+            <p>Prefilled from your system TCO default, fully overridable. The "everything else" tail is yours to set.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Monotonic Guardrails</h4>
+            <p>Thresholds must strictly ascend and restrictiveness can't decrease; the UI blocks non-monotonic configs at submit. No invalid ladders.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Pairs with the Preview Panel</h4>
+            <p>DPXL TCO Preview shows every transition point on the chart, so you tune all N boundaries against real traffic.</p>
+          </div>
+          <div class="bullet-item" style="grid-column: 1 / -1;">
+            <h4>Alert &amp; Audit Every Transition</h4>
+            <p>Each High &rarr; Medium &rarr; Block step and the daily quota reset emits a system-dataset event within 60s, queryable in DataPrime. Build standard alerts on quota exhaustion and audit when &amp; why priority changed &mdash; the observability gap 5 customers flagged.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Threshold Roadmap -->
+      <div class="roadmap">
+        <div class="roadmap-label">Quota-Based Routing Journey</div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Quota-Based Routing (binary)</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node">
+            <div class="tl-here">WE ARE HERE</div>
+            <div class="tl-dot current"></div>
+            <div class="tl-label">Multi-Threshold Ladder</div>
+          </div>
+          <div class="tl-connector"></div>
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Threshold Events &amp; Alerting</div></div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Group Quota Across TCO Rules</div></div>
+          <div class="tl-connector arrow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Quota Rules — Unit-Based ═══════════════ -->
+    <div class="feature-section accent-quota" data-cat="quota" id="sec-3">
+      <div class="section-header">
+        <span class="section-badge">Quota Rules</span>
+        <h2 class="section-title">Guarantee Capacity for Any entityType</h2>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Unit-Based Quota Reservations &mdash; Absolute Locks, Admin-Managed</span>
+        </div>
+        <p class="feature-subtitle">
+          Reserve a fixed number of units for any entityType within your quota &mdash; so critical workloads always have guaranteed capacity, no matter how the rest of your pipeline behaves. Unlike percentage-based rules that shift when plans change, unit locks hold their value absolutely. Admins can mark rules organization-managed, preventing users from overriding reserved capacity.
+        </p>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Absolute Unit Locks</h4>
+            <p>Reserve a fixed unit count for any entityType. Unlike % rules that drift when the plan changes, a unit lock holds its value absolutely.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Guaranteed Capacity Under Pressure</h4>
+            <p>Critical workloads keep their reserved units no matter how the rest of the pipeline behaves &mdash; no contention, no starvation.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Admin / Org-Managed Locks</h4>
+            <p>Mark a rule organization-managed so users can't override reserved capacity. Enforcement is code-level, not policy-level.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Plan-Aware &amp; Transfer-Safe</h4>
+            <p>The system rejects reservations that exceed the plan, and org-team unit transfers respect locks &mdash; reserved units are excluded from what can be moved.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quota Roadmap -->
+      <div class="roadmap">
+        <div class="roadmap-label">Quota Rules Journey</div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Quota Rules entityType Model</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">System Insights Quota (reserved system datasets)</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node">
+            <div class="tl-here">WE ARE HERE</div>
+            <div class="tl-dot current"></div>
+            <div class="tl-label">Unit-Based Reservations + Locked Units</div>
+          </div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Monthly Quota Enforcement</div></div>
+          <div class="tl-connector arrow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Org Quota — Export Reporting ═══════════════ -->
+    <div class="feature-section accent-orgquota" data-cat="orgquota" id="sec-4">
+      <div class="section-header">
+        <span class="section-badge">Org Quota</span>
+        <h2 class="section-title">Org-Wide Quota Reporting</h2>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Org Quota Manager &mdash; Export Reports</span>
+        </div>
+        <p class="feature-subtitle">
+          Export your organization's quota allocation and consumption as a report &mdash; the org-level companion to Data Usage's Customizable Reports. Pull per-team allocation and usage in a single unified CSV for FinOps, capacity planning, and chargeback, without screen-scraping the Org Quota Manager.
+        </p>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Org-Level Export</h4>
+            <p>One action exports per-team quota allocation and consumption across the whole org.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>One Unified CSV</h4>
+            <p>Detailed Daily export is a single clean file, not a per-team ZIP you have to stitch together.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>FinOps &amp; Chargeback Ready</h4>
+            <p>Feed allocation-vs-usage straight into capacity planning and internal chargeback.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Companion to Data Usage Reports</h4>
+            <p>The org-quota mirror of the Customizable Usage Reports &mdash; a consistent export story across the monetization surface.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Pipeline — Parsing Rules as Code ═══════════════ -->
+    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-5">
+      <div class="section-header">
+        <span class="section-badge">Pipeline</span>
+        <h2 class="section-title">Manage Parsing Rules the Way You Manage Everything Else</h2>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Parsing Rules as Code &mdash; Terraform &amp; Kubernetes YAML</span>
+        </div>
+        <p class="feature-subtitle">
+          View any saved parsing rule as ready-to-use Terraform (HCL) or Kubernetes YAML and copy the snippet straight into your IaC workflow. The new side panel mirrors the View as Code experience already available for Alerts, so platform-engineering teams can manage parsing rules alongside the rest of their Coralogix configuration &mdash; no manual reverse-engineering.
+        </p>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Two IaC Formats</h4>
+            <p>Every saved parsing rule renders as Terraform HCL or Kubernetes YAML in a side panel.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Copy Straight to Your Repo</h4>
+            <p>One copy button &mdash; no reverse-engineering the rule from the API.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Consistent with Alerts</h4>
+            <p>Same View as Code pattern platform teams already know from Alerts.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Read-Only &amp; Safe</h4>
+            <p>Pure export surface. No write path, no risk &mdash; manage rules alongside the rest of your Coralogix config.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Thank You ═══════════════ -->
+    <div class="teams-section" id="sec-6">
+      <h2 class="teams-title">Thank You</h2>
+      <p class="teams-subtitle">This sprint's delivery was powered by these amazing teams</p>
+
+      <div class="teams-grid">
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M12 15l-2 5h4l-2-5z"/><circle cx="12" cy="8" r="5"/><path d="M5 8h2M17 8h2M12 3v2"/></svg></div>
+          <div class="team-name">Radiant (Pipeline BE)</div>
+          <div class="team-members">Anton, Maor, Naor, Tamir, Tomer, Itay</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <div class="team-name">Nimbus (Pipeline + Monetization FE)</div>
+          <div class="team-members">Wiktor, Ruben, Pierre, Iulian</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <div class="team-name">Halo (Monetization BE)</div>
+          <div class="team-members">Gaspare, Rafael</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><rect x="9" y="13" width="6" height="8"/></svg></div>
+          <div class="team-name">Citadel (Governance BE)</div>
+          <div class="team-members">Asaf, Eliyahu, Roy, Shimon</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/></svg></div>
+          <div class="team-name">Content-Structure (Dataprime)</div>
+          <div class="team-members">Aleksandr M, Alexander V, Miroslav, Sebastian</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+          <div class="team-name">Architect</div>
+          <div class="team-members">Harel, Ievgen</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div>
+          <div class="team-name">Product Design</div>
+          <div class="team-members">Omer</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h6M8 16h4"/></svg></div>
+          <div class="team-name">Technical Writing</div>
+          <div class="team-members">Maya</div>
+        </div>
+        <div class="team-card">
+          <div class="team-icon"><svg viewBox="0 0 24 24"><path d="M3 11l18-8v18L3 13z"/><path d="M11 19v3"/></svg></div>
+          <div class="team-name">Product Marketing</div>
+          <div class="team-members">Micha</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span class="dot"></span> Coralogix</div>
+    <div>Sprint Demo 02-06-2026 | Noam Sheffi</div>
+  </footer>
+
+  <script>
+    // Filter pills
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const filter = pill.dataset.filter;
+        document.querySelectorAll('.feature-section').forEach(sec => {
+          if (filter === 'all' || sec.dataset.cat === filter) {
+            sec.classList.remove('hidden');
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Scroll nav dots
+    const sections = document.querySelectorAll('[id^="sec-"]');
+    const dots = document.querySelectorAll('.slide-dot');
+
+    function scrollToSection(i) {
+      sections[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(sections).indexOf(entry.target);
+          dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(s => observer.observe(s));
+
+    // Fade-in animation
+    const fadeObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .team-card, .roadmap').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(15px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      fadeObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
