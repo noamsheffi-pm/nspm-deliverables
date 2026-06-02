@@ -267,12 +267,12 @@
   <!-- Nav dots -->
   <nav class="slide-nav" aria-label="Section navigation">
     <button class="slide-dot active" onclick="scrollToSection(0)" aria-label="Top"></button>
-    <button class="slide-dot" onclick="scrollToSection(1)" aria-label="TCO Preview"></button>
-    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Quota Routing & Events"></button>
-    <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Quota Rules"></button>
-    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
-    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Pipeline"></button>
-    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Streaming Datasets"></button>
+    <button class="slide-dot" onclick="scrollToSection(1)" aria-label="Streaming Datasets"></button>
+    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Preview"></button>
+    <button class="slide-dot" onclick="scrollToSection(3)" aria-label="TCO Quota Routing & Events"></button>
+    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Quota Rules"></button>
+    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Org Quota"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Pipeline"></button>
     <button class="slide-dot" onclick="scrollToSection(7)" aria-label="Thank You"></button>
   </nav>
 
@@ -333,8 +333,55 @@
       <button class="pill" data-filter="datasets" aria-label="Datasets">Datasets</button>
     </nav>
 
+    <!-- ═══════════════ Follow-up — Streaming Datasets (catch-up from 05-05) — OPENING CARD ═══════════════ -->
+    <div class="feature-section accent-followup" data-cat="datasets" id="sec-1">
+      <div class="section-header">
+        <span class="section-badge">Dataspace · Datasets</span>
+        <h2 class="section-title">Your Streaming Datasets, Now a First-Class Processing Target</h2>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Streaming Datasets &mdash; Enrichment, Templating &amp; Multi-Priority Routing</span>
+          <span class="followup-chip">Follow-up</span>
+        </div>
+        <p class="feature-subtitle">
+          Last sprint you could carve your own streaming datasets under <code>default/</code> and route TCO traffic into them. Now those datasets are a full processing target: apply enrichment and templating to data as it streams in, and route multiple priorities into a single target dataset &mdash; a streaming dataset now behaves like any first-class Coralogix destination.
+        </p>
+        <a class="notion-link" href="https://www.notion.so/2adc048defad800d941aeb9c6221931a" target="_blank" rel="noopener">↗ Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Enrichment on Streaming Datasets</h4>
+            <p>Enrichment rules now apply to data routed into user-defined streaming datasets &mdash; augment records on the way in, scoped per dataset.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Templating in Streaming Datasets</h4>
+            <p>Reusable templates for routing and enrichment &mdash; configure a streaming dataset once and apply it consistently.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Multi-Priority per Target</h4>
+            <p>Route more than one TCO priority into the same target dataset &mdash; a target is no longer limited to a single priority.</p>
+          </div>
+        </div>
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-label">Streaming Datasets Journey</div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Manual Routing (05-05)</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node">
+            <div class="tl-here">WE ARE HERE</div>
+            <div class="tl-dot current"></div>
+            <div class="tl-label">Enrichment + Templating + Multi-Priority</div>
+          </div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Dynamic Streaming Datasets</div></div>
+          <div class="tl-connector arrow"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══════════════ TCO — DPXL Preview Panel ═══════════════ -->
-    <div class="feature-section accent-tco" data-cat="tco" id="sec-1">
+    <div class="feature-section accent-tco" data-cat="tco" id="sec-2">
       <div class="section-header">
         <span class="section-badge">TCO</span>
         <h2 class="section-title">See the Cost Before You Commit</h2>
@@ -397,7 +444,7 @@
     </div>
 
     <!-- ═══════════════ TCO — Multi-Threshold ═══════════════ -->
-    <div class="feature-section accent-tco" data-cat="tco" id="sec-2">
+    <div class="feature-section accent-tco" data-cat="tco" id="sec-3">
       <div class="section-header">
         <span class="section-badge">TCO</span>
         <h2 class="section-title">Quota-Based Routing &mdash; No More Cliffs</h2>
@@ -479,7 +526,7 @@
     </div>
 
     <!-- ═══════════════ Quota Rules — Unit-Based ═══════════════ -->
-    <div class="feature-section accent-quota" data-cat="quota" id="sec-3">
+    <div class="feature-section accent-quota" data-cat="quota" id="sec-4">
       <div class="section-header">
         <span class="section-badge">Quota Rules</span>
         <h2 class="section-title">Guarantee Capacity for Any entityType</h2>
@@ -534,7 +581,7 @@
     </div>
 
     <!-- ═══════════════ Org Quota — Export Reporting ═══════════════ -->
-    <div class="feature-section accent-orgquota" data-cat="orgquota" id="sec-4">
+    <div class="feature-section accent-orgquota" data-cat="orgquota" id="sec-5">
       <div class="section-header">
         <span class="section-badge">Org Quota</span>
         <h2 class="section-title">Org-Wide Quota Reporting</h2>
@@ -570,7 +617,7 @@
     </div>
 
     <!-- ═══════════════ Pipeline — Parsing Rules as Code ═══════════════ -->
-    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-5">
+    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-6">
       <div class="section-header">
         <span class="section-badge">Pipeline</span>
         <h2 class="section-title">Manage Parsing Rules the Way You Manage Everything Else</h2>
@@ -601,53 +648,6 @@
             <h4>Read-Only &amp; Safe</h4>
             <p>Pure export surface. No write path, no risk &mdash; manage rules alongside the rest of your Coralogix config.</p>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════════════ Follow-up — Streaming Datasets (catch-up from 05-05) ═══════════════ -->
-    <div class="feature-section accent-followup" data-cat="datasets" id="sec-6">
-      <div class="section-header">
-        <span class="section-badge">Dataspace · Datasets</span>
-        <h2 class="section-title">Your Streaming Datasets, Now a First-Class Processing Target</h2>
-      </div>
-      <div class="feature-card">
-        <div class="feature-title">
-          <span>Streaming Datasets &mdash; Enrichment, Templating &amp; Multi-Priority Routing</span>
-          <span class="followup-chip">Follow-up</span>
-        </div>
-        <p class="feature-subtitle">
-          Last sprint you could carve your own streaming datasets under <code>default/</code> and route TCO traffic into them. Now those datasets are a full processing target: apply enrichment and templating to data as it streams in, and route multiple priorities into a single target dataset &mdash; a streaming dataset now behaves like any first-class Coralogix destination.
-        </p>
-        <a class="notion-link" href="https://www.notion.so/2adc048defad800d941aeb9c6221931a" target="_blank" rel="noopener">↗ Roadmap card</a>
-        <div class="bullet-grid">
-          <div class="bullet-item">
-            <h4>Enrichment on Streaming Datasets</h4>
-            <p>Enrichment rules now apply to data routed into user-defined streaming datasets &mdash; augment records on the way in, scoped per dataset.</p>
-          </div>
-          <div class="bullet-item">
-            <h4>Templating in Streaming Datasets</h4>
-            <p>Reusable templates for routing and enrichment &mdash; configure a streaming dataset once and apply it consistently.</p>
-          </div>
-          <div class="bullet-item">
-            <h4>Multi-Priority per Target</h4>
-            <p>Route more than one TCO priority into the same target dataset &mdash; a target is no longer limited to a single priority.</p>
-          </div>
-        </div>
-      </div>
-      <div class="roadmap">
-        <div class="roadmap-label">Streaming Datasets Journey</div>
-        <div class="timeline">
-          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Manual Routing (05-05)</div></div>
-          <div class="tl-connector"></div>
-          <div class="tl-node">
-            <div class="tl-here">WE ARE HERE</div>
-            <div class="tl-dot current"></div>
-            <div class="tl-label">Enrichment + Templating + Multi-Priority</div>
-          </div>
-          <div class="tl-connector upcoming"></div>
-          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Dynamic Streaming Datasets</div></div>
-          <div class="tl-connector arrow"></div>
         </div>
       </div>
     </div>
