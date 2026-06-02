@@ -119,7 +119,9 @@
     }
     .feature-card:hover { transform: translateY(-2px); border-color: #333a48; }
     .feature-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 20px; max-width: 800px; }
+    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 16px; max-width: 800px; }
+    .notion-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00d4aa; text-decoration: none; margin-bottom: 20px; border: 1px solid rgba(0,212,170,0.3); background: rgba(0,212,170,0.08); padding: 4px 11px; border-radius: 8px; transition: background 0.2s; }
+    .notion-link:hover { background: rgba(0,212,170,0.18); }
 
     /* ── Bullet Grid ── */
     .bullet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
@@ -257,7 +259,7 @@
   <nav class="slide-nav" aria-label="Section navigation">
     <button class="slide-dot active" onclick="scrollToSection(0)" aria-label="Top"></button>
     <button class="slide-dot" onclick="scrollToSection(1)" aria-label="TCO Preview"></button>
-    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Multi-Threshold"></button>
+    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="TCO Quota Routing & Events"></button>
     <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Quota Rules"></button>
     <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
     <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Pipeline"></button>
@@ -286,11 +288,11 @@
     <!-- Stats -->
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-number">5</div>
+        <div class="stat-number">6</div>
         <div class="stat-label">Features Shipped</div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">2</div>
+        <div class="stat-number">3</div>
         <div class="stat-label">TCO</div>
       </div>
       <div class="stat-card">
@@ -332,6 +334,7 @@
         <p class="feature-subtitle">
           Preview the traffic volume, quota impact, and priority distribution of a DPXL-based TCO policy before you save &mdash; and after. The editor now shows total data sent, % of daily quota consumed, and total units, plus over-time charts of volume and unit cost by priority tier. DPXL policies finally preview like app/sub/severity policies always have.
         </p>
+        <a class="notion-link" href="https://www.notion.so/346c048defad810c9c90c37ad0c3dcce" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Live Counters Before You Save</h4>
@@ -385,6 +388,7 @@
         <h2 class="section-title">Quota-Based Routing &mdash; No More Cliffs</h2>
       </div>
 
+      <!-- Card 1: Multi-Threshold Ladder (Nimbus FE) -->
       <div class="feature-card">
         <div class="feature-title">
           <span>Gradual TCO Priority Management &mdash; Multi-Step Quota Routing</span>
@@ -392,6 +396,7 @@
         <p class="feature-subtitle">
           Define up to three priority tiers that automatically activate as your team's daily quota fills. Instead of all data dropping to Block at a single threshold, route the first 50% of quota as High, the next 30% as Medium, and only block as you approach the limit &mdash; fine-grained control over cost and availability without losing critical signals.
         </p>
+        <a class="notion-link" href="https://www.notion.so/355c048defad811a808adaa90d0e82d6" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Up to 3 Priority Tiers Per Policy</h4>
@@ -402,21 +407,43 @@
             <p>Prefilled from your system TCO default, fully overridable. The "everything else" tail is yours to set.</p>
           </div>
           <div class="bullet-item">
-            <h4>Monotonic Guardrails</h4>
-            <p>Thresholds must strictly ascend and restrictiveness can't decrease; the UI blocks non-monotonic configs at submit. No invalid ladders.</p>
-          </div>
-          <div class="bullet-item">
             <h4>Pairs with the Preview Panel</h4>
             <p>DPXL TCO Preview shows every transition point on the chart, so you tune all N boundaries against real traffic.</p>
-          </div>
-          <div class="bullet-item" style="grid-column: 1 / -1;">
-            <h4>Alert &amp; Audit Every Transition</h4>
-            <p>Each High &rarr; Medium &rarr; Block step and the daily quota reset emits a system-dataset event within 60s, queryable in DataPrime. Build standard alerts on quota exhaustion and audit when &amp; why priority changed &mdash; the observability gap 5 customers flagged.</p>
           </div>
         </div>
       </div>
 
-      <!-- Multi-Threshold Roadmap -->
+      <!-- Card 2: Quota Transition Events & Alerting (Radiant BE) -->
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Quota Transition Events &amp; Alerting</span>
+          <span class="ea-chip">New</span>
+        </div>
+        <p class="feature-subtitle">
+          When a quota-based TCO policy crosses a threshold or its quota resets, Radiant now emits a system-dataset event &mdash; so you can alert on quota exhaustion, audit when &amp; why data priority changed, and correlate transitions with cost spikes, all through standard DataPrime queries and alerts. Closes the observability gap 5 customers flagged (Via, Acko, FullPath, NielsenIQ, Happening).
+        </p>
+        <a class="notion-link" href="https://www.notion.so/34cc048defad81d18a29d22fa9023fc7" target="_blank" rel="noopener">↗ Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Event on Every Transition</h4>
+            <p>Each High &rarr; Medium &rarr; Block step &mdash; and the daily quota reset &mdash; emits a system-dataset event within 60s. Multi-tier cascades emit one event per step.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Queryable in DataPrime</h4>
+            <p>Events land in a system dataset and query like any other data &mdash; no parallel path, no special tooling.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Standard Alerts on Exhaustion</h4>
+            <p>Build normal Coralogix alerts on the transition events &mdash; know the moment a policy drops priority or starts blocking.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Audit &amp; Correlate</h4>
+            <p>See exactly when and why priority changed, and correlate quota exhaustion with cost spikes or data gaps. Fire-and-forget &mdash; emission never affects routing.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quota-Based Routing Roadmap -->
       <div class="roadmap">
         <div class="roadmap-label">Quota-Based Routing Journey</div>
         <div class="timeline">
@@ -450,6 +477,7 @@
         <p class="feature-subtitle">
           Reserve a fixed number of units for any entityType within your quota &mdash; so critical workloads always have guaranteed capacity, no matter how the rest of your pipeline behaves. Unlike percentage-based rules that shift when plans change, unit locks hold their value absolutely. Admins can mark rules organization-managed, preventing users from overriding reserved capacity.
         </p>
+        <a class="notion-link" href="https://www.notion.so/347c048defad81809d3ec8f0c44f802a" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Absolute Unit Locks</h4>
@@ -504,6 +532,7 @@
         <p class="feature-subtitle">
           Export your organization's quota allocation and consumption as a report &mdash; the org-level companion to Data Usage's Customizable Reports. Pull per-team allocation and usage in a single unified CSV for FinOps, capacity planning, and chargeback, without screen-scraping the Org Quota Manager.
         </p>
+        <a class="notion-link" href="https://www.notion.so/346c048defad81199d5bf16381f5d330" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Org-Level Export</h4>
@@ -539,6 +568,7 @@
         <p class="feature-subtitle">
           View any saved parsing rule as ready-to-use Terraform (HCL) or Kubernetes YAML and copy the snippet straight into your IaC workflow. The new side panel mirrors the View as Code experience already available for Alerts, so platform-engineering teams can manage parsing rules alongside the rest of their Coralogix configuration &mdash; no manual reverse-engineering.
         </p>
+        <a class="notion-link" href="https://www.notion.so/367c048defad81a58371fde700971d11" target="_blank" rel="noopener">↗ Roadmap card</a>
         <div class="bullet-grid">
           <div class="bullet-item">
             <h4>Two IaC Formats</h4>
