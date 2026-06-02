@@ -165,6 +165,15 @@
       vertical-align: middle;
     }
 
+    /* Follow-up (catch-up) card — orange accent */
+    .accent-followup .section-badge { background: rgba(255,159,67,0.14); color: #ff9f43; }
+    .accent-followup .bullet-item { border-left-color: #ff9f43; }
+    .accent-followup .notion-link { color:#ff9f43; border-color:rgba(255,159,67,0.35); background:rgba(255,159,67,0.08); }
+    .accent-followup .tl-dot.current { background:#ff9f43; box-shadow:0 0 10px #ff9f43; }
+    .followup-chip { display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.5px;
+      color:#ff9f43; background:rgba(255,159,67,0.12); border:1px solid rgba(255,159,67,0.35);
+      padding:2px 8px; border-radius:8px; margin-left:10px; text-transform:uppercase; vertical-align:middle; }
+
     /* ── Teams Section ── */
     .teams-section { margin-top: 64px; margin-bottom: 64px; }
     .teams-title { text-align: center; font-size: 28px; font-weight: 600; margin-bottom: 8px; color: #ffffff; }
@@ -263,7 +272,8 @@
     <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Quota Rules"></button>
     <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
     <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Pipeline"></button>
-    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Thank You"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Streaming Datasets"></button>
+    <button class="slide-dot" onclick="scrollToSection(7)" aria-label="Thank You"></button>
   </nav>
 
   <!-- Hero -->
@@ -288,7 +298,7 @@
     <!-- Stats -->
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-number">6</div>
+        <div class="stat-number">7</div>
         <div class="stat-label">Features Shipped</div>
       </div>
       <div class="stat-card">
@@ -307,6 +317,10 @@
         <div class="stat-number">1</div>
         <div class="stat-label">Pipeline</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Datasets</div>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -316,6 +330,7 @@
       <button class="pill" data-filter="quota" aria-label="Quota Rules">Quota Rules</button>
       <button class="pill" data-filter="orgquota" aria-label="Org Quota">Org Quota</button>
       <button class="pill" data-filter="pipeline" aria-label="Pipeline">Pipeline</button>
+      <button class="pill" data-filter="datasets" aria-label="Datasets">Datasets</button>
     </nav>
 
     <!-- ═══════════════ TCO — DPXL Preview Panel ═══════════════ -->
@@ -590,8 +605,59 @@
       </div>
     </div>
 
+    <!-- ═══════════════ Follow-up — Streaming Datasets (catch-up from 05-05) ═══════════════ -->
+    <div class="feature-section accent-followup" data-cat="datasets" id="sec-6">
+      <div class="section-header">
+        <span class="section-badge">Dataspace · Datasets</span>
+        <h2 class="section-title">Your Streaming Datasets, Now a First-Class Processing Target</h2>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">
+          <span>Streaming Datasets &mdash; Enrichment, Templating &amp; Multi-Priority Routing</span>
+          <span class="followup-chip">Follow-up</span>
+        </div>
+        <p class="feature-subtitle">
+          Last sprint you could carve your own streaming datasets under <code>default/</code> and route TCO traffic into them. Now those datasets are a full processing target: apply enrichment and templating to data as it streams in, and route multiple priorities into a single target dataset &mdash; a streaming dataset now behaves like any first-class Coralogix destination.
+        </p>
+        <a class="notion-link" href="https://www.notion.so/2adc048defad800d941aeb9c6221931a" target="_blank" rel="noopener">↗ Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item">
+            <h4>Enrichment on Streaming Datasets</h4>
+            <p>Enrichment rules now apply to data routed into user-defined streaming datasets &mdash; augment records on the way in, scoped per dataset.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Templating in Streaming Datasets</h4>
+            <p>Reusable templates for routing and enrichment &mdash; configure a streaming dataset once and apply it consistently.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Multi-Priority per Target</h4>
+            <p>Route more than one TCO priority into the same target dataset &mdash; a target is no longer limited to a single priority.</p>
+          </div>
+          <div class="bullet-item">
+            <h4>Builds on 05-05 Manual Routing</h4>
+            <p>Same <code>default/</code> streaming datasets, now a richer processing destination &mdash; closing the governance &times; pipeline loop further.</p>
+          </div>
+        </div>
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-label">Streaming Datasets Journey</div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Manual Routing (05-05)</div></div>
+          <div class="tl-connector"></div>
+          <div class="tl-node">
+            <div class="tl-here">WE ARE HERE</div>
+            <div class="tl-dot current"></div>
+            <div class="tl-label">Enrichment + Templating + Multi-Priority</div>
+          </div>
+          <div class="tl-connector upcoming"></div>
+          <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Dynamic Streaming Datasets</div></div>
+          <div class="tl-connector arrow"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══════════════ Thank You ═══════════════ -->
-    <div class="teams-section" id="sec-6">
+    <div class="teams-section" id="sec-7">
       <h2 class="teams-title">Thank You</h2>
       <p class="teams-subtitle">This sprint's delivery was powered by these amazing teams</p>
 
