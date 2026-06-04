@@ -270,7 +270,7 @@
   </section>
 
   <section>
-    <h2>Roster <span class="badge">10 agents</span></h2>
+    <h2>Roster <span class="badge">11 agents</span></h2>
     <nav class="filters" aria-label="Filter agents by status">
       <button class="pill active" data-filter="all" aria-label="Show all agents">All <span class="count">11</span></button>
       <button class="pill" data-filter="shipped" aria-label="Show shipped">Shipped <span class="count">3</span></button>
@@ -474,6 +474,26 @@
           <div class="meta-row"><div class="k">Lifecycle</div><div class="v">5 phases: 1 Observe (detect only) → 2-draft (assisted-write, no sends) → 2-execute (sends approved, no Yoshi handoff) → 3 Reconciliation (Yoshi handoff + cycle close) → 5 Autonomous (reserved indefinitely).</div></div>
           <div class="meta-row"><div class="k">Trigger</div><div class="v">Luigi C.8 (release-ready detector + suggested-level compute) → cross-agent.md React L0-L4 → <code>/cross-agent-close</code> routes → queue.jsonl → <code>/lakitu</code> pops</div></div>
           <div class="meta-row"><div class="k">Status</div><div class="v">Phase 0 scaffolded (concept + skill + state + wirings) · phase.txt=1 observe-only · Luigi C.8 still in scrum-chief-plan.md Future Extensions · L2 dry run validated on CX-43361 Parsing Rules View as Code</div></div>
+        </div>
+      </article>
+
+      <!-- Geno -->
+      <article class="card" data-cat="build">
+        <div class="head">
+          <div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:#1f1f1f;">🌟</div>
+          <div class="title-block">
+            <div class="name">🌟 Geno</div>
+            <div class="role">Roadmap strategist — objective alignment</div>
+            <span class="status observe">Phase 1 — debut scored (2026-06-04)</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><div class="k">Loop</div><div class="v">Scores the portfolio against the <strong>company objectives (P0–P3)</strong> using triangulated signals — revenue/sentiment/trend (cx-catalog overlay), breadth (NotebookLM + unified tracker), strategic defense (competitive tracker), capacity + in-flight dedup (workplans + Jira). Each axis from its authoritative source, so one source's blind spot is covered by another's strength.</div></div>
+          <div class="meta-row"><div class="k">Anchor</div><div class="v">Company objectives are fixed input — <code>_state/Geno/company-objectives.md</code> (Noam-owned, Geno never edits). Sort = objective-priority primary × signal-weight secondary.</div></div>
+          <div class="meta-row"><div class="k">Boundary</div><div class="v">Vault-only Phase 1 — no Jira, no Notion, no DMs. Strategic blind-spot guard: CS revenue may raise but never <em>lower</em> a strategic/competitive moat. In-flight dedup before scoring (no re-proposing shipped work).</div></div>
+          <div class="meta-row"><div class="k">Trigger</div><div class="v"><code>/geno</code> (on-demand + per quarter) · <code>/geno-retro</code> scores prior recs vs what got built · no launchd yet</div></div>
+          <div class="meta-row"><div class="k">Output</div><div class="v"><code>Roadmap/Roadmap 2026/geno-scorecard-{date}.md</code> — P0–P3 tagged, dedup'd, Q3 carry-over / Q4 net-new sequence, divergences flagged for override</div></div>
+          <div class="meta-row"><div class="k">Status</div><div class="v">Scaffolded + debut run 2026-06-04 (28 candidates scored · 3 divergences · 2 cuts). Awaiting Noam validation of objective-mapping before Phase 2 tuning. Plan: <code>AI PM/Agents/geno-plan.md</code></div></div>
         </div>
       </article>
 
