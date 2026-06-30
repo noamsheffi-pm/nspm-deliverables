@@ -8,10 +8,10 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d0f14; color: #e2e8f0; line-height: 1.6; }
 
-    .hero { text-align: center; padding: 72px 24px 40px; position: relative; overflow: hidden; }
+    .hero { text-align: center; padding: 80px 24px 48px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at center, rgba(0,212,170,0.06) 0%, transparent 60%); pointer-events: none; }
     .hero-chip { display: inline-block; background: transparent; color: #00d4aa; padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(0,212,170,0.4); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
-    .hero h1 { font-size: 46px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+    .hero h1 { font-size: 48px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
     .hero h1 .accent { color: #00d4aa; }
     .hero .subtitle { font-size: 20px; color: #7a8599; font-weight: 400; }
     .hero .divider { width: 48px; height: 3px; background: #00d4aa; margin: 20px auto; border-radius: 2px; }
@@ -20,15 +20,7 @@
 
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-    .view-toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
-    .view-tab { background: #161a22; border: 1px solid #252a35; color: #7a8599; padding: 10px 24px; border-radius: 24px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .view-tab:hover { border-color: #00d4aa; color: #e2e8f0; }
-    .view-tab.active { background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #00d4aa; }
-    .view { display: block; }
-    .view.hidden { display: none; }
-    .view-intro { text-align: center; color: #7a8599; font-size: 14px; margin: -24px auto 40px; max-width: 720px; }
-
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 48px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 56px; }
     .stat-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 24px; text-align: center; }
     .stat-number { font-size: 36px; font-weight: 700; line-height: 1.1; color: #00d4aa; }
     .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #7a8599; margin-top: 8px; }
@@ -40,47 +32,38 @@
 
     .feature-section { margin-bottom: 56px; opacity: 1; transition: opacity 0.3s; }
     .feature-section.hidden { display: none; }
-    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-    .section-badge { display: inline-block; padding: 4px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .section-badge { display: inline-block; padding: 4px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     .section-title { font-size: 24px; font-weight: 600; }
-    .act-kicker { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00d4aa; opacity: 0.7; width: 100%; margin-bottom: 2px; }
 
     .feature-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 32px; margin-bottom: 20px; transition: transform 0.2s, border-color 0.2s; }
     .feature-card:hover { transform: translateY(-2px); border-color: #333a48; }
     .feature-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 16px; max-width: 820px; }
-    .usecase { background: #0f1118; border-left: 3px solid #00d4aa; border-radius: 8px; padding: 14px 18px; margin-bottom: 18px; font-style: italic; color: #c0c8d8; font-size: 15px; max-width: 820px; }
-    .usecase .lbl { display: block; font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00d4aa; opacity: 0.7; margin-bottom: 4px; }
-    .notion-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00d4aa; text-decoration: none; margin-bottom: 20px; border: 1px solid rgba(0,212,170,0.3); background: rgba(0,212,170,0.08); padding: 4px 11px; border-radius: 8px; transition: background 0.2s; }
-    .notion-link:hover { background: rgba(0,212,170,0.18); }
+    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 16px; max-width: 800px; }
 
     .bullet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .bullet-grid.three { grid-template-columns: repeat(3, 1fr); }
     .bullet-item { background: #0f1118; border-radius: 10px; padding: 18px 20px; border-left: 3px solid #00d4aa; }
     .bullet-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #ffffff; }
     .bullet-item p { font-size: 13px; color: #8a94a8; line-height: 1.5; }
 
-    .feature-card.peek { border-color: rgba(255,159,67,0.35); background: linear-gradient(180deg, #161a22 0%, #1a1712 100%); }
-    .ea-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #00d4aa; background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3); padding: 2px 8px; border-radius: 8px; text-transform: uppercase; vertical-align: middle; }
-    .verify-note { font-size: 12px; color: #ffb37a; background: rgba(255,159,67,0.08); border: 1px solid rgba(255,159,67,0.25); border-radius: 8px; padding: 8px 12px; margin-bottom: 16px; max-width: 820px; }
-
-    /* "Also shipped" compact list */
-    .ship-list { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 8px 0; }
-    .ship-row { display: flex; gap: 16px; padding: 14px 24px; border-bottom: 1px solid #1d222c; }
-    .ship-row:last-child { border-bottom: none; }
-    .ship-main { flex: 1; }
-    .ship-main h4 { font-size: 15px; font-weight: 600; color: #e8edf5; margin-bottom: 2px; }
-    .ship-main p { font-size: 13px; color: #7a8599; }
-    .ship-keys { font-size: 11px; color: #5b6678; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; align-self: center; }
-    . alsohdr { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #7a8599; margin: 0 0 14px 2px; }
-
+    .section-badge { background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .accent-governance .bullet-item { border-left-color: #00e6b8; }
     .accent-quota .bullet-item { border-left-color: #00b88e; }
-    .accent-gov .bullet-item { border-left-color: #00e6b8; }
-    .accent-next .bullet-item { border-left-color: #ff9f43; }
-    .accent-next .section-badge { background: rgba(255,159,67,0.14); color: #ff9f43; }
-    .accent-next .ea-chip { color: #ff9f43; background: rgba(255,159,67,0.12); border-color: rgba(255,159,67,0.35); }
+    .accent-orgquota .bullet-item { border-left-color: #00c49a; }
+    .accent-datasets .bullet-item { border-left-color: #00e6b8; }
+    .accent-pipeline .bullet-item { border-left-color: #00d4aa; }
 
-    .teams-section { margin-top: 56px; margin-bottom: 56px; }
+    .ea-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #00d4aa; background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3); padding: 2px 8px; border-radius: 8px; text-transform: uppercase; vertical-align: middle; }
+
+    /* Coming Next — orange */
+    .accent-next .section-badge { background: rgba(255,159,67,0.14); color: #ff9f43; }
+    .accent-next .bullet-item { border-left-color: #ff9f43; }
+    .accent-next .ea-chip { color: #ff9f43; background: rgba(255,159,67,0.12); border-color: rgba(255,159,67,0.35); }
+    .feature-card.peek { border-color: rgba(255,159,67,0.3); background: linear-gradient(180deg, #161a22 0%, #1a1712 100%); }
+    .accent-next .tl-dot.current { background: #ff9f43; border-color: #ff9f43; box-shadow: 0 0 0 6px rgba(255,159,67,0.22), 0 0 16px rgba(255,159,67,0.4); }
+    .accent-next .tl-here { color: #ff9f43; }
+
+    .teams-section { margin-top: 64px; margin-bottom: 64px; }
     .teams-title { text-align: center; font-size: 28px; font-weight: 600; margin-bottom: 8px; color: #ffffff; }
     .teams-subtitle { text-align: center; color: #7a8599; font-size: 14px; margin-bottom: 32px; }
     .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
@@ -90,8 +73,16 @@
     .team-name { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
     .team-members { font-size: 12px; color: #7a8599; line-height: 1.5; }
 
-    @keyframes cta-pulse { 0%,100% { border-color: rgba(0,212,170,0.2); box-shadow: 0 0 0 0 rgba(0,212,170,0); } 50% { border-color: rgba(0,212,170,0.6); box-shadow: 0 0 20px 2px rgba(0,212,170,0.15); } }
-    .cta-banner { background: rgba(0,212,170,0.06); border: 1px solid rgba(0,212,170,0.2); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 48px; animation: cta-pulse 2.5s ease-in-out infinite; }
+    .slide-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    .slide-dot { width: 10px; height: 10px; border-radius: 50%; background: #252a35; cursor: pointer; transition: all 0.2s; border: none; }
+    .slide-dot:hover, .slide-dot.active { background: #00d4aa; transform: scale(1.3); }
+
+    footer { text-align: center; padding: 32px 24px; color: #7a8599; font-size: 12px; border-top: 1px solid #252a35; }
+    .footer-logo { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #c0c8d8; }
+    .footer-logo .dot { width: 10px; height: 10px; border-radius: 50%; background: #00d4aa; display: inline-block; }
+
+    @keyframes cta-pulse { 0%, 100% { border-color: rgba(0,212,170,0.2); box-shadow: 0 0 0 0 rgba(0,212,170,0); } 50% { border-color: rgba(0,212,170,0.6); box-shadow: 0 0 20px 2px rgba(0,212,170,0.15); } }
+    .cta-banner { background: rgba(0,212,170,0.06); border: 1px solid rgba(0,212,170,0.2); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 56px; animation: cta-pulse 2.5s ease-in-out infinite; }
     .cta-banner p { font-size: 18px; font-weight: 500; }
     .cta-banner .channel { color: #00d4aa; font-weight: 700; }
 
@@ -111,25 +102,29 @@
     .tl-connector.arrow::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-left: 10px solid #7a8599; }
     .tl-label { position: absolute; top: 30px; font-size: 11px; color: #8a94a8; font-weight: 500; width: 96px; text-align: center; white-space: normal; line-height: 1.35; left: 50%; transform: translateX(-50%); }
     .tl-here { position: absolute; top: -28px; font-size: 11px; font-weight: 700; color: #00d4aa; white-space: nowrap; letter-spacing: 0.5px; }
-    .accent-next .tl-dot.current { background: #ff9f43; border-color: #ff9f43; box-shadow: 0 0 0 6px rgba(255,159,67,0.22), 0 0 16px rgba(255,159,67,0.4); }
-    .accent-next .tl-here { color: #ff9f43; }
-
-    footer { text-align: center; padding: 32px 24px; color: #7a8599; font-size: 12px; border-top: 1px solid #252a35; }
-    .footer-logo { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #c0c8d8; }
-    .footer-logo .dot { width: 10px; height: 10px; border-radius: 50%; background: #00d4aa; display: inline-block; }
 
     @media (max-width: 640px) {
       .hero h1 { font-size: 28px; }
       .stats { grid-template-columns: repeat(2, 1fr); }
-      .bullet-grid, .bullet-grid.three { grid-template-columns: 1fr !important; }
+      .bullet-grid { grid-template-columns: 1fr !important; }
+      .slide-nav { display: none; }
       .teams-grid { grid-template-columns: repeat(2, 1fr); }
-      .ship-row { flex-direction: column; gap: 4px; }
     }
   </style>
 </head>
 <body>
 
-  <header class="hero">
+  <nav class="slide-nav" aria-label="Section navigation">
+    <button class="slide-dot active" onclick="scrollToSection(0)" aria-label="Top"></button>
+    <button class="slide-dot" onclick="scrollToSection(1)" aria-label="Schema Reports"></button>
+    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="System & Default Datasets Quota"></button>
+    <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Data Usage Aggregation"></button>
+    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Org Quota"></button>
+    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="PAYG"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Thank You"></button>
+  </nav>
+
+  <header class="hero" id="sec-0">
     <div class="hero-chip">Sprint Demo</div>
     <h1>Data Pipeline</h1>
     <h1><span class="accent">What We Shipped</span></h1>
@@ -141,179 +136,113 @@
 
   <div class="container">
 
-    <div class="view-toggle">
-      <button class="view-tab active" data-view="story">📖 Story</button>
-      <button class="view-tab" data-view="all">📋 What Shipped</button>
+    <div class="cta-banner">
+      <p><span style="font-size:12px;background:rgba(0,212,170,0.15);color:#00d4aa;padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:0.5px;margin-right:8px;">THEME</span> This sprint: <span class="channel">sharper governance visibility &amp; cleaner spend control</span></p>
+      <p style="font-size:13px;color:#7a8599;margin-top:8px;">Roadmap updates post to <span class="channel">#i-love-roadmap</span> &mdash; join <span class="channel">#i-love-dataflow</span> for ongoing pipeline &amp; governance discussions</p>
     </div>
 
-    <!-- ═══════════════════════════ STORY VIEW (usecase / sales-driven) ═══════════════════════════ -->
-    <div class="view" id="view-story">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-number">8</div><div class="stat-label">Features Shipped</div></div>
+      <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">Governance</div></div>
+      <div class="stat-card"><div class="stat-number">5</div><div class="stat-label">Monetization</div></div>
+    </div>
 
-      <div class="cta-banner">
-        <p><span style="font-size:12px;background:rgba(0,212,170,0.15);color:#00d4aa;padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:0.5px;margin-right:8px;">THEME</span> Sharper governance, <span class="channel">clearer spend</span></p>
-        <p style="font-size:13px;color:#7a8599;margin-top:8px;">Two value moments this sprint, plus where cost control goes next.</p>
+    <nav class="filters" aria-label="Feature category filter">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="governance">Governance</button>
+      <button class="pill" data-filter="monetization">Monetization</button>
+    </nav>
+
+    <!-- ═══════════════ Schema Explorer Monthly Reports ═══════════════ -->
+    <div class="feature-section accent-governance" data-cat="governance" id="sec-1">
+      <div class="section-header">
+        <span class="section-badge">Governance · Schema</span>
+        <h2 class="section-title">Govern Your Schema on a Cadence</h2>
       </div>
-
-      <!-- Act 1 — Schema Explorer Monthly Reports -->
-      <div class="feature-section accent-gov">
-        <div class="section-header">
-          <span class="act-kicker">Act 1 · Govern on a cadence</span>
-          <span class="section-badge">Governance</span>
-          <h2 class="section-title">Stop Discovering Schema Problems During Incidents</h2>
-        </div>
-        <div class="feature-card">
-          <div class="feature-title"><span>Schema Explorer Monthly Reports</span></div>
-          <div class="usecase"><span class="lbl">The customer</span>"Our schema sprawls silently. By the time we notice field explosion or a cost spike, it's already in production and we're debugging it live. We have no routine way to review where our data is growing."</div>
-          <div class="feature-subtitle"><strong>What we shipped:</strong> Schema Explorer now produces a recurring monthly report, inside the product, with configurable retention. Schema and data-growth posture becomes something a team reviews on a cadence, not something they discover too late.</div>
-          <div class="bullet-grid">
-            <div class="bullet-item"><h4>Monthly Report, In-Product</h4><p>A recurring monthly snapshot of your schema lives in Schema Explorer. No export pipeline, no manual pull, no spreadsheet.</p></div>
-            <div class="bullet-item"><h4>Configurable Retention</h4><p>Choose how long reports are kept, so you can look back and see how schema and data growth trended over months.</p></div>
-            <div class="bullet-item"><h4>Catch Sprawl Before It Costs</h4><p>Field explosion and growth hotspots surface on a schedule, so governance becomes proactive instead of incident-driven.</p></div>
-            <div class="bullet-item"><h4>Foundation for Cost Reviews</h4><p>The recurring report is the surface monthly cost and governance reviews are built on, tying schema visibility to spend.</p></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Act 2 — Sharper spend visibility -->
-      <div class="feature-section accent-quota">
-        <div class="section-header">
-          <span class="act-kicker">Act 2 · See your spend precisely</span>
-          <span class="section-badge">Quota &amp; Monetization</span>
-          <h2 class="section-title">Read Your Usage the Way You Actually Manage It</h2>
-        </div>
-        <div class="feature-card">
-          <div class="feature-title"><span>Data Usage &amp; Org Quota — Sharper Visibility</span></div>
-          <div class="usecase"><span class="lbl">The customer</span>"Daily usage bars are noisy when I'm planning a monthly budget. And our org totals are skewed by internal audit teams, so I can't trust the number I'm reporting up to finance."</div>
-          <div class="feature-subtitle"><strong>What we shipped:</strong> usage and quota now read at the grain you manage by. Pick the aggregation that matches your planning horizon, see exactly which teams are heading for a block, and get org totals that exclude internal audit noise.</div>
-          <div class="bullet-grid">
-            <div class="bullet-item"><h4>Choose Your Aggregation</h4><p>Auto, Daily, Weekly or Monthly on Data Usage and the Quota Manager, so the view matches the budget cycle you plan against.</p></div>
-            <div class="bullet-item"><h4>See Who's About to Block</h4><p>New block-days and estimated-blocked-units columns, plus a max-usage progress bar, make pressure visible before it bites.</p></div>
-            <div class="bullet-item"><h4>Trustworthy Org Totals</h4><p>Internal <code>_audit</code> teams are excluded from org-level counters, so the number you report up is the number that's real.</p></div>
-            <div class="bullet-item"><h4>Cleaner Olly Usage View</h4><p>Olly usage reads correctly for paid accounts and no longer shows zero when units are reserved by a quota rule.</p></div>
-          </div>
+      <div class="feature-card">
+        <div class="feature-title"><span>Schema Explorer &mdash; Monthly Reports</span></div>
+        <p class="feature-subtitle">Schema Explorer now produces a recurring monthly report inside the product, with configurable retention. Review schema sprawl and data growth on a schedule instead of discovering field explosion and cost spikes during an incident.</p>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Monthly Report, In-Product</h4><p>A recurring monthly snapshot of your schema lives in Schema Explorer &mdash; no export pipeline, no manual pull.</p></div>
+          <div class="bullet-item"><h4>Configurable Retention</h4><p>Choose how long reports are kept, so you can see how schema and data growth trended over months.</p></div>
+          <div class="bullet-item"><h4>Catch Sprawl Before It Costs</h4><p>Field explosion and growth hotspots surface on a schedule &mdash; governance becomes proactive, not incident-driven.</p></div>
+          <div class="bullet-item"><h4>Foundation for Cost Reviews</h4><p>The recurring report is the surface monthly cost and governance reviews are built on.</p></div>
         </div>
       </div>
+    </div>
 
-      <!-- Act 3 — Coming Next: TCO for Spans -->
-      <div class="feature-section accent-next">
-        <div class="section-header">
-          <span class="act-kicker">Coming Next · Route it</span>
-          <span class="section-badge">Coming Next</span>
-          <h2 class="section-title">Cost Routing Reaches Your Traces</h2>
-        </div>
-        <div class="feature-card peek">
-          <div class="feature-title"><span>TCO for Spans</span><span class="ea-chip">Coming Next</span></div>
-          <div class="usecase"><span class="lbl">The customer</span>"You've let me control log costs at ingestion for years. Spans are now my biggest, most expensive stream, and I have no equivalent lever for them."</div>
-          <div class="verify-note">Backend is live (span metering, quota-event emission). The spans policy / priority-block UI is still in build, so this is a roadmap preview, not a live demo.</div>
-          <div class="bullet-grid three">
-            <div class="bullet-item"><h4>Span-Aware Metering</h4><p>The quota engine now meters spans by TCO policy and emits quota-tier-change events, the same primitives as logs.</p></div>
-            <div class="bullet-item"><h4>Quota-Triggered Demotion</h4><p>Spans demote priority as quota fills, just like log routing. The cost-control model extends to traces.</p></div>
-            <div class="bullet-item"><h4>Editor Landing Next</h4><p>The spans policy and priority-block UI is in build; full end-to-end ships in an upcoming sprint.</p></div>
-          </div>
-        </div>
-        <div class="roadmap">
-          <div class="roadmap-label">TCO Coverage Journey</div>
-          <div class="timeline">
-            <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Log TCO Routing (GA)</div></div>
-            <div class="tl-connector"></div>
-            <div class="tl-node"><div class="tl-dot shipped"></div><div class="tl-label">Quota-Based Routing (GA)</div></div>
-            <div class="tl-connector"></div>
-            <div class="tl-node"><div class="tl-here">WE ARE HERE</div><div class="tl-dot current"></div><div class="tl-label">Span Metering + Quota Demotion (BE)</div></div>
-            <div class="tl-connector upcoming"></div>
-            <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Spans Policy Editor (next)</div></div>
-            <div class="tl-connector upcoming"></div>
-            <div class="tl-node"><div class="tl-dot upcoming"></div><div class="tl-label">Spans TCO GA</div></div>
-            <div class="tl-connector arrow"></div>
-          </div>
+    <!-- ═══════════════ System Datasets Quota Limits GA ═══════════════ -->
+    <div class="feature-section accent-governance" data-cat="governance" id="sec-2">
+      <div class="section-header">
+        <span class="section-badge">Governance · Quota</span>
+        <h2 class="section-title">Quota Limits for System &amp; Default Datasets</h2>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title"><span>System &amp; Default Datasets Quota Limits</span></div>
+        <p class="feature-subtitle">Reserved-capacity quota limits for both <code>system/</code> and <code>default/</code> datasets are now default-on for everyone &mdash; the feature flag has been removed. These datasets get treated as first-class governed entities with their own allocation, no longer a whitelisted preview.</p>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Default-On for All Tenants</h4><p>Feature flag removed &mdash; quota limits for <code>system/</code> and <code>default/</code> datasets ship to everyone.</p></div>
+          <div class="bullet-item"><h4>Both Dataspaces Governed</h4><p>System and default datasets each get their own allocation boundary, governed like any other dataset.</p></div>
+          <div class="bullet-item"><h4>Cap User-Defined Datasets</h4><p>The <code>default/</code> dataspace caps user-defined datasets, with a usage chip showing where you stand against the limit.</p></div>
+          <div class="bullet-item"><h4>Sets Up Unit-Based Locks</h4><p>The allocation model the upcoming unit-based reservations build on.</p></div>
         </div>
       </div>
+    </div>
 
-    </div><!-- /view-story -->
-
-    <!-- ═══════════════════════════ WHAT-SHIPPED VIEW (regular) ═══════════════════════════ -->
-    <div class="view hidden" id="view-all">
-
-      <p class="view-intro">Everything that shipped to customers this cycle (Nimbus + Phoenix, 02-06 → 30-06), organized by area. The deep-dive stories live in the Story tab.</p>
-
-      <div class="stats">
-        <div class="stat-card"><div class="stat-number">11</div><div class="stat-label">Features Shipped</div></div>
-        <div class="stat-card"><div class="stat-number">4</div><div class="stat-label">Governance &amp; Schema</div></div>
-        <div class="stat-card"><div class="stat-number">5</div><div class="stat-label">Quota &amp; Monetization</div></div>
-        <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">TCO &amp; Pipeline</div></div>
+    <!-- ═══════════════ Data Usage User-Controlled Aggregation ═══════════════ -->
+    <div class="feature-section accent-quota" data-cat="monetization" id="sec-3">
+      <div class="section-header">
+        <span class="section-badge">Monetization · Data Usage</span>
+        <h2 class="section-title">Read Usage the Way You Manage It</h2>
       </div>
-
-      <nav class="filters" aria-label="Category filter">
-        <button class="pill active" data-filter="all">All</button>
-        <button class="pill" data-filter="gov">Governance &amp; Schema</button>
-        <button class="pill" data-filter="quota">Quota &amp; Monetization</button>
-        <button class="pill" data-filter="tco">TCO &amp; Pipeline</button>
-      </nav>
-
-      <!-- Governance & Schema -->
-      <div class="feature-section accent-gov" data-cat="gov">
-        <div class="section-header"><span class="section-badge">Governance &amp; Schema</span><h2 class="section-title">Phoenix · Citadel · Content Structure</h2></div>
-        <div class="feature-card">
-          <div class="feature-title"><span>Schema Explorer Monthly Reports</span></div>
-          <p class="feature-subtitle">A recurring monthly schema report, in-product, with configurable retention. Review schema sprawl and data growth on a cadence instead of discovering it during an incident.</p>
-          <div class="bullet-grid">
-            <div class="bullet-item"><h4>Monthly Report In-Product</h4><p>Recurring snapshot inside Schema Explorer, no export pipeline.</p></div>
-            <div class="bullet-item"><h4>Configurable Retention</h4><p>Keep reports as long as you need to see the trend.</p></div>
-          </div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-title"><span>System Datasets Quota Limits — GA</span><span class="ea-chip">GA</span></div>
-          <p class="feature-subtitle">Reserved-capacity quota limits for system datasets are now default-on for everyone (feature flag removed).</p>
-        </div>
-        <p class="alsohdr" style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#7a8599;margin:0 0 14px 2px;">Also shipped</p>
-        <div class="ship-list">
-          <div class="ship-row"><div class="ship-main"><h4>Reserved Fields Grid — Select-All + Filter-Aware Delete</h4><p>Select-all and Delete now respect the active filter; routing-labels footer hint.</p></div><span class="ship-keys">CX-46803</span></div>
-          <div class="ship-row"><div class="ship-main"><h4>Dataset Management — Permissions + Delete</h4><p>Correct permissions in dataspace management; feature flag for deleting a dataset.</p></div><span class="ship-keys">CX-25505 · 46031</span></div>
+      <div class="feature-card">
+        <div class="feature-title"><span>Data Usage &mdash; User-Controlled Aggregation</span></div>
+        <p class="feature-subtitle">Choose how usage is aggregated &mdash; Auto, Daily, Weekly or Monthly &mdash; across Data Usage and the Quota Manager, so the view matches the budget cycle you actually plan against. Daily noise when you're planning a monthly budget is gone.</p>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Four Aggregation Modes</h4><p>Auto, Daily, Weekly, Monthly &mdash; applied consistently across Data Usage and the Quota Manager.</p></div>
+          <div class="bullet-item"><h4>Match Your Planning Horizon</h4><p>Read usage at the grain you budget by, instead of squinting at daily bars.</p></div>
+          <div class="bullet-item"><h4>Consistent Across Surfaces</h4><p>The same aggregation control on both the usage and quota views.</p></div>
+          <div class="bullet-item"><h4>Cleaner Trend Reading</h4><p>Smoother weekly/monthly rollups make month-over-month trends obvious.</p></div>
         </div>
       </div>
+    </div>
 
-      <!-- Quota & Monetization -->
-      <div class="feature-section accent-quota" data-cat="quota">
-        <div class="section-header"><span class="section-badge">Quota &amp; Monetization</span><h2 class="section-title">Nimbus · Halo</h2></div>
-        <div class="feature-card">
-          <div class="feature-title"><span>Data Usage — User-Controlled Aggregation</span></div>
-          <p class="feature-subtitle">Choose Auto / Daily / Weekly / Monthly aggregation on Data Usage and the Quota Manager, so the view matches the budget cycle you plan against.</p>
-          <div class="bullet-grid">
-            <div class="bullet-item"><h4>Four Aggregation Modes</h4><p>Auto, Daily, Weekly, Monthly across Data Usage and Quota Manager.</p></div>
-            <div class="bullet-item"><h4>Planning-Horizon Match</h4><p>Read usage at the grain you actually budget by.</p></div>
-          </div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-title"><span>Org Quota Manager — Sharper Usage View</span></div>
-          <p class="feature-subtitle">See which teams are heading for a block, and get org totals that exclude internal audit-team noise.</p>
-          <div class="bullet-grid">
-            <div class="bullet-item"><h4>Block-Visibility Columns</h4><p>Block-days, estimated-blocked-units, and a max-usage progress bar with numeric sort.</p></div>
-            <div class="bullet-item"><h4>Exclude <code>_audit</code> Teams</h4><p>Internal audit teams no longer skew org-level quota totals.</p></div>
-          </div>
-        </div>
-        <p class="alsohdr" style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#7a8599;margin:0 0 14px 2px;">Also shipped</p>
-        <div class="ship-list">
-          <div class="ship-row"><div class="ship-main"><h4>Olly in Data Usage / Org Quota — Fixes</h4><p>Olly pie-chart fix; free-tier banner hidden for paid; reserved-units counter no longer shows 0.</p></div><span class="ship-keys">CX-44481 · 44030/44031</span></div>
-          <div class="ship-row"><div class="ship-main"><h4>PAYG Usage Filter &amp; Report Export</h4><p>PAYG report type in usage export.</p></div><span class="ship-keys">CX-43075</span></div>
+    <!-- ═══════════════ Org Quota — Sharper Usage View ═══════════════ -->
+    <div class="feature-section accent-orgquota" data-cat="monetization" id="sec-4">
+      <div class="section-header">
+        <span class="section-badge">Monetization · Data Usage</span>
+        <h2 class="section-title">Trustworthy Org-Wide Usage Visibility</h2>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title"><span>Org Quota Manager &mdash; Sharper Usage View</span></div>
+        <p class="feature-subtitle">See exactly which teams are heading for a block, and get org totals you can trust &mdash; internal audit teams no longer skew the numbers you report up to finance.</p>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Block-Visibility Columns</h4><p>New block-days and estimated-blocked-units columns make pressure visible before data starts dropping.</p></div>
+          <div class="bullet-item"><h4>Max-Usage Progress Bar</h4><p>A max-usage bar with numeric sort surfaces the teams closest to their limit.</p></div>
+          <div class="bullet-item"><h4>Exclude <code>_audit</code> Teams</h4><p>Internal audit teams are excluded from org-level counters, so the reported total is the real one.</p></div>
+          <div class="bullet-item"><h4>Cleaner Olly Usage View</h4><p>Olly usage reads correctly for paid accounts and no longer shows zero when units are reserved by a quota rule.</p></div>
         </div>
       </div>
+    </div>
 
-      <!-- TCO & Pipeline -->
-      <div class="feature-section accent-quota" data-cat="tco">
-        <div class="section-header"><span class="section-badge">TCO &amp; Pipeline</span><h2 class="section-title">Nimbus · Radiant</h2></div>
-        <div class="ship-list">
-          <div class="ship-row"><div class="ship-main"><h4>TCO Log Policy Builder — Free-Text Keypath</h4><p>Target arbitrary keypaths in the log TCO policy builder.</p></div><span class="ship-keys">CX-44384</span></div>
-          <div class="ship-row"><div class="ship-main"><h4>Per-Target TCO Priority in Routing Rule</h4><p>Set TCO priority per routing target.</p></div><span class="ship-keys">CX-44537</span></div>
-        </div>
-        <div class="feature-card peek" style="margin-top:20px">
-          <div class="feature-title"><span>TCO for Spans</span><span class="ea-chip" style="color:#ff9f43;background:rgba(255,159,67,0.12);border-color:rgba(255,159,67,0.35)">Coming Next</span></div>
-          <p class="feature-subtitle">Span metering + quota-event emission are live in the backend; the spans policy / block UI is in build. Cost routing extends to traces next. (See the Story tab.)</p>
+    <!-- ═══════════════ PAYG Usage Reporting ═══════════════ -->
+    <div class="feature-section accent-quota" data-cat="monetization" id="sec-5">
+      <div class="section-header">
+        <span class="section-badge">Monetization · Data Usage</span>
+        <h2 class="section-title">Usage Reporting for Pay-As-You-Go</h2>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title"><span>PAYG Usage Filter &amp; Report Export</span></div>
+        <p class="feature-subtitle">Pay-as-you-go customers can now filter usage and export a dedicated PAYG report &mdash; the same export experience the rest of the monetization surface offers, now for the PAYG model.</p>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Dedicated PAYG Report Type</h4><p>Export a report scoped to the pay-as-you-go usage model, not a generic dump.</p></div>
+          <div class="bullet-item"><h4>Filter Before You Export</h4><p>Narrow PAYG usage to what matters before pulling the report.</p></div>
         </div>
       </div>
+    </div>
 
-    </div><!-- /view-all -->
-
-    <!-- ═══════════════ Thank You (shared) ═══════════════ -->
-    <div class="teams-section">
+    <!-- ═══════════════ Thank You ═══════════════ -->
+    <div class="teams-section" id="sec-8">
       <h2 class="teams-title">Thank You</h2>
       <p class="teams-subtitle">This sprint's delivery was powered by these teams</p>
       <div class="teams-grid">
@@ -337,34 +266,35 @@
   </footer>
 
   <script>
-    function setView(v, smooth) {
-      document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-      document.getElementById('view-story').classList.toggle('hidden', v !== 'story');
-      document.getElementById('view-all').classList.toggle('hidden', v !== 'all');
-      if (smooth) window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    document.querySelectorAll('.view-tab').forEach(tab => tab.addEventListener('click', () => setView(tab.dataset.view, true)));
-    (function () {
-      const h = (location.hash || '').toLowerCase();
-      const q = new URLSearchParams(location.search).get('view');
-      if (h === '#all' || q === 'all') setView('all', false);
-    })();
-
     document.querySelectorAll('.pill').forEach(pill => {
       pill.addEventListener('click', () => {
         document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
         const filter = pill.dataset.filter;
-        document.querySelectorAll('#view-all .feature-section').forEach(sec => {
-          sec.classList.toggle('hidden', !(filter === 'all' || sec.dataset.cat === filter));
+        document.querySelectorAll('.feature-section').forEach(sec => {
+          if (filter === 'all' || sec.dataset.cat === filter) sec.classList.remove('hidden');
+          else sec.classList.add('hidden');
         });
       });
     });
 
+    const sections = document.querySelectorAll('[id^="sec-"]');
+    const dots = document.querySelectorAll('.slide-dot');
+    function scrollToSection(i) { sections[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(sections).indexOf(entry.target);
+          dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(s => observer.observe(s));
+
     const fadeObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; } });
     }, { threshold: 0.1 });
-    document.querySelectorAll('.feature-card, .team-card, .roadmap, .ship-list').forEach(el => {
+    document.querySelectorAll('.feature-card, .team-card, .roadmap').forEach(el => {
       el.style.opacity = '0'; el.style.transform = 'translateY(15px)';
       el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       fadeObserver.observe(el);
