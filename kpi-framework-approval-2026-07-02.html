@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product KPI Framework — Approval</title>
+<style>
+  :root {
+    --ground: #0E1420;
+    --panel: #151D2C;
+    --panel-2: #1A2333;
+    --line: #26314A;
+    --text: #E7ECF5;
+    --muted: #8A97B0;
+    --faint: #5C6982;
+    --accent: #FF5D4C;      /* coral — master brand */
+    --warm: #F5A623;        /* Spectra channel */
+    --cool: #34D5C8;        /* Sentinel channel */
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(120% 80% at 85% -10%, rgba(255,93,76,0.10), transparent 55%),
+      radial-gradient(100% 70% at 0% 0%, rgba(52,213,200,0.07), transparent 50%),
+      var(--ground);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px 96px; }
+
+  /* ---- top rule / eyebrow ---- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    padding: 22px 0 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .topbar .dot { color: var(--accent); }
+
+  /* ---- hero ---- */
+  .hero { padding: 72px 0 40px; }
+  .kicker {
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 22px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(38px, 6.4vw, 74px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin: 0 0 26px;
+    max-width: 15ch;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 0;
+    margin-top: 44px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.015);
+  }
+  .meta div {
+    flex: 1 1 140px;
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+  }
+  .meta div:last-child { border-right: none; }
+  .meta .n {
+    font-family: var(--mono); font-size: 26px; font-weight: 600;
+    color: var(--text); display: block; letter-spacing: -0.01em;
+  }
+  .meta .l {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--faint); margin-top: 4px;
+  }
+
+  /* ---- motivation ---- */
+  .why { margin-top: 84px; }
+  .section-tag {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--faint);
+    display: flex; align-items: center; gap: 14px; margin-bottom: 30px;
+  }
+  .section-tag::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .principle {
+    padding: 24px 22px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+  .principle h3 {
+    font-size: 17px; margin: 0 0 10px; font-weight: 700; letter-spacing: -0.01em;
+  }
+  .principle p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .principle .mk {
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+    display: block; margin-bottom: 14px; letter-spacing: 0.05em;
+  }
+
+  /* ---- channel panels ---- */
+  .channel { margin-top: 80px; scroll-margin-top: 24px; }
+  .channel-head {
+    display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+    padding-bottom: 20px; margin-bottom: 26px;
+    border-bottom: 2px solid var(--chan);
+  }
+  .channel-head .name {
+    font-family: var(--sans); font-weight: 800;
+    font-size: clamp(26px, 3.6vw, 38px); letter-spacing: -0.02em;
+    margin: 0; color: var(--text);
+  }
+  .channel-head .name .bar { color: var(--chan); }
+  .channel-head .scope {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .leads {
+    margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .lead {
+    font-family: var(--mono); font-size: 12px;
+    padding: 5px 11px; border-radius: 999px;
+    border: 1px solid var(--chan);
+    color: var(--chan);
+    letter-spacing: 0.03em;
+  }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+
+  .kpi {
+    position: relative;
+    padding: 26px 24px 24px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--chan);
+  }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .kpi-code {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+    color: var(--chan); font-weight: 600;
+  }
+  .kpi-status {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--faint);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px;
+  }
+  .kpi h4 {
+    font-size: 20px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.015em;
+  }
+  .kpi .measures { color: var(--text); font-size: 14.5px; margin: 0 0 14px; }
+  .kpi .measures b { color: var(--chan); font-weight: 600; }
+  .kpi dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+  .kpi dt {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--faint); padding-top: 1px;
+  }
+  .kpi dd { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .kpi dd .tm { font-family: var(--mono); color: var(--text); font-size: 12.5px; }
+
+  .rejected {
+    margin-top: 30px; padding: 16px 20px;
+    border: 1px dashed var(--line); border-radius: 10px;
+    font-size: 13.5px; color: var(--muted);
+  }
+  .rejected b { color: var(--text); font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; }
+
+  /* ---- the ask ---- */
+  .ask {
+    margin-top: 90px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    padding: 40px 36px;
+  }
+  .ask h2 {
+    font-size: clamp(24px, 3.4vw, 34px); font-weight: 800;
+    letter-spacing: -0.02em; margin: 0 0 8px;
+  }
+  .ask .sub { color: var(--muted); margin: 0 0 28px; font-size: 15.5px; }
+  .checklist { display: grid; gap: 14px; }
+  .check {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+  }
+  .check .mark {
+    font-family: var(--mono); color: var(--accent); font-size: 14px;
+    border: 1px solid var(--accent); border-radius: 6px;
+    width: 26px; height: 26px; flex: 0 0 26px;
+    display: grid; place-items: center; margin-top: 1px;
+  }
+  .check p { margin: 0; font-size: 14.5px; }
+  .check p b { font-weight: 700; }
+  .check p span { color: var(--muted); }
+
+  footer {
+    margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+    color: var(--faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+
+  @media (max-width: 760px) {
+    .principles { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .leads { margin-left: 0; width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(14px); animation: rise 0.7s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+    .hero .kicker { animation-delay: 0.05s; }
+    .hero h1 { animation-delay: 0.12s; }
+    .hero .lede { animation-delay: 0.20s; }
+    .hero .meta { animation-delay: 0.30s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <span>Product KPI Framework <span class="dot">◆</span> Q3 2026</span>
+    <span>Approval requested — Spectra &amp; Sentinel</span>
+  </div>
+
+  <header class="hero">
+    <p class="kicker reveal">Outcome KPIs · agreed with Piyush · 29 Jun</p>
+    <h1 class="reveal">Metrics as a <em>license to kill noise.</em></h1>
+    <p class="lede reveal">We are locking a small set of outcome-level KPIs per product area — not per-feature metrics, but the signal that tells us whether the direction we took was right. This page is the set we want the two engineering groups to own and instrument this quarter. Directions are agreed; target numbers land next.</p>
+
+    <div class="meta reveal">
+      <div><span class="n">6</span><span class="l">KPIs to track</span></div>
+      <div><span class="n">2</span><span class="l">Owning groups</span></div>
+      <div><span class="n">3</span><span class="l">Product areas</span></div>
+      <div><span class="n">TBD</span><span class="l">Targets — this quarter</span></div>
+    </div>
+  </header>
+
+  <section class="why">
+    <div class="section-tag">Why we are doing this</div>
+    <div class="principles">
+      <div class="principle">
+        <span class="mk">01</span>
+        <h3>Outcome, not output</h3>
+        <p>A KPI measures whether a direction was correct — not whether one feature shipped. Features are the means; the KPI is the end.</p>
+      </div>
+      <div class="principle">
+        <span class="mk">02</span>
+        <h3>A filter for the roadmap</h3>
+        <p>An agreed KPI lets us decline work that does not move the number. It is the reason to say no to ad-hoc requests.</p>
+      </div>
+      <div class="principle">
+        <span class="mk">03</span>
+        <h3>Owned across teams</h3>
+        <p>A PM owns the metric even when the infrastructure behind it sits on another team. Instrumenting it is a shared commitment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SPECTRA ================= -->
+  <section class="channel" id="spectra" style="--chan: var(--warm);">
+    <div class="channel-head">
+      <h2 class="name"><span class="bar">▍</span>Spectra</h2>
+      <span class="scope">Pipeline · Monetization</span>
+      <div class="leads">
+        <span class="lead">Timor</span>
+        <span class="lead">Itay</span>
+        <span class="lead">Rafael</span>
+        <span class="lead">Iulian</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-01 · TART</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Turnaround time</h4>
+        <p class="measures">Time from data <b>ingest → queryable</b>. A regression here (e.g. 10s → 30s) is a direct signal the pipeline is degrading.</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Radiant</span></dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-02 · COST/GB</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Cost per GB / TB</h4>
+        <p class="measures">Internal <b>processing efficiency</b> per unit of data — driving the cost of running the engine down over time (e.g. 10¢ → 8¢/GB).</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Radiant · Halo</span></dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-03 · BO-VOL</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Back-office work on-platform</h4>
+        <p class="measures">Volume of billing &amp; account operations — by customers, TAMs, or AMs — <b>done inside the product</b> instead of offline.</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Halo · Nimbus</span></dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-04 · BO-EFF</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Back-office efficiency</h4>
+        <p class="measures">Reduction in <b>hours and instances</b> of manual off-platform work (Excel, spreadsheets) needed to run billing.</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Halo · Nimbus</span></dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+    </div>
+
+    <div class="rejected">
+      <b>NOT TRACKED —</b> Volume processed (petabytes) was considered and dropped: the engine does not control how much data customers send, so it is not a legitimate self-owned metric.
+    </div>
+  </section>
+
+  <!-- ================= SENTINEL ================= -->
+  <section class="channel" id="sentinel" style="--chan: var(--cool);">
+    <div class="channel-head">
+      <h2 class="name"><span class="bar">▍</span>Sentinel</h2>
+      <span class="scope">Datasets · Governance</span>
+      <div class="leads">
+        <span class="lead">Ilya</span>
+        <span class="lead">Roy</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-05 · P95</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Dataset query P95 uplift</h4>
+        <p class="measures">Improvement in <b>P95 query performance</b> for customers who use datasets. Caveat: real gains require proper data segmentation, not renaming a default pool.</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Citadel</span></dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">KPI-06 · ADOPT</span><span class="kpi-status">Direction agreed</span></div>
+        <h4>Dataset adoption</h4>
+        <p class="measures">Share of <b>companies and teams creating at least one dataset</b> — horizontal (new customers) and vertical (existing customers going deeper).</p>
+        <dl>
+          <dt>Owns</dt><dd><span class="tm">Citadel · Phoenix</span></dd>
+          <dt>Target</dt><dd>TBD — gated on alias prereqs</dd>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= THE ASK ================= -->
+  <section class="ask">
+    <h2>What we are asking you to approve</h2>
+    <p class="sub">Sign-off from both group leads unblocks instrumentation this quarter.</p>
+    <div class="checklist">
+      <div class="check">
+        <span class="mark">01</span>
+        <p><b>The KPI set is right.</b> <span>These are the correct outcome signals for your area — nothing critical is missing, nothing listed is noise.</span></p>
+      </div>
+      <div class="check">
+        <span class="mark">02</span>
+        <p><b>You will instrument them this quarter.</b> <span>Establish baseline visibility for each KPI — including where the underlying data sits on another team, which we will unblock together.</span></p>
+      </div>
+      <div class="check">
+        <span class="mark">03</span>
+        <p><b>Measurement units, in a follow-up 1:1.</b> <span>We agree the exact unit and initial baseline per KPI before setting targets, one month after data starts flowing.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Noam Sheffi · Data Economics &amp; Governance</span>
+    <span>Draft for approval · Q3 2026</span>
+    <span class="source">Generated from: roadmap-kpis.md · meeting-summary-piyush-2026-06-29 · Jul 2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
