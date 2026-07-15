@@ -272,7 +272,6 @@
 </style>
 
 <div id="progress"></div>
-<div id="brand"><b>Coralogix</b> · Webinar · mirror of Chris's Slides</div>
 <div id="counter"><b id="cur">01</b> / <span id="tot">00</span></div>
 <div id="stage">
 
@@ -549,6 +548,33 @@
     <div class="meta"><div class="b">Raw telemetry<span>"Could be the database… or the network…" — no exact answer.</span></div><div class="b">Contextualized<span>Found the exact root cause!</span></div><div class="b">The point<span>AI-native observability is won or lost at the data layer, long before any model is in the loop.</span></div></div>
   </div>
   <div class="foot"><span>Illustrative figure (Kloudfuse), same model both runs</span><span></span></div>
+</section>
+
+<!-- ============ ALTERNATIVE: merged agent payoff (candidate to replace slides 17-18-19) ============ -->
+<section class="slide" data-notes="ALTERNATIVE — merges the three agent slides (discoverability + fewer tokens + contextualized 36×) into one page. Same agent, one screen: without datasets it wildcard-guesses and burns ~36k tokens on no answer; with datasets it finds the right field, reads ~1k, and lands the exact root cause. Stat strip = the three credibility numbers (90% TOON, 17.1% context engineering, 10–100× vs raw rows). NOTE all figures BORROWED/illustrative (36× = Kloudfuse) — say so. Decide: keep the three separate slides or this single merged one.">
+  <div class="altbadge">Alternative · merges 17–19</div>
+  <div class="ey">The payoff <span class="mut">// agents on scoped data</span></div>
+  <h2>Same agent: <em>finds</em> it, reads less, gets it right</h2>
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2.4vh,24px)">
+    <div class="split" style="flex:0 1 auto;align-items:stretch">
+      <div class="panel" style="border-color:var(--line-2);background:var(--surface)">
+        <div class="tag" style="color:var(--coral)">Without datasets</div>
+        <div class="code" style="background:rgba(0,0,0,.3)"><span class="k">search</span> *</div>
+        <div class="deliver">Wildcard guess across every field &middot; <b style="color:var(--coral)">~36k tokens</b> &middot; <i>"could be the database… or the network…"</i></div>
+      </div>
+      <div class="panel a">
+        <div class="tag">With datasets</div>
+        <div class="code" style="background:rgba(0,0,0,.3)"><span class="k">cx</span> search-fields <span class="st">"response time"</span></div>
+        <div class="deliver">Bounded to one dataset's schema &middot; <b style="color:var(--emerald)">~1k tokens</b> &middot; <b style="color:var(--emerald)">found the exact root cause</b></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,2vw,26px);border-top:1px solid var(--line);padding-top:clamp(10px,2vh,18px)">
+      <div class="bigstat"><div class="n" style="font-size:clamp(22px,3.2vw,38px)">90%</div><div class="l" style="font-size:clamp(10px,1.05vw,13px);margin-top:6px">fewer tokens · CLI output encoded in TOON</div><div class="src">Coralogix CLI · TOON</div></div>
+      <div class="bigstat"><div class="n" style="font-size:clamp(22px,3.2vw,38px)">17.1%</div><div class="l" style="font-size:clamp(10px,1.05vw,13px);margin-top:6px">accuracy gain from context engineering, same model</div><div class="src">Stanford · SambaNova · Berkeley</div></div>
+      <div class="bigstat"><div class="n" style="font-size:clamp(22px,3.2vw,38px)">10–100×</div><div class="l" style="font-size:clamp(10px,1.05vw,13px);margin-top:6px">fewer tokens than pulling raw rows into context</div><div class="src">Published agent benchmarks</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>Illustrative figures (36× = Kloudfuse), same model both runs</span><span>AI-native observability is won or lost at the data layer</span></div>
 </section>
 
 <!-- 32 SUMMARY -->
