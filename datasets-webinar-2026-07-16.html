@@ -1,0 +1,615 @@
+<title>Datasets Webinar — Slides Mirror (Chris's deck)</title>
+<style>
+  :root{
+    --base:#131313; --base-2:#1a1a1a; --surface:rgba(255,255,255,.04); --surface-2:rgba(255,255,255,.07);
+    --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.2);
+    --emerald:#13E989; --emerald-deep:#11C470; --mint:#81FDA5; --emerald-dim:rgba(19,233,137,.14);
+    /* data-type color coding: payments=green, auth=yellow, compliance=blue */
+    --dc-pay:#13E989; --dc-auth:#E4B83C; --dc-comp:#5B9EF0;
+    --text:#ffffff; --muted:rgba(255,255,255,.55); --faint:rgba(255,255,255,.35);
+    /* problem/issue emphasis = red #FF6B6B; amber remapped to mint (second accent) */
+    --amber:#81FDA5; --coral:#FF6B6B; --coral-dim:rgba(255,107,107,.5);
+    --sans:"Plus Jakarta Sans","SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--base);color:var(--text);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+  #stage{position:fixed;inset:0;display:grid;place-items:center;
+    background:radial-gradient(1100px 620px at 82% -12%,rgba(19,233,137,.10),transparent 58%),
+      radial-gradient(820px 460px at -8% 112%,rgba(19,233,137,.05),transparent 60%),var(--base);}
+  .slide{position:absolute;width:min(96vw,1200px);aspect-ratio:16/9;max-height:94vh;
+    padding:clamp(26px,4vw,58px);display:none;flex-direction:column;opacity:0;transform:translateY(10px);
+    transition:opacity .4s ease,transform .4s ease}
+  .slide.on{display:flex;opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none}}
+
+  .ey{font-family:var(--mono);font-size:clamp(10px,1.15vw,13px);letter-spacing:.22em;text-transform:uppercase;
+    color:var(--emerald);font-weight:600;display:flex;align-items:center;gap:11px;margin-bottom:auto}
+  .ey::before{content:"";width:24px;height:2px;background:var(--emerald)}
+  .ey .mut{color:var(--faint);letter-spacing:.16em}
+  h2{font-weight:800;letter-spacing:-.02em;font-size:clamp(24px,4.2vw,48px);line-height:1.04;text-wrap:balance;margin:.32em 0 .5em}
+  h2 em{font-style:normal;color:var(--emerald)}
+  h2 .coral{color:var(--coral)}
+  .sub{font-size:clamp(14px,1.7vw,20px);color:var(--muted);line-height:1.4;max-width:46ch;text-wrap:balance}
+  .fill{flex:1;min-height:0}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:14px;
+    font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em;padding-top:16px}
+  .todo{color:var(--amber);font-weight:600}
+
+  /* cover / section */
+  .cover{justify-content:center}
+  .cover .kick{font-family:var(--mono);font-size:clamp(11px,1.3vw,14px);letter-spacing:.26em;text-transform:uppercase;color:var(--emerald);margin-bottom:20px}
+  .cover h1{font-weight:800;letter-spacing:-.025em;font-size:clamp(32px,6.2vw,74px);line-height:.98;text-wrap:balance;margin-bottom:.4em}
+  .cover h1 .g{color:var(--emerald)}
+  .cover .who{margin-top:clamp(22px,4vw,44px);display:flex;gap:10px 24px;flex-wrap:wrap;align-items:center;font-size:clamp(14px,1.7vw,19px);color:var(--muted)}
+  .cover .who b{color:var(--text);font-weight:700}
+  .cover .who .d{width:5px;height:5px;border-radius:50%;background:var(--emerald)}
+  .section{justify-content:center}
+  .section .no{font-family:var(--mono);font-size:clamp(30px,7vw,90px);font-weight:800;color:var(--emerald);line-height:1;letter-spacing:-.02em}
+  .section h2{font-size:clamp(30px,6vw,64px);margin-top:.1em}
+
+  /* contents */
+  .toc{display:grid;gap:12px;flex:1;align-content:center;max-width:52ch}
+  .toc .row{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}
+  .toc .n{font-family:var(--mono);color:var(--emerald);font-size:18px;font-weight:700}
+  .toc .t{font-size:clamp(16px,2vw,23px);font-weight:600}
+  .toc .t small{display:block;color:var(--muted);font-weight:400;font-size:13px;margin-top:2px}
+
+  /* generic cards / grids */
+  .grid{display:grid;gap:clamp(9px,1.3vw,15px)}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(12px,1.6vw,20px);display:flex;flex-direction:column;gap:6px}
+  .card .ic{font-family:var(--mono);font-size:11px;color:var(--emerald);letter-spacing:.05em;font-weight:600}
+  .card h3{font-size:clamp(13px,1.55vw,18px);font-weight:700;letter-spacing:-.01em}
+  .card p{color:var(--muted);font-size:clamp(11.5px,1.25vw,14px);line-height:1.4}
+  .card.bad{border-color:var(--coral-dim)} .card.bad .ic{color:var(--coral)}
+  .card.good{border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}
+  /* equal-height cards on the 6-up problem/fix grids so slides don't jump on transition */
+  .grid.g3.fill{margin-top:clamp(14px,4vh,46px)}
+  .grid.g3.fill .card{min-height:clamp(96px,13vh,124px);justify-content:center}
+
+  /* one-table / bucket viz */
+  .pilerow{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-content:center;flex:1}
+  .chip{font-family:var(--mono);font-size:clamp(11px,1.3vw,15px);padding:8px 14px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+  .chip.mixed{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05),rgba(255,255,255,.05) 5px,rgba(255,255,255,.02) 5px,rgba(255,255,255,.02) 10px)}
+  .bigtable{border:2px dashed var(--coral-dim);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:9px;align-items:center;width:100%}
+  .bigtable .lab{font-family:var(--mono);font-size:12px;color:var(--coral);letter-spacing:.12em;text-transform:uppercase}
+
+  /* one-table scatter (aesthetic pile) */
+  .tablebox{position:relative;flex:1;min-height:0;width:100%;margin-top:18px;overflow:visible;
+    border:1px solid var(--line);border-radius:22px;
+    background:radial-gradient(120% 150% at 88% -12%,rgba(19,233,137,.07),transparent 55%),var(--surface)}
+  .tablebox .cap{position:absolute;top:-13px;left:26px;z-index:2;background:var(--base-2);border:1px solid var(--line);
+    border-radius:999px;padding:5px 15px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;
+    color:var(--muted);text-transform:uppercase}
+  .dchip{position:absolute;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;
+    background:var(--base-2);border:1px solid var(--line);border-radius:999px;
+    padding:9px 17px;font-weight:700;font-size:clamp(12px,1.45vw,18px);color:var(--text);
+    box-shadow:0 6px 22px rgba(0,0,0,.42)}
+  .dchip svg{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  @media (max-width:680px){.dchip{font-size:11px;padding:6px 11px}}
+
+  /* merged bucket: chips fall into a bottom vessel */
+  .mixviz{flex:1;min-height:0;display:flex;flex-direction:column;margin-top:14px}
+  .fallzone{position:relative;flex:6 1 0;min-height:0}
+  .bucket-bar{flex:4 1 0;border:2px solid var(--coral-dim);border-top:none;border-radius:0 0 20px 20px;background:linear-gradient(180deg,rgba(255,107,107,.03),rgba(255,107,107,.12));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:clamp(10.5px,1.3vw,14px);letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+
+  /* one-bucket funnel viz (slide 7) */
+  .bucketviz{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%}
+  .srcrow{display:flex;flex-wrap:wrap;gap:clamp(6px,1vw,9px);justify-content:center;max-width:92%;margin-bottom:clamp(4px,1vw,10px)}
+  .srcchip{display:inline-flex;align-items:center;gap:7px;background:var(--base-2);border:1px solid var(--line);
+    border-radius:999px;padding:clamp(7px,1vw,10px) clamp(12px,1.5vw,16px);font-weight:700;
+    font-size:clamp(12px,1.4vw,17px);color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.35)}
+  .srcchip svg{width:15px;height:15px;color:var(--muted);flex-shrink:0}
+  .funnel{width:clamp(240px,44vw,460px);height:clamp(46px,7vw,84px);display:block}
+  .funnel .wall{stroke:var(--line-2);stroke-width:2;fill:none}
+  .funnel .flow{stroke:var(--coral);stroke-width:2;opacity:.55;stroke-dasharray:3 5;stroke-linecap:round}
+  .bucket{width:clamp(210px,38vw,400px);border:2px solid var(--coral-dim);border-top:none;
+    border-radius:0 0 18px 18px;background:linear-gradient(180deg,transparent,rgba(255,107,107,.07));
+    padding:clamp(11px,1.5vw,16px);display:flex;flex-direction:column;gap:9px;align-items:center}
+  .bucket .blab{font-family:var(--mono);font-size:clamp(9.5px,1.1vw,12px);letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .bmix{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+  .bmix span{font-family:var(--mono);font-size:clamp(10px,1.15vw,13px);padding:4px 10px;border-radius:7px;color:var(--muted);border:1px solid var(--line);
+    background:repeating-linear-gradient(45deg,rgba(255,255,255,.05),rgba(255,255,255,.05) 5px,rgba(255,255,255,.02) 5px,rgba(255,255,255,.02) 10px)}
+
+  /* split panels */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.2vw,30px);flex:1;align-items:stretch}
+  .split.s3{grid-template-columns:repeat(3,1fr)}
+  .panel{border-radius:16px;padding:clamp(16px,2.2vw,26px);display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);justify-content:center}
+  .panel.a{background:linear-gradient(160deg,var(--emerald-dim),transparent);border-color:rgba(19,233,137,.35)}
+  .panel.b{background:linear-gradient(160deg,rgba(129,253,165,.08),transparent);border-color:rgba(129,253,165,.28)}
+  .panel .tag{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;color:var(--emerald)}
+  .panel .big{font-weight:800;font-size:clamp(19px,2.5vw,30px);line-height:1.08;letter-spacing:-.01em}
+  .panel .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .panel .chips span{font-family:var(--mono);font-size:clamp(10.5px,1.2vw,13px);padding:4px 12px;border-radius:999px;border:1px solid var(--line-2);letter-spacing:.02em;white-space:nowrap}
+  .panel.a .chips span{border-color:rgba(19,233,137,.4);background:rgba(19,233,137,.09);color:var(--emerald)}
+  .panel.b .chips span{border-color:rgba(129,253,165,.38);background:rgba(129,253,165,.08);color:var(--mint)}
+  .panel .deliver{font-size:13px;color:var(--muted)}
+
+  /* fix-slide layout (problem -> fix) */
+  .fix{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(16px,2.4vw,34px);flex:1;align-items:center}
+  .fix .viz{display:flex;flex-direction:column;gap:12px;justify-content:center}
+  .fix .meta{display:grid;gap:14px}
+  .fix .meta .b{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald)}
+  .fix .meta .b span{display:block;color:var(--text);font-family:var(--sans);font-size:clamp(13px,1.5vw,16px);font-weight:500;letter-spacing:0;text-transform:none;margin-top:3px;line-height:1.35}
+  .compare{display:flex;gap:14px;align-items:center;justify-content:center}
+  .stat{text-align:center;padding:clamp(12px,1.8vw,22px);border-radius:14px;border:1px solid var(--line);background:var(--base-2);flex:1}
+  .stat.bad{border-color:var(--coral-dim)} .stat.good{border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}
+  .stat .n{font-weight:800;font-size:clamp(20px,3.2vw,38px);line-height:1;letter-spacing:-.02em}
+  .stat.bad .n{color:var(--coral)} .stat.good .n{color:var(--emerald)}
+  .stat .u{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--faint);text-transform:uppercase;margin-top:7px}
+  .arrowbig{font-size:clamp(20px,2.4vw,30px);color:var(--emerald)}
+
+  /* stat row (3 stats) */
+  .statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,2vw,26px);flex:1;align-items:center}
+  .bigstat{text-align:center}
+  .bigstat .n{font-weight:800;font-size:clamp(34px,6vw,72px);line-height:.95;color:var(--emerald);letter-spacing:-.03em}
+  .bigstat .l{font-size:clamp(12px,1.4vw,16px);color:var(--text);margin-top:12px;line-height:1.3}
+  .bigstat .src{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:8px}
+
+  /* flow */
+  .flow{display:flex;align-items:center;gap:clamp(7px,1.2vw,16px);flex:1;flex-wrap:wrap;justify-content:center}
+  .node{background:var(--base-2);border:1px solid var(--line);border-radius:13px;padding:clamp(11px,1.5vw,18px);text-align:center;min-width:clamp(100px,14vw,170px)}
+  .node .l{font-family:var(--mono);font-size:10.5px;color:var(--emerald);letter-spacing:.08em;text-transform:uppercase}
+  .node .m{font-weight:700;font-size:clamp(13px,1.5vw,18px);margin-top:6px}
+  .node .s{color:var(--faint);font-size:11.5px;margin-top:3px;font-family:var(--mono)}
+  .node.proc{border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}
+  .arrow{color:var(--emerald);font-size:clamp(18px,2.2vw,28px);flex-shrink:0}
+  .fan{display:flex;flex-direction:column;gap:7px}
+  .fan .node{min-width:clamp(150px,20vw,230px);text-align:left;padding:9px 13px}
+  .fan .node .m{font-size:clamp(12px,1.35vw,16px)}
+
+  /* consolidated data-flow diagram (from Data Flow.html) */
+  .dfdomains{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:4px 2px 8px}
+  .dfwrap{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+  .df{display:grid;grid-template-columns:1fr auto 1.05fr auto 1.2fr;gap:clamp(5px,.9vw,13px);align-items:stretch}
+  .dfbox{background:var(--base-2);border:1px solid var(--line);border-radius:14px;padding:clamp(11px,1.5vw,18px);display:flex;flex-direction:column;justify-content:center;gap:8px}
+  .dfbox.proc{border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}
+  .dfbox .l{font-family:var(--mono);font-size:clamp(9.5px,1.05vw,11px);letter-spacing:.08em;text-transform:uppercase;color:var(--emerald)}
+  .dfbox .m{font-weight:700;font-size:clamp(13px,1.5vw,18px);line-height:1.15}
+  .dfbox .sublist{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+  .dfbox .sublist span{font-family:var(--mono);font-size:clamp(9.5px,1.05vw,11.5px);color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+  .dfds{display:flex;flex-direction:column;justify-content:center;gap:clamp(6px,1vw,10px)}
+  .dsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--base-2);border:1px solid var(--line);border-radius:11px;padding:clamp(9px,1.2vw,13px) clamp(11px,1.4vw,15px)}
+  .dsrow .nm{font-family:var(--mono);font-size:clamp(10.5px,1.2vw,14px);color:var(--text)}
+  .dsrow .rt{display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .dsrow .un{font-family:var(--mono);font-size:clamp(10px,1.1vw,12px);color:var(--muted);font-variant-numeric:tabular-nums}
+  .pill{font-family:var(--mono);font-size:clamp(8.5px,.95vw,10px);letter-spacing:.06em;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .pill.mon{background:var(--emerald-dim);color:var(--emerald)}
+  .pill.hi{background:rgba(129,253,165,.16);color:var(--mint)}
+  .pill.comp{background:var(--surface-2);color:var(--muted)}
+  .dfarrow{color:var(--emerald);font-size:clamp(16px,2vw,26px);display:flex;align-items:center;justify-content:center}
+  @media (max-width:680px){.df{grid-template-columns:1fr}.dfarrow{transform:rotate(90deg)}}
+
+  /* aggregated fix matrix (ALT A) */
+  .altbadge{position:absolute;top:clamp(14px,2vw,22px);right:clamp(14px,2vw,22px);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);border:1px solid rgba(129,253,165,.4);border-radius:999px;padding:4px 11px;z-index:5}
+  .fixmatrix{display:grid;grid-template-columns:auto 1fr 1.1fr;gap:1px;flex:1;align-content:stretch;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:8px}
+  .fixmatrix > div{background:var(--base-2);padding:clamp(9px,1.4vw,15px) clamp(11px,1.6vw,18px);display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .fixmatrix .hd{background:var(--surface);font-family:var(--mono);font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);justify-content:flex-end}
+  .fixmatrix .prob{font-family:var(--mono);font-size:clamp(10.5px,1.2vw,14px);color:var(--text);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .fixmatrix .before{color:var(--muted);font-size:clamp(11.5px,1.3vw,15px);line-height:1.3}
+  .fixmatrix .after{color:var(--text);font-size:clamp(11.5px,1.3vw,15px);line-height:1.3}
+  .fixmatrix .after b{color:var(--emerald);font-weight:700}
+  .fixmatrix .before b{color:var(--coral);font-weight:700;font-family:var(--mono)}
+  .fixmatrix .n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  @media (max-width:680px){.fixmatrix{grid-template-columns:1fr}.fixmatrix .hd{display:none}}
+
+  /* code */
+  .code{font-family:var(--mono);background:#0b0b0b;border:1px solid var(--line);border-radius:11px;
+    padding:clamp(11px,1.5vw,17px);font-size:clamp(11px,1.25vw,15px);line-height:1.65;color:var(--text);overflow-x:auto}
+  .code .k{color:var(--emerald)} .code .f{color:#81FDA5} .code .c{color:var(--faint)} .code .st{color:var(--amber)}
+
+  /* maturity ladder */
+  .ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex:1;align-items:end}
+  .rung{background:var(--base-2);border:1px solid var(--line);border-radius:12px 12px 0 0;padding:clamp(11px,1.5vw,18px);display:flex;flex-direction:column;gap:7px;position:relative}
+  .rung .lv{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
+  .rung h4{font-size:clamp(12px,1.45vw,17px);font-weight:700;letter-spacing:-.01em}
+  .rung p{color:var(--muted);font-size:clamp(10.5px,1.15vw,13px);line-height:1.32}
+  .rung.l1{height:52%}.rung.l2{height:68%}.rung.l3{height:84%;border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}.rung.l4{height:100%;border-color:rgba(19,233,137,.5);background:linear-gradient(180deg,rgba(19,233,137,.2),transparent)}
+  .rung.l3 h4,.rung.l4 h4{color:var(--emerald)}
+  .jump{position:absolute;top:-30px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--mint)}
+
+  /* 4-col maturity detail (bulleted) */
+  .mat4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex:1;align-content:stretch}
+  .matcol{background:var(--base-2);border:1px solid var(--line);border-radius:12px;padding:clamp(10px,1.3vw,15px);display:flex;flex-direction:column;gap:6px}
+  .matcol.hi{border-color:rgba(19,233,137,.4);background:var(--emerald-dim)}
+  .matcol .lv{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
+  .matcol h4{font-size:clamp(12px,1.4vw,16px);font-weight:700;letter-spacing:-.01em}
+  .matcol.hi h4{color:var(--emerald)}
+  .matcol ul{list-style:none;display:grid;gap:4px;margin-top:2px}
+  .matcol li{position:relative;padding-left:13px;color:var(--muted);font-size:clamp(9.5px,1.02vw,12px);line-height:1.28}
+  .matcol li::before{content:"";position:absolute;left:2px;top:.5em;width:4px;height:4px;border-radius:1px;background:var(--emerald)}
+
+  /* grouping table */
+  .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:1;align-content:center}
+  .grp{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px 16px;display:grid;gap:6px}
+  .grp .h{font-weight:700;font-size:clamp(14px,1.6vw,18px);color:var(--emerald)}
+  .grp .kv{display:flex;justify-content:space-between;font-size:12.5px;gap:10px}
+  .grp .kv b{font-family:var(--mono);color:var(--faint);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:.05em;align-self:center}
+  .grp .kv span{color:var(--text);text-align:right}
+  .grp .desc{color:var(--muted);font-size:11px;line-height:1.3;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+
+  /* lists */
+  ul.pts{list-style:none;display:grid;gap:10px;margin-top:4px}
+  ul.pts li{position:relative;padding-left:22px;color:var(--muted);font-size:clamp(13px,1.55vw,18px);line-height:1.38}
+  ul.pts li::before{content:"";position:absolute;left:2px;top:.6em;width:7px;height:7px;border-radius:2px;background:var(--emerald)}
+  ul.pts li b{color:var(--text);font-weight:700}
+
+  /* system datasets grid */
+  .sysds{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;flex:1;align-content:center}
+  .sysds .r{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line)}
+  .sysds code{font-family:var(--mono);color:var(--emerald);font-size:clamp(11px,1.3vw,14px);white-space:nowrap}
+  .sysds p{color:var(--muted);font-size:clamp(11px,1.2vw,13px);line-height:1.3}
+
+  /* two-col agent field lists */
+  .fieldcols{display:flex;gap:8px;flex-wrap:wrap}
+  .fieldcols .fc{font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+  .fieldcols .fc.hit{border-color:rgba(19,233,137,.4);background:var(--emerald-dim);color:var(--mint)}
+
+  /* controls */
+  #hud{position:fixed;bottom:15px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:30;pointer-events:none}
+  #dots{display:flex;gap:6px;pointer-events:auto;flex-wrap:wrap;max-width:80vw;justify-content:center}
+  #dots button{width:7px;height:7px;border-radius:50%;border:none;background:var(--line-2);cursor:pointer;padding:0;transition:background .2s,transform .2s}
+  #dots button.on{background:var(--emerald);transform:scale(1.4)}
+  #dots button:focus-visible{outline:2px solid var(--emerald);outline-offset:3px}
+  .navbtn{position:fixed;top:50%;transform:translateY(-50%);z-index:30;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:19px;display:grid;place-items:center;transition:.2s;backdrop-filter:blur(6px)}
+  .navbtn:hover{background:var(--surface-2);color:var(--emerald)}
+  .navbtn:focus-visible{outline:2px solid var(--emerald);outline-offset:2px}
+  #prev{left:14px}#next{right:14px}
+  #counter{position:fixed;top:15px;right:18px;font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.08em;z-index:30}
+  #counter b{color:var(--emerald)}
+  #brand{position:fixed;top:15px;left:18px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--faint);z-index:30;text-transform:uppercase}
+  #brand b{color:var(--text)}
+  #progress{position:fixed;top:0;left:0;height:2px;background:var(--emerald);z-index:31;transition:width .4s ease}
+  #notes{position:fixed;left:0;right:0;bottom:0;max-height:44vh;overflow-y:auto;background:rgba(8,8,8,.98);border-top:1px solid rgba(19,233,137,.4);padding:18px clamp(20px,5vw,60px);z-index:40;transform:translateY(101%);transition:transform .3s ease;font-size:14px;line-height:1.5;color:var(--muted)}
+  #notes.show{transform:none}
+  #notes h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald);margin-bottom:8px}
+  #notes b{color:var(--text)} #notes .fill-flag{color:var(--amber)}
+  #hint{position:fixed;bottom:15px;right:18px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.05em;z-index:30}
+  @media (max-width:680px){.split,.split.s3,.fix{grid-template-columns:1fr}.g3,.g4,.g5,.groups,.ladder,.mat4,.statrow,.sysds{grid-template-columns:1fr 1fr}.flow{flex-direction:column}.arrow{transform:rotate(90deg)}.navbtn{display:none}}
+</style>
+
+<div id="progress"></div>
+<div id="brand"><b>Coralogix</b> · Webinar · mirror of Chris's Slides</div>
+<div id="counter"><b id="cur">01</b> / <span id="tot">00</span></div>
+<div id="stage">
+
+<!-- 1 COVER -->
+<section class="slide cover on" data-notes="Presenters: Lior Redlus + Noam Sheffi. Cover reframed per Ariel: Coralogix is a telemetry data lake ('Databricks for telemetry'), NOT an observability tool and NOT a cheaper Datadog. Lead org-wide (engineering + security + business = Organization Intelligence) and tie operations to business outcomes. On stage, avoid boxing it as 'observability'.">
+  <div class="kick">Coralogix · Live Webinar · 16 July 2026</div>
+  <h1>One governed <span class="g">data lake</span><br>for your whole organization</h1>
+  <div class="sub">Engineering, security, and business data on one foundation, from infrastructure health to business outcomes. With Dataspaces and Datasets.</div>
+  <div class="who"><span><b>Lior Redlus</b></span><span class="d"></span><span><b>Noam Sheffi</b></span></div>
+</section>
+
+<!-- 2 CONTENTS -->
+<section class="slide" data-notes="Set expectations in 20s. Four parts, verbatim from Chris's contents slide.">
+  <div class="ey">Contents <span class="mut">// what we'll cover</span></div>
+  <h2>What we will cover</h2>
+  <div class="toc">
+    <div class="row"><span class="n">01</span><span class="t">How data is managed today</span></div>
+    <div class="row"><span class="n">02</span><span class="t">Dataspaces &amp; Datasets<small>governance, scalable performance, and discoverability</small></span></div>
+    <div class="row"><span class="n">03</span><span class="t">Demo</span></div>
+    <div class="row"><span class="n">04</span><span class="t">Questions</span></div>
+  </div>
+</section>
+
+<!-- BRIDGE OUT OF THE STUCK ZONE -->
+<section class="slide" data-notes="The bridge slide. Same 4 levels one-line, plus the chaos → monetize transition. Bottom line: data chaos / fragmented governance / evaporating results / unattributable cost  →  clarify / govern / operationalize / monetize.">
+  <div class="ey">The bridge <span class="mut">// out of the stuck zone</span></div>
+  <h2>Dataspaces are the bridge<br>out of the <span class="coral">stuck zone</span></h2>
+  <div class="ladder">
+    <div class="rung l1"><div class="lv">Level 1</div><h4>Telemetry</h4><p>Collect logs, metrics, traces.</p></div>
+    <div class="rung l2"><div class="lv">Level 2</div><h4>Engineering intel</h4><p>APM, RED metrics, alerting.</p></div>
+    <div class="rung l3"><div class="jump">◂ the jump ▸</div><div class="lv">Level 3</div><h4>Production intel</h4><p>Flows, SLAs, customer impact.</p></div>
+    <div class="rung l4"><div class="lv">Level 4</div><h4>Business insight</h4><p>Tie operations to revenue &amp; ROI.</p></div>
+  </div>
+  <div class="foot"><span style="color:var(--coral)">Data chaos · fragmented governance · evaporating results · unattributable cost</span><span style="color:var(--emerald)">→ clarify · govern · operationalize · monetize</span></div>
+</section>
+
+<!-- 5 SECTION 01 -->
+<section class="slide section" data-notes="Section divider.">
+  <div class="ey">Section one</div>
+  <div class="no">01</div>
+  <h2>How data is managed today</h2>
+</section>
+
+<!-- MERGED: one table / one bucket (replaces old slides 5 + 7) -->
+<section class="slide" data-notes="Merged slide 5 + 7. Slide-5 visual: named data items tumble into ONE bucket. Focus on logs and traces. Logs business-impact: Payments records, Auth events, Compliance events. Spans/traces (suggested): Checkout traces, Search traces, Cart traces. Chips are deliberately NEUTRAL here, the point is undifferentiated chaos; the green/yellow/blue coding is introduced once governance sorts them (slides 10 + 14). Names match downstream. Open with the DB-one-table analogy, land the observability mirror.">
+  <div class="ey">The reality <span class="mut">// one table, one bucket</span></div>
+  <h2>Today it all lands in <span class="coral">one bucket</span></h2>
+  <div class="sub" style="margin-bottom:14px">Like a database with a single table for everything. Your logs and your traces, business and operational, all in one place with no separation.</div>
+  <div class="mixviz">
+    <div class="fallzone">
+      <div class="dchip" style="top:5%;left:7%;transform:rotate(-4deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Payments records</div>
+      <div class="dchip" style="top:2%;left:44%;transform:rotate(3deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Checkout traces</div>
+      <div class="dchip" style="top:8%;left:75%;transform:rotate(-3deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Auth events</div>
+      <div class="dchip" style="top:34%;left:5%;transform:rotate(4deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search traces</div>
+      <div class="dchip" style="top:30%;left:40%;transform:rotate(-5deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Compliance events</div>
+      <div class="dchip" style="top:37%;left:73%;transform:rotate(3deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Cart traces</div>
+      <div class="dchip" style="top:62%;left:16%;transform:rotate(5deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Payments records</div>
+      <div class="dchip" style="top:64%;left:48%;transform:rotate(-3deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Auth events</div>
+      <div class="dchip" style="top:60%;left:76%;transform:rotate(4deg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search traces</div>
+    </div>
+    <div class="bucket-bar">One bucket &middot; all mixed together</div>
+  </div>
+</section>
+
+<!-- 7 WHAT GOES WRONG (6 problems) -->
+<section class="slide" data-notes="<span class='fill-flag'>TODO (Chris placeholder in Slides): 'ADD POINT ON DIFFERENT TELEM TYPES'</span> — the 6th card (data-types) is the current stand-in. Six failure modes any engineer recognizes. Don't dwell — this is the problem inventory the deck pays off later, one 'Datasets fix that' slide at a time.">
+  <div class="ey">Part one <span class="mut">// what goes wrong</span></div>
+  <h2>One table, six problems</h2>
+  <div class="grid g3 fill" style="align-content:start">
+    <div class="card"><div class="ic" style="color:var(--coral)">PERMISSIONS</div><h3>All or nothing</h3><p>You can't manage permissions on some of the data.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">PERFORMANCE</div><h3>Scans everything</h3><p>Every query scans everything, greatly impacting performance.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">SCHEMA</div><h3>One messy schema</h3><p>The table holds every kind of data at once.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">RESOURCES</div><h3>No prioritization</h3><p>Can't prioritize resources for certain tables over others.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">DISCOVERY</div><h3>Not discoverable</h3><p>Data types are just embedded rows in one table.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">DATA TYPES</div><h3>One type only</h3><p>Only one type of data — timeseries or lookup, but not both.</p></div>
+  </div>
+  <div class="foot"><span>No one would run a production database like this</span><span></span></div>
+</section>
+
+<!-- AGENTS ACCELERATE -->
+<section class="slide" data-notes="The amplifier. A person with a dashboard already has the map. An autonomous agent has no boundaries, so every one of the six problems gets worse: it searches everything and pays a Token Tax for the disorder. Managing data into datasets is token engineering (Lior's framing).">
+  <div class="ey">Part one <span class="mut">// agents accelerate every problem</span></div>
+  <h2>Agents <em>accelerate</em> all six problems</h2>
+  <div class="grid g3 fill" style="align-content:start">
+    <div class="card"><div class="ic" style="color:var(--coral)">PERMISSIONS</div><h3>Now autonomous</h3><p>Can't scope an agent to part of the data.<br>All-or-nothing access, unsupervised.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">PERFORMANCE</div><h3>Many queries, not one</h3><p>Every exploratory step scans everything.<br>An agent fires dozens.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">SCHEMA</div><h3>More to misread</h3><p>The agent reasons over one giant schema.<br>More to read, more to get wrong.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">RESOURCES</div><h3>Runaway load</h3><p>No prioritization.<br>A runaway agent starves the queries that matter.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">DISCOVERY</div><h3>Blind guessing</h3><p>Nothing is discoverable, so the agent guesses.<br>Wildcard searches, wrong turns.</p></div>
+    <div class="card"><div class="ic" style="color:var(--coral)">DATA TYPES</div><h3>Can't tell them apart</h3><p>Timeseries and lookup mixed together, so the agent mixes them up.</p></div>
+  </div>
+  <div class="foot"><span>A person with a dashboard knows where to look. An agent without boundaries searches everything, and every wrong turn is a <b style="color:var(--coral)">Token Tax</b>.</span><span></span></div>
+</section>
+
+<!-- 11 MORE DATA MORE MISTAKES -->
+<section class="slide" data-notes="Credibility stats on why less-but-relevant beats more. Published studies, NOT our benchmarks — say so on stage. Honest framing: 65% is Apple's worst-case model on GSM-NoOp (say 'up to'); 30% is the low end of Chroma's 30-50% range and is about context LENGTH, not burial position; the mid-context finding is Lost in the Middle (the solid one).">
+  <div class="ey">Part one <span class="mut">// more data, more mistakes</span></div>
+  <h2>More data to search through<br>means more <em>mistakes</em></h2>
+  <div class="statrow">
+    <div class="bigstat"><div class="n"><span style="font-size:.4em;font-weight:600;vertical-align:middle;color:var(--muted)">up to </span>65%</div><div class="l">accuracy drop from one added sentence</div><div class="src">Apple · GSM-Symbolic</div></div>
+    <div class="bigstat"><div class="n">30%</div><div class="l">accuracy drop as context grows longer</div><div class="src">Chroma · Context Rot</div></div>
+    <div class="bigstat"><div class="n">Middle</div><div class="l">facts mid-context are missed most</div><div class="src">Lost in the Middle</div></div>
+  </div>
+</section>
+
+<!-- 12 WHAT A GOOD SOLUTION NEEDS (groupings) -->
+<section class="slide" data-notes="Introduce the three datasets we follow for the rest of the deck: Payments records (business), Auth events (security), Compliance events (governance). Each carries its own schema, quota, access and retention, plus a description agents and governance can read. Same trio recurs on every fix slide.">
+
+  <div class="ey">Part one <span class="mut">// what a good solution needs to do</span></div>
+  <h2>Split data into <em>logical groupings</em></h2>
+  <div class="groups">
+    <div class="grp"><div class="h" style="color:var(--dc-pay)">Payments records</div><div class="kv"><b>Schema</b><span>Payment txns</span></div><div class="kv"><b>Quota</b><span>80 GB / day</span></div><div class="kv"><b>Access</b><span>Finance team</span></div><div class="kv"><b>Retention</b><span>1 year</span></div><div class="desc">Every purchase and refund transaction.</div></div>
+    <div class="grp"><div class="h" style="color:var(--dc-auth)">Auth events</div><div class="kv"><b>Schema</b><span>Login events</span></div><div class="kv"><b>Quota</b><span>5 GB / day</span></div><div class="kv"><b>Access</b><span>Security team</span></div><div class="kv"><b>Retention</b><span>1 month</span></div><div class="desc">Every failed or successful login.</div></div>
+    <div class="grp"><div class="h" style="color:var(--dc-comp)">Compliance events</div><div class="kv"><b>Schema</b><span>Audit trail</span></div><div class="kv"><b>Quota</b><span>10 GB / day</span></div><div class="kv"><b>Access</b><span>Compliance team</span></div><div class="kv"><b>Retention</b><span>7 years</span></div><div class="desc">Every access and config change, for audit.</div></div>
+  </div>
+  <div class="foot"><span>Each grouping carries metadata that benefits Agentic interfaces and Governance use cases</span><span></span></div>
+</section>
+
+<!-- 13 SECTION 02 -->
+<section class="slide section" data-notes="Section divider — the solution.">
+  <div class="ey">Section two</div>
+  <div class="no">02</div>
+  <h2>Dataspaces and Datasets</h2>
+</section>
+
+<!-- 14 THE SOLUTION -->
+<section class="slide" data-notes="The reveal. Dataspace = the database (control layer: retention, permissions). Dataset = the table (scoped collection: storage, schema, lifecycle, quota).">
+  <div class="ey">The solution <span class="mut">// like a database, like a table</span></div>
+  <h2>Dataspaces and Datasets</h2>
+  <div class="split">
+    <div class="panel a"><div class="tag">Dataspaces · like a database</div><div class="big">Logical containers</div><div class="deliver">Structured containers that provide organization — the centralized control layer for the datasets inside them.</div><div class="chips"><span>Retention</span><span>Permissions</span></div><div class="deliver" style="color:var(--emerald)">Delivers: governance, attribution, compliance</div></div>
+    <div class="panel b"><div class="tag" style="color:var(--mint)">Datasets · like a table</div><div class="big">Related data collections</div><div class="deliver">Tightly scoped data within a dataspace — segmented by team, service, or environment.</div><div class="chips" style="color:var(--mint)"><span>Storage</span><span>Schema</span><span>Lifecycle</span><span>Quota</span></div><div class="deliver" style="color:var(--mint)">Delivers: clarity, segmentation, isolation</div></div>
+  </div>
+</section>
+
+<!-- 15 STREAMING AND SUMMARY DATASETS (jargon fix applied) -->
+<section class="slide" data-notes="Two dataset types. Streaming = populated by routing, real time. Summary = populated by a Background Query (scheduled/ad-hoc DataPrime query writes results in). This is the jargon-fixed slide.">
+  <div class="ey">The solution <span class="mut">// two kinds of dataset</span></div>
+  <h2>Streaming and Summary datasets</h2>
+  <div class="split">
+    <div class="panel a"><div class="tag">Streaming dataset</div><div class="big">Populated by routing</div><div class="deliver">Data is routed straight in, in real time, as it streams into the platform.</div></div>
+    <div class="panel b"><div class="tag" style="color:var(--mint)">Summary dataset</div><div class="big">Populated by a Background Query</div><div class="deliver">An ad-hoc / scheduled DataPrime query writes its results into it.</div></div>
+  </div>
+</section>
+
+<!-- DATA FLOW (consolidated from Data Flow.html) -->
+<section class="slide" data-notes="Consolidated flow. Ariel's mental model: ALL the organization's data (operational and business) flows into one lake and is governed into datasets, so we say 'raw data', not 'telemetry'. Left = customer domain sends data as-is; middle = TrafficProcessor routes by rule; right = the trio (Payments, Auth events, Compliance events) with units + priority. Routing rules aligned to the trio outputs. NOTE: source design tagged HIGH amber / COMPLIANCE purple; remapped to mint/muted per the palette rule.">
+  <div class="ey">Data flow <span class="mut">// everything in, governed out</span></div>
+  <h2>From raw data to<br>governed <em>Datasets</em></h2>
+  <div class="dfwrap">
+  <div class="dfdomains"><span>◄ Customer domain</span><span>Coralogix domain ►</span></div>
+  <div class="df">
+    <div class="dfbox">
+      <div class="l">Raw data</div><div class="m">Sent as-is</div>
+      <div class="sublist"><span style="color:var(--dc-pay);border-color:rgba(19,233,137,.45)">Payments records</span><span style="color:var(--dc-auth);border-color:rgba(228,184,60,.5)">Auth events</span><span style="color:var(--dc-comp);border-color:rgba(91,158,240,.5)">Compliance events</span><span>Checkout traces</span><span>Search traces</span><span>Cart traces</span></div>
+    </div>
+    <div class="dfarrow">→</div>
+    <div class="dfbox proc">
+      <div class="l">TrafficProcessor</div><div class="m">Routes each record by rule</div>
+      <div class="sublist"><span style="color:var(--dc-pay);border-color:rgba(19,233,137,.45)">$l.applicationName == 'payments' → payments</span><span style="color:var(--dc-auth);border-color:rgba(228,184,60,.5)">$d.event == 'login' → auth</span><span style="color:var(--dc-comp);border-color:rgba(91,158,240,.5)">$d.category == 'audit' → compliance</span></div>
+    </div>
+    <div class="dfarrow">→</div>
+    <div class="dfds">
+      <div class="dsrow" style="border-color:rgba(19,233,137,.35)"><span class="nm" style="color:var(--dc-pay)">default/payments</span><span class="rt"><span class="un">250 units</span><span class="pill" style="color:var(--dc-pay);background:rgba(19,233,137,.15)">MONITORING</span></span></div>
+      <div class="dsrow" style="border-color:rgba(228,184,60,.35)"><span class="nm" style="color:var(--dc-auth)">default/auth_events</span><span class="rt"><span class="un">142 units</span><span class="pill" style="color:var(--dc-auth);background:rgba(228,184,60,.16)">HIGH</span></span></div>
+      <div class="dsrow" style="border-color:rgba(91,158,240,.35)"><span class="nm" style="color:var(--dc-comp)">default/compliance</span><span class="rt"><span class="un">80 units</span><span class="pill" style="color:var(--dc-comp);background:rgba(91,158,240,.16)">COMPLIANCE</span></span></div>
+    </div>
+  </div>
+  </div>
+  <div class="foot"><span>Data leaves the customer environment, gets routed by rule, and lands in the right Dataspace and Dataset</span><span>no re-instrumentation</span></div>
+</section>
+
+<!-- 20 SUMMARY DATASETS -->
+<section class="slide" data-notes="Revised: multiple Background Queries can write into a SINGLE Summary dataset (many-to-one). Each is a scheduled DataPrime query; together they populate one pre-computed dataset. Removed the metrics source chip and the per-row schedule tags. Revenue slices example keeps the business thread.">
+  <div class="ey">Data flow <span class="mut">// summary datasets</span></div>
+  <h2>Multiple Background Queries can write<br>to a single <em>Summary dataset</em></h2>
+  <div class="dfwrap">
+  <div class="dfdomains"><span>◄ Source data</span><span>Written on a schedule ►</span></div>
+  <div class="df">
+    <div class="dfbox">
+      <div class="l">Source data</div><div class="m">Query the lake</div>
+      <div class="sublist"><span>logs</span><span>spans</span></div>
+    </div>
+    <div class="dfarrow">→</div>
+    <div class="dfbox proc">
+      <div class="l">Background Queries</div><div class="m">DataPrime, on a schedule</div>
+      <div class="sublist"><span>revenue by region</span><span>revenue by product</span><span>revenue by day</span></div>
+    </div>
+    <div class="dfarrow">→</div>
+    <div class="dfbox" style="border-color:rgba(129,253,165,.4);background:linear-gradient(160deg,rgba(129,253,165,.08),transparent)">
+      <div class="l" style="color:var(--mint)">Summary dataset</div><div class="m">summary/revenue</div>
+      <div class="sublist"><span>pre-computed</span><span>instant reads</span></div>
+    </div>
+  </div>
+  </div>
+  <div class="foot"><span>Several Background Queries can write into one Summary dataset, pre-computed for instant dashboards</span><span>logs, spans and other entity types</span></div>
+</section>
+
+<!-- FIX MATRIX (aggregated — all six problems, one screen) -->
+<section class="slide" data-notes="The payoff, aggregated. One scannable matrix: each problem from Part One, the one-table 'before', the dataset 'after'. Keeps the whole context on one screen so the callback to the six problems is instant. Walk the rows top to bottom; land 'one primitive, every problem'. Numbers (27.64M → 0.82M) are illustrative scan-reduction — say so.">
+  <div class="ey">Datasets fix that <span class="mut">// all of it, one screen</span></div>
+  <h2>One primitive, <em>every</em> problem fixed</h2>
+  <div class="fixmatrix">
+    <div class="hd"></div><div class="hd">One table</div><div class="hd">With Datasets</div>
+    <div class="prob">Permissions</div><div class="before">All or nothing</div><div class="after"><b>Per-dataset access</b>, inherited defaults</div>
+    <div class="prob">Performance</div><div class="before"><b class="n">27.64M</b> rows scanned</div><div class="after"><b class="n">0.82M</b> rows, scoped scan</div>
+    <div class="prob">Schema</div><div class="before">One giant merged schema</div><div class="after"><b>A schema</b> per dataset</div>
+    <div class="prob">Resources</div><div class="before">No prioritization</div><div class="after"><b>Quota + owner</b> per dataset</div>
+    <div class="prob">Discovery</div><div class="before">Not discoverable</div><div class="after"><b>Searchable catalog</b>, agents included</div>
+    <div class="prob">Data types</div><div class="before">One type only</div><div class="after"><b>A dataset</b> per entity type</div>
+  </div>
+  <div class="foot"><span>The same problems from Part One, answered by one primitive</span><span>Payments &middot; Auth events &middot; Compliance events</span></div>
+</section>
+
+<!-- SYSTEM DATASPACE (merged 23 + 24) -->
+<section class="slide" data-notes="Merged slides 23+24. The system dataspace: Coralogix maintains internal metadata about your own environment, queryable like any other dataset with the source keyword. The eight system datasets are the examples, kept from the 'what is inside' slide. Demo candidates: engine.queries (cost/behavior), dataplan.usage_events (quota). Works in Explore, dashboards, automated reports.">
+  <div class="ey">The solution <span class="mut">// the system dataspace</span></div>
+  <h2>The <em>system</em> dataspace</h2>
+  <div class="code" style="margin-bottom:14px"><span class="k">source</span> system/engine.schema_fields</div>
+  <div class="sysds">
+    <div class="r"><code>aaa.audit_events</code><p>Audit trail of system activity for compliance &amp; access monitoring.</p></div>
+    <div class="r"><code>alerts.history</code><p>History of alert evaluations and trigger events.</p></div>
+    <div class="r"><code>engine.queries</code><p>User query history for introspection &amp; optimization.</p></div>
+    <div class="r"><code>engine.schema_fields</code><p>Field-level schema evolution over time.</p></div>
+    <div class="r"><code>dataplan.usage_events</code><p>Aggregated team data usage, after unit ratios applied.</p></div>
+    <div class="r"><code>dataplan.quota_events</code><p>Quota allocations, consumption, and threshold breaches.</p></div>
+    <div class="r"><code>labs.limit_violations</code><p>Records each time a configured limit is exceeded.</p></div>
+    <div class="r"><code>notification.deliveries</code><p>Notification Center delivery events, successes and failures.</p></div>
+  </div>
+  <div class="foot"><span>Query any of them like any other dataset — Explore, dashboards, automated reports</span><span></span></div>
+</section>
+
+<!-- 29 AGENT DISCOVERABILITY -->
+<section class="slide" data-notes="Callback to the agent problem. Without datasets an agent does a wildcard guess (search *) across every field. With datasets, cx search-fields finds the right field from plain language, bounded to the schema it cares about. The schema command hands the agent its full capabilities as structured data.">
+  <div class="ey">Datasets fix that <span class="mut">// agent discoverability</span></div>
+  <h2>Datasets let an agent <em>discover</em><br>the data that matters</h2>
+  <div class="split">
+    <div class="panel" style="border-color:var(--line-2);background:var(--surface)">
+      <div class="tag" style="color:var(--coral)">Same agent · without datasets</div>
+      <div class="code" style="background:rgba(0,0,0,.3)"><span class="k">search</span> *</div>
+      <div class="fieldcols"><span class="fc">status</span><span class="fc">latency_ms</span><span class="fc">region</span><span class="fc">user_id</span><span class="fc">span_id</span><span class="fc">method</span><span class="fc">bytes</span><span class="fc">host</span><span class="fc">level</span><span class="fc">cache_hit</span></div>
+      <div class="deliver">A wildcard guess across every field.</div>
+    </div>
+    <div class="panel a">
+      <div class="tag">Same agent · with datasets</div>
+      <div class="code" style="background:rgba(0,0,0,.3)"><span class="k">cx</span> search-fields <span class="st">"response time"</span></div>
+      <div class="fieldcols"><span class="fc hit">latency_ms</span><span class="fc hit">duration</span><span class="fc">Payments records →</span><span class="fc hit">latency_ms</span><span class="fc">status</span><span class="fc">service</span></div>
+      <div class="deliver">Finds the right field from plain language, bounded to one dataset's schema.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 30 SCOPED = FEWER TOKENS -->
+<section class="slide" data-notes="Fewer tokens · cleaner context · summarized rows · higher accuracy. Three credibility numbers — 90% (TOON CLI), 17.1% (context engineering, same model), 10-100x (vs raw rows). Sources on-slide.">
+  <div class="ey">The payoff <span class="mut">// less to read, fewer mistakes</span></div>
+  <h2>Scoped datasets: less to read,<br>fewer chances to get it wrong</h2>
+  <div class="statrow">
+    <div class="bigstat"><div class="n">90%</div><div class="l">fewer tokens with the CLI agent output mode, encoded in TOON</div><div class="src">Coralogix CLI · TOON</div></div>
+    <div class="bigstat"><div class="n">17.1%</div><div class="l">accuracy gain from context engineering alone, same model</div><div class="src">Stanford · SambaNova · Berkeley</div></div>
+    <div class="bigstat"><div class="n">10–100×</div><div class="l">fewer tokens than pulling raw rows into context</div><div class="src">Published agent benchmarks</div></div>
+  </div>
+</section>
+
+<!-- 31 36x SLIDE -->
+<section class="slide" data-notes="<span class='fill-flag'>Watch-out: the 36× figure is BORROWED (Kloudfuse) — present as illustrative, not our benchmark.</span> Same model, same question: ~36,000 tokens on raw telemetry (guesses) vs ~1,000 on contextualized data (exact root cause).">
+  <div class="ey">The payoff <span class="mut">// same model, same question</span></div>
+  <h2>The difference of having<br><em>contextualized</em> data</h2>
+  <div class="fix">
+    <div class="viz"><div class="compare">
+      <div class="stat bad"><div class="n">~36k</div><div class="u">tokens · raw telemetry</div></div>
+      <div class="arrowbig">36×</div>
+      <div class="stat good"><div class="n">~1k</div><div class="u">tokens · contextualized</div></div>
+    </div></div>
+    <div class="meta"><div class="b">Raw telemetry<span>"Could be the database… or the network…" — no exact answer.</span></div><div class="b">Contextualized<span>Found the exact root cause!</span></div><div class="b">The point<span>AI-native observability is won or lost at the data layer, long before any model is in the loop.</span></div></div>
+  </div>
+  <div class="foot"><span>Illustrative figure (Kloudfuse), same model both runs</span><span></span></div>
+</section>
+
+<!-- 32 SUMMARY -->
+<section class="slide" data-notes="Close on the data-lake message. Dataspaces & Datasets turn one undivided pile into a governed data lake that scales, built for humans and agents alike.">
+  <div class="ey">In summary <span class="mut">// one governed data lake</span></div>
+  <h2>One governed <em>data lake</em>,<br>for the whole organization</h2>
+  <div class="grid g4 fill" style="align-content:center">
+    <div class="card good"><div class="ic">Organised &amp; governed</div><p>Named domains, each with its own schema, quota, access, and retention.</p></div>
+    <div class="card good"><div class="ic">Scales with volume</div><p>Scoped queries touch one dataset, not the whole pile.<br>Fast at any size.</p></div>
+    <div class="card good"><div class="ic">A queryable data lake</div><p>Streaming &amp; summary datasets keep results reusable and pipeline-ready.</p></div>
+    <div class="card good"><div class="ic">Humans &amp; agents</div><p>Dashboards for people.<br>A searchable catalog and clean context for agents.</p></div>
+  </div>
+  <div class="foot"><span>From one pile, to a lake that everyone, and every agent, can navigate</span><span></span></div>
+</section>
+
+<!-- 33 SECTION 03 DEMO -->
+<section class="slide section" data-notes="Demo section divider. Hand to Noam + Lior. Live in the UI on the Online Boutique account (cleaned of test datasets/BGQs). Two angles: streaming (payments own lane) + engine-queries dataset (cost/perf visibility).">
+  <div class="ey">Section three</div>
+  <div class="no">03</div>
+  <h2>Demo</h2>
+</section>
+
+<!-- 34 QUESTIONS -->
+<section class="slide cover" data-notes="Open the floor. Thank them. Dataspaces & Datasets are GA now.">
+  <div class="kick">Section four · Questions</div>
+  <h1 style="font-size:clamp(60px,14vw,180px)"><span class="g">?</span></h1>
+  <div class="who"><span><b>Lior Redlus</b></span><span class="d"></span><span><b>Noam Sheffi</b></span></div>
+</section>
+
+</div>
+
+<button class="navbtn" id="prev" aria-label="Previous slide">‹</button>
+<button class="navbtn" id="next" aria-label="Next slide">›</button>
+<div id="hud"><div id="dots"></div></div>
+<div id="hint">← → nav · S notes</div>
+<div id="notes"><h4>Speaker notes</h4><div id="notesbody"></div></div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var i=0,N=slides.length;
+  var cur=document.getElementById('cur'),tot=document.getElementById('tot');
+  var prog=document.getElementById('progress'),notes=document.getElementById('notes'),nb=document.getElementById('notesbody'),dw=document.getElementById('dots');
+  tot.textContent=String(N).padStart(2,'0');
+  slides.forEach(function(s,idx){var b=document.createElement('button');b.setAttribute('aria-label','Slide '+(idx+1));b.addEventListener('click',function(){go(idx)});dw.appendChild(b)});
+  var dots=[].slice.call(dw.children);
+  function render(){slides.forEach(function(s,idx){s.classList.toggle('on',idx===i)});dots.forEach(function(d,idx){d.classList.toggle('on',idx===i)});cur.textContent=String(i+1).padStart(2,'0');prog.style.width=((i+1)/N*100)+'%';nb.innerHTML=slides[i].getAttribute('data-notes')||'<i>No notes.</i>'}
+  function go(n){i=Math.max(0,Math.min(N-1,n));render()}
+  function next(){go(i+1)}function prev(){go(i-1)}
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next()}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+    else if(e.key==='Home'){go(0)}else if(e.key==='End'){go(N-1)}
+    else if(e.key.toLowerCase()==='s'){notes.classList.toggle('show')}
+    else if(e.key==='Escape'){notes.classList.remove('show')}
+  });
+  var x0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50){dx<0?next():prev()}x0=null},{passive:true});
+  render();
+})();
+</script>
