@@ -189,7 +189,7 @@
   .fixmatrix > div{background:var(--base-2);padding:clamp(9px,1.4vw,15px) clamp(11px,1.6vw,18px);display:flex;flex-direction:column;justify-content:center;gap:3px}
   .fixmatrix .hd{background:var(--surface);font-family:var(--mono);font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);justify-content:flex-end}
   .fixmatrix .prob{font-family:var(--mono);font-size:clamp(10.5px,1.2vw,14px);color:var(--text);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-  .fixmatrix .before{color:var(--muted);font-size:clamp(11.5px,1.3vw,15px);line-height:1.3}
+  .fixmatrix .before{color:var(--coral);font-size:clamp(11.5px,1.3vw,15px);line-height:1.3}
   .fixmatrix .after{color:var(--text);font-size:clamp(11.5px,1.3vw,15px);line-height:1.3}
   .fixmatrix .after b{color:var(--emerald);font-weight:700}
   .fixmatrix .before b{color:var(--coral);font-weight:700;font-family:var(--mono)}
@@ -430,7 +430,7 @@
     </div>
     <div class="dfarrow">→</div>
     <div class="dfbox" style="border-color:#363636;background:#1A1A1A">
-      <div class="l">TrafficProcessor</div><div class="m">Routes each record by rule</div>
+      <div class="l">Traffic Processor</div><div class="m">Routes each record by rule</div>
       <div class="sublist"><span style="color:var(--dc-pay);border-color:rgba(19,233,137,.45)">$l.applicationName == 'payments' → payments</span><span style="color:var(--dc-auth);border-color:rgba(228,184,60,.5)">$d.event == 'login' → auth</span><span style="color:var(--dc-comp);border-color:rgba(91,158,240,.5)">$d.category == 'audit' → compliance</span></div>
     </div>
     <div class="dfarrow">→</div>
@@ -475,8 +475,8 @@
   <div class="ey">Datasets fix that <span class="mut">// all of it, one screen</span></div>
   <h2>One primitive, <em>every</em> problem fixed</h2>
   <div class="fixmatrix">
-    <div class="hd"></div><div class="hd">One table</div><div class="hd">With Datasets</div>
-    <div class="prob">Permissions</div><div class="before">All or nothing</div><div class="after"><b>Per-dataset access</b>, inherited defaults</div>
+    <div class="hd"></div><div class="hd" style="color:#7E7E7E">One table</div><div class="hd">With Datasets</div>
+    <div class="prob">Permissions</div><div class="before">All or nothing</div><div class="after"><b>Per-dataset access</b> inherited defaults</div>
     <div class="prob">Performance</div><div class="before"><b class="n">27.64M</b> rows scanned</div><div class="after"><b class="n">0.82M</b> rows, scoped scan</div>
     <div class="prob">Schema</div><div class="before">One giant merged schema</div><div class="after"><b>A schema</b> per dataset</div>
     <div class="prob">Resources</div><div class="before">No prioritization</div><div class="after"><b>Quota + owner</b> per dataset</div>
@@ -484,24 +484,6 @@
     <div class="prob">Data types</div><div class="before">One type only</div><div class="after"><b>A dataset</b> per entity type</div>
   </div>
   <div class="foot"><span>The same problems from Part One, answered by one primitive</span><span>Payments &middot; Auth events &middot; Compliance events</span></div>
-</section>
-
-<!-- SYSTEM DATASPACE (merged 23 + 24) -->
-<section class="slide" data-notes="Merged slides 23+24. The system dataspace: Coralogix maintains internal metadata about your own environment, queryable like any other dataset with the source keyword. The eight system datasets are the examples, kept from the 'what is inside' slide. Demo candidates: engine.queries (cost/behavior), dataplan.usage_events (quota). Works in Explore, dashboards, automated reports.">
-  <div class="ey">The solution <span class="mut">// the system dataspace</span></div>
-  <h2>The <em>system</em> dataspace</h2>
-  <div class="code" style="margin-bottom:14px"><span class="k">source</span> system/engine.schema_fields</div>
-  <div class="sysds">
-    <div class="r"><code>aaa.audit_events</code><p>Audit trail of system activity for compliance &amp; access monitoring.</p></div>
-    <div class="r"><code>alerts.history</code><p>History of alert evaluations and trigger events.</p></div>
-    <div class="r"><code>engine.queries</code><p>User query history for introspection &amp; optimization.</p></div>
-    <div class="r"><code>engine.schema_fields</code><p>Field-level schema evolution over time.</p></div>
-    <div class="r"><code>dataplan.usage_events</code><p>Aggregated team data usage, after unit ratios applied.</p></div>
-    <div class="r"><code>dataplan.quota_events</code><p>Quota allocations, consumption, and threshold breaches.</p></div>
-    <div class="r"><code>labs.limit_violations</code><p>Records each time a configured limit is exceeded.</p></div>
-    <div class="r"><code>notification.deliveries</code><p>Notification Center delivery events, successes and failures.</p></div>
-  </div>
-  <div class="foot"><span>Query any of them like any other dataset — Explore, dashboards, automated reports</span><span></span></div>
 </section>
 
 <!-- AGENT PAYOFF (merged: discoverability + fewer tokens + contextualized 36×) -->
@@ -528,6 +510,24 @@
     </div>
   </div>
   <div class="foot"><span>Illustrative figures (36× = Kloudfuse), same model both runs</span><span>AI-native observability is won or lost at the data layer</span></div>
+</section>
+
+<!-- SYSTEM DATASPACE (merged 23 + 24) -->
+<section class="slide" data-notes="Merged slides 23+24. The system dataspace: Coralogix maintains internal metadata about your own environment, queryable like any other dataset with the source keyword. The eight system datasets are the examples, kept from the 'what is inside' slide. Demo candidates: engine.queries (cost/behavior), dataplan.usage_events (quota). Works in Explore, dashboards, automated reports.">
+  <div class="ey">The solution <span class="mut">// the system dataspace</span></div>
+  <h2>The <em>system</em> dataspace</h2>
+  <div class="code" style="margin-bottom:14px"><span class="k">source</span> system/engine.schema_fields</div>
+  <div class="sysds">
+    <div class="r"><code>aaa.audit_events</code><p>Audit trail of system activity for compliance &amp; access monitoring.</p></div>
+    <div class="r"><code>alerts.history</code><p>History of alert evaluations and trigger events.</p></div>
+    <div class="r"><code>engine.queries</code><p>User query history for introspection &amp; optimization.</p></div>
+    <div class="r"><code>engine.schema_fields</code><p>Field-level schema evolution over time.</p></div>
+    <div class="r"><code>dataplan.usage_events</code><p>Aggregated team data usage, after unit ratios applied.</p></div>
+    <div class="r"><code>dataplan.quota_events</code><p>Quota allocations, consumption, and threshold breaches.</p></div>
+    <div class="r"><code>labs.limit_violations</code><p>Records each time a configured limit is exceeded.</p></div>
+    <div class="r"><code>notification.deliveries</code><p>Notification Center delivery events, successes and failures.</p></div>
+  </div>
+  <div class="foot"><span>Query any of them like any other dataset — Explore, dashboards, automated reports</span><span></span></div>
 </section>
 
 <!-- 32 SUMMARY -->
