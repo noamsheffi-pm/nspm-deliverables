@@ -44,7 +44,7 @@
 </header>
 <main>
   <div class="svg-wrap">
-    <svg id="diagram" viewBox="0 0 1060 1080" role="img" aria-label="Generic Events V2 Citadel ingestion flow diagram"></svg>
+    <svg id="diagram" viewBox="0 0 1000 1100" role="img" aria-label="Generic Events V2 Citadel ingestion flow diagram"></svg>
   </div>
 </main>
 <footer>
@@ -69,23 +69,23 @@ const TYPES = {
   decision:   { fill:'#2e1a3d', stroke:'#A855F7' },
   governance: { fill:'#0c2419', stroke:'#22dd92' },
 };
-const W = 200, H = 60;
+const W = 250, H = 62;
 const nodes = [
-  { id:'n1',  x:460, y:20,  type:'trigger',    label:'Upstream producers',     sub:'DataPrime bulk-ingest · Radiant · alerts' },
-  { id:'n2',  x:460, y:115, type:'store',      label:'dataprime-bulks-ingest', sub:'Kafka — Citadel input topic' },
-  { id:'n3',  x:460, y:210, type:'processing', label:'Parse (dataset-ingress)',sub:'validate msg · dead-letter on fail' },
-  { id:'n4',  x:460, y:305, type:'service',    label:'Dataset-rule match',     sub:'ws-datasets — location + pillar/entityType' },
-  { id:'n5',  x:460, y:400, type:'decision',   label:'Quota / block decision', sub:'per-target enforcement' },
-  { id:'n6',  x:780, y:360, type:'output',     label:'Hard drop',              sub:'no data, no metering' },
-  { id:'n7',  x:780, y:445, type:'output',     label:'Soft drop',              sub:'dropped, still metered' },
-  { id:'n8',  x:460, y:510, type:'governance', label:'Data-usage metering',    sub:'emit BulkSizesEvent' },
-  { id:'n9',  x:780, y:530, type:'service',    label:'Halo · Data Usage',      sub:'billing / quota accounting' },
-  { id:'n10', x:460, y:605, type:'decision',   label:'TCO priority filter',    sub:'drop blocked priorityClass' },
-  { id:'n11', x:460, y:700, type:'store',      label:'generic-events-v2',      sub:'VALIDATED · ENRICHED · ROUTED' },
-  { id:'n15', x:780, y:700, type:'service',    label:'Error-tracking tap (Zvika)', sub:'reads V2 · derives events' },
-  { id:'n12', x:460, y:795, type:'service',    label:'stage-writer',           sub:'write Parquet to bucket' },
-  { id:'n13', x:460, y:890, type:'store',      label:'Object store',           sub:'customer S3 / IBM COS / internal' },
-  { id:'n14', x:460, y:985, type:'service',    label:'Compaction → metastore', sub:'L0→L3 · datasets-tracker registers' },
+  { id:'n1',  x:330, y:20,  type:'trigger',    label:'Upstream producers',     sub:'DataPrime bulk-ingest · Radiant · alerts' },
+  { id:'n2',  x:330, y:115, type:'store',      label:'dataprime-bulks-ingest', sub:'Kafka — Citadel input topic' },
+  { id:'n3',  x:330, y:210, type:'processing', label:'Parse (dataset-ingress)',sub:'validate msg · dead-letter on fail' },
+  { id:'n4',  x:330, y:305, type:'service',    label:'Dataset-rule match',     sub:'ws-datasets — location + pillar/entityType' },
+  { id:'n5',  x:330, y:400, type:'decision',   label:'Quota / block decision', sub:'per-target enforcement' },
+  { id:'n6',  x:700, y:360, type:'output',     label:'Hard drop',              sub:'no data, no metering' },
+  { id:'n7',  x:700, y:445, type:'output',     label:'Soft drop',              sub:'dropped, still metered' },
+  { id:'n8',  x:330, y:510, type:'governance', label:'Data-usage metering',    sub:'emit BulkSizesEvent' },
+  { id:'n9',  x:700, y:530, type:'service',    label:'Halo · Data Usage',      sub:'billing / quota accounting' },
+  { id:'n10', x:330, y:605, type:'decision',   label:'TCO priority filter',    sub:'drop blocked priorityClass' },
+  { id:'n11', x:330, y:700, type:'store',      label:'generic-events-v2',      sub:'VALIDATED · ENRICHED · ROUTED' },
+  { id:'n15', x:700, y:700, type:'service',    label:'Error-tracking tap (Zvika)', sub:'reads V2 · derives events' },
+  { id:'n12', x:330, y:795, type:'service',    label:'stage-writer',           sub:'write Parquet to bucket' },
+  { id:'n13', x:330, y:890, type:'store',      label:'Object store',           sub:'customer S3 / IBM COS / internal' },
+  { id:'n14', x:330, y:985, type:'service',    label:'Compaction → metastore', sub:'L0→L3 · datasets-tracker registers' },
 ];
 const edges = [
   { f:'n1',  t:'n2',  label:'DatasetIngestMessage' },
