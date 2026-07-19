@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generic Events V2 — Citadel Ingestion Flow</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #000000;
+    background-image: radial-gradient(ellipse at top, rgba(34,221,146,0.05), transparent 60%);
+    color: #fff; min-height: 100vh;
+  }
+  header { padding: 28px 32px 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background: #22dd92; box-shadow: 0 0 16px rgba(34,221,146,0.5); }
+  .brand span { font-weight: 600; letter-spacing: .3px; color: #fff; }
+  h1 { margin: 0 0 6px; font-size: 24px; }
+  .sub { color: #a1a1aa; font-size: 14px; max-width: 900px; line-height: 1.5; }
+  main { padding: 8px 16px 0; }
+  .svg-wrap { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 14px; overflow-x: auto; padding: 8px; }
+  svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  g.node { cursor: pointer; }
+  g.node rect { transition: opacity .3s ease, stroke-width .15s ease; }
+  g.node text { transition: opacity .3s ease; pointer-events: none; }
+  g.edge { transition: opacity .3s ease; }
+  .dimmed { opacity: 0.18; }
+  g.node:hover rect { stroke-width: 3.5; filter: url(#glow); }
+  footer { padding: 20px 32px 40px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px 22px; margin-bottom: 14px; }
+  .legend div { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #d4d4d8; }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; }
+  .source { color: #52525b; font-size: 12px; }
+  .hint { color: #52525b; font-size: 12px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="dot"></div><span>Coralogix · NSPM</span></div>
+  <h1>Generic Events V2 — Citadel Ingestion Flow</h1>
+  <p class="sub">How an event travels from the raw ingest topic through <b>dataset-ingress</b> (rule match → quota/block → metering → TCO filter) onto <code>archive_write.generic-events-v2</code>, then to storage and downstream consumers. V2 is the "everything decided, nothing written yet" hand-off. Click any node to isolate its connections.</p>
+</header>
+<main>
+  <div class="svg-wrap">
+    <svg id="diagram" viewBox="0 0 1060 1080" role="img" aria-label="Generic Events V2 Citadel ingestion flow diagram"></svg>
+  </div>
+</main>
+<footer>
+  <div class="legend">
+    <div><span class="swatch" style="border-color:#22dd92;background:#0c2419"></span>Trigger / Governance</div>
+    <div><span class="swatch" style="border-color:#1ab677;background:#0c2419"></span>Processing</div>
+    <div><span class="swatch" style="border-color:#F59E0B;background:#3d2e1a"></span>Service / System</div>
+    <div><span class="swatch" style="border-color:#EF4444;background:#3d1a1a"></span>Output (drop / bill)</div>
+    <div><span class="swatch" style="border-color:#6366F1;background:#1a1a2e"></span>Data Store / Topic</div>
+    <div><span class="swatch" style="border-color:#A855F7;background:#2e1a3d"></span>Decision</div>
+  </div>
+  <div class="source">Generated from: archive-ingestion repo (dataset-ingress: event_handler.rs, converter.rs; stage-writer; INGEST_TO_DATASET_PLAN.md) · 2026-07-19 · see [[generic-events-v2-citadel-flow]]</div>
+  <div class="hint">Click a node to highlight its direct connections · click empty space to reset</div>
+</footer>
+<script>
+const TYPES = {
+  trigger:    { fill:'#0c2419', stroke:'#22dd92' },
+  processing: { fill:'#0c2419', stroke:'#1ab677' },
+  service:    { fill:'#3d2e1a', stroke:'#F59E0B' },
+  output:     { fill:'#3d1a1a', stroke:'#EF4444' },
+  store:      { fill:'#1a1a2e', stroke:'#6366F1' },
+  decision:   { fill:'#2e1a3d', stroke:'#A855F7' },
+  governance: { fill:'#0c2419', stroke:'#22dd92' },
+};
+const W = 200, H = 60;
+const nodes = [
+  { id:'n1',  x:460, y:20,  type:'trigger',    label:'Upstream producers',     sub:'DataPrime bulk-ingest · Radiant · alerts' },
+  { id:'n2',  x:460, y:115, type:'store',      label:'dataprime-bulks-ingest', sub:'Kafka — Citadel input topic' },
+  { id:'n3',  x:460, y:210, type:'processing', label:'Parse (dataset-ingress)',sub:'validate msg · dead-letter on fail' },
+  { id:'n4',  x:460, y:305, type:'service',    label:'Dataset-rule match',     sub:'ws-datasets — location + pillar/entityType' },
+  { id:'n5',  x:460, y:400, type:'decision',   label:'Quota / block decision', sub:'per-target enforcement' },
+  { id:'n6',  x:780, y:360, type:'output',     label:'Hard drop',              sub:'no data, no metering' },
+  { id:'n7',  x:780, y:445, type:'output',     label:'Soft drop',              sub:'dropped, still metered' },
+  { id:'n8',  x:460, y:510, type:'governance', label:'Data-usage metering',    sub:'emit BulkSizesEvent' },
+  { id:'n9',  x:780, y:530, type:'service',    label:'Halo · Data Usage',      sub:'billing / quota accounting' },
+  { id:'n10', x:460, y:605, type:'decision',   label:'TCO priority filter',    sub:'drop blocked priorityClass' },
+  { id:'n11', x:460, y:700, type:'store',      label:'generic-events-v2',      sub:'VALIDATED · ENRICHED · ROUTED' },
+  { id:'n15', x:780, y:700, type:'service',    label:'Error-tracking tap (Zvika)', sub:'reads V2 · derives events' },
+  { id:'n12', x:460, y:795, type:'service',    label:'stage-writer',           sub:'write Parquet to bucket' },
+  { id:'n13', x:460, y:890, type:'store',      label:'Object store',           sub:'customer S3 / IBM COS / internal' },
+  { id:'n14', x:460, y:985, type:'service',    label:'Compaction → metastore', sub:'L0→L3 · datasets-tracker registers' },
+];
+const edges = [
+  { f:'n1',  t:'n2',  label:'DatasetIngestMessage' },
+  { f:'n2',  t:'n3',  label:'consume' },
+  { f:'n3',  t:'n4',  label:'parsed entries + targets' },
+  { f:'n4',  t:'n5',  label:'location + pillar/entityType + quota + internal' },
+  { f:'n5',  t:'n6',  label:'blocked · quota+system' },
+  { f:'n5',  t:'n7',  label:'quota hit · non-system' },
+  { f:'n5',  t:'n8',  label:'kept (internal always)' },
+  { f:'n7',  t:'n9',  label:'blocked usage' },
+  { f:'n8',  t:'n9',  label:'BulkSizesEvent' },
+  { f:'n8',  t:'n10', label:'metered events' },
+  { f:'n10', t:'n11', label:'→ GenericEventV2' },
+  { f:'n11', t:'n15', label:'tap V2' },
+  { f:'n11', t:'n12', label:'consume V2' },
+  { f:'n12', t:'n13', label:'Parquet v1/v3' },
+  { f:'n13', t:'n14', label:'L0→L3' },
+];
+const NM = Object.fromEntries(nodes.map(n=>[n.id,n]));
+const adj = {};
+nodes.forEach(n=>adj[n.id]=new Set([n.id]));
+edges.forEach(e=>{ adj[e.f].add(e.t); adj[e.t].add(e.f); });
+
+const svg = document.getElementById('diagram');
+const NS='http://www.w3.org/2000/svg';
+function el(t,a){ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); return e; }
+
+// defs: arrow markers per color + glow
+const defs = el('defs',{});
+const markerColors = {'#22dd92':'m_mint','#1ab677':'m_mintd','#F59E0B':'m_amber','#EF4444':'m_red','#6366F1':'m_indigo','#A855F7':'m_purple'};
+for(const c in markerColors){
+  const m = el('marker',{id:markerColors[c],markerWidth:9,markerHeight:9,refX:7,refY:3,orient:'auto',markerUnits:'strokeWidth'});
+  m.appendChild(el('path',{d:'M0,0 L7,3 L0,6 Z',fill:c}));
+  defs.appendChild(m);
+}
+const f = el('filter',{id:'glow',x:'-50%',y:'-50%',width:'200%',height:'200%'});
+const fb = el('feGaussianBlur',{stdDeviation:3,result:'b'}); f.appendChild(fb);
+const fl=el('feFlood',{'flood-color':'#22dd92','flood-opacity':'0.6',result:'c'}); f.appendChild(fl);
+const fc=el('feComposite',{in:'c',in2:'b',operator:'in',result:'g'}); f.appendChild(fc);
+const mg=el('feMerge',{}); mg.appendChild(el('feMergeNode',{in:'g'})); mg.appendChild(el('feMergeNode',{in:'SourceGraphic'})); f.appendChild(mg);
+defs.appendChild(f);
+svg.appendChild(defs);
+
+const edgeLayer = el('g',{}); svg.appendChild(edgeLayer);
+const nodeLayer = el('g',{}); svg.appendChild(nodeLayer);
+
+function ports(n){ return {
+  top:[n.x+W/2, n.y], bottom:[n.x+W/2, n.y+H], left:[n.x, n.y+H/2], right:[n.x+W, n.y+H/2]
+};}
+
+edges.forEach(e=>{
+  const a=NM[e.f], b=NM[e.t]; const pa=ports(a), pb=ports(b);
+  let p1,p2,path;
+  if(a.x===b.x){ // vertical spine or side
+    p1=pa.bottom; p2=pb.top; path=`M${p1[0]},${p1[1]} L${p2[0]},${p2[1]}`;
+  } else if(b.x>a.x){ // branch to the right
+    p1=pa.right; p2=pb.left;
+    path=`M${p1[0]},${p1[1]} C${p1[0]+45},${p1[1]} ${p2[0]-45},${p2[1]} ${p2[0]},${p2[1]}`;
+  } else {
+    p1=pa.left; p2=pb.right;
+    path=`M${p1[0]},${p1[1]} C${p1[0]-45},${p1[1]} ${p2[0]+45},${p2[1]} ${p2[0]},${p2[1]}`;
+  }
+  const color=TYPES[a.type].stroke;
+  const g=el('g',{class:'edge','data-f':e.f,'data-t':e.t});
+  g.appendChild(el('path',{d:path,fill:'none',stroke:color,'stroke-width':1.6,'marker-end':`url(#${markerColors[color]})`,opacity:0.85}));
+  const mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+  const tw=e.label.length*5.6+10;
+  g.appendChild(el('rect',{x:mx-tw/2,y:my-9,width:tw,height:16,rx:4,fill:'#0a0a0a',opacity:0.9}));
+  const t=el('text',{x:mx,y:my+3,'text-anchor':'middle','font-size':10.5,fill:'#a1a1aa'}); t.textContent=e.label;
+  g.appendChild(t);
+  edgeLayer.appendChild(g);
+});
+
+nodes.forEach(n=>{
+  const c=TYPES[n.type];
+  const g=el('g',{class:'node','data-id':n.id,role:'img','aria-label':`${n.label}: ${n.sub}`});
+  g.appendChild(el('rect',{x:n.x,y:n.y,width:W,height:H,rx:12,fill:c.fill,stroke:c.stroke,'stroke-width':2}));
+  const t1=el('text',{x:n.x+W/2,y:n.y+26,'text-anchor':'middle','font-size':13.5,'font-weight':700,fill:'#fff'}); t1.textContent=n.label;
+  g.appendChild(t1);
+  const t2=el('text',{x:n.x+W/2,y:n.y+45,'text-anchor':'middle','font-size':10.5,fill:'#fff',opacity:0.72}); t2.textContent=n.sub;
+  g.appendChild(t2);
+  nodeLayer.appendChild(g);
+});
+
+function reset(){ document.querySelectorAll('.node,.edge').forEach(x=>x.classList.remove('dimmed')); }
+svg.addEventListener('click',ev=>{
+  const g=ev.target.closest('g.node');
+  if(!g){ reset(); return; }
+  const id=g.getAttribute('data-id'); const keep=adj[id];
+  document.querySelectorAll('g.node').forEach(n=> n.classList.toggle('dimmed', !keep.has(n.getAttribute('data-id'))));
+  document.querySelectorAll('g.edge').forEach(e=>{
+    const on = keep.has(e.getAttribute('data-f')) && keep.has(e.getAttribute('data-t')) && (e.getAttribute('data-f')===id||e.getAttribute('data-t')===id);
+    e.classList.toggle('dimmed', !on);
+  });
+});
+</script>
+</body>
+</html>
