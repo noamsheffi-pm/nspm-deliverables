@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I Use My Agents</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-alt: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --code-bg: #050505;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #22dd92;
+    --mint-dim: #1ab677;
+    --mint-soft: rgba(34, 221, 146, 0.15);
+    --mint-faint: rgba(34, 221, 146, 0.06);
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(34, 221, 146, 0.06), transparent 60%),
+      var(--bg);
+  }
+
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw 9vh;
+  }
+  .slide {
+    display: none;
+    width: min(100%, 1280px);
+    height: min(100%, 720px);
+    aspect-ratio: 16 / 9;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 56px 72px;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .slide.lead { justify-content: center; text-align: left; }
+  .slide.lead::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 20% 30%, rgba(34,221,146,0.10), transparent 55%);
+    pointer-events: none;
+  }
+  .slide.invert { background: var(--mint); color: #03110b; }
+  .slide.invert .kicker { color: #03110b; opacity: .7; }
+
+  .kicker {
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--mint); font-weight: 700; margin-bottom: 20px;
+  }
+  h1 { font-size: 54px; line-height: 1.08; font-weight: 800; letter-spacing: -.02em; }
+  h1 .accent { color: var(--mint); }
+  h2 { font-size: 38px; line-height: 1.12; font-weight: 800; letter-spacing: -.01em; margin-bottom: 26px; }
+  .sub { font-size: 23px; color: var(--text-2); margin-top: 18px; font-weight: 500; line-height: 1.35; max-width: 34ch; }
+  .sub b { color: var(--mint); font-weight: 700; }
+
+  ul { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+  li {
+    font-size: 23px; line-height: 1.4; color: var(--text); padding-left: 30px; position: relative;
+  }
+  li::before {
+    content: ""; position: absolute; left: 0; top: 13px;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--mint);
+    box-shadow: 0 0 12px rgba(34,221,146,.5);
+  }
+  li b { color: var(--mint); font-weight: 700; }
+
+  .callout {
+    margin-top: 26px; padding: 18px 24px; border-left: 3px solid var(--mint);
+    background: var(--mint-faint); border-radius: 8px; font-size: 21px; color: var(--text-2); line-height: 1.4;
+  }
+  .callout b { color: #fff; }
+
+  /* the loop cycle */
+  .cycle { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .cyc-node {
+    background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 12px;
+    padding: 18px 22px; text-align: center; min-width: 150px;
+  }
+  .cyc-node .step { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; }
+  .cyc-node .what { font-size: 19px; font-weight: 700; color: #fff; }
+  .cyc-node.me { border-color: var(--mint-dim); background: var(--mint-faint); }
+  .cyc-node.me .what { color: var(--mint); }
+  .cyc-arrow { font-size: 26px; color: var(--mint); line-height: 1; }
+  .cyc-loop { margin-top: 18px; text-align: center; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+  .cyc-loop b { color: var(--mint); }
+
+  /* cast grid */
+  .cast { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 22px; margin-top: 8px; }
+  .card { display: flex; align-items: baseline; gap: 12px; padding: 12px 16px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; }
+  .card .nm { flex: 0 0 84px; font-size: 19px; font-weight: 800; color: var(--mint); }
+  .card .jb { font-size: 17px; color: var(--text-2); line-height: 1.3; }
+
+  /* grammar table */
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th, td { text-align: left; padding: 13px 20px; font-size: 22px; border-bottom: 1px solid var(--border); }
+  th { color: var(--mint); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+  td:first-child { width: 200px; }
+  tr:last-child td { border-bottom: none; }
+
+  /* maturity ladder */
+  .ladder { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+  .rung { display: flex; align-items: center; gap: 18px; }
+  .rung .num { flex: 0 0 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; background: var(--mint-soft); color: var(--mint); border: 1px solid var(--mint-dim); }
+  .rung .name { flex: 0 0 210px; font-size: 21px; font-weight: 700; color: #fff; }
+  .rung .desc { font-size: 19px; color: var(--text-2); line-height: 1.3; }
+
+  /* morning timeline */
+  .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 6px; }
+  .tl-row { display: flex; align-items: flex-start; gap: 20px; padding: 12px 0; border-left: 2px solid var(--border-strong); padding-left: 26px; position: relative; }
+  .tl-row::before { content: ""; position: absolute; left: -7px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px rgba(34,221,146,.5); }
+  .tl-row .clock { flex: 0 0 74px; font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--mint); }
+  .tl-row .act { font-size: 20px; color: var(--text); line-height: 1.3; }
+  .tl-row.mine { border-left-color: var(--mint-dim); }
+  .tl-row.mine .act { color: var(--mint); font-weight: 700; }
+
+  code, .mono { font-family: var(--mono); background: var(--code-bg); padding: 2px 8px; border-radius: 6px; color: var(--mint); font-size: .9em; }
+
+  .tag { position: absolute; top: 28px; right: 32px; font-size: 13px; color: var(--text-muted); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+  .brand { position: absolute; top: 28px; left: 32px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); letter-spacing: .04em; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px rgba(34,221,146,.6); }
+  .invert .dot { background: #03110b; box-shadow: none; }
+  .invert .brand { color: #03110b; }
+
+  .navbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 7vh; min-height: 48px;
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    background: rgba(0,0,0,.6); border-top: 1px solid var(--border); backdrop-filter: blur(8px); z-index: 10;
+  }
+  .navbar button {
+    background: var(--surface-alt); color: var(--text); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 8px 18px; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); transition: .15s;
+  }
+  .navbar button:hover { border-color: var(--mint-dim); color: var(--mint); }
+  .navbar button:disabled { opacity: .3; cursor: default; }
+  .counter { font-size: 14px; color: var(--text-2); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--mint); z-index: 20; transition: width .3s; box-shadow: 0 0 10px rgba(34,221,146,.6); }
+
+  .notes {
+    position: fixed; bottom: 7vh; left: 0; right: 0; max-height: 32vh; overflow-y: auto;
+    background: rgba(5,5,5,.96); border-top: 1px solid var(--mint-dim); padding: 18px 32px;
+    font-size: 16px; line-height: 1.5; color: var(--text-2); display: none; z-index: 9;
+  }
+  .notes.show { display: block; }
+  .notes b { color: var(--mint); }
+  .hint { position: fixed; bottom: calc(7vh + 8px); right: 16px; font-size: 12px; color: var(--text-muted); z-index: 11; }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="stage" id="stage">
+
+  <!-- 1 · HOOK / TITLE -->
+  <section class="slide lead active">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">1 / 9</span>
+    <div class="kicker">The starting point</div>
+    <h1 style="font-size:62px;">My job was<br><span class="accent">100 tabs.</span></h1>
+    <p class="sub" style="font-size:25px;">Slack, Jira, meeting notes, docs. The thinking part of my job kept losing to the tracking part.</p>
+    <div class="notes-data" hidden>Open on the feeling, not the tools. Everyone with a desk job recognizes this. The problem was never judgment, it was that the busywork never stopped.</div>
+  </section>
+
+  <!-- 2 · THE ONE IDEA -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">2 / 9</span>
+    <h2>The whole idea, in one line</h2>
+    <ul>
+      <li>Everything I work on is a <b>plain text file</b> in one folder on my laptop</li>
+      <li>My agents <b>read those files and write back</b> to them</li>
+      <li>I stay the <b>approver</b>. Nothing happens that I did not say yes to</li>
+    </ul>
+    <div class="callout">No new app to buy. Just files an agent can read and write, and a human who decides. If you remember one thing, remember this.</div>
+    <div class="notes-data" hidden>This is the whole trick. No new app. Files agents can read and write, and a human who says yes or no. The folder is an Obsidian vault, which is just markdown files.</div>
+  </section>
+
+  <!-- 3 · THE LOOP -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">3 / 9</span>
+    <h2>The same loop, every day</h2>
+    <div class="cycle">
+      <div class="cyc-node"><div class="step">Agent</div><div class="what">Observe</div></div>
+      <span class="cyc-arrow">&rarr;</span>
+      <div class="cyc-node"><div class="step">Agent</div><div class="what">Propose</div></div>
+      <span class="cyc-arrow">&rarr;</span>
+      <div class="cyc-node me"><div class="step">Me</div><div class="what">React</div></div>
+      <span class="cyc-arrow">&rarr;</span>
+      <div class="cyc-node"><div class="step">Agent</div><div class="what">Execute</div></div>
+      <span class="cyc-arrow">&rarr;</span>
+      <div class="cyc-node"><div class="step">Agent</div><div class="what">Self-check</div></div>
+    </div>
+    <div class="cyc-loop">Self-check feeds tomorrow's <b>Observe</b> &nbsp;&#8635;</div>
+    <div class="callout">The agent never acts on what it read. It <b>proposes</b>, I <b>react</b>, and it does only the part I approved.</div>
+    <div class="notes-data" hidden>Draw it as a cycle. The agent never acts on its own read. It proposes, I react, it executes only what I approved, then it checks its own work. The "React" step is the safety valve.</div>
+  </section>
+
+  <!-- 4 · THE CAST -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">4 / 9</span>
+    <h2>Eight helpers, one job each</h2>
+    <div class="cast">
+      <div class="card"><span class="nm">Mario</span><span class="jb">co-PM, twice a day</span></div>
+      <div class="card"><span class="nm">Luigi</span><span class="jb">nightly status keeper</span></div>
+      <div class="card"><span class="nm">Yoshi</span><span class="jb">Slack follow-up tracker</span></div>
+      <div class="card"><span class="nm">Boo</span><span class="jb">meeting-fallout dispatcher</span></div>
+      <div class="card"><span class="nm">Cappy</span><span class="jb">design handoff loop</span></div>
+      <div class="card"><span class="nm">DK</span><span class="jb">bug watcher</span></div>
+      <div class="card"><span class="nm">Peach</span><span class="jb">customer-signal triage</span></div>
+      <div class="card"><span class="nm">Pauline</span><span class="jb">brief executor</span></div>
+    </div>
+    <div class="callout">The game-character names are just so I remember who does what. Each one is a role a bigger team would hire for.</div>
+    <div class="notes-data" hidden>The Mario-universe names are just a memory aid. Each is a role a real product org staffs. One line each, do not lecture the lore.</div>
+  </section>
+
+  <!-- 5 · ONE GRAMMAR -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">5 / 9</span>
+    <h2>One set of codes for all of them</h2>
+    <table>
+      <tr><th>I type</th><th>It means</th></tr>
+      <tr><td><code>y</code></td><td>do it</td></tr>
+      <tr><td><code>n</code></td><td>wrong call</td></tr>
+      <tr><td><code>p</code></td><td>not now</td></tr>
+      <tr><td><code>x</code></td><td>skip</td></tr>
+      <tr><td><code>d: @who</code></td><td>hand it to someone</td></tr>
+      <tr><td><code>-&gt; do: ...</code></td><td>do this instead</td></tr>
+    </table>
+    <div class="callout">Same six codes on every agent's brief. I sweep the whole stack like a <b>card deck</b> in about ten minutes.</div>
+    <div class="notes-data" hidden>This is why it scales. I never learn a new interface per agent. Same six codes everywhere, swept over coffee. The "n" codes matter later, they become training data.</div>
+  </section>
+
+  <!-- 6 · TRUST LADDER -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">6 / 9</span>
+    <h2>They earn trust one rung at a time</h2>
+    <div class="ladder">
+      <div class="rung"><span class="num">1</span><div class="name">Look, don't touch</div><div class="desc">Watches and reports. No writing anything.</div></div>
+      <div class="rung"><span class="num">2</span><div class="name">Approved writes</div><div class="desc">Can act, but every batch waits behind my yes.</div></div>
+      <div class="rung"><span class="num">3</span><div class="name">Runs while I sleep</div><div class="desc">Scheduled on its own, still inside the approval gate.</div></div>
+    </div>
+    <div class="callout">No promotion on paper. An agent moves up only after I have <b>watched it do the new thing once</b>. Cappy moved to rung 2 only after its first real write was applied and I checked it.</div>
+    <div class="notes-data" hidden>This is what makes unattended running safe. A new agent cannot write anything. It gets a privilege only after one supervised run proves it. Trust is granted, not assumed.</div>
+  </section>
+
+  <!-- 7 · SELF-RETRO -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">7 / 9</span>
+    <h2>They grade themselves</h2>
+    <ul>
+      <li>Once a week, each agent compares <b>what it proposed</b> against <b>how I corrected it</b></li>
+      <li>My <code>n</code> codes are the answer key</li>
+      <li>It then drafts an edit to <b>its own instruction file</b></li>
+      <li>The edit lands only when I say yes</li>
+    </ul>
+    <div class="callout">My corrections are not lost. They are the training signal. Next week the agent is a little better, without me rebuilding it.</div>
+    <div class="notes-data" hidden>This is the compounding part. Corrections become the training signal. The agent proposes a fix to its own prompt, I approve it, next week it is better.</div>
+  </section>
+
+  <!-- 8 · A REAL MORNING -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">8 / 9</span>
+    <h2>A real morning</h2>
+    <div class="timeline">
+      <div class="tl-row"><span class="clock">7:30</span><span class="act">Mario posts its brief</span></div>
+      <div class="tl-row"><span class="clock">8:00</span><span class="act">The watchers wake and scan</span></div>
+      <div class="tl-row"><span class="clock">8:15</span><span class="act">One standup file is assembled from all of them</span></div>
+      <div class="tl-row mine"><span class="clock">coffee</span><span class="act">I sweep the card deck with my codes</span></div>
+      <div class="tl-row"><span class="clock">after</span><span class="act">The agents run the batch I approved</span></div>
+    </div>
+    <div class="callout">By the time I finish coffee, the day is triaged and the approved work is moving. I spent about <b>fifteen minutes reacting</b>, not gathering.</div>
+    <div class="notes-data" hidden>A normal Sunday morning. By the time coffee is done, the day is triaged and the approved work is moving. Fifteen minutes reacting, not gathering.</div>
+  </section>
+
+  <!-- 9 · TAKEAWAYS -->
+  <section class="slide invert lead">
+    <div class="brand"><span class="dot"></span> How I Use My Agents</div>
+    <span class="tag">9 / 9</span>
+    <div class="kicker">If you want to try it</div>
+    <h1 style="font-size:44px;color:#03110b;">Start with one loop<br>you already hate doing.</h1>
+    <ul style="margin-top:24px;">
+      <li style="color:#03110b;font-size:24px;">Plain files beat buying another app</li>
+      <li style="color:#03110b;font-size:24px;">Give autonomy the way you would train a junior: watch, then assist, then own</li>
+    </ul>
+    <div class="notes-data" hidden>Close on the invitation. Do not build twelve agents. Build one, for the chore you dread most, and only give it room as it earns it.</div>
+  </section>
+
+</div>
+
+<div class="notes" id="notes"></div>
+<div class="hint">&larr; &rarr; navigate &middot; N notes &middot; F fullscreen</div>
+<div class="navbar">
+  <button id="prev">&larr; Back</button>
+  <span class="counter" id="counter">1 / 9</span>
+  <button id="next">Next &rarr;</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const notes = document.getElementById('notes');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  let notesOn = false;
+
+  function render() {
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    counter.textContent = (i + 1) + ' / ' + total;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === total - 1;
+    const note = slides[i].querySelector('.notes-data');
+    notes.innerHTML = note ? '<b>Speaker note &middot;</b> ' + note.innerHTML : '';
+  }
+  function go(n) { i = Math.max(0, Math.min(total - 1, n)); render(); }
+
+  prevBtn.onclick = () => go(i - 1);
+  nextBtn.onclick = () => go(i + 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { go(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(i - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(total - 1); }
+    else if (e.key.toLowerCase() === 'n') { notesOn = !notesOn; notes.classList.toggle('show', notesOn); }
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  render();
+</script>
+</body>
+</html>
