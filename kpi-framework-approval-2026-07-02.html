@@ -103,7 +103,7 @@
   }
   .section-tag::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
-  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .principle {
     padding: 24px 22px;
     border: 1px solid var(--line);
@@ -226,6 +226,37 @@
     color: var(--faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
   }
 
+  /* ---- quick nav (sticky jump bar) ---- */
+  .quicknav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 12px 0; margin-bottom: 4px;
+    background: rgba(14,20,32,0.86); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12px;
+  }
+  .quicknav .qn-label {
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); margin-right: 4px;
+  }
+  .quicknav a {
+    text-decoration: none; color: var(--muted);
+    padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px;
+    letter-spacing: 0.04em; transition: color 0.15s, border-color 0.15s;
+  }
+  .quicknav a:hover { color: var(--text); border-color: var(--accent); }
+  .quicknav a .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 7px; vertical-align: middle; }
+
+  /* ---- collapsible channels ---- */
+  .channel-head { cursor: pointer; user-select: none; }
+  .channel-head .chev {
+    margin-left: 14px; color: var(--chan); font-size: 13px;
+    transition: transform 0.2s; transform: rotate(0deg);
+  }
+  .channel.collapsed .chev { transform: rotate(-90deg); }
+  .channel.collapsed .kpi-grid,
+  .channel.collapsed .rejected { display: none; }
+  .channel.collapsed .channel-head { margin-bottom: 0; border-bottom-width: 1px; }
+
   @media (max-width: 760px) {
     .principles { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: 1fr; }
@@ -248,19 +279,19 @@
 
   <div class="topbar">
     <span>Product KPI Framework <span class="dot">◆</span> Q3 2026</span>
-    <span>Approval requested — Spectra &amp; Sentinel</span>
+    <span>Board locked with Piyush — 16 Jul</span>
   </div>
 
   <header class="hero">
-    <p class="kicker reveal">Outcome KPIs · agreed with Piyush · 29 Jun</p>
+    <p class="kicker reveal">Outcome KPIs · locked with Piyush · 16 Jul (sessions 29 Jun → 01 Jul → 16 Jul)</p>
     <h1 class="reveal">Metrics as a <em>license to kill noise.</em></h1>
-    <p class="lede reveal">We are locking a small set of outcome-level KPIs per product area — not per-feature metrics, but the signal that tells us whether the direction we took was right. This page is the set we want the two engineering groups to own and instrument this quarter. Directions are agreed; target numbers land next.</p>
+    <p class="lede reveal">A small set of outcome-level KPIs per product area — not per-feature metrics, but the signal that tells us whether the direction we took was right. This is the set the two engineering groups own and instrument this quarter. The rule settled 16 Jul: <b>product owns the number, engineering delivers the data.</b> Directions are locked; target numbers land after baseline.</p>
 
     <div class="meta reveal">
-      <div><span class="n">6</span><span class="l">KPIs to track</span></div>
-      <div><span class="n">2</span><span class="l">Owning groups</span></div>
+      <div><span class="n">8</span><span class="l">KPIs to track</span></div>
+      <div><span class="n">1</span><span class="l">Cross-product KPI</span></div>
       <div><span class="n">3</span><span class="l">Product areas</span></div>
-      <div><span class="n">TBD</span><span class="l">Targets — this quarter</span></div>
+      <div><span class="n">TBD</span><span class="l">Targets — after baseline</span></div>
     </div>
   </header>
 
@@ -280,68 +311,102 @@
       <div class="principle">
         <span class="mk">03</span>
         <h3>Owned across teams</h3>
-        <p>A PM owns the metric even when the infrastructure behind it sits on another team. Instrumenting it is a shared commitment.</p>
+        <p>Product owns the number even when the infrastructure behind it sits on another team; engineering delivers the data. Instrumenting it is a shared commitment.</p>
+      </div>
+      <div class="principle">
+        <span class="mk">04</span>
+        <h3>Rests on immutable data</h3>
+        <p>Every KPI sits on a stable, self-observable data source so the definition doesn't silently drift as internals change. No KPI built on off-limits or unstable internals.</p>
       </div>
     </div>
   </section>
+
+  <nav class="quicknav">
+    <span class="qn-label">Jump to</span>
+    <a href="#spectra"><span class="sw" style="background: var(--warm);"></span>Spectra</a>
+    <a href="#sentinel"><span class="sw" style="background: var(--cool);"></span>Sentinel</a>
+    <a href="#cross-product"><span class="sw" style="background: var(--accent);"></span>Cross-product</a>
+    <a href="#ask">The ask</a>
+  </nav>
 
   <!-- ================= SPECTRA ================= -->
   <section class="channel" id="spectra" style="--chan: var(--warm);">
     <div class="channel-head">
       <h2 class="name"><span class="bar">▍</span>Spectra</h2>
-      <span class="scope">Pipeline · Monetization</span>
+      <span class="scope">Ingestion · Billing</span>
       <div class="leads">
         <span class="lead">Timor</span>
         <span class="lead">Itay</span>
         <span class="lead">Rafael</span>
         <span class="lead">Iulian</span>
       </div>
+      <span class="chev">▾</span>
     </div>
 
     <div class="kpi-grid">
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-01 · TART</span><span class="kpi-status">Direction agreed</span></div>
-        <h4>Turnaround time</h4>
-        <p class="measures">Time from data <b>ingest → queryable</b>. A regression here (e.g. 10s → 30s) is a direct signal the pipeline is degrading.</p>
+        <div class="kpi-top"><span class="kpi-code">INGESTION · TART</span><span class="kpi-status">Accepted</span></div>
+        <h4>Time from ingest → queryable</h4>
+        <p class="measures">Pillar-level latency, gateway → queryable. A regression (e.g. 10s → 30s) is a direct signal the pipeline is degrading. <b>Product-owned:</b> Noam owns logs + traces, Mohan owns metrics — symmetric across pillars.</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Radiant</span></dd>
+          <dt>Category</dt><dd>Quality</dd>
+          <dt>Unit</dt><dd><span class="tm">ms</span> · dims: tenant · region · pillar</dd>
+          <dt>Delivers</dt><dd>Radiant (Zdenek ingress · Fuman · Timor/Ilya write path)</dd>
           <dt>Target</dt><dd>TBD — baseline first</dd>
         </dl>
       </article>
 
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-02 · COST/GB</span><span class="kpi-status">Direction agreed</span></div>
-        <h4>Cost per GB / TB</h4>
+        <div class="kpi-top"><span class="kpi-code">INGESTION · COST/GB</span><span class="kpi-status">Accepted</span></div>
+        <h4>Cost per GB processed</h4>
         <p class="measures">Internal <b>processing efficiency</b> per unit of data — driving the cost of running the engine down over time (e.g. 10¢ → 8¢/GB).</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Radiant · Halo</span></dd>
+          <dt>Category</dt><dd>Cogs</dd>
+          <dt>Unit</dt><dd><span class="tm">$</span> · dims: tenant · region · pillar</dd>
+          <dt>Delivers</dt><dd>Radiant</dd>
           <dt>Target</dt><dd>TBD — baseline first</dd>
         </dl>
       </article>
 
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-03 · BO-VOL</span><span class="kpi-status">Direction agreed</span></div>
-        <h4>Back-office work on-platform</h4>
-        <p class="measures">Volume of billing &amp; account operations — by customers, TAMs, or AMs — <b>done inside the product</b> instead of offline.</p>
+        <div class="kpi-top"><span class="kpi-code">BILLING · W-o-W ACTIVE</span><span class="kpi-status">Accepted</span></div>
+        <h4>Week-on-week active users</h4>
+        <p class="measures">Back-office work done <b>on-platform</b> — click-based and query-on-billing-dataset both kept, since better self-serve may shift engagement from UI to datasets.</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Halo · Nimbus</span></dd>
+          <dt>Category</dt><dd>Adoption</dd>
+          <dt>Unit</dt><dd><span class="tm">count</span></dd>
+          <dt>Delivers</dt><dd>Halo · Nimbus</dd>
           <dt>Target</dt><dd>TBD — baseline first</dd>
         </dl>
       </article>
 
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-04 · BO-EFF</span><span class="kpi-status">Direction agreed</span></div>
-        <h4>Back-office efficiency</h4>
-        <p class="measures">Reduction in <b>hours and instances</b> of manual off-platform work (Excel, spreadsheets) needed to run billing.</p>
+        <div class="kpi-top"><span class="kpi-code">BILLING · DATASET QUERY RATE</span><span class="kpi-status">Accepted</span></div>
+        <h4>Billing-dataset query rate</h4>
+        <p class="measures">Queries run against the billing dataset — the query-based half of on-platform engagement, tracking the shift from UI clicks to self-serve data access.</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Halo · Nimbus</span></dd>
+          <dt>Category</dt><dd>Adoption</dd>
+          <dt>Unit</dt><dd><span class="tm">count</span></dd>
+          <dt>Delivers</dt><dd>Halo · Nimbus</dd>
+          <dt>Target</dt><dd>TBD — baseline first</dd>
+        </dl>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">BILLING · FREE UNITS</span><span class="kpi-status">Accepted</span></div>
+        <h4>Free units per customer</h4>
+        <p class="measures">Reduce <b>free units given away</b> per customer — a direct COGS/margin lever added 16 Jul.</p>
+        <dl>
+          <dt>Category</dt><dd>Cogs</dd>
+          <dt>Unit</dt><dd><span class="tm">count</span> (target: down)</dd>
+          <dt>Delivers</dt><dd>Halo</dd>
           <dt>Target</dt><dd>TBD — baseline first</dd>
         </dl>
       </article>
     </div>
 
     <div class="rejected">
-      <b>NOT TRACKED —</b> Volume processed (petabytes) was considered and dropped: the engine does not control how much data customers send, so it is not a legitimate self-owned metric.
+      <b>NOT TRACKED —</b> Volume processed (petabytes): the engine does not control how much data customers send, so it is not a legitimate self-owned metric. <b>Self-serve / credit-card adoption</b> as a primary KPI dropped — too dependent on dashboards/alerting outside this area.
     </div>
   </section>
 
@@ -354,33 +419,69 @@
         <span class="lead">Ilya</span>
         <span class="lead">Roy</span>
       </div>
+      <span class="chev">▾</span>
     </div>
 
     <div class="kpi-grid">
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-05 · P95</span><span class="kpi-status">Direction agreed</span></div>
+        <div class="kpi-top"><span class="kpi-code">DATASETS · P95</span><span class="kpi-status">Accepted</span></div>
         <h4>Dataset query P95 uplift</h4>
         <p class="measures">Improvement in <b>P95 query performance</b> for customers who use datasets. Caveat: real gains require proper data segmentation, not renaming a default pool.</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Citadel</span></dd>
+          <dt>Category</dt><dd>Performance</dd>
+          <dt>Unit</dt><dd><span class="tm">ms</span> · dims: tenant · region</dd>
+          <dt>Delivers</dt><dd>Citadel</dd>
           <dt>Target</dt><dd>TBD — baseline first</dd>
         </dl>
       </article>
 
       <article class="kpi">
-        <div class="kpi-top"><span class="kpi-code">KPI-06 · ADOPT</span><span class="kpi-status">Direction agreed</span></div>
+        <div class="kpi-top"><span class="kpi-code">DATASETS · ADOPT</span><span class="kpi-status">Accepted</span></div>
         <h4>Dataset adoption</h4>
         <p class="measures">Share of <b>companies and teams creating at least one dataset</b> — horizontal (new customers) and vertical (existing customers going deeper).</p>
         <dl>
-          <dt>Owns</dt><dd><span class="tm">Citadel · Phoenix</span></dd>
+          <dt>Category</dt><dd>Adoption</dd>
+          <dt>Unit</dt><dd><span class="tm">%</span> · dims: tenant · region</dd>
+          <dt>Delivers</dt><dd>Citadel · Phoenix</dd>
           <dt>Target</dt><dd>TBD — gated on alias prereqs</dd>
         </dl>
       </article>
     </div>
   </section>
 
+  <!-- ================= CROSS-PRODUCT ================= -->
+  <section class="channel" id="cross-product" style="--chan: var(--accent);">
+    <div class="channel-head">
+      <h2 class="name"><span class="bar">▍</span>Cross-product</h2>
+      <span class="scope">Every screen — added 16 Jul</span>
+      <div class="leads">
+        <span class="lead">Zuhaar</span>
+        <span class="lead">Amnon</span>
+      </div>
+      <span class="chev">▾</span>
+    </div>
+
+    <div class="kpi-grid">
+      <article class="kpi">
+        <div class="kpi-top"><span class="kpi-code">PRODUCTIVITY · ERROR RATE</span><span class="kpi-status" style="color: var(--warm); border-color: var(--warm);">Gated — shared infra</span></div>
+        <h4>Error rate ("Productivity")</h4>
+        <p class="measures">Success vs failure % of user actions — attempts vs success vs failure — across <b>TCO, archive, dataspace, dataset, pipeline, billing</b>. One honest signal of whether the product actually works.</p>
+        <dl>
+          <dt>Category</dt><dd>Quality</dd>
+          <dt>Unit</dt><dd><span class="tm">%</span> · dims: tenant · region · product (TBD)</dd>
+          <dt>Delivers</dt><dd>Zuhaar + Amnon — shared instrumentation (attempts / success / failure)</dd>
+          <dt>Target</dt><dd>TBD — infra must land first</dd>
+        </dl>
+      </article>
+    </div>
+
+    <div class="rejected" style="border-style: solid; border-color: var(--warm);">
+      <b>DEFERRED → Q4 —</b> Fair-usage / limits moving under Halo. Halo <b>meters only; it does not enforce</b> — blocking logic stays with Citadel / Radiant / Zdenek. Company-wide project (all teams write to datasets), revisited Q4.
+    </div>
+  </section>
+
   <!-- ================= THE ASK ================= -->
-  <section class="ask">
+  <section class="ask" id="ask">
     <h2>What we are asking you to approve</h2>
     <p class="sub">Sign-off from both group leads unblocks instrumentation this quarter.</p>
     <div class="checklist">
@@ -401,11 +502,31 @@
 
   <footer>
     <span>Noam Sheffi · Data Economics &amp; Governance</span>
-    <span>Draft for approval · Q3 2026</span>
-    <span class="source">Generated from: roadmap-kpis.md · meeting-summary-piyush-2026-06-29 · Jul 2026</span>
+    <span>Board locked 16 Jul · Q3 2026</span>
+    <span class="source">From: roadmap-kpis.md · piyush 29-06 / 01-07 / 16-07 · immutable-source discipline borrowed from Redlus DataPrime KPI proposal</span>
   </footer>
 
 </div>
+
+<script>
+  // Collapsible channel sections — click the header to toggle.
+  document.querySelectorAll('.channel-head').forEach(function (head) {
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    function toggle() { head.closest('.channel').classList.toggle('collapsed'); }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+  // Quick-nav: expand a collapsed target before jumping so the anchor lands.
+  document.querySelectorAll('.quicknav a').forEach(function (link) {
+    link.addEventListener('click', function () {
+      var target = document.querySelector(link.getAttribute('href'));
+      if (target) target.classList.remove('collapsed');
+    });
+  });
+</script>
 
 </body>
 </html>
