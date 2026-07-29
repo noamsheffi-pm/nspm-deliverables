@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quota Flow Map — reservations and limits</title>
+<style>
+/* ─── CX design tokens ─────────────────────────────────────────────────────────
+   Values lifted verbatim from cx-web-workspace/libs/cx-ui/theme/tokens.json
+   ("CX Dark" + "CX Visualization"). Naming follows the --c-* / --f-* convention
+   used by internal-cx-web-workspace-design (see grid-lite.component.scss).
+   ────────────────────────────────────────────────────────────────────────────── */
+:root{
+  --c-background-surface-primary:#1C1C1C;
+  --c-background-surface-secondary:#202020;
+  --c-background-card:#262628;
+  --c-background-tooltip:#323D4E;
+  --c-background-hover:#FFFFFF1A;
+  --c-text-primary:#FFFFFF;
+  --c-text-secondary:#ABABB1;
+  --c-text-placeholder:#8A8A92;
+  --c-border-subtle:#2D2D2E;
+  --c-border-strong:#68686D;
+  --c-border-interactive:#2AA968;
+  --v-blue-400:#71ADEE;   --v-blue-500:#5095ED;
+  --v-cyan-500:#3CBCD3;   --v-purple-500:#B273EE;
+  --v-magenta-500:#D866E7; --v-green-500:#3CC67E;
+  --v-yellow-500:#E4B83C; --v-orange-500:#EE873B;
+  --v-red-500:#EB6166;
+  --v-gray-400:#ABABB1;   --v-gray-500:#8A8A92; --v-gray-700:#68686D;
+  --border-radius-sm:4px; --border-radius-md:6px; --border-radius-lg:8px;
+  --shadow-dropdown:0 5px 10px 0 rgba(33,43,59,.1);
+  --f-family:"Nunito Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:Inconsolata,ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-caption:11px; --f-code-sm:12px; --f-paragraph:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--c-background-surface-primary);color:var(--c-text-primary);
+  font-family:var(--f-family);font-size:var(--f-paragraph);line-height:1.5;-webkit-font-smoothing:antialiased}
+.page{max-width:1640px;margin:0 auto;padding:22px 22px 44px}
+.ph{margin-bottom:14px}
+.ph h1{font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:-.2px}
+.ph p{margin:0 0 4px;font-size:var(--f-code-sm);color:var(--c-text-secondary);max-width:120ch}
+.crumb{font-size:var(--f-caption);color:var(--c-text-placeholder);text-transform:uppercase;
+  letter-spacing:.09em;margin-bottom:6px}
+.card{background:var(--c-background-surface-secondary);border:1px solid var(--c-border-subtle);
+  border-radius:var(--border-radius-lg);overflow:hidden}
+.toolbar{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 8px;flex-wrap:wrap;
+  background:var(--c-background-surface-primary);border-bottom:1px solid var(--c-border-subtle)}
+.tgroup{display:flex;align-items:center;gap:6px}
+.tlabel{font-size:var(--f-caption);color:var(--c-text-placeholder);text-transform:uppercase;
+  letter-spacing:.09em;padding-left:6px}
+.sep{width:1px;height:22px;background:var(--c-border-subtle);margin:0 4px}
+button{font-family:inherit;font-size:var(--f-code-sm);color:var(--c-text-secondary);background:transparent;
+  border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);padding:5px 10px;
+  cursor:pointer;transition:background .12s,color .12s,border-color .12s}
+button:hover{color:var(--c-text-primary);background:var(--c-background-hover)}
+button[aria-pressed="true"]{color:var(--c-text-primary);border-color:var(--c-border-strong);
+  background:var(--c-background-card)}
+.seg button[aria-pressed="true"]{border-color:var(--c-border-interactive)}
+.lv button[aria-pressed="false"]{opacity:.45}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start;padding:14px}
+@media (max-width:1320px){.stage{grid-template-columns:minmax(0,1fr)}}
+.plot{padding:4px 0 0;overflow-x:auto}
+svg{display:block;min-width:1120px}
+.foot{display:flex;flex-wrap:wrap;gap:13px;align-items:center;padding:9px 13px;
+  border-top:1px solid var(--c-border-subtle);background:var(--c-background-surface-primary);
+  font-size:var(--f-caption);color:var(--c-text-secondary)}
+.foot i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.colhead{font-size:var(--f-caption);fill:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.09em}
+.colsub{font-size:10px;fill:var(--c-text-placeholder)}
+.zone{font-size:10px;fill:var(--c-text-placeholder);text-transform:uppercase;letter-spacing:.09em}
+.lane{stroke:var(--c-border-subtle);stroke-width:1;stroke-dasharray:2 4}
+.divide{stroke:var(--c-border-strong);stroke-width:1;stroke-dasharray:6 4}
+.zrule{stroke:var(--c-border-subtle);stroke-width:1}
+/* labels sit on top of ribbons, so they carry a halo of the canvas colour and
+   paint the fill over it — otherwise a wide ribbon swallows the text */
+.nlabel,.nval{paint-order:stroke;stroke:var(--c-background-card);stroke-width:3.5px;
+  stroke-linejoin:round;stroke-linecap:round}
+.nlabel{font-size:var(--f-code-sm);fill:var(--c-text-primary)}
+.nval{font-size:var(--f-caption);fill:var(--c-text-secondary);font-family:var(--f-mono)}
+.rail{display:flex;flex-direction:column;gap:14px}
+.rhead{padding:10px 13px;background:var(--c-background-surface-primary);
+  border-bottom:1px solid var(--c-border-subtle);display:flex;justify-content:space-between;align-items:center}
+.rhead h2{margin:0;font-size:var(--f-code-sm);font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--c-text-secondary)}
+.rbody{padding:11px 13px}
+.brow{display:flex;align-items:center;gap:8px;font-size:var(--f-code-sm);margin-bottom:7px}
+.brow .grow{flex:1}
+.bucket{border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);
+  padding:9px 10px;margin-bottom:9px;background:var(--c-background-card)}
+.ent{border-top:1px solid var(--c-border-subtle);padding-top:7px;margin-top:7px}
+.lim{display:flex;align-items:center;justify-content:space-between;gap:6px;
+  font-size:10px;font-family:var(--f-mono);color:var(--c-text-placeholder);padding:1px 0}
+input[type=number]{width:60px;font-family:var(--f-mono);font-size:var(--f-code-sm);
+  color:var(--c-text-primary);background:var(--c-background-surface-secondary);
+  border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-sm);
+  padding:3px 5px;text-align:right;-moz-appearance:textfield}
+input[type=number]:focus{outline:none;border-color:var(--c-border-interactive)}
+input.w{width:54px}
+input.dsname{flex:1;min-width:0;font-family:var(--f-mono);font-size:10px;color:var(--c-text-primary);
+  background:transparent;border:1px solid transparent;border-radius:var(--border-radius-sm);
+  padding:2px 4px;margin-right:4px}
+input.dsname:hover{border-color:var(--c-border-subtle)}
+input.dsname:focus{outline:none;border-color:var(--c-border-interactive);
+  background:var(--c-background-surface-secondary)}
+select{font-family:var(--f-mono);font-size:10px;background:var(--c-background-surface-secondary);
+  color:var(--c-text-primary);border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-sm)}
+button.mini{padding:1px 6px;font-size:10px;line-height:1.4}
+.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.sub{font-size:10px;color:var(--c-text-placeholder);font-family:var(--f-mono)}
+.tot{font-size:10px;font-family:var(--f-mono);padding:3px 0 1px}
+.tot.over{color:#EE8486} .tot.under{color:var(--c-text-placeholder)}
+.readout{display:flex;justify-content:space-between;gap:8px;font-size:var(--f-code-sm);
+  font-family:var(--f-mono);padding:7px 9px;border-radius:var(--border-radius-sm);
+  background:var(--c-background-card);border:1px solid var(--c-border-subtle)}
+.readout.bad{border-color:#EB616688;color:#EE8486}
+.find{font-size:var(--f-code-sm);color:var(--c-text-secondary);margin:0 0 8px;padding-left:16px;position:relative}
+.find:last-child{margin-bottom:0} .find b{color:var(--c-text-primary)}
+.find:before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;border-radius:2px;
+  background:var(--c-text-placeholder)}
+.find.err:before{background:var(--v-red-500)} .find.warn:before{background:var(--v-yellow-500)}
+.find.ok:before{background:var(--v-green-500)}
+.qcard{margin-top:14px}
+ol.q{margin:0;padding-left:18px;font-size:var(--f-code-sm);color:var(--c-text-secondary)}
+ol.q li{margin-bottom:9px} ol.q b{color:var(--c-text-primary)}
+#tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;z-index:9;
+  background:var(--c-background-tooltip);border-radius:var(--border-radius-md);
+  box-shadow:var(--shadow-dropdown);padding:8px 10px;font-size:var(--f-code-sm);max-width:290px}
+#tip b{color:#fff} #tip span{color:#C9D2E0;font-family:var(--f-mono)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="ph">
+    <div class="crumb">Quota Visibility Map · concept · planned allocation</div>
+    <h1>Quota Flow Map — reservations left, limits right</h1>
+    <p><b>Left of the divider is a partition.</b> Team quota splits into unit types, unit types into entityType reservations plus an unallocated remainder. Hard guarantees, so the widths sum to exactly 100% at every column.</p>
+    <p><b>Right of the divider are ceilings.</b> The TCO column is the aggregate of many TCO rules grouped into High, Med, Low and Block. Datasets sit behind them, and routing is constrained: <b>frequentsearch/&lt;pillar&gt; can only be fed by High</b>, <b>default/&lt;name&gt; only by Med and Low</b>. Every hop on this side compares the sum of its children's ceilings against its own: excess is hatched red, shortfall is a dashed grey gap.</p>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span class="tlabel">Plan</span><div class="tgroup seg" id="tabs"></div>
+      <div class="sep"></div>
+      <span class="tlabel">Show</span><div class="tgroup lv" id="lv"></div>
+      <div class="sep"></div>
+      <span class="tlabel">EntityType</span><div class="tgroup seg" id="et"></div>
+      <div class="sep"></div>
+      <div class="tgroup"><button id="tVal" aria-pressed="true">Values</button></div>
+    </div>
+
+    <div class="stage">
+      <div class="card" style="background:var(--c-background-card)">
+        <div class="plot"><svg id="svg" viewBox="0 0 1400 700" width="100%" height="700"></svg></div>
+        <div class="foot" id="leg"></div>
+      </div>
+      <div class="rail">
+        <div class="card">
+          <div class="rhead"><h2>Plan</h2><button id="reset">Reset</button></div>
+          <div class="rbody">
+            <div class="brow"><span class="grow">Team quota</span>
+              <input type="number" id="plan" min="0" step="100"><span class="sub">U</span></div>
+            <div id="buckets"></div>
+            <div class="readout" id="out"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="rhead"><h2>Validation</h2></div>
+          <div class="rbody" id="finds"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card qcard">
+    <div class="toolbar"><span class="tlabel">How to read the right-hand side</span></div>
+    <div style="padding:14px 16px">
+      <ol class="q">
+        <li><b>A priority node is an aggregate, not a rule.</b> High is the sum of every TCO rule that routes to high priority for that entityType, and the rule count is in its tooltip. That aggregation is the backend cost the team flagged on 2026-07-29, and the reason this half needs a TCO rule summary per entityType before it can ship.</li>
+        <li><b>Every node's percentage is measured against its own parent</b>, never against a lane total. A dataset reads as a share of the priority band feeding it, a band reads as a share of the entityType reservation. Over-subscription of a whole hop is stated once, on the hatched marker and in validation, so a single dataset can never appear to be 260% of anything on its own.</li>
+        <li><b>Routing is a constraint, not a preference.</b> A frequentsearch dataset fed by Med or Low, or a default dataset fed by High, is a plan error and is called out as one. Frequent search is a different dataspace with its own commercial model, so those units are not cost-equivalent to default-dataspace units of the same width.</li>
+        <li><b>Block is terminal.</b> Units routed to Block by policy reach no dataset. Deliberate loss, and the only red on this map the customer chose.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<div id="tip"></div>
+
+<script>
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const KEY={
+  team:{l:'Team quota',c:'--v-gray-400'},
+  cx:{l:'CX units',c:'--v-blue-400'}, ai:{l:'AI units',c:'--v-magenta-500'},
+  logs:{l:'logs',c:'--v-blue-500'}, spans:{l:'spans',c:'--v-purple-500'},
+  metrics:{l:'metrics',c:'--v-cyan-500'},
+  'ai.evaluations':{l:'ai.evaluations',c:'--v-magenta-500'},
+  'unalloc:cx':{l:'unallocated · CX',c:'--v-yellow-500'},
+  'unalloc:ai':{l:'unallocated · AI',c:'--v-yellow-500'},
+  high:{l:'High',c:'--v-green-500'}, med:{l:'Med',c:'--v-blue-400'},
+  low:{l:'Low',c:'--v-gray-500'}, block:{l:'Block',c:'--v-red-500'},
+  none:{l:'No TCO rules',c:'--v-gray-700'}
+};
+const BANDS=['high','med','low','block','none'];
+/* a band key is "<entityType>|<band>" — the priority is scoped to its pillar, so
+   it is labelled that way: "logs · High" is not the same node as "spans · High" */
+const label=k=>{
+  const s=String(k);
+  if(s.includes('|')){const [e,b]=s.split('|');
+    return (KEY[e]?KEY[e].l:e)+' · '+(KEY[b]?KEY[b].l:b)}
+  return (KEY[k]&&KEY[k].l)||s;
+};
+const color=k=>cv((KEY[k]&&KEY[k].c)||'--v-gray-500');
+const fmt=n=>(Math.round(n*100)/100).toLocaleString();
+/* routing rule: high feeds frequentsearch only, med+low feed default only */
+const feeds=b=>b==='high'?['high']:b==='none'?['none']:['med','low'];
+const dspace=n=>String(n).split('/')[0];
+
+const PLANS={
+  noam:{name:'logs + metrics only',plan:5000,buckets:[
+    {k:'cx',units:4500,ent:[
+      {k:'logs',res:2500,rules:{high:2,med:3,low:1,block:1},
+        tco:{high:600,med:1200,low:500,block:125},
+        ds:[{n:'frequentsearch/logs',band:'high',limit:600},
+            {n:'default/logs',band:'medlow',limit:750},
+            {n:'default/foo',band:'medlow',limit:1625},
+            {n:'default/transaction',band:'medlow',limit:125}]},
+      {k:'metrics',res:1000,rules:{},tco:{none:1000},
+        ds:[{n:'default/metrics',band:'none',limit:1000}]}
+    ]},
+    {k:'ai',units:500,ent:[]}
+  ]},
+  spans:{name:'logs + spans → frequentsearch',plan:5000,buckets:[
+    {k:'cx',units:4500,ent:[
+      {k:'logs',res:2500,rules:{high:2,med:3,low:1,block:1},
+        tco:{high:600,med:1200,low:500,block:125},
+        ds:[{n:'frequentsearch/logs',band:'high',limit:600},
+            {n:'default/logs',band:'medlow',limit:750},
+            {n:'default/foo',band:'medlow',limit:900},
+            {n:'default/transaction',band:'medlow',limit:125}]},
+      {k:'spans',res:800,rules:{high:1,med:2,low:1},
+        tco:{high:300,med:400,low:100},
+        ds:[{n:'frequentsearch/spans',band:'high',limit:300},
+            {n:'default/spans',band:'medlow',limit:500}]},
+      {k:'metrics',res:1000,rules:{},tco:{none:1000},
+        ds:[{n:'default/metrics',band:'none',limit:1000}]}
+    ]},
+    {k:'ai',units:500,ent:[
+      {k:'ai.evaluations',res:500,rules:{},tco:{none:500},
+        ds:[{n:'default/ai.evaluations',band:'none',limit:500}]}
+    ]}
+  ]},
+  broken:{name:'Over-subscribed',plan:5000,buckets:[
+    {k:'cx',units:4500,ent:[
+      {k:'logs',res:2000,rules:{high:4,med:6,low:2,block:2},
+        tco:{high:1500,med:1800,low:600,block:200},
+        ds:[{n:'frequentsearch/logs',band:'high',limit:1800},
+            {n:'default/logs',band:'medlow',limit:1500},
+            {n:'default/foo',band:'medlow',limit:900},
+            {n:'default/transaction',band:'medlow',limit:400}]},
+      {k:'metrics',res:2500,rules:{},tco:{none:2500},
+        ds:[{n:'default/metrics',band:'none',limit:800}]}
+    ]},
+    {k:'ai',units:500,ent:[
+      {k:'ai.evaluations',res:500,rules:{},tco:{none:500},
+        ds:[{n:'default/ai.evaluations',band:'none',limit:900}]}
+    ]}
+  ]}
+};
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+let plan='spans', M=clone(PLANS.spans);
+let on={bucket:true,tco:true,ds:true}, showVal=true, ent=null;
+/* hover target: {t:'node'|'link', id} — a ribbon highlights its own lineage the
+   same way a node does */
+let hov=null;
+const isHot=id=>hov&&hov.id===id;
+
+/* ── model ───────────────────────────────────────────────────────────────────
+   chain hops: team → unit type → entityType   (partition, hard)
+               entityType → priority band      (ceilings, may over-subscribe)
+               priority band → dataset         (ceilings, may over-subscribe)
+   A dataset allowed on med+low is fed by both, split in proportion to those two
+   ceilings. That split is a display choice and is stated in the tooltip.      */
+function build(m){
+  const L=[], sum={plan:+m.plan||0,assigned:0,unalloc:0,buckets:[],ents:[],routing:[]};
+  m.buckets.forEach(b=>{
+    const units=Math.max(0,+b.units||0); sum.assigned+=units;
+    const resSum=b.ent.reduce((a,e)=>a+Math.max(0,+e.res||0),0);
+    sum.buckets.push({k:b.k,units,resSum,rest:units-resSum});
+    L.push({s:'team:team',t:'bucket:'+b.k,v:units,hop:'hard'});
+    if(units-resSum>0){ sum.unalloc+=units-resSum;
+      L.push({s:'bucket:'+b.k,t:'rules:unalloc:'+b.k,v:units-resSum,hop:'unalloc'}); }
+
+    b.ent.forEach(e=>{
+      const res=Math.max(0,+e.res||0); if(res<=0) return;
+      L.push({s:'bucket:'+b.k,t:'rules:'+e.k,v:res,hop:'hard'});
+
+      const bandsOn=BANDS.filter(x=>+((e.tco||{})[x])>0);
+      const tcoTot=bandsOn.reduce((a,x)=>a+ +e.tco[x],0);
+      bandsOn.forEach(x=>L.push({s:'rules:'+e.k,t:'band:'+e.k+'|'+x,v:+e.tco[x],
+        hop:'ceiling',ent:e.k,band:x}));
+
+      const bandInfo={};
+      bandsOn.forEach(x=>bandInfo[x]={ceiling:+e.tco[x],dsTot:0,n:0});
+      (e.ds||[]).forEach(d=>{
+        const lim=Math.max(0,+d.limit||0); if(!lim) return;
+        const src=d.band==='high'?['high']:d.band==='none'?['none']:['med','low'];
+        const live=src.filter(x=>bandInfo[x]);
+        const w=live.reduce((a,x)=>a+bandInfo[x].ceiling,0);
+        /* routing check: the dataspace must match the band feeding it. An invalid
+           route is still drawn, but never as ordinary flow — see `bad` below. */
+        const ds=dspace(d.n);
+        let bad=null;
+        if(ds==='frequentsearch'&&d.band!=='high')
+          bad=`${d.n} is fed by ${d.band==='none'?'no TCO rules':'med+low'}, but frequentsearch can only be fed by High`;
+        if(ds==='default'&&d.band==='high')
+          bad=`${d.n} is fed by High, but High can only feed frequentsearch`;
+        if(bad) sum.routing.push(bad);
+        if(!live.length){ L.push({s:'rules:'+e.k,t:'ds:'+d.n,v:lim,hop:'orphan',ent:e.k}); return }
+        live.forEach(x=>{ bandInfo[x].dsTot+=w>0?lim*(bandInfo[x].ceiling/w):lim/live.length;
+          bandInfo[x].n++;
+          L.push({s:'band:'+e.k+'|'+x,t:'ds:'+d.n,v:w>0?lim*(bandInfo[x].ceiling/w):lim/live.length,
+            hop:'ceiling',ent:e.k,band:x,split:live.length>1,bad}); });
+      });
+      sum.ents.push({k:e.k,bucket:b.k,res,tcoTot,bands:bandInfo,
+        rules:e.rules||{},dsTot:(e.ds||[]).reduce((a,d)=>a+Math.max(0,+d.limit||0),0)});
+    });
+  });
+  sum.unassigned=sum.plan-sum.assigned;
+  return {L,sum};
+}
+
+/* ── editor ──────────────────────────────────────────────────────────────── */
+const tabs=document.getElementById('tabs');
+Object.keys(PLANS).forEach(k=>{const b=document.createElement('button');
+  b.textContent=PLANS[k].name;b.dataset.k=k;
+  b.onclick=()=>{plan=k;M=clone(PLANS[k]);ent=null;editor();draw()};tabs.appendChild(b)});
+const lv=document.getElementById('lv');
+[['bucket','Unit types'],['tco','TCO priority'],['ds','Datasets']].forEach(([k,l])=>{
+  const b=document.createElement('button');b.textContent=l;b.dataset.k=k;
+  b.onclick=()=>{on[k]=!on[k];draw()};lv.appendChild(b)});
+document.getElementById('tVal').onclick=()=>{showVal=!showVal;draw()};
+document.getElementById('reset').onclick=()=>{M=clone(PLANS[plan]);editor();draw()};
+
+function num(v,attrs,cb){
+  const i=document.createElement('input'); i.type='number'; i.min='0'; i.step='50';
+  Object.assign(i,attrs); i.value=v==null?'':v;
+  i.oninput=()=>{cb(i.value===''?null:Math.max(0,+i.value));draw()};
+  return i;
+}
+function editor(){
+  const p=document.getElementById('plan');
+  p.value=M.plan; p.oninput=()=>{M.plan=Math.max(0,+p.value||0);draw()};
+  const host=document.getElementById('buckets'); host.innerHTML='';
+  M.buckets.forEach(b=>{
+    const box=document.createElement('div'); box.className='bucket';
+    const head=document.createElement('div'); head.className='brow';
+    head.innerHTML=`<span class="grow"><span class="dot" style="background:${color(b.k)}"></span>${label(b.k)}</span>`;
+    head.appendChild(num(b.units,{step:100},v=>{b.units=v||0}));
+    const u=document.createElement('span'); u.className='sub'; u.textContent='U'; head.appendChild(u);
+    box.appendChild(head);
+    if(!b.ent.length){const n=document.createElement('div');n.className='sub';
+      n.textContent='bulk quota, no sub-allocation (phase 1)';box.appendChild(n)}
+
+    b.ent.forEach(e=>{
+      const w=document.createElement('div'); w.className='ent';
+      const r=document.createElement('div'); r.className='brow';
+      r.innerHTML=`<span class="grow"><span class="dot" style="background:${color(e.k)}"></span>${label(e.k)}</span><span class="sub">reserved</span>`;
+      r.appendChild(num(e.res,{step:100},v=>{e.res=v||0})); w.appendChild(r);
+
+      const h=document.createElement('div'); h.className='sub'; h.style.paddingTop='3px';
+      const nr=Object.values(e.rules||{}).reduce((a,x)=>a+x,0);
+      h.textContent=`TCO priority ceilings${nr?' · '+nr+' rules':''}`; w.appendChild(h);
+      BANDS.filter(x=>x!=='none').forEach(x=>{
+        const l=document.createElement('div'); l.className='lim';
+        const nm=document.createElement('span');
+        nm.innerHTML=`<span class="dot" style="background:${color(x)}"></span>${label(x)}${(e.rules||{})[x]?' ('+e.rules[x]+')':''}`;
+        l.appendChild(nm);
+        const i=num(e.tco[x],{step:50,placeholder:'—'},v=>{e.tco[x]=v||0}); i.className='w';
+        l.appendChild(i); w.appendChild(l);
+      });
+      const tt=Object.keys(e.tco||{}).reduce((a,x)=>a+Math.max(0,+e.tco[x]||0),0);
+      const t1=document.createElement('div');
+      t1.className='tot '+(tt>e.res?'over':tt<e.res?'under':'');
+      t1.textContent=`Σ ${fmt(tt)} of ${fmt(e.res)} reserved`+
+        (tt>e.res?` · over by ${fmt(tt-e.res)}`:tt<e.res?` · ${fmt(e.res-tt)} unreachable`:' · exact');
+      w.appendChild(t1);
+
+      const h2=document.createElement('div'); h2.className='sub'; h2.style.paddingTop='3px';
+      h2.textContent='dataset quota limits · name · fed by · limit'; w.appendChild(h2);
+      e.ds=e.ds||[];
+      const dsRow=d=>{
+        const l=document.createElement('div'); l.className='lim';
+        const nm=document.createElement('input'); nm.type='text'; nm.value=d.n;
+        nm.className='dsname'; nm.placeholder='dataspace/dataset';
+        nm.oninput=()=>{d.n=nm.value;draw()};
+        l.appendChild(nm);
+        const g=document.createElement('span'); g.style.display='inline-flex'; g.style.gap='4px';
+        const sel=document.createElement('select');
+        [['high','high'],['medlow','med+low'],['none','no TCO']].forEach(([v,t])=>{
+          const o=document.createElement('option'); o.value=v; o.textContent=t;
+          o.selected=d.band===v; sel.appendChild(o)});
+        sel.onchange=()=>{d.band=sel.value;draw()};
+        g.appendChild(sel);
+        const i=num(d.limit,{step:50},v=>{d.limit=v||0}); i.className='w'; g.appendChild(i);
+        const x=document.createElement('button'); x.className='mini'; x.textContent='×';
+        x.title='remove dataset';
+        x.onclick=()=>{e.ds.splice(e.ds.indexOf(d),1);editor();draw()};
+        g.appendChild(x); l.appendChild(g); w.appendChild(l);
+      };
+      e.ds.forEach(dsRow);
+      const add=document.createElement('button'); add.className='mini';
+      add.style.marginTop='4px'; add.textContent='+ dataset limit';
+      add.onclick=()=>{ e.ds.push({n:'default/new-'+(e.ds.length+1),band:'medlow',limit:100});
+        editor(); draw(); };
+      w.appendChild(add);
+      box.appendChild(w);
+    });
+    host.appendChild(box);
+  });
+}
+
+const tip=document.getElementById('tip');
+const show=(e,h)=>{tip.innerHTML=h;tip.style.opacity=1;
+  tip.style.left=Math.min(e.clientX+14,innerWidth-305)+'px';tip.style.top=(e.clientY+16)+'px'};
+const hide=()=>{tip.style.opacity=0};
+
+/* ── render ──────────────────────────────────────────────────────────────── */
+function draw(){
+  const {L,sum}=build(M);
+  /* header stack: zone labels 13, zone rule 19, column titles 42, subs 56,
+     lane guides from 64, node tops from Mg.t — 23px of air under the zone rule */
+  const W=1400,H=700,Mg={t:74,b:28,l:10},NW=13,PAD=15,LG=26,CG=20;
+  [...tabs.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===plan));
+  [...lv.children].forEach(b=>b.setAttribute('aria-pressed',!!on[b.dataset.k]));
+  document.getElementById('tVal').setAttribute('aria-pressed',showVal);
+
+  const ents=sum.ents.map(e=>e.k);
+  if(ent&&!ents.includes(ent)) ent=null;
+  const et=document.getElementById('et'); et.innerHTML='';
+  [['','All'],...ents.map(e=>[e,label(e)])].forEach(([k,l])=>{
+    const b=document.createElement('button'); b.textContent=l;
+    b.setAttribute('aria-pressed',(ent||'')===k);
+    if(k) b.style.color=(ent||'')===k?cv('--c-text-primary'):color(k);
+    b.onclick=()=>{ent=k||null;hov=null;draw()}; et.appendChild(b);
+  });
+
+  const cols=['team',...(on.bucket?['bucket']:[]),'rules',
+    ...(on.tco?['band']:[]),...(on.ds?['ds']:[])];
+  const HEAD={team:['Team quota','plan · hard'],bucket:['Unit types','partition · hard'],
+    rules:['Quota rules','reservation · hard'],
+    band:['TCO priority','aggregate of rules · ceiling'],
+    ds:['Datasets','ceiling · may over-subscribe']};
+  const colOf=id=>id.split(':')[0];
+  const eb=(sum.ents.find(e=>e.k===ent)||{}).bucket;
+
+  let F=L.filter(f=>cols.includes(colOf(f.t)));
+  if(!on.tco&&on.ds) F=F.map(f=>colOf(f.s)==='band'?{...f,s:'rules:'+f.ent}:f);
+  if(ent) F=F.filter(f=>f.ent===ent||f.t==='rules:'+ent||(f.s==='team:team'&&f.t==='bucket:'+eb));
+  if(!on.bucket) F=F.filter(f=>f.s!=='team:team').map(f=>colOf(f.s)==='bucket'?{...f,s:'team:team'}:f);
+
+  const N={},order=[];
+  const node=id=>{if(!N[id]){N[id]={id,col:colOf(id),k:id.replace(/^[a-z]+:/,''),
+    v:0,in:[],out:[]};order.push(N[id])}return N[id]};
+  F.forEach(f=>{const s=node(f.s),t=node(f.t);f.S=s;f.T=t;s.out.push(f);t.in.push(f)});
+  const sm=a=>a.reduce((x,l)=>x+l.v,0);
+  order.forEach(n=>{n.v=n.col==='ds'?sm(n.in):Math.max(sm(n.in),sm(n.out))});
+
+  const inCol=c=>order.filter(n=>n.col===c);
+  const nMax=Math.max(1,...cols.map(c=>inCol(c).length));
+  /* an over-subscription marker continues its node downward, so its overhang is
+     part of the column's height and must be priced into the scale */
+  const over=n=>{
+    if(n.col==='rules'){const e=sum.ents.find(x=>x.k===n.k);
+      return e?Math.max(0,e.tcoTot-e.res):0}
+    if(n.col==='band'){const [ek,b]=n.k.split('|'), e=sum.ents.find(x=>x.k===ek);
+      const i=e&&e.bands[b]; return i?Math.max(0,i.dsTot-i.ceiling):0}
+    return 0;
+  };
+  const ceil=Math.max(1,...cols.map(c=>sm(inCol(c).map(n=>({v:n.v+over(n)})))));
+  /* the tallest column may be a ceiling column, whose siblings are CG apart */
+  const scale=(H-Mg.t-Mg.b-(nMax-1)*Math.max(PAD,CG))/ceil;
+  const gap=(W-Mg.l-NW-215-LG)/(cols.length-1);
+  const div=cols.indexOf('rules')+1;
+  const xOf=i=>Mg.l+i*gap+(i>=div?LG:0);
+
+  /* the hard columns are centred; the ceiling columns are aligned to the parent
+     they hang off, so each pillar's chain reads as one straight lane */
+  cols.forEach((c,ci)=>{
+    if(c==='band'||c==='ds') return;
+    const ns=inCol(c), h=sm(ns.map(n=>({v:n.v+over(n)})))*scale+(ns.length-1)*PAD;
+    let y=Mg.t+(H-Mg.t-Mg.b-h)/2;
+    ns.forEach(n=>{n.x=xOf(ci);n.h=Math.max(n.v*scale,2);n.y=y;y+=n.h+over(n)*scale+PAD});
+  });
+  const placed=new Set();
+  const align=(col,parentCols)=>{
+    const ci=cols.indexOf(col); if(ci<0) return;
+    const x=xOf(ci); let floor=Mg.t;
+    const parents=order.filter(n=>parentCols.includes(n.col)&&n.y!=null)
+      .sort((a,b)=>a.y-b.y);
+    parents.forEach(p=>{
+      const kids=p.out.map(l=>l.T).filter(n=>n.col===col&&!placed.has(n.id));
+      if(!kids.length) return;
+      /* CG between siblings so a two-line label always clears its neighbour */
+      let y=Math.max(p.y,floor);
+      kids.forEach(n=>{placed.add(n.id);n.x=x;n.h=Math.max(n.v*scale,2);n.y=y;
+        y+=n.h+over(n)*scale+CG});
+      floor=y;
+    });
+    /* parent alignment can push a column past the bottom; slide it back up by as
+       much as the top margin allows */
+    const ns=order.filter(n=>n.col===col&&n.y!=null);
+    if(!ns.length) return;
+    const bot=Math.max(...ns.map(n=>n.y+n.h+over(n)*scale));
+    const shift=Math.min(Math.max(0,bot-(H-Mg.b)),Math.min(...ns.map(n=>n.y))-Mg.t);
+    if(shift>0) ns.forEach(n=>{n.y-=shift});
+  };
+  align('band',['rules']);
+  align('ds',['band','rules']);
+  order.forEach(n=>{
+    let o=n.y; n.out.sort((a,b)=>a.T.y-b.T.y).forEach(l=>{l.sy=o;o+=l.v*scale});
+    let i=n.y; n.in.sort((a,b)=>a.S.y-b.S.y).forEach(l=>{l.ty=i;i+=l.v*scale});
+  });
+
+  F.forEach((l,i)=>{l.key='L'+i});
+  let tL=null,tN=null;
+  const up=n=>n.in.forEach(l=>{if(!tL.has(l)){tL.add(l);tN.add(l.S.id);up(l.S)}});
+  const dn=n=>n.out.forEach(l=>{if(!tL.has(l)){tL.add(l);tN.add(l.T.id);dn(l.T)}});
+  if(hov){
+    tL=new Set(); tN=new Set();
+    if(hov.t==='node'&&N[hov.id]){ tN.add(hov.id); up(N[hov.id]); dn(N[hov.id]) }
+    if(hov.t==='link'){
+      const l=F.find(x=>x.key===hov.id);
+      if(l){ tL.add(l); tN.add(l.S.id); tN.add(l.T.id); up(l.S); dn(l.T) }
+      else { tL=tN=null }
+    }
+  }
+
+  const P=[`<defs><pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+    <line x1="0" y1="0" x2="0" y2="6" stroke="${cv('--v-red-500')}" stroke-width="2.5" stroke-opacity=".55"></line></pattern></defs>`];
+  /* the divider runs through the middle of the quota-rules column: that column is
+     the hinge, hard on its left, ceilings on its right */
+  const dx=div<cols.length?xOf(div-1)+NW/2:null;
+  cols.forEach((c,ci)=>{
+    const x=xOf(ci), last=ci===cols.length-1, hx=last?x+NW/2:x, an=last?'end':'start';
+    P.push(`<text class="colhead" x="${hx}" y="42" text-anchor="${an}">${HEAD[c][0]}</text>`,
+           `<text class="colsub" x="${hx}" y="56" text-anchor="${an}">${HEAD[c][1]}</text>`);
+    /* the rules column's guide would sit exactly under the divider */
+    if(!(c==='rules'&&dx!=null))
+      P.push(`<line class="lane" x1="${x+NW/2}" y1="64" x2="${x+NW/2}" y2="${H-16}"></line>`);
+  });
+  if(dx!=null){
+    const rightEnd=xOf(cols.length-1)+NW;
+    const leftMid=(Mg.l+dx)/2, rightMid=(dx+rightEnd)/2;
+    P.push(`<line class="divide" x1="${dx}" y1="8" x2="${dx}" y2="${H-16}"></line>`,
+      `<text class="zone" x="${leftMid}" y="13" text-anchor="middle">reservations · sum to 100%</text>`,
+      `<text class="zone" x="${rightMid}" y="13" text-anchor="middle">limits · may over-subscribe</text>`,
+      `<line class="zrule" x1="${Mg.l}" y1="19" x2="${dx-10}" y2="19"></line>`,
+      `<line class="zrule" x1="${dx+10}" y1="19" x2="${rightEnd}" y2="19"></line>`);
+  }
+
+  /* ribbons */
+  F.slice().sort((a,b)=>b.v-a.v).forEach(l=>{
+    const t=Math.max(l.v*scale,1.2),x0=l.S.x+NW,x1=l.T.x,xm=(x0+x1)/2;
+    const y0=l.sy+t/2,y1=l.ty+t/2, un=l.hop==='unalloc', ce=l.hop!=='hard'&&!un;
+    const col=l.bad||l.hop==='orphan'?cv('--v-red-500')
+      :un?cv('--v-yellow-500')
+      :l.T.col==='band'?color(l.T.k.split('|')[1])
+      :l.T.col==='ds'?color(l.S.col==='band'?l.S.k.split('|')[1]:l.ent)
+      :color(l.T.col==='bucket'?l.T.k:l.S.col==='bucket'?l.T.k:l.S.k);
+    const dim=tL&&!tL.has(l), self=isHot(l.key);
+    const d=`M${x0},${y0} C${xm},${y0} ${xm},${y1} ${x1},${y1}`;
+    const op=dim?.09:self?1:l.bad?.8:un?.55:ce?.7:.85;
+    /* reserved flow is solid, a ceiling is striped — the two must not read alike */
+    P.push(`<path fill="none" stroke="${col}" stroke-opacity="${op}" pointer-events="none"
+      stroke-width="${t}" ${l.bad?'stroke-dasharray="2 7"':un?'stroke-dasharray="2 4"':ce?'stroke-dasharray="3 5"':''}
+      d="${d}"></path>`);
+    if(self) P.push(`<path fill="none" stroke="${cv('--c-text-primary')}" stroke-opacity=".5"
+      stroke-width="1" pointer-events="none" d="${d}"></path>`);
+    /* a dashed stroke only receives pointer events on its painted dashes, so every
+       ribbon carries an invisible solid hit path of the same width */
+    P.push(`<path fill="none" stroke="transparent" stroke-width="${Math.max(t,6)}"
+      pointer-events="stroke" data-link="${l.key}" d="${d}"
+      data-tip="${l.bad?'<b>invalid route</b><br><span>'+l.bad+'</span><br>':''}<b>${label(l.S.k)} &rarr; ${label(l.T.k)}</b><br><span>${fmt(l.v)} U</span>${
+        ce&&!l.bad?'<br><span>ceiling, not an allocation</span>':''}${
+        l.split?'<br><span>fed by med and low, split by their ceilings</span>':''}${
+        l.hop==='orphan'?'<br><b>no priority band feeds this dataset</b>':''}"></path>`);
+  });
+
+  /* per-hop excess / shortfall marker on the parent node */
+  /* the marker continues the parent's own bar downward, so excess reads as that
+     bar overflowing rather than as a stray line beside it */
+  const mark=(n,parentV,childSum,what)=>{
+    if(!childSum||!parentV) return;
+    const x=n.x;
+    if(childSum>parentV) P.push(`<rect x="${x}" y="${n.y+parentV*scale}" width="${NW}"
+      height="${(childSum-parentV)*scale}" rx="2.5" fill="url(#hatch)" stroke="${cv('--v-red-500')}"
+      stroke-opacity=".6" stroke-width="1"
+      data-tip="<b>${label(n.k)} · over-subscribed</b><br><span>${what} total ${fmt(childSum)} U against ${fmt(parentV)} U</span><br><span>over by ${fmt(childSum-parentV)} U (${Math.round(childSum/parentV*100)}%)</span>"></rect>`);
+    else if(childSum<parentV) P.push(`<rect x="${x}" y="${n.y+childSum*scale}" width="${NW}"
+      height="${(parentV-childSum)*scale}" rx="2.5" fill="${cv('--c-background-card')}"
+      fill-opacity=".55" stroke="${cv('--c-border-strong')}" stroke-width="1" stroke-dasharray="3 3"
+      data-tip="<b>${label(n.k)} · unreachable</b><br><span>${what} total ${fmt(childSum)} U of ${fmt(parentV)} U</span><br><span>${fmt(parentV-childSum)} U cannot be reached through them</span>"></rect>`);
+  };
+  if(on.tco) sum.ents.filter(e=>!ent||e.k===ent).forEach(e=>{
+    const n=N['rules:'+e.k]; if(n) mark(n,e.res,e.tcoTot,'priority ceilings');
+    if(on.ds) Object.keys(e.bands).forEach(b=>{
+      const bn=N['band:'+e.k+'|'+b]; if(bn) mark(bn,e.bands[b].ceiling,e.bands[b].dsTot,'dataset limits');
+    });
+  });
+
+  order.forEach(n=>{
+    const off=tN&&!tN.has(n.id), o1=off?.22:1;
+    const outline=n.col==='band'||n.col==='ds';
+    const badIn=n.in.some(l=>l.bad||l.hop==='orphan');
+    const ck=badIn?'block':n.col==='band'?n.k.split('|')[1]:n.k;
+    /* percentages are always against the node's own parent, never a lane total */
+    const parent=sm(n.in)>0?n.in[0].S:null;
+    /* a dataset's parent is "<pillar> · <band>"; the pillar is already obvious from
+       the lane, so the inline value keeps only the band and the row stays short */
+    const pk=parent?(parent.col==='band'&&n.col==='ds'
+      ? label(parent.k.split('|')[1]) : label(parent.k)):null;
+    const rel=parent&&parent.v>0?Math.round(n.v/parent.v*100)+'% of '+pk:null;
+    P.push(`<rect x="${n.x}" y="${n.y}" width="${NW}" height="${n.h}" rx="2.5"
+      fill="${outline?'none':color(ck)}" fill-opacity="${o1}"
+      ${outline?`stroke="${color(ck)}" stroke-width="1.5" stroke-opacity="${off?.25:.9}"`:''}
+      ${isHot(n.id)?`stroke="${cv('--c-text-primary')}" stroke-width="1.5"`:''}
+      data-node="${n.id}" data-tip="${badIn?'<b>invalid route</b><br>':''}<b>${label(n.k)}</b><br><span>${fmt(n.v)} U${rel?' · '+rel:''}</span>${
+        n.col==='band'?bandTip(n):n.col==='rules'?entTip(n):''}"></rect>`);
+    /* the last column and the quota-rules column label to the left, so nothing
+       collides with the canvas edge or with the divider */
+    const right=!(n.col==='ds'&&cols[cols.length-1]==='ds')&&!(n.col==='rules'&&dx!=null);
+    const tx=right?n.x+NW+9:n.x-9;
+    const an=right?'start':'end', ly=n.y+Math.min(n.h/2,12)+3;
+    P.push(`<text class="nlabel" x="${tx}" y="${ly}" text-anchor="${an}" opacity="${off?.25:1}">${label(n.k)}</text>`);
+    if(showVal) P.push(`<text class="nval" x="${tx}" y="${ly+15}" text-anchor="${an}" opacity="${off?.25:1}">${fmt(n.v)} U${rel?' · '+rel:''}</text>`);
+  });
+  /* one fact per line — these tooltips carry four or five separate statements and
+     ran together as prose when they shared a line */
+  function lines(a){return a.filter(Boolean).map(s=>`<br><span>${s}</span>`).join('')}
+  function bandTip(n){
+    const [ek,b]=n.k.split('|'), e=sum.ents.find(x=>x.k===ek); if(!e) return '';
+    const nr=(e.rules||{})[b], info=e.bands[b]||{dsTot:0,n:0};
+    const d=info.dsTot-info.ceiling;
+    return lines([
+      `pillar: ${label(ek)}`,
+      nr?`aggregates ${nr} TCO rule${nr>1?'s':''}`:'aggregate ceiling, no rule count',
+      `ceiling: ${fmt(info.ceiling)} U`,
+      `feeds: ${b==='high'?'frequentsearch only':b==='block'?'nothing, data is dropped'
+        :b==='none'?'default, no TCO rules':'default only'}`,
+      info.n?`${info.n} dataset limit${info.n>1?'s':''} behind it, Σ ${fmt(info.dsTot)} U`:null,
+      info.n&&d>0?`over-subscribed by ${fmt(d)} U`:info.n&&d<0?`${fmt(-d)} U unreachable`:null
+    ]);
+  }
+  function entTip(n){
+    const e=sum.ents.find(x=>x.k===n.k); if(!e) return '';
+    const d=e.tcoTot-e.res;
+    return lines([
+      `reserved: ${fmt(e.res)} U, hard guarantee`,
+      `priority ceilings: Σ ${fmt(e.tcoTot)} U`,
+      d>0?`over the reservation by ${fmt(d)} U`:d<0?`${fmt(-d)} U unreachable by any rule`:'matches the reservation exactly',
+      `dataset limits: Σ ${fmt(e.dsTot)} U`
+    ]);
+  }
+
+  document.getElementById('svg').innerHTML=P.join('');
+  const setHov=(t,id)=>{if(hov&&hov.t===t&&hov.id===id)return;hov={t,id};draw()};
+  document.querySelectorAll('#svg [data-tip]').forEach(el=>{
+    el.onmousemove=ev=>show(ev,el.dataset.tip);
+    el.onmouseenter=()=>{ el.dataset.node?setHov('node',el.dataset.node)
+      :el.dataset.link?setHov('link',el.dataset.link):null };
+    el.onmouseleave=()=>{hide();if(hov){hov=null;draw()}};
+  });
+  document.getElementById('leg').innerHTML=
+    ['cx','ai','unalloc:cx','high','med','low','block']
+      .map(k=>`<span><i style="background:${color(k)}"></i>${label(k)}</span>`).join('')
+    +`<span><i style="border:1.5px solid ${cv('--v-blue-500')};background:none"></i>ceiling, outlined</span>`
+    +`<span><i style="background:${cv('--v-red-500')};opacity:.55"></i>over-subscribed</span>`;
+
+  const o=document.getElementById('out');
+  o.className='readout'+(sum.unassigned!==0?' bad':'');
+  o.innerHTML=`<span>assigned ${fmt(sum.assigned)} / ${fmt(sum.plan)}</span><span>${
+    sum.unassigned===0?'balanced':sum.unassigned>0?fmt(sum.unassigned)+' unassigned':fmt(-sum.unassigned)+' over plan'}</span>`;
+
+  const f=[];
+  if(sum.unassigned<0) f.push(['err',`<b>Over plan by ${fmt(-sum.unassigned)} U.</b> Unit types total more than the team quota, and the left half is a partition.`]);
+  else if(sum.unassigned>0) f.push(['warn',`<b>${fmt(sum.unassigned)} U assigned to no unit type.</b>`]);
+  sum.buckets.filter(b=>b.rest<0).forEach(b=>f.push(['err',
+    `<b>${label(b.k)} reservations exceed the unit type by ${fmt(-b.rest)} U.</b> Guarantees cannot over-subscribe: this is the one hop where authoring must reject it.`]));
+  if(sum.unalloc>0) f.push(['warn',`<b>${fmt(sum.unalloc)} U unallocated</b> across ${sum.buckets.filter(b=>b.rest>0).map(b=>label(b.k)).join(', ')}. No owner, and unallocated metrics consuming it cannot be blocked (CX-44923).`]);
+  [...new Set(sum.routing)].forEach(r=>f.push(['err',`<b>Routing violation.</b> ${r}.`]));
+  sum.ents.forEach(e=>{
+    const d=e.tcoTot-e.res;
+    if(d>0) f.push(['err',`<b>${label(e.k)} priority ceilings promise ${fmt(e.tcoTot)} U against ${fmt(e.res)} reserved.</b> Over by ${fmt(d)} U (${Math.round(e.tcoTot/(e.res||1)*100)}%). Legitimate as ceilings, unsound if read as simultaneously reachable.`]);
+    else if(d<0) f.push(['warn',`<b>${label(e.k)} priority ceilings total ${fmt(e.tcoTot)} U of ${fmt(e.res)} reserved.</b> ${fmt(-d)} U cannot be reached through any TCO rule.`]);
+    Object.keys(e.bands).forEach(b=>{
+      const x=e.bands[b], dd=x.dsTot-x.ceiling; if(!x.n) return;
+      if(dd>0) f.push(['err',`<b>${label(e.k)} ${label(b)} feeds dataset limits totalling ${fmt(x.dsTot)} U against its own ${fmt(x.ceiling)} U ceiling.</b> Over by ${fmt(dd)} U.`]);
+    });
+  });
+  if(!f.length) f.push(['ok',`<b>Plan is sound.</b> Reservations partition ${fmt(sum.plan)} U exactly, every ceiling matches its parent, and routing obeys the dataspace rule.`]);
+  document.getElementById('finds').innerHTML=f.map(([c,t])=>`<p class="find ${c}">${t}</p>`).join('');
+}
+editor(); draw();
+</script>
+</body>
+</html>
