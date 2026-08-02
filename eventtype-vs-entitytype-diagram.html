@@ -44,6 +44,19 @@
   th { color: #a1a1aa; font-weight: 600; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
   td:first-child { color: #ffffff; font-weight: 600; }
   td code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; color: #22dd92; }
+  .layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .layer { border: 1px solid #1a1a1a; border-radius: 10px; padding: 14px 16px; background: #050505; }
+  .tier { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: #ffffff; font-weight: 700; margin-bottom: 8px; }
+  .auto { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 20px; padding: 2px 10px; margin-bottom: 10px; border: 1px solid; }
+  .auto.ok { color: #22dd92; border-color: #22dd92; background: #0c2419; }
+  .auto.half { color: #F59E0B; border-color: #F59E0B; background: #3d2e1a; }
+  .auto.no { color: #EF4444; border-color: #EF4444; background: #3d1a1a; }
+  .layer p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; color: #d4d4d8; }
+  .layer p.verdict { margin: 0; color: #a1a1aa; font-style: italic; }
+  .layer code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12px; color: #22dd92; }
+  .takeaway { font-size: 13.5px; line-height: 1.65; color: #d4d4d8; margin: 0 0 4px; padding: 12px 14px; border-left: 3px solid #22dd92; background: #050505; border-radius: 0 8px 8px 0; }
+  .takeaway code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; color: #22dd92; }
+  .takeaway strong { color: #ffffff; }
   footer { margin-top: 28px; }
   .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
   .legend div { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #a1a1aa; }
@@ -261,6 +274,31 @@
   </table>
 </div>
 
+<div class="map">
+  <h3>How New Relic correlates an event to a log — three layers, only the coarsest is automatic</h3>
+  <div class="layers">
+    <div class="layer">
+      <div class="tier">Layer 1 · entity</div>
+      <div class="auto ok">automatic</div>
+      <p>Entity synthesis matches resource attributes against definition rules and binds the telemetry to an entity. <code>entity.guid</code>, <code>entity.name</code> and <code>entity.type</code> are reserved and system-owned; producer-supplied values cause undefined behavior.</p>
+      <p class="verdict">Answers "same service". Never "same request".</p>
+    </div>
+    <div class="layer">
+      <div class="tier">Layer 2 · trace</div>
+      <div class="auto half">logs only</div>
+      <p>The agent injects <code>trace.id</code> and <code>span.id</code> into every log. Custom events get nothing unless the producer fetches trace metadata and stamps them by hand, per call.</p>
+      <p class="verdict">A log and a custom event meet here only when someone remembered.</p>
+    </div>
+    <div class="layer">
+      <div class="tier">Layer 3 · record</div>
+      <div class="auto no">manual</div>
+      <p>NRQL subquery join: <code>FROM Log JOIN (FROM Purchase SELECT sessionId, amount) ON sessionId</code>. Equality only, no type coercion, <strong>cardinality capped 1:100</strong>, inner LIMIT default 10 and max 5,000.</p>
+      <p class="verdict">An analyst tool for bounded lookups, not a correlation engine.</p>
+    </div>
+  </div>
+  <p class="takeaway">There is no automatic event-to-log correlation in New Relic. The entity is the only free link, so "custom event, no correlation" genuinely disconnects the data: no union reaches it, no trace panel shows it. We chose a more permissive model. A DPXL-routed log keeps <code>entityType = logs</code>, so it is still a log and the union reaches it. New Relic can never return the same record twice, and we can. <strong>The duplicate is the price of the permission.</strong></p>
+</div>
+
 <div class="contrast">
   <div class="card">
     <h3>New Relic — the record says what it is</h3>
@@ -274,7 +312,7 @@
     <h3>Coralogix — two paths, and only one is governed</h3>
     <p><strong>Platform path.</strong> Radiant matches <code>cx.integration.source.type</code> against a rule in code, cx-catalog holds the entityType, pillar and target dataset. New type, PR and approval, 44 live.</p>
     <p><strong>Customer path.</strong> A DPXL expression in the Traffic Processor routes or fans out matching records into <code>default/&lt;dataset_name&gt;</code>. No registration and no approval, bounded only by a soft limit of 15 user datasets on top of the predefined system ones, raisable per team. The <span class="warn">entityType stays <code>logs</code></span>. The customer created a container, not a type.</p>
-    <p class="warn">Only exception: aiEvaluations routes on the OTel payload field <code>event.name</code>, the one place we resemble New Relic, and the routing key with no sign-off since 15-07.</p>
+    <p>No exceptions. aiEvaluations was briefly proposed to route on the OTel payload field <code>event.name</code>, which would have been the one place we resemble New Relic. CX AI was required to move to <code>cx.integration.source.type</code>, so every entityType now routes on integration metadata and nothing in the platform reads a type out of the payload.</p>
   </div>
   <div class="card">
     <h3>Why this decides the correlation argument</h3>
