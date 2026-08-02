@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eventType vs entityType — how the type is carried at ingest</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 24px 48px;
+    background: #000000;
+    background-image: radial-gradient(ellipse at top, rgba(34, 221, 146, 0.05), transparent 60%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1720px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background: #22dd92; box-shadow: 0 0 16px rgba(34, 221, 146, 0.5); }
+  .brand span { font-size: 13px; letter-spacing: 0.06em; color: #ffffff; text-transform: uppercase; }
+  header h1 { font-size: 26px; margin: 0 0 10px; font-weight: 650; letter-spacing: -0.01em; }
+  header p { margin: 0 0 6px; color: #a1a1aa; font-size: 14.5px; line-height: 1.55; max-width: 100ch; }
+  header p strong { color: #22dd92; font-weight: 600; }
+  header code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; color: #22dd92; }
+  main { margin: 26px 0 0; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 16px; padding: 8px; overflow-x: auto; }
+  svg { width: 100%; min-width: 1120px; height: auto; display: block; }
+  .node rect { transition: stroke-width 0.2s ease, opacity 0.3s ease; cursor: pointer; }
+  .node text { pointer-events: none; }
+  .node:hover rect { stroke-width: 3.5; filter: url(#glow); }
+  .dimmed { opacity: 0.18; }
+  .node, .edge { transition: opacity 0.3s ease; }
+  .contrast { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin: 26px 0 0; }
+  .card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; padding: 16px 18px; }
+  .card h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; color: #22dd92; font-weight: 600; }
+  .card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.6; color: #d4d4d8; }
+  .card p:last-child { margin-bottom: 0; }
+  .card code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; color: #22dd92; }
+  .card .warn { color: #F59E0B; }
+  .map { margin: 20px 0 0; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; padding: 4px 18px 14px; overflow-x: auto; }
+  .map h3 { font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; color: #22dd92; font-weight: 600; margin: 14px 0 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 620px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #1a1a1a; color: #d4d4d8; vertical-align: top; }
+  th { color: #a1a1aa; font-weight: 600; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+  td:first-child { color: #ffffff; font-weight: 600; }
+  td code { background: #141414; border: 1px solid #222; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; color: #22dd92; }
+  footer { margin-top: 28px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
+  .legend div { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #a1a1aa; }
+  .sw { width: 13px; height: 13px; border-radius: 3px; border-width: 2px; border-style: solid; }
+  .source { font-size: 12px; color: #52525b; line-height: 1.6; }
+  .hint { font-size: 12px; color: #52525b; margin-top: 10px; }
+  @media (max-width: 768px) {
+    body { padding: 20px 12px 36px; }
+    header h1 { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brand"><div class="dot"></div><span>Coralogix · NSPM</span></div>
+
+<header>
+  <h1>eventType vs entityType — how the type is carried at ingest</h1>
+  <p><strong>New Relic:</strong> the producer writes the type into the record. <code>eventType</code> is required in the Event API body and reserved on the Log API, where it is dropped during ingest. The record is self-describing and the platform enforces the split at the endpoint.</p>
+  <p><strong>Coralogix:</strong> the record never names its type. Two separate paths put it in a dataset. The platform path registers a new entityType in cx-catalog. The customer path is a DPXL expression in the Traffic Processor that routes or fans out into <code>default/&lt;dataset_name&gt;</code> while the entityType stays <code>logs</code>. The second path is the one customers actually use, and it creates containers, not types.</p>
+</header>
+
+<main>
+<svg viewBox="0 0 1680 990" role="img" aria-label="New Relic eventType ingest path compared with the two Coralogix paths that place a record in a dataset">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feFlood flood-color="#22dd92" flood-opacity="0.6" result="c"/>
+      <feComposite in="c" in2="b" operator="in" result="d"/>
+      <feMerge><feMergeNode in="d"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="a-mint" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#22dd92"/></marker>
+    <marker id="a-mintdim" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1ab677"/></marker>
+    <marker id="a-amber" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#F59E0B"/></marker>
+    <marker id="a-indigo" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#6366F1"/></marker>
+    <marker id="a-purple" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#A855F7"/></marker>
+    <marker id="a-red" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#EF4444"/></marker>
+  </defs>
+
+  <text x="40" y="42" font-size="13" font-weight="700" letter-spacing="2" fill="#52525b">NEW RELIC — THE TYPE IS IN THE RECORD</text>
+  <line x1="40" y1="400" x2="1640" y2="400" stroke="#1a1a1a" stroke-width="1" stroke-dasharray="6 6"/>
+  <text x="40" y="448" font-size="13" font-weight="700" letter-spacing="2" fill="#52525b">CORALOGIX — THE TYPE IS ASSIGNED, THE CONTAINER IS USER-DEFINED</text>
+  <text x="560" y="478" font-size="11.5" font-weight="700" letter-spacing="1.4" fill="#F59E0B" opacity="0.75">PLATFORM PATH · new entityType, PR-gated</text>
+  <text x="560" y="948" font-size="11.5" font-weight="700" letter-spacing="1.4" fill="#22dd92" opacity="0.75">CUSTOMER PATH · new dataset, self-service, entityType stays logs</text>
+
+  <!-- ============ EDGES: NEW RELIC ============ -->
+  <g class="edge" data-a="nr1" data-b="nr3"><path d="M240,184 L304,122" fill="none" stroke="#22dd92" stroke-width="2" marker-end="url(#a-mint)"/><text x="248" y="142" font-size="11" fill="#a1a1aa" text-anchor="start">declared an event</text></g>
+  <g class="edge" data-a="nr1" data-b="nr4"><path d="M240,216 L304,276" fill="none" stroke="#22dd92" stroke-width="2" marker-end="url(#a-mint)"/><text x="248" y="274" font-size="11" fill="#a1a1aa" text-anchor="start">declared a log</text></g>
+  <g class="edge" data-a="nr3" data-b="nr5"><line x1="530" y1="114" x2="594" y2="114" stroke="#F59E0B" stroke-width="2" marker-end="url(#a-amber)"/><text x="562" y="103" font-size="11" fill="#22dd92" text-anchor="middle" font-weight="600">eventType kept</text></g>
+  <g class="edge" data-a="nr4" data-b="nr6"><line x1="530" y1="284" x2="594" y2="284" stroke="#F59E0B" stroke-width="2" marker-end="url(#a-amber)"/><text x="562" y="273" font-size="11" fill="#EF4444" text-anchor="middle" font-weight="600">eventType dropped</text></g>
+  <g class="edge" data-a="nr5" data-b="nr7"><path d="M830,122 L894,178" fill="none" stroke="#6366F1" stroke-width="2" marker-end="url(#a-indigo)"/><text x="838" y="142" font-size="11" fill="#a1a1aa" text-anchor="start">FROM Purchase</text></g>
+  <g class="edge" data-a="nr6" data-b="nr7"><path d="M830,276 L894,222" fill="none" stroke="#6366F1" stroke-width="2" marker-end="url(#a-indigo)"/><text x="838" y="272" font-size="11" fill="#a1a1aa" text-anchor="start">FROM Log</text></g>
+  <g class="edge" data-a="nr7" data-b="nr8"><line x1="1110" y1="200" x2="1174" y2="200" stroke="#EF4444" stroke-width="2" marker-end="url(#a-red)"/><text x="1142" y="189" font-size="11" fill="#a1a1aa" text-anchor="middle">trace.id</text></g>
+
+  <!-- ============ EDGES: CORALOGIX ============ -->
+  <g class="edge" data-a="cx1" data-b="cx3"><line x1="240" y1="690" x2="294" y2="690" stroke="#22dd92" stroke-width="2" marker-end="url(#a-mint)"/><text x="267" y="680" font-size="11" fill="#a1a1aa" text-anchor="middle">record</text></g>
+  <g class="edge" data-a="cx3" data-b="cx2"><path d="M500,672 L554,556" fill="none" stroke="#A855F7" stroke-width="2" marker-end="url(#a-purple)"/><text x="508" y="592" font-size="11" fill="#a1a1aa" text-anchor="start">platform decides</text></g>
+  <g class="edge" data-a="cx3" data-b="cx7"><path d="M500,708 L554,792" fill="none" stroke="#A855F7" stroke-width="2" marker-end="url(#a-purple)"/><text x="508" y="768" font-size="11" fill="#22dd92" text-anchor="start" font-weight="600">customer decides</text></g>
+  <g class="edge" data-a="cx2" data-b="cx4"><line x1="790" y1="544" x2="854" y2="544" stroke="#F59E0B" stroke-width="2" marker-end="url(#a-amber)"/><text x="822" y="533" font-size="11" fill="#a1a1aa" text-anchor="middle">matched source</text></g>
+  <g class="edge" data-a="cx4" data-b="cx5"><line x1="1090" y1="544" x2="1154" y2="544" stroke="#22dd92" stroke-width="2" marker-end="url(#a-mint)"/><text x="1122" y="533" font-size="11" fill="#22dd92" text-anchor="middle" font-weight="600">new entityType</text></g>
+  <g class="edge" data-a="cx7" data-b="cx8"><line x1="790" y1="804" x2="854" y2="804" stroke="#1ab677" stroke-width="2" marker-end="url(#a-mintdim)"/><text x="822" y="793" font-size="11" fill="#a1a1aa" text-anchor="middle">filter matches</text></g>
+  <g class="edge" data-a="cx8" data-b="cx9"><path d="M1090,788 Q1122,752 1154,786" fill="none" stroke="#A855F7" stroke-width="2" marker-end="url(#a-purple)"/><text x="1122" y="746" font-size="11" fill="#a1a1aa" text-anchor="middle">route = 1 copy</text></g>
+  <g class="edge" data-a="cx8" data-b="cx9"><path d="M1090,820 Q1122,858 1154,822" fill="none" stroke="#A855F7" stroke-width="2" marker-end="url(#a-purple)"/><text x="1122" y="878" font-size="11" fill="#EF4444" text-anchor="middle" font-weight="600">fan-out = N copies</text></g>
+  <g class="edge" data-a="cx5" data-b="cx6"><path d="M1390,552 L1444,662" fill="none" stroke="#6366F1" stroke-width="2" marker-end="url(#a-indigo)"/><text x="1398" y="600" font-size="11" fill="#a1a1aa" text-anchor="start">source ds</text></g>
+  <g class="edge" data-a="cx9" data-b="cx6"><path d="M1390,796 L1444,730" fill="none" stroke="#6366F1" stroke-width="2" marker-end="url(#a-indigo)"/><text x="1398" y="792" font-size="11" fill="#a1a1aa" text-anchor="start">union</text></g>
+
+  <!-- ============ NODES: NEW RELIC ============ -->
+  <g class="node" id="nr1" role="img" aria-label="Producer app: the endpoint it POSTs to is the type declaration">
+    <rect x="40" y="160" width="200" height="80" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+    <text x="140" y="191" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Producer app</text>
+    <text x="140" y="210" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">the endpoint it POSTs to</text>
+    <text x="140" y="225" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">IS the declaration</text>
+  </g>
+  <g class="node" id="nr3" role="img" aria-label="Event API: eventType is a required field in the JSON body">
+    <rect x="310" y="70" width="220" height="88" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+    <text x="420" y="100" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Event API</text>
+    <text x="420" y="119" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">/v1/accounts/{id}/events</text>
+    <text x="420" y="136" font-size="11.5" fill="#22dd92" text-anchor="middle">"eventType" REQUIRED</text>
+  </g>
+  <g class="node" id="nr4" role="img" aria-label="Log API: eventType is reserved and dropped during ingest">
+    <rect x="310" y="240" width="220" height="88" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+    <text x="420" y="270" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Log API</text>
+    <text x="420" y="289" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">/log/v1</text>
+    <text x="420" y="306" font-size="11.5" fill="#EF4444" text-anchor="middle">"eventType" DROPPED</text>
+  </g>
+  <g class="node" id="nr5" role="img" aria-label="Purchase namespace: each eventType value is its own namespace, capped at 250 per account per day">
+    <rect x="600" y="70" width="230" height="88" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="715" y="100" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Purchase namespace</text>
+    <text x="715" y="119" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">one namespace per value</text>
+    <text x="715" y="136" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">cap: 250 / account / 24h</text>
+  </g>
+  <g class="node" id="nr6" role="img" aria-label="Log store: every log lands in one namespace, logtype is only a label">
+    <rect x="600" y="240" width="230" height="88" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="715" y="270" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Log store</text>
+    <text x="715" y="289" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">one namespace for all logs</text>
+    <text x="715" y="306" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">logtype is a label, not a split</text>
+  </g>
+  <g class="node" id="nr7" role="img" aria-label="NRQL: the FROM clause names the type the producer declared">
+    <rect x="900" y="155" width="210" height="90" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+    <text x="1005" y="186" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">NRQL query</text>
+    <text x="1005" y="205" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">FROM names the type</text>
+    <text x="1005" y="222" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">the producer declared</text>
+  </g>
+  <g class="node" id="nr8" role="img" aria-label="Correlation keys are reserved and agent-injected, producer values are rejected">
+    <rect x="1180" y="155" width="230" height="90" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+    <text x="1295" y="186" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Correlation keys</text>
+    <text x="1295" y="205" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">entity.guid, trace.id</text>
+    <text x="1295" y="222" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">reserved, agent-injected</text>
+  </g>
+
+  <!-- ============ NODES: CORALOGIX ============ -->
+  <g class="node" id="cx1" role="img" aria-label="Producer integration emits a record carrying no type">
+    <rect x="40" y="650" width="200" height="80" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+    <text x="140" y="681" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Producer integration</text>
+    <text x="140" y="700" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">record carries no type,</text>
+    <text x="140" y="715" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">only $d / $l / $m</text>
+  </g>
+  <g class="node" id="cx3" role="img" aria-label="Who assigns the dataset: the platform registry or a customer rule">
+    <rect x="300" y="650" width="200" height="80" rx="12" fill="#2e1a3d" stroke="#A855F7" stroke-width="2"/>
+    <text x="400" y="681" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Who assigns it?</text>
+    <text x="400" y="700" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">two live paths into</text>
+    <text x="400" y="715" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">a dataset, not one</text>
+  </g>
+
+  <g class="node" id="cx2" role="img" aria-label="Radiant routing rule matches the integration source type, rule held in code">
+    <rect x="560" y="500" width="230" height="88" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+    <text x="675" y="530" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Radiant routing rule</text>
+    <text x="675" y="549" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">cx.integration.source.type</text>
+    <text x="675" y="566" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">rule lives in code</text>
+  </g>
+  <g class="node" id="cx4" role="img" aria-label="cx-catalog registry holds entityType, pillar and target dataset for 44 live types, gated by pull request">
+    <rect x="860" y="500" width="230" height="88" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+    <text x="975" y="530" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">cx-catalog registry</text>
+    <text x="975" y="549" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">entityType + pillar + dataset</text>
+    <text x="975" y="566" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">44 live types, PR-gated</text>
+  </g>
+  <g class="node" id="cx5" role="img" aria-label="Registered dataset such as ops.events, carrying its own new entityType">
+    <rect x="1160" y="500" width="230" height="88" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="1275" y="530" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Registered dataset</text>
+    <text x="1275" y="549" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">ops.events, ai.sessions.claude</text>
+    <text x="1275" y="566" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">carries its OWN entityType</text>
+  </g>
+
+  <g class="node" id="cx7" role="img" aria-label="Traffic Processor DPXL rule: a customer expression over the record fields, no registration required">
+    <rect x="560" y="760" width="230" height="88" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+    <text x="675" y="790" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Traffic Processor rule</text>
+    <text x="675" y="809" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">DPXL expression on $d / $l</text>
+    <text x="675" y="826" font-size="11.5" fill="#22dd92" text-anchor="middle">no registration, counts to 15</text>
+  </g>
+  <g class="node" id="cx8" role="img" aria-label="Route or fan out: route moves the record, fan-out copies it to every matching target">
+    <rect x="860" y="760" width="230" height="88" rx="12" fill="#2e1a3d" stroke="#A855F7" stroke-width="2"/>
+    <text x="975" y="790" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">Route or fan out?</text>
+    <text x="975" y="809" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">route moves the record,</text>
+    <text x="975" y="826" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">fan-out copies it</text>
+  </g>
+  <g class="node" id="cx9" role="img" aria-label="default slash dataset name: a user-created container whose entityType stays logs">
+    <rect x="1160" y="760" width="230" height="88" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="1275" y="790" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">default/&lt;dataset_name&gt;</text>
+    <text x="1275" y="809" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">user-created container</text>
+    <text x="1275" y="826" font-size="11.5" fill="#22dd92" text-anchor="middle">entityType STAYS logs</text>
+  </g>
+
+  <g class="node" id="cx6" role="img" aria-label="DataPrime and the related-logs union: the consumer names containers because no type distinguishes them">
+    <rect x="1440" y="650" width="200" height="90" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+    <text x="1540" y="681" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">DataPrime</text>
+    <text x="1540" y="700" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">consumer names the</text>
+    <text x="1540" y="717" font-size="11.5" fill="#fff" opacity="0.7" text-anchor="middle">container, not the type</text>
+  </g>
+</svg>
+</main>
+
+<div class="map">
+  <h3>The mapping that actually holds</h3>
+  <table>
+    <thead><tr><th>Concept</th><th>New Relic</th><th>Datadog</th><th>Coralogix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Type identity</td>
+        <td><code>eventType</code> in the record, producer-minted</td>
+        <td>data type fixed by endpoint</td>
+        <td><code>entityType</code> in cx-catalog, PR-gated</td>
+      </tr>
+      <tr>
+        <td>User-created container</td>
+        <td>log data partition, rule-matched at ingest, queried as <code>Log_nginx</code></td>
+        <td>log index, filter query, first match wins</td>
+        <td>dataset via DPXL route or fan-out</td>
+      </tr>
+      <tr>
+        <td>Can one record land in two containers</td>
+        <td>no fan-out primitive; unmatched logs fall to default <code>Log</code></td>
+        <td>not in indexes; only pipeline dual-ship, and a Dedupe processor ships with it</td>
+        <td><span class="warn">yes, fan-out is a copy, by design</span></td>
+      </tr>
+      <tr>
+        <td>Cap on containers</td>
+        <td>250 eventTypes / account / 24h · 100 log partitions / account</td>
+        <td>100 indexes, per-index daily quota</td>
+        <td>15 user datasets + predefined system datasets, soft, raisable per team</td>
+      </tr>
+      <tr>
+        <td>Cross-container read</td>
+        <td><code>FROM A, B</code>; multi-partition query supported</td>
+        <td>Log Explorer is cross-index</td>
+        <td>shipped: union in the related-logs tab (02-08). In flight, three separate initiatives: <code>source a, b, c</code> multi-dataset sources · <code>source *</code> wildcard · dataset alias</td>
+      </tr>
+      <tr>
+        <td>Correlation resolves on</td>
+        <td>reserved injected keys</td>
+        <td>reserved injected tags</td>
+        <td><span class="warn">the container</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="contrast">
+  <div class="card">
+    <h3>New Relic — the record says what it is</h3>
+    <p>Event API body, <code>eventType</code> required and producer-set:</p>
+    <p><code>[{ "eventType": "Purchase", "account": 3, "amount": 259.54 }]</code></p>
+    <p>Log API body, same field reserved. The docs state it plainly: <span class="warn">if it is included, it will be dropped during ingest</span>.</p>
+    <p><code>{ "logs": [{ "timestamp": 1550086450124, "message": "User 'xyz' logged in" }] }</code></p>
+    <p>You cannot smuggle an event into the log pipe. The split is enforced, not conventional.</p>
+  </div>
+  <div class="card">
+    <h3>Coralogix — two paths, and only one is governed</h3>
+    <p><strong>Platform path.</strong> Radiant matches <code>cx.integration.source.type</code> against a rule in code, cx-catalog holds the entityType, pillar and target dataset. New type, PR and approval, 44 live.</p>
+    <p><strong>Customer path.</strong> A DPXL expression in the Traffic Processor routes or fans out matching records into <code>default/&lt;dataset_name&gt;</code>. No registration and no approval, bounded only by a soft limit of 15 user datasets on top of the predefined system ones, raisable per team. The <span class="warn">entityType stays <code>logs</code></span>. The customer created a container, not a type.</p>
+    <p class="warn">Only exception: aiEvaluations routes on the OTel payload field <code>event.name</code>, the one place we resemble New Relic, and the routing key with no sign-off since 15-07.</p>
+  </div>
+  <div class="card">
+    <h3>Why this decides the correlation argument</h3>
+    <p>Every user-created log dataset is the same <code>entityType = logs</code>. Nothing distinguishes them by kind, so a consumer asking "where are my related logs" can only answer with a list of containers. That is the union in the spans view, and it is the only answer the model permits.</p>
+    <p>Fan-out is a copy, so one record can sit in several of those containers. New Relic and Datadog both make that impossible by construction. Ours is a deliberate product capability, which means the duplicate is ours to solve.</p>
+    <p>Key-based correlation is the way out. Reserve and inject the keys, and the container stops being the answer.</p>
+    <p class="warn">Three initiatives are already building cross-container reads in parallel: multi-dataset sources, wildcard, and alias. All three make the union easier and none of them dedups a fan-out copy.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="legend">
+    <div><span class="sw" style="background:#0c2419;border-color:#22dd92"></span>Trigger / Governance</div>
+    <div><span class="sw" style="background:#0c2419;border-color:#1ab677"></span>Processing</div>
+    <div><span class="sw" style="background:#3d2e1a;border-color:#F59E0B"></span>Service / API</div>
+    <div><span class="sw" style="background:#1a1a2e;border-color:#6366F1"></span>Data store</div>
+    <div><span class="sw" style="background:#2e1a3d;border-color:#A855F7"></span>Decision</div>
+    <div><span class="sw" style="background:#3d1a1a;border-color:#EF4444"></span>Query surface</div>
+  </div>
+  <div class="source">
+    Generated from: New Relic Event API and Log API public documentation · Datadog log index documentation · <em>traffic-processor-ref-file.md</em> (expression-based routing, fan-out, templated dataset names) · <em>Radiant Routing Register 2026-07-28</em> (live cx-catalog, 44 entity types) · <em>new-relic-custom-events-model-2026-08-02</em>. Prepared for the Operational logs vs custom events forum, 02-08-2026.
+  </div>
+  <div class="hint">Click any node to isolate its path. Click the background to reset.</div>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var adj = {
+    nr1: ['nr3','nr4'], nr3: ['nr1','nr5'], nr4: ['nr1','nr6'],
+    nr5: ['nr3','nr7'], nr6: ['nr4','nr7'], nr7: ['nr5','nr6','nr8'], nr8: ['nr7'],
+    cx1: ['cx3'], cx3: ['cx1','cx2','cx7'],
+    cx2: ['cx3','cx4'], cx4: ['cx2','cx5'], cx5: ['cx4','cx6'],
+    cx7: ['cx3','cx8'], cx8: ['cx7','cx9'], cx9: ['cx8','cx6'],
+    cx6: ['cx5','cx9']
+  };
+  var svg = document.querySelector('svg');
+  var nodes = Array.prototype.slice.call(svg.querySelectorAll('g.node'));
+  var edges = Array.prototype.slice.call(svg.querySelectorAll('g.edge'));
+
+  function reset() {
+    nodes.forEach(function (n) { n.classList.remove('dimmed'); });
+    edges.forEach(function (e) { e.classList.remove('dimmed'); });
+  }
+
+  function focus(id) {
+    var keep = {};
+    keep[id] = true;
+    (adj[id] || []).forEach(function (k) { keep[k] = true; });
+    nodes.forEach(function (n) { n.classList.toggle('dimmed', !keep[n.id]); });
+    edges.forEach(function (e) {
+      var a = e.getAttribute('data-a'), b = e.getAttribute('data-b');
+      e.classList.toggle('dimmed', !(a === id || b === id));
+    });
+  }
+
+  svg.addEventListener('click', function (ev) {
+    var g = ev.target.closest ? ev.target.closest('g.node') : null;
+    if (g && g.id) { focus(g.id); } else { reset(); }
+  });
+})();
+</script>
+</body>
+</html>
