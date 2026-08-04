@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Demo 04/08/2026 | Noam Sheffi</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d0f14; color: #e2e8f0; line-height: 1.6; }
+
+    .hero { text-align: center; padding: 80px 24px 48px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at center, rgba(0,212,170,0.06) 0%, transparent 60%); pointer-events: none; }
+    .hero-chip { display: inline-block; background: transparent; color: #00d4aa; padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(0,212,170,0.4); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
+    .hero h1 { font-size: 48px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+    .hero h1 .accent { color: #00d4aa; }
+    .hero .subtitle { font-size: 20px; color: #7a8599; font-weight: 400; }
+    .hero .divider { width: 48px; height: 3px; background: #00d4aa; margin: 20px auto; border-radius: 2px; }
+    .hero .author { margin-top: 8px; font-size: 15px; color: #c0c8d8; font-weight: 600; }
+    .hero .author-role { font-size: 13px; color: #7a8599; font-weight: 400; margin-top: 4px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 56px; }
+    .stat-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 24px; text-align: center; }
+    .stat-number { font-size: 36px; font-weight: 700; line-height: 1.1; color: #00d4aa; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #7a8599; margin-top: 8px; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; justify-content: center; }
+    .pill { background: #161a22; border: 1px solid #252a35; color: #7a8599; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; user-select: none; }
+    .pill:hover { border-color: #00d4aa; color: #e2e8f0; }
+    .pill.active { background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #00d4aa; }
+
+    .feature-section { margin-bottom: 56px; opacity: 1; transition: opacity 0.3s; }
+    .feature-section.hidden { display: none; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .section-badge { display: inline-block; padding: 4px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 24px; font-weight: 600; }
+
+    .feature-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 32px; margin-bottom: 20px; transition: transform 0.2s, border-color 0.2s; }
+    .feature-card:hover { transform: translateY(-2px); border-color: #333a48; }
+    .feature-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .feature-subtitle { color: #8a94a8; font-size: 15px; margin-bottom: 16px; max-width: 800px; }
+
+    .notion-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#00d4aa; text-decoration:none; margin-bottom:20px; border:1px solid rgba(0,212,170,0.3); background:rgba(0,212,170,0.08); padding:4px 11px; border-radius:8px; }
+
+    .bullet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .bullet-item { background: #0f1118; border-radius: 10px; padding: 18px 20px; border-left: 3px solid #00d4aa; }
+    .bullet-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #ffffff; }
+    .bullet-item p { font-size: 13px; color: #8a94a8; line-height: 1.5; }
+
+    .section-badge { background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .accent-governance .bullet-item { border-left-color: #00e6b8; }
+    .accent-quota .bullet-item { border-left-color: #00b88e; }
+    .accent-orgquota .bullet-item { border-left-color: #00c49a; }
+    .accent-datasets .bullet-item { border-left-color: #00e6b8; }
+    .accent-pipeline .bullet-item { border-left-color: #00d4aa; }
+
+    .ea-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #00d4aa; background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3); padding: 2px 8px; border-radius: 8px; text-transform: uppercase; vertical-align: middle; }
+
+    /* Coming Next, orange */
+    .accent-next .section-badge { background: rgba(255,159,67,0.14); color: #ff9f43; }
+    .accent-next .bullet-item { border-left-color: #ff9f43; }
+    .accent-next .ea-chip { color: #ff9f43; background: rgba(255,159,67,0.12); border-color: rgba(255,159,67,0.35); }
+    .accent-next .notion-link { color:#ff9f43; border-color:rgba(255,159,67,0.35); background:rgba(255,159,67,0.1); }
+    .feature-card.peek { border-color: rgba(255,159,67,0.3); background: linear-gradient(180deg, #161a22 0%, #1a1712 100%); }
+
+    .teams-section { margin-top: 64px; margin-bottom: 64px; }
+    .teams-title { text-align: center; font-size: 28px; font-weight: 600; margin-bottom: 8px; color: #ffffff; }
+    .teams-subtitle { text-align: center; color: #7a8599; font-size: 14px; margin-bottom: 32px; }
+    .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .team-card { background: #161a22; border: 1px solid #252a35; border-radius: 12px; padding: 20px; text-align: center; }
+    .team-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+    .team-icon svg { width: 20px; height: 20px; fill: none; stroke: #00d4aa; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .team-name { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+    .team-members { font-size: 12px; color: #7a8599; line-height: 1.5; }
+
+    .slide-nav { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    .slide-dot { width: 10px; height: 10px; border-radius: 50%; background: #252a35; cursor: pointer; transition: all 0.2s; border: none; }
+    .slide-dot:hover, .slide-dot.active { background: #00d4aa; transform: scale(1.3); }
+
+    footer { text-align: center; padding: 32px 24px; color: #7a8599; font-size: 12px; border-top: 1px solid #252a35; }
+    .footer-logo { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #c0c8d8; }
+    .footer-logo .dot { width: 10px; height: 10px; border-radius: 50%; background: #00d4aa; display: inline-block; }
+
+    @keyframes cta-pulse { 0%, 100% { border-color: rgba(0,212,170,0.2); box-shadow: 0 0 0 0 rgba(0,212,170,0); } 50% { border-color: rgba(0,212,170,0.6); box-shadow: 0 0 20px 2px rgba(0,212,170,0.15); } }
+    .cta-banner { background: rgba(0,212,170,0.06); border: 1px solid rgba(0,212,170,0.2); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 56px; animation: cta-pulse 2.5s ease-in-out infinite; }
+    .cta-banner p { font-size: 18px; font-weight: 500; }
+    .cta-banner .channel { color: #00d4aa; font-weight: 700; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 28px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .bullet-grid { grid-template-columns: 1fr !important; }
+      .slide-nav { display: none; }
+      .teams-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="slide-nav" aria-label="Section navigation">
+    <button class="slide-dot active" onclick="scrollToSection(0)" aria-label="Top"></button>
+    <button class="slide-dot" onclick="scrollToSection(1)" aria-label="Cost Control for Spans"></button>
+    <button class="slide-dot" onclick="scrollToSection(2)" aria-label="Quota, Units and Movement"></button>
+    <button class="slide-dot" onclick="scrollToSection(3)" aria-label="Usage &amp; AI"></button>
+    <button class="slide-dot" onclick="scrollToSection(4)" aria-label="Governance &amp; Schema"></button>
+    <button class="slide-dot" onclick="scrollToSection(5)" aria-label="Coming Next"></button>
+    <button class="slide-dot" onclick="scrollToSection(6)" aria-label="Thank You"></button>
+  </nav>
+
+  <header class="hero" id="sec-0">
+    <div class="hero-chip">Sprint Demo</div>
+    <h1>Data Pipeline</h1>
+    <h1><span class="accent">What We Shipped</span></h1>
+    <div class="divider"></div>
+    <p class="author">Noam Sheffi</p>
+    <p class="author-role">Product Manager, Pipeline &middot; Governance &middot; Monetization</p>
+    <p class="subtitle" style="margin-top:24px">04-08-2026</p>
+  </header>
+
+  <div class="container">
+
+    <div class="cta-banner">
+      <p><span style="font-size:12px;background:rgba(0,212,170,0.15);color:#00d4aa;padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:0.5px;margin-right:8px;">THEME</span> Five weeks: <span class="channel">cost control reaches spans, quota becomes movable, and usage gets an owner</span></p>
+      <p style="font-size:13px;color:#7a8599;margin-top:8px;">Roadmap updates post to <span class="channel">#i-love-roadmap</span>. Join <span class="channel">#i-love-dataflow</span> for ongoing pipeline &amp; governance discussions</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card"><div class="stat-number">5</div><div class="stat-label">Shipped</div></div>
+      <div class="stat-card"><div class="stat-number">5</div><div class="stat-label">Rolling Out</div></div>
+      <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Coming Next</div></div>
+      <div class="stat-card"><div class="stat-number">9</div><div class="stat-label">Teams Contributing</div></div>
+    </div>
+
+    <p style="text-align:center;color:#7a8599;font-size:13px;margin:-36px 0 40px;">Cards marked <span class="ea-chip">Rolling Out</span> are built and merged but not yet closed as released, so treat them as available rather than final.</p>
+
+    <nav class="filters" aria-label="Feature category filter">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="pipeline">Pipeline / TCO</button>
+      <button class="pill" data-filter="monetization">Quota / Usage</button>
+      <button class="pill" data-filter="governance">Governance</button>
+      <button class="pill" data-filter="next">Coming Next</button>
+    </nav>
+
+    <!-- ═══════════════ SECTION 1 · Cost Control Reaches Spans ═══════════════ -->
+    <div class="feature-section accent-pipeline" data-cat="pipeline" id="sec-1">
+      <div class="section-header">
+        <span class="section-badge">Pipeline &middot; TCO</span>
+        <h2 class="section-title">Cost Control Reaches Spans</h2>
+      </div>
+
+      <!-- Card 1 · CX-45405 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Graceful Span Cost Control</span></div>
+        <p class="feature-subtitle">Span quotas no longer flip straight to block. As a span quota fills, ingestion priority steps down through multiple thresholds, so the least valuable traces degrade first and the important ones keep their priority. Metering, ingestion-priority transition and the policy editor all landed together.</p>
+        <a class="notion-link" href="https://app.notion.com/p/37bc048defad8176b6cdf73761b5ada3" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Multi-Threshold Stepping</h4><p>Priority steps down gradually as the quota fills, instead of a single cutoff to block.</p></div>
+          <div class="bullet-item"><h4>Span Policy Editor</h4><p>Author and manage span TCO policies with default-dataset and multi-quota support.</p></div>
+          <div class="bullet-item"><h4>Metered by Applied Priority</h4><p>Usage is recorded against the priority actually applied, so cost matches what was ingested.</p></div>
+          <div class="bullet-item"><h4>Same Controls as Logs</h4><p>Span cost control uses the TCO policies and quota model you already know.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 2 · CX-45493 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>TCO Spans: Priority Block on Ingest</span> <span class="ea-chip">Rolling Out</span></div>
+        <p class="feature-subtitle">The bottom of the priority ladder is now a real stop. A Block priority on spans drops the lowest-value traces at ingest rather than storing and charging for them, with the blocked state visible in the policy UI and the trace view.</p>
+        <!-- NOTE: no Notion sales card yet, needs /roadmap-create -->
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Block at Ingest</h4><p>Spans matching a Block priority are dropped before storage, not filtered after the fact.</p></div>
+          <div class="bullet-item"><h4>Visible in the Policy UI</h4><p>Block appears as a first-class priority in the span policy editor.</p></div>
+          <div class="bullet-item"><h4>Trace View Reflects It</h4><p>The trace view shows when data is absent because a Block priority applied.</p></div>
+          <div class="bullet-item"><h4>Completes the Ladder</h4><p>High, medium, low and now block. The full range of span priority is configurable.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SECTION 2 · Quota Becomes Movable ═══════════════ -->
+    <div class="feature-section accent-quota" data-cat="monetization" id="sec-2">
+      <div class="section-header">
+        <span class="section-badge">Monetization &middot; Quota</span>
+        <h2 class="section-title">Quota Becomes Movable</h2>
+      </div>
+
+      <!-- Card 3 · CX-38652 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Unit-Based Quota Rules</span></div>
+        <p class="feature-subtitle">Quota is expressed in units rather than raw volume, so one currency covers every entity type and a reservation means the same thing wherever you read it.</p>
+        <a class="notion-link" href="https://app.notion.com/p/353c048defad8112b588e9e7666ae140" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Units as the Model</h4><p>One unit currency across entity types, instead of per-pillar volume rules.</p></div>
+          <div class="bullet-item"><h4>Reservations Enforce</h4><p>A reserved allocation is applied in the entity-type blocker, not a soft target.</p></div>
+          <div class="bullet-item"><h4>One Currency</h4><p>Quota Rules and Org Quota Manager express allocations in the same units.</p></div>
+          <div class="bullet-item"><h4>CX-bot Operations</h4><p>Quota and data-usage operations available through CX-bot commands.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 4 · CX-27053 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Move Units Between Teams</span> <span class="ea-chip">Rolling Out</span></div>
+        <p class="feature-subtitle">Org admins can rebalance quota across teams without re-contracting. A guided drawer moves units from a source team to a target with a live preview before you commit, and locked allocations are protected from being moved out from under the team that depends on them.</p>
+        <a class="notion-link" href="https://app.notion.com/p/357c048defad81ad85e9fbbaf9f5c28e" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Guided Move Drawer</h4><p>Source row, target card, amount and a live preview of the result before you apply.</p></div>
+          <div class="bullet-item"><h4>Locked-Unit Guard</h4><p>The flow excludes locked allocations from the movable pool and shows how much is protected.</p></div>
+          <div class="bullet-item"><h4>Replaces the Legacy Modal</h4><p>One drawer for the whole flow, with the table updating in place on apply.</p></div>
+          <div class="bullet-item"><h4>No Re-Contracting</h4><p>Capacity moves where it is needed without a commercial change.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SECTION 3 · Usage Gets an Owner ═══════════════ -->
+    <div class="feature-section accent-orgquota" data-cat="monetization" id="sec-3">
+      <div class="section-header">
+        <span class="section-badge">Monetization &middot; Usage &amp; AI</span>
+        <h2 class="section-title">Usage Gets an Owner</h2>
+      </div>
+
+      <!-- Card 5 · CX-39876 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Unified Usage Analytics</span></div>
+        <p class="feature-subtitle">Consumption across every team in the org, in one place. Pick the teams you are entitled to see, query them together, and get one answer to &ldquo;which team spent what, on which data&rdquo; instead of a per-team hunt.</p>
+        <a class="notion-link" href="https://app.notion.com/p/coralogix/Unified-Usage-Analytics-See-Data-Consumption-Across-All-Your-Teams-in-One-Place-2aec048defad806dac39f0fcde71ef33" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Multi-Team Query</h4><p>Query consumption across teams from one entry point rather than switching contexts.</p></div>
+          <div class="bullet-item"><h4>Eligible-Team Selection</h4><p>A checkbox column and count make it explicit which teams you can include.</p></div>
+          <div class="bullet-item"><h4>Org-Level DataPrime</h4><p>Cross-team usage is queryable in DataPrime, so there is no separate reporting path to learn.</p></div>
+          <div class="bullet-item"><h4>Answers Chargeback</h4><p>Attribute spend to the team that caused it without exporting and reconciling by hand.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 6 · CX-49228 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Olly on the Quota Surfaces</span> <span class="ea-chip">Rolling Out</span></div>
+        <p class="feature-subtitle">Olly is now embedded in the screens where you manage consumption: Quota Rules, Org Quota Manager and Data Usage. Ask in natural language on the surface you are already using, instead of leaving to assemble a query.</p>
+        <!-- NOTE: no Notion sales card yet, needs /roadmap-create -->
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Olly in Quota Rules</h4><p>Ask about rules, reservations and usage against them without leaving the screen.</p></div>
+          <div class="bullet-item"><h4>Olly in Org Quota Manager</h4><p>Query org-level allocation and movement in natural language.</p></div>
+          <div class="bullet-item"><h4>Olly in Data Usage</h4><p>Interrogate consumption directly on the usage surface.</p></div>
+          <div class="bullet-item"><h4>No New Destination</h4><p>The assistant comes to the screens you already use.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 7 · CX-42092 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Team API Keys in Data Usage</span> <span class="ea-chip">Rolling Out</span></div>
+        <p class="feature-subtitle">Usage can now be attributed to the caller that generated it. The Olly tab shows identity type and name per caller, so AI consumption stops being one anonymous total and becomes traceable to a team API key.</p>
+        <!-- NOTE: no Notion sales card yet, needs /roadmap-create -->
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Caller Attribution</h4><p>Identity type and name per caller on the Olly usage tab.</p></div>
+          <div class="bullet-item"><h4>Detailed CSV Export</h4><p>Caller-level detail carried through to the Olly detailed-report export.</p></div>
+          <div class="bullet-item"><h4>Legend Differentiation</h4><p>Callers are visually distinguishable in the usage breakdown.</p></div>
+          <div class="bullet-item"><h4>Who Spent the AI Budget</h4><p>Turns an aggregate AI number into an accountable one.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SECTION 4 · Governance & Schema ═══════════════ -->
+    <div class="feature-section accent-governance" data-cat="governance" id="sec-4">
+      <div class="section-header">
+        <span class="section-badge">Governance &middot; Schema</span>
+        <h2 class="section-title">Know and Guard Your Data</h2>
+      </div>
+
+      <!-- Card 8 · CX-45369 + CX-45607 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Schema Explorer Reports</span></div>
+        <p class="feature-subtitle">Two gaps closed in Schema Explorer. Keypaths nested under array fields are now findable in tree mode, where before they were invisible to search. And frequent-search reporting is split out for logs, so the top-searched fields are not diluted by other data types.</p>
+        <!-- NOTE: no Notion sales card yet, needs /roadmap-create -->
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Nested Keypath Search</h4><p>Tree mode surfaces keypaths nested under array fields, which were previously unfindable.</p></div>
+          <div class="bullet-item"><h4>Frequent Search, Logs Split</h4><p>Frequent-search reporting separated for logs, backed end-to-end in schema-store.</p></div>
+          <div class="bullet-item"><h4>Search Reaches the Whole Tree</h4><p>Nested paths are returned, not only top-level fields.</p></div>
+          <div class="bullet-item"><h4>Backed End-to-End</h4><p>Content-Structure backend and Phoenix frontend shipped together.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 9 · CX-45299 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Reserved Fields for Every Dataset</span> <span class="ea-chip">Rolling Out</span></div>
+        <p class="feature-subtitle">Reserved field types are now managed per dataset instead of one global setting, so <code>default/logs</code> and a custom dataset can each carry the types that suit them. The candidate list shows the fields actually observed in the data, so the choice is grounded in what is really arriving.</p>
+        <a class="notion-link" href="https://app.notion.com/p/37ac048defad817f9c50e1f81f08b2c9" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Per-Dataset Configuration</h4><p>Reserved field types set independently for each dataset, not one global rule.</p></div>
+          <div class="bullet-item"><h4>Observed Fields Shown</h4><p>Candidate lookup shows the fields actually seen in the data, so choices are grounded.</p></div>
+          <div class="bullet-item"><h4>Dataset-Scoped API</h4><p>A dataset-scoped namedSchema get/set reads and writes reserved fields per dataset.</p></div>
+          <div class="bullet-item"><h4>Shared Selector</h4><p>The dataspace and dataset selector is now a shared component across governance screens.</p></div>
+        </div>
+      </div>
+
+      <!-- Card 10 · CX-44024 + CX-41620 -->
+      <div class="feature-card">
+        <div class="feature-title"><span>Dataset Guardrails</span></div>
+        <p class="feature-subtitle">Two guardrails that stop bad dataset configuration before it costs anything: bucket and name validation in the Create Dataset drawer, and quota limits on datasets in the <code>default/</code> dataspace.</p>
+        <a class="notion-link" href="https://app.notion.com/p/37bc048defad8103ae06de229d95a6f6" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Bucket Validation</h4><p>The Create Dataset drawer validates the bucket and the fully-qualified name up front.</p></div>
+          <div class="bullet-item"><h4>default/ Quota Limits</h4><p>Datasets in the reserved <code>default/</code> dataspace can carry quota limits like any other.</p></div>
+          <div class="bullet-item"><h4>Fail at Creation</h4><p>Misconfiguration surfaces in the drawer rather than as missing data later.</p></div>
+          <div class="bullet-item"><h4>Reserved Dataspaces Covered</h4><p>Governance applies to the dataspaces customers do not create themselves.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SECTION 5 · Coming Next ═══════════════ -->
+    <div class="feature-section accent-next" data-cat="next" id="sec-5">
+      <div class="section-header">
+        <span class="section-badge">Coming Next</span>
+        <h2 class="section-title">Coming Next</h2>
+      </div>
+
+      <div class="feature-card peek">
+        <div class="feature-title"><span>Monthly Team Quota</span> <span class="ea-chip">In Build</span></div>
+        <p class="feature-subtitle">Quota enforcement is moving beyond the daily cycle to the monthly budget you actually contract on. Month-to-date usage, monthly blocking and monthly notifications are built on the backend and running in dry-run today.</p>
+        <!-- NOTE: no Notion sales card yet, needs /roadmap-create -->
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Month-to-Date Usage</h4><p>Track against a monthly allowance, not just today&rsquo;s number.</p></div>
+          <div class="bullet-item"><h4>Monthly Blocking</h4><p>Backend MVP complete and currently in dry-run, not enforcing live.</p></div>
+          <div class="bullet-item"><h4>Monthly Notifications</h4><p>Threshold and block notifications on the monthly cycle, behind a flag today.</p></div>
+          <div class="bullet-item"><h4>Your Contract Cycle</h4><p>Align enforcement with the budget finance actually signs.</p></div>
+        </div>
+      </div>
+
+      <div class="feature-card peek">
+        <div class="feature-title"><span>Keypath Drill-Down Drawer</span> <span class="ea-chip">In Review</span></div>
+        <p class="feature-subtitle">Click any keypath in Schema Explorer to open a drawer with attribution, trend charts and an AI-generated description of what the field is, without leaving the schema view. In review now.</p>
+        <a class="notion-link" href="https://app.notion.com/p/366c048defad81d585eed165e37a12fe" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Click to Drill</h4><p>A row click opens a scoped drawer for that field, no context switch.</p></div>
+          <div class="bullet-item"><h4>Trends &amp; Attribution</h4><p>Where the field comes from and how its volume moves over time.</p></div>
+          <div class="bullet-item"><h4>AI Field Description</h4><p>An AI-generated explanation of the field, editable in place.</p></div>
+          <div class="bullet-item"><h4>View Query</h4><p>Jump from the drawer to the query behind what you are seeing.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Quick mentions ═══════════════ -->
+    <div class="feature-section accent-governance" data-cat="governance">
+      <div class="section-header">
+        <span class="section-badge">Also Shipped</span>
+        <h2 class="section-title">Worth a Mention</h2>
+      </div>
+      <div class="feature-card">
+        <div class="bullet-grid">
+          <div class="bullet-item"><h4>Enrichment Multi-Tab Keys</h4><p>Enrichment rules get a tabbed key layout with positional labels, per-tab duplicate and remove.</p></div>
+          <div class="bullet-item"><h4>Quota Summary, Everywhere</h4><p>The quota summary is now one shared component reused across screens instead of per-screen variants.</p></div>
+          <div class="bullet-item"><h4>system/ Dataset Quota Limits</h4><p>Quota limits now also cover the reserved <code>system/</code> dataspace.</p></div>
+          <div class="bullet-item"><h4>Automatic Ingestion Throttling</h4><p>Platform-fairness throttling is GA across all environments.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ Thank You ═══════════════ -->
+    <div class="teams-section" id="sec-6">
+      <h2 class="teams-title">Thank You</h2>
+      <p class="teams-subtitle">This sprint's delivery was powered by these teams</p>
+      <div class="teams-grid">
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M12 8v8"/></svg></div><div class="team-name">Nimbus (Pipeline + Monetization FE)</div><div class="team-members">Wiktor, Ruben, Iulian</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div><div class="team-name">Phoenix (Governance FE)</div><div class="team-members">Gili, Nahar</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div class="team-name">Halo (Monetization BE)</div><div class="team-members">Gaspare, Rafael</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><rect x="9" y="13" width="6" height="8"/></svg></div><div class="team-name">Citadel (Governance BE)</div><div class="team-members">Asaf, Eliyahu, Roy, Shimon</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/></svg></div><div class="team-name">Content-Structure (Schema)</div><div class="team-members">Aleksandr M, Alexander V, Miroslav, Sebastian</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><path d="M12 15l-2 5h4l-2-5z"/><circle cx="12" cy="8" r="5"/></svg></div><div class="team-name">Radiant (Pipeline BE)</div><div class="team-members">Anton, Linoy, Naor, Tamir, Tomer, Itay</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><path d="M2 12l10 5 10-5"/><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="team-name">Architect</div><div class="team-members">Harel, Ievgen</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h6M8 16h4"/></svg></div><div class="team-name">Technical Writing</div><div class="team-members">Maya</div></div>
+        <div class="team-card"><div class="team-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div><div class="team-name">Product Design</div><div class="team-members">Omer</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span class="dot"></span> Coralogix</div>
+    <div>Sprint Demo 04-08-2026 | Noam Sheffi</div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const filter = pill.dataset.filter;
+        document.querySelectorAll('.feature-section').forEach(sec => {
+          if (filter === 'all' || sec.dataset.cat === filter) sec.classList.remove('hidden');
+          else sec.classList.add('hidden');
+        });
+      });
+    });
+
+    const sections = document.querySelectorAll('[id^="sec-"]');
+    const dots = document.querySelectorAll('.slide-dot');
+    function scrollToSection(i) { sections[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(sections).indexOf(entry.target);
+          dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(s => observer.observe(s));
+
+    const fadeObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.feature-card, .team-card').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(15px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      fadeObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
