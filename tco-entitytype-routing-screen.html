@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TCO Entity Type Routing</title>
+<style>
+  :root {
+    --page:        #f7f8f9;
+    --surface:     #ffffff;
+    --sunk:        #f4f5f7;
+    --border:      #e4e7ec;
+    --border-firm: #d0d5dd;
+    --text:        #1a2230;
+    --text-2:      #667085;
+    --text-3:      #98a2b3;
+    --green:       #12a55e;
+    --green-soft:  #e9f7f0;
+    --green-line:  #86d6ae;
+    --amber:       #b25e09;
+    --amber-soft:  #fdf3e7;
+    --amber-line:  #f0c992;
+    --red:         #b42318;
+    --violet-chip: #ebe9fe;
+    --violet-text: #5b52c9;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page:        #0e1219;
+      --surface:     #171d27;
+      --sunk:        #10151d;
+      --border:      #262e3b;
+      --border-firm: #38424f;
+      --text:        #e6eaf1;
+      --text-2:      #98a2b3;
+      --text-3:      #6b7688;
+      --green:       #35c586;
+      --green-soft:  #10291f;
+      --green-line:  #1f5e42;
+      --amber:       #e0a860;
+      --amber-soft:  #2a2113;
+      --amber-line:  #574526;
+      --red:         #e07a6d;
+      --violet-chip: #262244;
+      --violet-text: #b3a9f5;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page:        #0e1219;
+    --surface:     #171d27;
+    --sunk:        #10151d;
+    --border:      #262e3b;
+    --border-firm: #38424f;
+    --text:        #e6eaf1;
+    --text-2:      #98a2b3;
+    --text-3:      #6b7688;
+    --green:       #35c586;
+    --green-soft:  #10291f;
+    --green-line:  #1f5e42;
+    --amber:       #e0a860;
+    --amber-soft:  #2a2113;
+    --amber-line:  #574526;
+    --red:         #e07a6d;
+    --violet-chip: #262244;
+    --violet-text: #b3a9f5;
+  }
+
+  * { box-sizing: border-box; }
+  /* Class rules below set `display`, which outranks the UA stylesheet's
+     `[hidden] { display: none }`. Without this, anything toggled via the
+     hidden attribute (route 2 tab, fan-out banner, fan-out tag) stays visible. */
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; background: var(--page); color: var(--text);
+    font-family: var(--sans); font-size: 14px; line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Normal document flow throughout — no fixed/overlay positioning, so review
+     tools and print both get real element boxes to anchor to. */
+  .stage { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }
+  @media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+
+  /* ---------- background page (beside the drawer) ---------- */
+  .behind { padding: 22px 26px; overflow: hidden; }
+  .behind h1 { margin: 0 0 22px; font-size: 22px; font-weight: 650; letter-spacing: -.01em; }
+  .behind .ghost-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; max-width: 300px; margin-bottom: 14px;
+  }
+  .behind .row { height: 12px; background: var(--sunk); border-radius: 4px; margin: 12px 0; }
+  .behind .row:nth-child(odd) { width: 78%; }
+
+  /* ---------- drawer ---------- */
+  .drawer {
+    background: var(--surface);
+    border-left: 1px solid var(--border); box-shadow: -18px 0 48px rgb(16 24 40 / .10);
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  @media (max-width: 900px) { .behind { display: none; } .drawer { border-left: none; box-shadow: none; } }
+
+  /* toolbar */
+  .toolbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .toolbar h2 { margin: 0; font-size: 19px; font-weight: 650; letter-spacing: -.01em; }
+  .quota {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px;
+  }
+  .quota .label { font-size: 13px; }
+  .quota .label b { font-weight: 650; }
+  .quota .label span { color: var(--text-2); }
+  .bars { display: flex; gap: 3px; align-items: center; }
+  .bars i { display: block; height: 9px; border-radius: 3px; }
+  .toolbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .switch {
+    width: 38px; height: 21px; border-radius: 999px; background: var(--green);
+    position: relative; border: none; cursor: pointer; padding: 0;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 2px; left: 19px; width: 17px; height: 17px;
+    border-radius: 50%; background: #fff; transition: left .15s;
+  }
+  .switch[aria-checked="false"] { background: var(--border-firm); }
+  .switch[aria-checked="false"]::after { left: 2px; }
+  .switch:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .switch-label { font-size: 14px; }
+  .btn {
+    font-family: inherit; font-size: 14px; padding: 8px 18px; border-radius: 8px;
+    border: 1px solid transparent; cursor: pointer;
+  }
+  .btn.primary { background: var(--green); color: #fff; font-weight: 600; }
+  .btn.primary[disabled] { background: var(--sunk); color: var(--text-3); cursor: not-allowed; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer; color: var(--text-2);
+    font-size: 17px; line-height: 1; padding: 4px 6px; border-radius: 6px; font-family: inherit;
+  }
+  .icon-btn:hover { background: var(--sunk); }
+  .icon-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; }
+
+  /* panes */
+  .panes { flex: 1; display: grid; grid-template-columns: minmax(0,1fr) 1px minmax(0,1fr); align-items: start; }
+  @media (max-width: 1180px) { .panes { grid-template-columns: 1fr; } .divider { display: none; } }
+  .divider { background: var(--border); align-self: stretch; }
+  .form-pane { padding: 18px; background: var(--page); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .preview { padding: 18px 22px; min-width: 0; }
+
+  /* section cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  .card > header {
+    display: flex; align-items: center; gap: 8px; padding: 14px 16px; cursor: pointer;
+  }
+  .card > header h3 { margin: 0; font-size: 15px; font-weight: 650; }
+  .card > header .chev { color: var(--text-2); font-size: 11px; width: 12px; }
+  .card > header .spacer { margin-left: auto; }
+  .card .body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+  .card[data-open="false"] .body { display: none; }
+  .card[data-open="false"] > header .chev { transform: rotate(-90deg); }
+
+  label.fl { display: flex; align-items: center; gap: 5px; font-size: 13.5px; margin-bottom: 6px; }
+  label.fl .opt { color: var(--text-3); }
+  .i {
+    width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-3); color: var(--text-3);
+    font-size: 9px; line-height: 12px; text-align: center; cursor: help; flex: none; font-style: normal;
+  }
+  input.tf, textarea.tf, select.sel {
+    width: 100%; font-family: inherit; font-size: 14px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border-firm); border-radius: 8px;
+    padding: 9px 11px;
+  }
+  textarea.tf { min-height: 88px; resize: vertical; }
+  input.tf::placeholder, textarea.tf::placeholder { color: var(--text-3); }
+  select.sel { appearance: none; cursor: pointer; font-family: var(--mono); font-size: 13px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-3) 50%), linear-gradient(135deg, var(--text-3) 50%, transparent 50%);
+    background-position: calc(100% - 16px) 18px, calc(100% - 11px) 18px; background-size: 5px 5px; background-repeat: no-repeat; }
+  input.tf:focus, textarea.tf:focus, select.sel:focus { outline: 2px solid var(--green); outline-offset: -1px; border-color: var(--green); }
+
+  .radio-row { display: flex; align-items: center; gap: 22px; }
+  .radio { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 14px; }
+  .dot {
+    width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border-firm);
+    display: grid; place-items: center; flex: none;
+  }
+  .radio.on .dot, .act.on .dot { border-color: var(--green); }
+  .radio.on .dot::after, .act.on .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .warn-ico { color: var(--amber); }
+
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 8px; padding: 3px; }
+  .seg span { padding: 5px 14px; border-radius: 6px; font-size: 13px; color: var(--text-2); }
+  .seg span.on { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgb(16 24 40 / .08); }
+
+  .filter-box { border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .attr-row { display: flex; align-items: center; gap: 10px; }
+  .attr {
+    flex: 1; border: 1px solid var(--border-firm); border-radius: 8px; padding: 9px 11px;
+  }
+  .chip-attr { background: #eaf3fb; color: #2b6cb0; border-radius: 6px; padding: 3px 9px; font-size: 13px; }
+  :root[data-theme="dark"] .chip-attr, :root:not([data-theme="light"]) .chip-attr { background: #16273a; color: #7cb2e8; }
+  .add-filter { color: var(--text-3); font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
+
+  /* action radio cards */
+  .action-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .action-cards { grid-template-columns: 1fr; } }
+  .act {
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px; cursor: pointer;
+    display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start;
+  }
+  .act.on { border-color: var(--green); background: var(--green-soft); }
+  .act b { font-weight: 620; display: flex; align-items: center; gap: 7px; }
+  .act p { margin: 4px 0 0; color: var(--text-2); font-size: 12.5px; }
+
+  /* destination card */
+  .dest { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .dest .dhead { padding: 14px 16px 0; }
+  .dest .dhead b { font-size: 14.5px; font-weight: 650; }
+  .dest .dhead p { margin: 3px 0 0; color: var(--text-2); font-size: 13px; }
+  .dest .dhead a { color: var(--green); text-decoration: none; font-weight: 500; }
+  .dest .dhead a:hover { text-decoration: underline; }
+
+  .banner {
+    margin: 14px 16px 0; padding: 11px 13px; border-radius: 8px; font-size: 13px;
+    border: 1px solid var(--amber-line); background: var(--amber-soft); display: flex; gap: 10px;
+  }
+  .banner .bi { color: var(--amber); font-weight: 700; }
+  .banner b { display: block; }
+  .banner p { margin: 3px 0 0; color: var(--text-2); }
+
+  .tabbar { display: flex; align-items: center; gap: 2px; margin: 14px 16px 0; border-bottom: 1px solid var(--border); }
+  .tab {
+    display: flex; align-items: center; gap: 7px; padding: 8px 12px; cursor: pointer;
+    font-family: inherit; font-size: 13px; color: var(--text-2);
+    background: none; border: none; border-bottom: 2px solid transparent;
+  }
+  .tab.on { color: var(--text); border-bottom-color: var(--green); font-weight: 600; }
+  .tab:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; }
+  .tab code { font-family: var(--mono); font-size: 12px; }
+  .pill-sm {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .04em; font-weight: 650;
+    border: 1px solid var(--border-firm); color: var(--text-2); border-radius: 4px; padding: 1px 5px;
+  }
+  .addroute {
+    margin-left: auto; font-family: inherit; font-size: 13px; color: var(--text-2);
+    background: none; border: none; cursor: pointer; padding: 6px 8px; border-radius: 6px;
+  }
+  .addroute:hover:not(:disabled) { background: var(--sunk); color: var(--text); }
+  .addroute:disabled { color: var(--text-3); cursor: not-allowed; }
+  .addroute:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; }
+
+  .destfields { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+  /* Entity type sits on its own row beneath dataspace/dataset, aligned to col 1. */
+  .below { max-width: calc(50% - 7px); }
+  @media (max-width: 860px) { .pair { grid-template-columns: 1fr; } .below { max-width: none; } }
+  select.sel:disabled {
+    background-color: var(--sunk); color: var(--text-3); cursor: not-allowed;
+    border-color: var(--border); border-style: dashed;
+  }
+  .tagline { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+  .prio { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  @media (max-width: 620px) { .prio { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .pr {
+    display: flex; flex-direction: column; gap: 2px; align-items: flex-start; cursor: pointer;
+    font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--text);
+    border: 1.5px solid var(--border); border-radius: 9px; background: var(--surface);
+    padding: 10px 12px;
+  }
+  .pr span { font-weight: 400; font-size: 11.5px; color: var(--text-3); }
+  .pr.on { border-color: var(--green); background: var(--green-soft); }
+  .pr.on span { color: var(--green); }
+  .pr:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .tag {
+    font-family: var(--sans); font-size: 11px; font-weight: 600; white-space: nowrap;
+    border-radius: 4px; padding: 2px 7px; color: var(--amber);
+    background: var(--amber-soft); border: 1px solid var(--amber-line);
+  }
+  .why { margin-top: 6px; font-size: 12px; color: var(--text-3); line-height: 1.4; }
+
+  /* preview pane */
+  .pv-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pv-head h3 { margin: 0; font-size: 17px; font-weight: 650; }
+  .chip-med { background: var(--violet-chip); color: var(--violet-text); border-radius: 6px; padding: 3px 10px; font-size: 12.5px; font-weight: 600; }
+  .pv-head .spacer { margin-left: auto; }
+  .pv-sub { margin: 5px 0 14px; color: var(--text-2); font-size: 13.5px; }
+  .pv-empty {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--sunk);
+    min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; text-align: center; padding: 30px;
+  }
+  .pv-empty .glyph {
+    width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--border-firm);
+    display: grid; place-items: center; color: var(--text-3); font-size: 20px;
+  }
+  .pv-empty h4 { margin: 6px 0 0; font-size: 17px; font-weight: 620; }
+  .pv-empty p { margin: 0; color: var(--text-2); max-width: 46ch; font-size: 13.5px; }
+
+  /* metering readout */
+  .meter { border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 10px; background: var(--surface); padding: 14px 16px; margin-top: 16px; }
+  .meter h4 { margin: 0 0 10px; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+  .meter dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 7px 14px; align-items: baseline; }
+  .meter dt { color: var(--text-2); font-size: 13px; }
+  .meter dd { margin: 0; font-family: var(--mono); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .st { font-family: var(--sans); font-size: 11px; font-weight: 650; border-radius: 999px; padding: 1px 8px; }
+  .st.ok  { color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); }
+  .st.bad { color: var(--red);   background: #fdeceb; border: 1px solid #f3b5b0; }
+  :root[data-theme="dark"] .st.bad, :root:not([data-theme="light"]) .st.bad { background: #2b1512; border-color: #5c2a24; }
+  .meter .foot { margin: 11px 0 0; font-size: 12.5px; color: var(--text-2); }
+  .meter code { font-family: var(--mono); font-size: 11.5px; background: var(--sunk); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+<div class="behind" aria-hidden="true">
+  <h1>TCO Optimizer</h1>
+  <div class="ghost-card"><div class="row"></div><div class="row"></div><div class="row"></div></div>
+  <div class="ghost-card"><div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div></div>
+</div>
+
+<div class="drawer" role="dialog" aria-label="New log policy">
+
+  <div class="toolbar">
+    <h2>New log policy</h2>
+    <div class="quota">
+      <span class="label"><b>Logs</b> <span>· 145 / 498.59</span></span>
+      <i class="i" title="Daily quota allocated to the logs entity type.">i</i>
+      <span class="bars">
+        <i style="width:34px;background:var(--sunk)"></i>
+        <i style="width:70px;background:var(--green)"></i>
+        <i style="width:74px;background:#cdeee2"></i>
+        <i style="width:8px;background:#b9b4f0"></i>
+        <i style="width:8px;background:#b9b4f0"></i>
+        <i style="width:22px;background:#f6b8ae"></i>
+      </span>
+    </div>
+    <div class="right">
+      <button class="switch" id="enableSwitch" role="switch" aria-checked="true" aria-label="Enable policy"></button>
+      <span class="switch-label">Enable policy</span>
+      <button class="btn primary" id="createBtn" disabled>Create</button>
+      <button class="icon-btn" title="Fullscreen" aria-label="Fullscreen">⤢</button>
+      <button class="icon-btn" title="Close" aria-label="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="panes">
+    <div class="form-pane">
+
+      <section class="card" data-open="true">
+        <header><span class="chev">▾</span><h3>Details</h3></header>
+        <div class="body">
+          <div>
+            <label class="fl" for="pname">Policy name</label>
+            <input class="tf" id="pname" placeholder="Enter policy name" />
+          </div>
+          <div>
+            <label class="fl" for="pdesc">Description <span class="opt">(optional)</span></label>
+            <textarea class="tf" id="pdesc" placeholder="Provide a description for the policy"></textarea>
+          </div>
+          <div>
+            <label class="fl">Policy order <i class="i" title="Policy order determines which rule takes effect when multiple policies match. The first policy has the highest precedence.">i</i></label>
+            <div class="radio-row">
+              <span class="radio on"><span class="dot"></span>Last</span>
+              <span class="radio"><span class="dot"></span>First <span class="warn-ico">⚠</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" data-open="true">
+        <header>
+          <span class="chev">▾</span><h3>Filters</h3>
+          <span class="spacer"></span>
+          <span class="seg"><span class="on">Builder</span><span>Expression</span></span>
+        </header>
+        <div class="body">
+          <div class="filter-box">
+            <div class="attr-row">
+              <div class="attr"><span class="chip-attr">Select attribute</span></div>
+              <span class="icon-btn" title="Remove filter">🗑</span>
+            </div>
+            <div class="add-filter">＋ Add filter</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" data-open="true">
+        <header><span class="chev">▾</span><h3>Action</h3></header>
+        <div class="body">
+          <p style="margin:0;color:var(--text-2);font-size:13.5px">What should happen to data matched by this filter?</p>
+          <div class="action-cards">
+            <div class="act on">
+              <span class="dot" style="margin-top:2px"></span>
+              <div><b>🗺 Route &amp; Store</b><p>Send matched data to one or more destinations with configured storage.</p></div>
+            </div>
+            <div class="act">
+              <span class="dot" style="margin-top:2px"></span>
+              <div><b>🚫 Block</b><p>Drop all matched data. Nothing is stored or forwarded.</p></div>
+            </div>
+          </div>
+
+          <div class="dest">
+            <div class="dhead">
+              <b>Destination &amp; Storage</b>
+              <p>Route matched data to one or more destinations, each with its own storage strategy. <a href="#meter">Learn more ↗</a></p>
+            </div>
+
+            <div class="banner" id="fanBanner" hidden>
+              <span class="bi">!</span>
+              <div>
+                <b id="fanTitle">Fan-out active - matched data is duplicated across 2 destinations.</b>
+                <p id="fanBody">Each route stores a full copy, so this policy is billed at approximately 2× units of matched volume.</p>
+              </div>
+            </div>
+
+            <div class="tabbar" role="tablist">
+              <button class="tab on" role="tab" type="button" data-route="0" aria-selected="true">
+                <code id="lbl0">default/logs</code><span class="pill-sm">Standard</span>
+              </button>
+              <button class="tab" role="tab" type="button" data-route="1" aria-selected="false" hidden>
+                <code id="lbl1">default/payments_audit</code><span class="pill-sm">Standard</span>
+              </button>
+              <button class="addroute" id="addRoute" type="button">＋ Add route</button>
+            </div>
+
+            <div class="destfields">
+              <div class="pair">
+                <div>
+                  <label class="fl" for="dataspace">Dataspace <i class="i" title="The dataspace determines the storage namespace for routed logs. Currently only the default dataspace is available.">i</i></label>
+                  <select class="sel" id="dataspace" disabled title="Currently only the default dataspace is available."><option>default</option></select>
+                </div>
+                <div>
+                  <label class="fl" for="dataset">Dataset <i class="i" title="Select the dataset to route matching logs into. Datasets are managed in Dataspace Management.">i</i></label>
+                  <select class="sel" id="dataset">
+                    <option value="" disabled>Select dataset</option>
+                    <option value="logs">logs</option>
+                    <option value="payments_audit">payments_audit</option>
+                    <option value="checkout_events">checkout_events</option>
+                    <option value="svc_api_gateway">svc_api_gateway</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="below">
+                <label class="fl" for="entityType">Entity type <i class="i" title="What the written data is. Operational logs carry unique ids, deduplicate, and are read by related logs and APM correlation. Log events are business or analytics events, may legitimately repeat, and are excluded from those surfaces.">i</i></label>
+                <select class="sel" id="entityType">
+                  <option value="logs">logs</option>
+                  <option value="logEvents">logEvents</option>
+                </select>
+                <div class="tagline"><span class="tag" id="etTag" hidden>Fan-out copy</span></div>
+                <div class="why" id="etWhy"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" data-open="true">
+        <header><span class="chev">▾</span><h3>Priority</h3></header>
+        <div class="body">
+          <p style="margin:0;color:var(--text-2);font-size:13.5px">Select the priority for logs matching this policy. The selected priority determines the data pipeline Coralogix will use to ingest and store the logs.</p>
+          <div class="prio" id="prio" role="radiogroup" aria-label="Priority">
+            <button class="pr" type="button" data-prio="high">High<span>default</span></button>
+            <button class="pr on" type="button" data-prio="medium">Medium<span>57% savings</span></button>
+            <button class="pr" type="button" data-prio="low">Low<span>84% savings</span></button>
+            <button class="pr" type="button" data-prio="block">Block<span>89% savings</span></button>
+          </div>
+        </div>
+      </section>
+      <section class="card" data-open="false">
+        <header><span class="chev">▾</span><h3>Archive retention</h3></header>
+        <div class="body"><p style="margin:0;color:var(--text-2);font-size:13.5px">Define how long matching logs will be stored in your archive before expiration.</p></div>
+      </section>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="preview">
+      <div class="pv-head">
+        <h3>Preview</h3>
+        <i class="i" title="See how this rule affects your data.">i</i>
+        <span class="chip-med" id="prioChip">Medium</span>
+        <span class="spacer"></span>
+        <span class="seg"><span class="on">Last 24 hours</span><span>Last 7 days</span></span>
+      </div>
+      <p class="pv-sub">See how this rule affects your data.</p>
+
+      <div class="pv-empty">
+        <span class="glyph">⊘</span>
+        <h4>No filters selected yet</h4>
+        <p>Please choose an application, subsystem, or severity to view data for the selected time frame.</p>
+      </div>
+
+      <div class="meter" id="meter">
+        <h4>What this route meters as</h4>
+        <dl>
+          <dt>Entity type</dt>
+          <dd id="mType">logs</dd>
+          <dt>Quota reservation</dt>
+          <dd><span id="mQuota">Reserved under logs</span><span class="st ok" id="mQuotaSt">Covered</span></dd>
+          <dt>Price dimension</dt>
+          <dd><span id="mPrice">(logs, high)</span><span class="st ok" id="mPriceSt">Priced</span></dd>
+          <dt>Related logs</dt>
+          <dd><span id="mRead">In the union</span><span class="st ok" id="mReadSt">Correlates</span></dd>
+        </dl>
+        <p class="foot" id="mFoot"></p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const dataset = $('dataset'), etSel = $('entityType');
+  const tabs = [...document.querySelectorAll('.tab')];
+
+  let activeRoute = 0;
+  // Per-route dataset, mirroring the FormArray of targets. '' = not chosen yet:
+  // a route added via "Add route" starts empty and the user picks its dataset.
+  let routes = ['logs'];
+  // Per-route entity type. Only route 0 is user-editable; route 1 is forced.
+  let entityTypes = ['logs'];
+  // Policy priority — the 4th component of the pricing dimension tuple.
+  let priority = 'medium';
+
+  function apply() {
+    const fanOut = routes.length > 1;
+
+    tabs[1].hidden = !fanOut;
+    $('addRoute').disabled = fanOut;
+    if (!fanOut) activeRoute = 0;
+
+    tabs.forEach((t, i) => {
+      const on = i === activeRoute;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    tabs.forEach((t, i) => {
+      const code = t.querySelector('code');
+      if (code) code.textContent = routes[i] ? 'default/' + routes[i] : 'Route ' + (i + 1);
+    });
+
+    dataset.value = routes[activeRoute] || '';
+
+    // ---- the rule ----
+    // Route 1 (the only destination) is a routing 1:1 move: the user chooses,
+    // defaulting to logs. An additional fan-out destination is a 1:N copy and
+    // is forced to logEvents so copies never enter the operational read path.
+    const isCopy = activeRoute > 0;
+    let value, why;
+    if (isCopy) {
+      value = 'logEvents';
+      why = 'Additional fan-out destinations write copies, so they are always log events.';
+    } else {
+      value = entityTypes[0] || 'logs';
+      why = 'Routing moves data 1:1. Choose whether this destination stays operational.';
+    }
+
+    etSel.value = value;
+    etSel.disabled = isCopy;
+    $('etTag').hidden = !isCopy;
+    $('etWhy').textContent = why;
+
+    $('fanBanner').hidden = !fanOut;
+    if (fanOut) {
+      $('fanTitle').textContent = 'Fan-out active - matched data is duplicated across 2 destinations.';
+      $('fanBody').textContent = 'Each route stores a full copy, so this policy is billed at approximately 2× units of matched volume.';
+    }
+
+    // ---- metering readout ----
+    const ev = value === 'logEvents';
+    // DimensionPricing is keyed on (measurement, pillar, entity_type, priority),
+    // so the tuple has to track the policy's priority setting, not a fixed value.
+    $('prioChip').textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+    $('mType').textContent = value;
+    $('mQuota').textContent = ev ? 'No reservation for logEvents' : 'Reserved under logs';
+    $('mPrice').textContent = '(' + value + ', ' + priority + ')' + (ev ? ' — no row' : '');
+    $('mRead').textContent  = ev ? 'Excluded from the union' : 'In the union';
+    st('mQuotaSt', !ev, 'Covered', 'Unallocated');
+    st('mPriceSt', !ev, 'Priced', 'No price');
+    st('mReadSt',  !ev, 'Correlates', 'Excluded');
+    $('mFoot').innerHTML = ev
+      ? 'Today <code>logEvents</code> is registered and active in cx-catalog but sits outside every monetization control: absent from the quota-allocation supported-entity-type list, no <code>DimensionPricing</code> row, and <code>ws-quota-grpc</code> caps TCO policy counts on a closed <code>["spans","logs"]</code> union so the limit never fires.'
+      : 'Unchanged from today: the existing per-entity-type reservation and price dimension both apply, and the destination stays in the related-logs union.';
+  }
+
+  function st(id, ok, a, b) {
+    const el = $(id);
+    el.className = 'st ' + (ok ? 'ok' : 'bad');
+    el.textContent = ok ? a : b;
+  }
+
+  document.querySelectorAll('.pr').forEach((b) => b.addEventListener('click', () => {
+    priority = b.dataset.prio;
+    document.querySelectorAll('.pr').forEach((o) => o.classList.toggle('on', o === b));
+    apply();
+  }));
+
+  dataset.addEventListener('change', () => { routes[activeRoute] = dataset.value; apply(); });
+  etSel.addEventListener('change', () => {
+    if (activeRoute === 0) entityTypes[0] = etSel.value;
+    apply();
+  });
+  tabs.forEach((t, i) => t.addEventListener('click', () => {
+    if (tabs[i].hidden) return;
+    activeRoute = i; apply();
+  }));
+  $('addRoute').addEventListener('click', () => {
+    if (routes.length > 1) return;
+    // mirrors FanOutConfirmDialogComponent
+    const ok = confirm('Add another destination?\n\nAdding a destination duplicates matched data to every route in this policy. Each copy is billed separately. This policy currently routes to 1 destination(s). Adding another will bill matched data at approximately 2× units.');
+    if (!ok) return;
+    // New route starts with no dataset — the user picks it.
+    routes.push('');
+    entityTypes.push('logEvents');
+    activeRoute = 1;
+    apply();
+  });
+  document.querySelectorAll('.card > header').forEach((h) => h.addEventListener('click', () => {
+    const c = h.parentElement;
+    c.dataset.open = c.dataset.open === 'true' ? 'false' : 'true';
+  }));
+  $('enableSwitch').addEventListener('click', (e) => {
+    const on = e.currentTarget.getAttribute('aria-checked') === 'true';
+    e.currentTarget.setAttribute('aria-checked', String(!on));
+  });
+
+  apply();
+</script>
+
+</body>
+</html>
