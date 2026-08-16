@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finonex · Historical Import — 16 Aug 2026</title>
+<style>
+:root{
+  --bg:#000; --surface:#0a0a0a; --border:#1f1f1f; --code-bg:#050505;
+  --text:#fff; --text-2:#a1a1aa; --text-muted:#52525b;
+  --mint:#22dd92; --mint-faint:rgba(34,221,146,0.06);
+  --font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);
+  line-height:1.65;padding:64px 24px 96px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto}
+
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--mint);flex:none}
+.brand span{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-2)}
+h1{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.meta{color:var(--text-muted);font-size:13px;margin-top:12px}
+
+section{margin-top:52px}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;
+   color:var(--mint);font-weight:600;margin-bottom:16px}
+p{color:var(--text-2);font-size:15px}
+p + p{margin-top:10px}
+strong{color:var(--text);font-weight:600}
+
+ul{list-style:none}
+li{color:var(--text-2);font-size:15px;padding:10px 0 10px 18px;
+   position:relative;border-top:1px solid var(--border)}
+li:first-child{border-top:0}
+li::before{content:"";position:absolute;left:0;top:19px;
+  width:5px;height:5px;border-radius:50%;background:var(--mint)}
+li b{color:var(--text);font-weight:600}
+
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;
+  color:var(--mint);margin-bottom:16px}
+code{font-family:var(--mono);font-size:.92em;color:var(--text)}
+
+ol{list-style:none;counter-reset:s}
+ol li{counter-increment:s;padding-left:38px}
+ol li::before{content:counter(s);left:0;top:9px;width:22px;height:22px;
+  border-radius:50%;background:transparent;border:1px solid var(--mint);
+  color:var(--mint);font-size:12px;display:flex;align-items:center;justify-content:center}
+
+.note{border-left:2px solid var(--mint);background:var(--mint-faint);
+  padding:16px 20px;border-radius:0 8px 8px 0}
+.note p{font-size:15px}
+
+footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--border);
+  color:var(--text-muted);font-size:12px}
+
+@media(max-width:640px){body{padding:36px 18px 64px}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand"><div class="dot"></div><span>Coralogix · Historical Import</span></div>
+  <h1>Finonex historical import</h1>
+  <p class="meta">16 August 2026</p>
+</header>
+
+<section>
+  <h2>Where we are</h2>
+  <p>Your two hourly files from <code>s3-finonex-coralogix-logs</code> were imported and queried successfully on 3 August. The format you sent worked as it was.</p>
+  <p>The next step is a bounded chunk into the Finonex account, not more validation.</p>
+</section>
+
+<section>
+  <h2>File format</h2>
+  <pre>s3://&lt;bucket&gt;/&lt;prefix&gt;/year=YYYY/month=MM/day=DD/hour=HH/&lt;file&gt;.ndjson.gz</pre>
+  <ul>
+    <li>Gzipped NDJSON, one JSON object per line</li>
+    <li>Every record carries an event-time field</li>
+    <li>Records uniformly shaped, one malformed record fails its file</li>
+    <li><b>Partitioning is a preference, not a requirement.</b> Your existing layout worked. Partitioning by hour makes the run faster on our side.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What we need from you</h2>
+  <ul>
+    <li><b>Scope of the first chunk.</b> Which time range, how many hours, uncompressed size.</li>
+    <li><b>Dataset name</b> to create for the imported data.</li>
+    <li><b>Retention tag.</b> One tag, applied across all groups. Per-field retention is not supported yet.</li>
+    <li><b>Timeline.</b> When you need the history available by.</li>
+    <li><b>Contacts.</b> Who on your side owns the export and is our technical point of contact.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>How a run finishes</h2>
+  <ol>
+    <li>We read the partitions from your bucket.</li>
+    <li>We import and write the result back to your bucket.</li>
+    <li>You check the data and confirm it is correct.</li>
+    <li>Once you confirm, we advise on removing the source data.</li>
+  </ol>
+  <div class="note" style="margin-top:18px">
+    <p>Your validation is the gate on deleting a source database, not ours. We will not tell you it is safe to delete before you have looked at the result yourself.</p>
+  </div>
+</section>
+
+<footer>
+  Coralogix · Finonex sync, 16 August 2026
+</footer>
+
+</div>
+</body>
+</html>
