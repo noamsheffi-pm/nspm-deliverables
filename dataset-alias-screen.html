@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dataset Aliases</title>
+<style>
+/* ---------------------------------------------------------------
+   Tokens taken from cx-web-workspace/libs/cx-ui/theme/tokens.json
+   (light theme, CX brand). Geometry from cx-grid + dataset-dialog.
+   --------------------------------------------------------------- */
+:root{
+  --c-background-surface-primary:#F8FAFC;
+  --c-background-surface-secondary:#FFFFFF;
+  --c-background-card:#FFFFFF;
+  --c-background-table-header:#F8FAFC;
+  --c-background-hover:#0000000D;
+  --c-background-focus:#E6FFF2;
+  --c-background-label:#DBE9FD;
+  --c-background-overlay:rgba(9,7,25,.5);
+
+  --c-text-primary:#1C1C1C;
+  --c-text-secondary:#68686D;
+  --c-text-placeholder:#D0D0D3;
+  --c-text-interactive:#029449;
+  --c-text-on-color:#FFFFFF;
+  --c-text-error:#EB6166;
+
+  --c-border-subtle:#ECECEE;
+  --c-border-strong:#DEDEE0;
+  --c-border-interactive:#029449;
+
+  --c-button-primary:#02763A;
+  --c-button-primary-hover:#029449;
+
+  --c-icon-primary:#68686D;
+  --c-icon-warning:#E4B83C;
+
+  --c-chip-label:#DBE9FD;
+  --c-tag-lightgrey-bg:#C9D1D933;
+  --c-tag-lightgrey-tx:#323D4E;
+  --c-tag-blue-bg:#5095ED33;
+  --c-tag-blue-tx:#1E6F81;
+  --c-tag-green-bg:#3CC67E33;
+  --c-tag-green-tx:#24734B;
+
+  --r-sm:4px; --r-md:6px; --r-lg:8px;
+  --font:'Nunito Sans',Helvetica,Roboto,Arial,sans-serif;
+  --mono:'Inconsolata',monospace;
+  --shadow-dropdown:0 5px 10px 0 rgba(33,43,59,.1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--c-background-surface-primary);
+  color:var(--c-text-primary);
+  font:400 12px/1.5 var(--font);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,p{margin:0}
+
+/* ---- page chrome ---- */
+.pagehead{background:var(--c-background-surface-secondary);padding-top:12px}
+.pagehead .row{display:flex;align-items:center;padding:0 16px}
+.pagehead h1{font:600 20px/1.5 var(--font)}
+.pagehead .spacer{flex:1}
+.tabs{display:flex;gap:8px;padding:0 16px;height:32px;border-bottom:1px solid var(--c-border-subtle);margin-top:10px}
+.tab{
+  position:relative;padding:4px 8px;font:600 12px/1.5 var(--font);color:var(--c-text-secondary);
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+}
+.tab:hover{color:var(--c-text-interactive)}
+.tab.on{color:var(--c-text-interactive)}
+.tab.on::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:var(--c-border-interactive);
+}
+main{padding:16px}
+
+/* ---- card ---- */
+.card{
+  background:var(--c-background-card);border:1px solid var(--c-border-subtle);
+  border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:16px;
+}
+.titlesec{display:flex;align-items:flex-start;gap:16px}
+.titlesec .txt{width:min(100%,800px);display:flex;flex-direction:column;gap:4px}
+.titlesec h2{font:600 16px/1.5 var(--font);display:flex;align-items:center;gap:8px}
+.titlesec p{font:600 12px/1.5 var(--font);color:var(--c-text-secondary)}
+.titlesec .spacer{flex:1}
+.cnt{font:400 12px/1.5 var(--font);color:var(--c-text-secondary);font-weight:400}
+
+/* ---- buttons ---- */
+.btn{
+  min-height:32px;min-width:80px;padding:2px 8px;border-radius:var(--r-md);
+  font:600 12px/1.5 var(--font);cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;gap:6px;white-space:nowrap;border:1px solid transparent;
+  background:transparent;color:var(--c-text-primary);font-family:var(--font);
+}
+.btn:active{transform:scale(.99)}
+.btn-solid{background:var(--c-button-primary);color:var(--c-text-on-color);border-color:var(--c-button-primary)}
+.btn-solid:hover{background:var(--c-button-primary-hover);border-color:var(--c-button-primary-hover)}
+.btn-outline{border-color:var(--c-border-subtle);background:transparent}
+.btn-outline:hover{background:var(--c-background-hover)}
+.btn-ghost{border-color:transparent}
+.btn-ghost:hover{background:var(--c-background-hover)}
+.btn-icon{min-width:32px;width:32px;height:32px;padding:0;color:var(--c-icon-primary);font-size:15px}
+.btn-icon:hover{color:var(--c-text-interactive)}
+.btn-link{
+  min-width:0;min-height:0;padding:0;color:var(--c-text-interactive);
+  font:400 12px/1.5 var(--font);border:none;
+}
+.btn-link:hover{text-decoration:underline}
+
+/* ---- notice ---- */
+.notice{
+  display:flex;gap:10px;align-items:flex-start;border:1px solid var(--c-border-subtle);
+  border-radius:var(--r-lg);padding:12px;background:var(--c-background-surface-secondary);
+}
+.notice .ic{color:var(--c-icon-warning);font-size:14px;line-height:1.3;flex:0 0 auto}
+.notice .bd{display:flex;flex-direction:column;gap:4px;color:var(--c-text-secondary)}
+.notice b{color:var(--c-text-primary);font-weight:600}
+code{font:400 12px/1.5 var(--mono);color:var(--c-text-primary);background:var(--c-background-surface-primary);padding:0 4px;border-radius:var(--r-sm)}
+
+/* ---- grid ---- */
+.grid{border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);overflow:hidden}
+.gtoolbar{height:48px;display:flex;align-items:center;padding:0 8px;border-bottom:1px solid var(--c-border-subtle)}
+.search{
+  width:min(600px,100%);height:32px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);
+  padding:0 8px;font:400 12px/1.5 var(--font);color:var(--c-text-primary);
+}
+.search::placeholder{color:var(--c-text-placeholder)}
+.search:focus{outline:none;border-color:var(--c-border-interactive)}
+.gtoolbar .spacer{flex:1}
+.fchips{display:flex;gap:4px}
+.fchip{
+  height:24px;padding:0 8px;border-radius:var(--r-sm);border:1px solid var(--c-border-subtle);
+  background:transparent;color:var(--c-text-secondary);font:400 12px/1.5 var(--font);cursor:pointer;
+}
+.fchip.on{background:var(--c-background-label);color:var(--c-tag-lightgrey-tx);border-color:var(--c-background-label)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1040px}
+thead th{
+  height:32px;text-align:left;padding:0 8px;font:400 12px/1.5 var(--font);
+  color:var(--c-text-secondary);background:var(--c-background-surface-secondary);
+  border-bottom:1px solid var(--c-border-subtle);white-space:nowrap;font-weight:400;
+}
+tbody td{height:44px;padding:0 8px;border-bottom:1px solid var(--c-border-subtle);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.data{cursor:pointer}
+tbody tr.data:hover{background:var(--c-background-hover)}
+tbody tr.grp td{
+  height:30px;background:var(--c-background-table-header);color:var(--c-text-secondary);
+  font-weight:600;border-bottom:1px solid var(--c-border-subtle);
+}
+.nm{font:400 12px/1.5 var(--mono);color:var(--c-text-primary)}
+.sub{color:var(--c-text-secondary);font-size:12px;line-height:1.35;margin-top:1px}
+.pat{font:400 12px/1.5 var(--mono);color:var(--c-tag-blue-tx)}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;height:20px;
+  padding:0 6px;border-radius:var(--r-sm);font:400 12px/1.5 var(--font);white-space:nowrap;
+}
+.b-cx{background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx)}
+.b-custom{background:var(--c-tag-lightgrey-bg);color:var(--c-text-secondary)}
+.b-rebind{background:var(--c-tag-blue-bg);color:var(--c-tag-blue-tx)}
+.mtcell{color:var(--c-text-primary)}
+.count{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--c-text-interactive);flex:0 0 6px}
+.count span{color:var(--c-text-secondary)}
+.refs{color:var(--c-text-secondary)}
+.acts{text-align:right;white-space:nowrap}
+tbody tr.data .acts .btn-icon{opacity:0;transition:opacity .1s}
+tbody tr.data:hover .acts .btn-icon{opacity:1}
+
+/* ---- zero state ---- */
+.zero{display:flex;flex-direction:column;align-items:center;gap:4px;padding:40px 16px}
+.zero .ring{
+  width:56px;height:56px;border-radius:50%;background:var(--c-background-label);
+  display:grid;place-items:center;margin-bottom:8px;
+}
+.zero .ring i{
+  width:36px;height:36px;border-radius:50%;background:var(--c-background-surface-secondary);
+  display:grid;place-items:center;box-shadow:var(--shadow-dropdown);font-style:normal;
+  color:var(--c-icon-primary);font-size:15px;
+}
+.zero h3{margin:0;font:600 14px/1.5 var(--font)}
+.zero p{color:var(--c-text-secondary)}
+
+/* ---- slide-in drawer ---- */
+.scrim{position:fixed;inset:0;background:var(--c-background-overlay);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;height:100vh;width:75%;min-width:560px;max-width:98vw;
+  background:var(--c-background-surface-primary);transform:translateX(100%);
+  transition:transform .2s ease;z-index:50;display:flex;flex-direction:column;
+}
+.drawer.on{transform:translateX(0)}
+.drawer.resizing{transition:none;user-select:none}
+.dgrip{
+  position:absolute;top:0;left:0;width:6px;height:100%;cursor:col-resize;z-index:2;
+  background:transparent;
+}
+.dgrip::after{
+  content:"";position:absolute;top:0;left:2px;width:2px;height:100%;background:transparent;
+  transition:background .12s;
+}
+.dgrip:hover::after,.drawer.resizing .dgrip::after{background:var(--c-border-interactive)}
+.dhead{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 16px;border-bottom:1px solid var(--c-border-subtle);
+  background:var(--c-background-surface-secondary);
+}
+.dhead .lead{display:flex;align-items:center;gap:8px;min-width:0}
+.dhead h2{font:600 16px/1.5 var(--font);white-space:nowrap}
+.dbody{flex:1;display:flex;min-height:0}
+.dform{flex:1 1 52%;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;min-width:0}
+.dprev{
+  flex:1 1 48%;padding:16px;overflow-y:auto;min-width:0;
+  border-left:1px solid var(--c-border-subtle);background:var(--c-background-surface-secondary);
+}
+.sub-card{
+  background:var(--c-background-card);border:1px solid var(--c-border-subtle);
+  border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:16px;
+}
+.sub-card>.st{font:600 16px/1.5 var(--font)}
+.warncard{
+  display:flex;gap:8px;align-items:flex-start;background:var(--c-background-card);
+  border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:12px;color:var(--c-text-secondary);
+}
+.warncard .ic{color:var(--c-icon-warning);flex:0 0 auto;line-height:1.3}
+.warncard b{color:var(--c-text-primary);font-weight:600}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{display:flex;align-items:center;gap:2px;font:400 12px/1.5 var(--font);color:var(--c-text-primary)}
+.field label .req{color:var(--c-text-error)}
+.field label .opt{color:var(--c-text-placeholder)}
+.input{
+  width:100%;height:32px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);
+  padding:0 8px;font:400 12px/1.5 var(--font);color:var(--c-text-primary);background:#fff;
+}
+.input.mono{font-family:var(--mono)}
+.input:focus{outline:none;border-color:var(--c-border-interactive)}
+.hint{font:400 12px/1.5 var(--font);color:var(--c-text-secondary)}
+.err{font:400 12px/1.5 var(--font);color:var(--c-text-error)}
+.seg{display:flex;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);overflow:hidden;width:fit-content}
+.seg button{
+  height:32px;padding:0 14px;border:none;border-right:1px solid var(--c-border-subtle);
+  background:#fff;color:var(--c-text-secondary);font:400 12px/1.5 var(--font);cursor:pointer;
+}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:var(--c-background-hover)}
+.seg button.on{background:var(--c-button-primary);color:var(--c-text-on-color);font-weight:600}
+
+/* ---- dataset picker (modelled on the Explore source dropdown) ---- */
+.picker{position:relative}
+.pickctl{
+  width:100%;min-height:32px;display:flex;align-items:center;gap:8px;padding:4px 8px;
+  border:1px solid var(--c-border-subtle);border-radius:var(--r-md);background:#fff;
+  font:400 12px/1.5 var(--font);color:var(--c-text-primary);cursor:pointer;text-align:left;
+}
+.pickctl.open{border-color:var(--c-border-interactive)}
+.pickicon{color:var(--c-icon-primary);flex:0 0 auto}
+.picksel{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.picksel .ph{color:var(--c-text-placeholder)}
+.picksel .chip{
+  display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;
+  border-radius:var(--r-md);background:var(--c-chip-label);border:1px solid var(--c-border-subtle);
+  color:var(--c-text-primary);font-family:var(--mono);max-width:200px;
+}
+.picksel .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picksel .chip b{cursor:pointer;color:var(--c-icon-primary);font-weight:400}
+.picksel .chip b:hover{color:var(--c-text-error)}
+.caret{color:var(--c-icon-primary);flex:0 0 auto}
+.pickpanel{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:5;background:#fff;
+  border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);box-shadow:var(--shadow-dropdown);
+  overflow:hidden;
+}
+.picksearch{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--c-border-subtle)}
+.picksearch .mag{color:var(--c-icon-primary)}
+.picksearch input{flex:1;border:none;outline:none;font:400 12px/1.5 var(--font);color:var(--c-text-primary)}
+.picksearch input::placeholder{color:var(--c-text-placeholder)}
+.picklist{max-height:230px;overflow-y:auto}
+.pickrow{
+  display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;cursor:pointer;
+  font:400 12px/1.5 var(--font);
+}
+.pickrow:hover{background:var(--c-background-hover)}
+.pickrow.sel{background:var(--c-background-focus)}
+.pickrow .cb{
+  width:14px;height:14px;flex:0 0 14px;border:1px solid var(--c-border-strong);border-radius:3px;
+  display:grid;place-items:center;font-size:10px;color:#fff;background:#fff;
+}
+.pickrow.sel .cb{background:var(--c-button-primary);border-color:var(--c-button-primary)}
+.pickrow .dn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
+.pickrow .et{color:var(--c-text-secondary);white-space:nowrap}
+.pickfoot{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 12px;
+  border-top:1px solid var(--c-border-subtle);
+}
+.pickfoot label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--c-text-primary)}
+.pickfoot .cb{
+  width:14px;height:14px;border:1px solid var(--c-border-strong);border-radius:3px;
+  display:grid;place-items:center;font-size:10px;color:#fff;background:#fff;
+}
+.pickfoot label.on .cb{background:var(--c-button-primary);border-color:var(--c-button-primary)}
+.pickfoot .divider{width:1px;height:14px;background:var(--c-border-subtle)}
+.syntax{
+  border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:8px;
+  background:var(--c-background-surface-primary);font:400 12px/1.6 var(--mono);
+  color:var(--c-text-primary);word-break:break-all;
+}
+.syntax .eq{display:block;margin-top:6px;color:var(--c-text-secondary)}
+
+.pvhead{font:400 12px/1.5 var(--font);color:var(--c-text-secondary)}
+.bignum{font:600 28px/1.2 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:2px 0}
+.bignum.zero{color:var(--c-text-error)}
+.pvsub{color:var(--c-text-secondary);margin-bottom:12px}
+.dslist{border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);overflow:hidden}
+.dsrow{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-bottom:1px solid var(--c-border-subtle)}
+.dsrow:last-child{border-bottom:none}
+.dsrow.miss{opacity:.36}
+.dsrow .tick{width:12px;flex:0 0 12px;color:var(--c-text-interactive)}
+.dsrow.miss .tick{color:var(--c-text-placeholder)}
+.dsrow .dn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
+.dsrow .et{
+  height:20px;padding:0 6px;border-radius:var(--r-sm);background:var(--c-tag-lightgrey-bg);
+  color:var(--c-tag-lightgrey-tx);display:inline-flex;align-items:center;white-space:nowrap;
+}
+.dsrow .new{
+  height:20px;padding:0 6px;border-radius:var(--r-sm);background:var(--c-tag-green-bg);
+  color:var(--c-tag-green-tx);display:inline-flex;align-items:center;font-weight:600;
+}
+.pvnote{
+  margin-top:12px;border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);
+  padding:12px;color:var(--c-text-secondary);background:var(--c-background-surface-primary);
+}
+.pvnote b{color:var(--c-text-primary);font-weight:600}
+.pvnote.warn{border-color:var(--c-icon-warning);background:#FDF8EC}
+.sim{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sim .lbl{color:var(--c-text-secondary)}
+.simmsg{margin-top:8px;color:var(--c-text-interactive);font-weight:600;min-height:18px}
+</style>
+</head>
+<body>
+
+<header class="pagehead">
+  <div class="row">
+    <h1>Dataspace Management</h1>
+    <span class="spacer"></span>
+    <span class="badge b-cx">Concept mockup</span>
+  </div>
+  <nav class="tabs">
+    <button class="tab">default</button>
+    <button class="tab">system</button>
+    <button class="tab on">Dataset Alias</button>
+  </nav>
+</header>
+
+<main>
+  <div class="card">
+
+    <div class="titlesec">
+      <div class="txt">
+        <h2>Dataset Aliases <span class="cnt" id="cnt">6 / 50</span></h2>
+        <p>An alias is a name that resolves to a source expression at query time. Every surface that accepts a source resolves through it: DataPrime, Explore, dashboards, alerts, background queries and saved views. <button class="btn btn-link">Learn more</button></p>
+      </div>
+      <span class="spacer"></span>
+      <button class="btn btn-solid" onclick="openCreate()">+ Create alias</button>
+    </div>
+
+    <div class="notice">
+      <span class="ic">&#9888;</span>
+      <div class="bd">
+        <span><b>Coralogix maintains three aliases for you.</b> Operational logs and log events are now separate entity types. Routing continues to write <code>logs</code> while fan-out writes <code>logEvents</code>.</span>
+        <span>The predefined <code>logs</code> alias resolves to both, so queries, dashboards and alerts written before the split keep returning the same data. Edit it to opt out.</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="gtoolbar">
+        <input class="search" id="q" placeholder="Search aliases" oninput="render()">
+        <span class="spacer"></span>
+        <div class="fchips">
+          <button class="fchip on" data-f="all" onclick="setF(this)">All</button>
+          <button class="fchip" data-f="cx" onclick="setF(this)">Predefined</button>
+          <button class="fchip" data-f="custom" onclick="setF(this)">Custom</button>
+        </div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:220px">Alias</th>
+              <th style="width:104px">Match type</th>
+              <th>Resolves to</th>
+              <th style="width:146px">Resolved datasets</th>
+              <th style="width:154px">Referenced by</th>
+              <th style="width:150px">Source</th>
+              <th style="width:100px"></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-label="Alias editor">
+  <div class="dgrip" id="dgrip" title="Drag to resize"></div>
+  <div class="dhead">
+    <div class="lead">
+      <button class="btn btn-ghost btn-icon" onclick="closeDrawer()" title="Close">&#10005;</button>
+      <h2 id="dtitle">Create alias</h2>
+    </div>
+    <button class="btn btn-solid" onclick="closeDrawer()">Save alias</button>
+  </div>
+
+  <div class="dbody">
+    <div class="dform">
+      <div id="impact"></div>
+
+      <div class="sub-card">
+        <span class="st">Details</span>
+        <div class="field">
+          <label>Alias name <span class="req">*</span></label>
+          <input class="input mono" id="f_name" oninput="preview()" placeholder="logs_eu">
+          <span class="hint">Verbal identifiers only. No slashes, commas or special characters. Underscores are allowed.</span>
+        </div>
+        <div class="field">
+          <label>Description <span class="opt">(optional)</span></label>
+          <input class="input" id="f_desc" placeholder="What this alias is for">
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <span class="st">Resolution</span>
+        <div class="field">
+          <label>Match type</label>
+          <div class="seg" id="f_mt">
+            <button data-mt="list" onclick="setMT('list')">Builder</button>
+            <button data-mt="exact" onclick="setMT('exact')">Exact</button>
+            <button data-mt="wildcard" class="on" onclick="setMT('wildcard')">Wildcard</button>
+            <button data-mt="regex" onclick="setMT('regex')">Regex</button>
+          </div>
+        </div>
+
+        <div class="field" id="wrap_builder" hidden>
+          <label>Datasets <span class="req">*</span></label>
+          <div class="picker">
+            <button class="pickctl" id="pickctl" onclick="togglePicker(event)">
+              <span class="pickicon">&#9783;</span>
+              <span class="picksel" id="picksel"></span>
+              <span class="caret">&#9662;</span>
+            </button>
+            <div class="pickpanel" id="pickpanel" hidden onclick="event.stopPropagation()">
+              <div class="picksearch">
+                <span class="mag">&#9906;</span>
+                <input id="pickq" placeholder="Select a Span or Log dataset" oninput="renderPicker()">
+              </div>
+              <div class="picklist" id="picklist"></div>
+              <div class="pickfoot" id="pickfoot"></div>
+            </div>
+          </div>
+          <span class="hint">Pick the datasets explicitly. This is the saved form of a DataPrime multi-source query.</span>
+        </div>
+
+        <div class="field" id="wrap_pattern">
+          <label>Pattern <span class="req">*</span></label>
+          <input class="input mono" id="f_pat" oninput="preview()" placeholder="logs-eu-*">
+          <span class="hint" id="pathint"></span>
+          <span class="err" id="paterr"></span>
+        </div>
+
+        <div class="field">
+          <label>Query syntax</label>
+          <div class="syntax" id="syntax"></div>
+        </div>
+        <div class="field">
+          <label>Entity type <span class="opt">(optional)</span></label>
+          <select class="input" id="f_et" onchange="preview()">
+            <option value="">Any entity type</option>
+            <option value="logs">logs</option>
+            <option value="logEvents">logEvents</option>
+            <option value="logs,logEvents">logs + logEvents</option>
+            <option value="spans">spans</option>
+            <option value="metrics">metrics</option>
+          </select>
+          <span class="hint">Applied after the pattern. Leave as Any unless the alias should be pinned to one entity type.</span>
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <span class="st">Scope</span>
+        <div class="field">
+          <label>Visibility</label>
+          <select class="input" id="f_scope">
+            <option>Organization (all teams)</option>
+            <option>This team only</option>
+          </select>
+          <span class="hint">Resolution never grants access. Datasets the user cannot read return zero results, matching the dataset permission model.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dprev">
+      <div class="pvhead">Resolves now to</div>
+      <div class="bignum" id="pv_n">0</div>
+      <p class="pvsub" id="pv_sub">Enter a pattern to preview.</p>
+      <div class="dslist" id="pv_list"></div>
+
+      <div class="pvnote" id="pvnote">
+        <b>Evaluated at query time.</b> The registry is read on every query, so datasets created after this alias is saved are matched automatically. Nothing here is stored as a list.
+      </div>
+
+      <div class="sim">
+        <span class="lbl">Demo:</span>
+        <button class="btn btn-outline" onclick="addDataset()">A new dataset arrives</button>
+        <button class="btn btn-ghost" onclick="resetDatasets()">Reset</button>
+      </div>
+      <div class="simmsg" id="simmsg"></div>
+    </div>
+  </div>
+</aside>
+
+<script>
+const BASE = [
+  {n:"default/logs",          et:"logs"},
+  {n:"default/log_events",    et:"logEvents"},
+  {n:"default/spans",         et:"spans"},
+  {n:"default/metrics",       et:"metrics"},
+  {n:"logs-eu-west-1",        et:"logs"},
+  {n:"logs-eu-central-1",     et:"logs"},
+  {n:"logs-us-east-1",        et:"logs"},
+  {n:"logs-ap-south-1",       et:"logs"},
+  {n:"payments/logs",         et:"logs"},
+  {n:"payments/log_events",   et:"logEvents"},
+  {n:"security/logs",         et:"logs"},
+  {n:"system/engine_queries", et:"logs"}
+];
+const EXTRA = [
+  {n:"logs-sa-east-1",  et:"logs", isNew:true},
+  {n:"logs-eu-north-1", et:"logs", isNew:true}
+];
+let datasets = BASE.slice();
+let extraUsed = 0;
+
+const ALIASES = [
+  {name:"logs", cx:true, rebind:true, mt:"regex", pat:"^default/(logs|log_events)$",
+   desc:"Preserves pre-split behaviour. Resolves to what source logs returned before the split",
+   refs:"48 dashboards, 22 alerts"},
+  {name:"spans", cx:true, rebind:true, mt:"exact", pat:"default/spans",
+   desc:"Canonical span source", refs:"17 dashboards, 9 alerts"},
+  {name:"all_logs", cx:true, rebind:false, mt:"entity", pat:"* where entityType in (logs, logEvents)",
+   desc:"Every logs and logEvents dataset in the organization", refs:"4 dashboards", ets:["logs","logEvents"]},
+  {name:"splunk_main", cx:false, rebind:false, mt:"exact", pat:"default/logs",
+   desc:"Migration identity for the retired Splunk index", refs:"31 saved views"},
+  {name:"checkout_flow", cx:false, rebind:false, mt:"list",
+   pat:"default/logs, payments/logs, payments/log_events, security/logs",
+   sel:["default/logs","payments/logs","payments/log_events","security/logs"],
+   desc:"Datasets the checkout path writes to, picked explicitly", refs:"11 dashboards, 7 alerts"},
+  {name:"logs_eu", cx:false, rebind:false, mt:"wildcard", pat:"logs-eu-*",
+   desc:"All EU regional log datasets", refs:"6 dashboards, 3 alerts"},
+  {name:"payments", cx:false, rebind:false, mt:"regex", pat:"^payments/(logs|log_events)$",
+   desc:"Payments domain across both entity types", refs:"9 dashboards, 5 alerts"}
+];
+
+function toRe(pat, mt){
+  if(mt==="regex"){ try{ return new RegExp(pat); }catch(e){ return null; } }
+  if(mt==="exact"){ return new RegExp("^"+pat.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"$"); }
+  const esc = pat.replace(/[.+?^${}()|[\]\\]/g,"\\$&").replace(/\*/g,".*");
+  return new RegExp("^"+esc+"$");
+}
+function resolve(a){
+  if(a.mt==="entity") return datasets.filter(d=>a.ets.includes(d.et));
+  if(a.mt==="list")   return datasets.filter(d=>a.sel.indexOf(d.n)>-1);
+  const re=toRe(a.pat,a.mt);
+  return re?datasets.filter(d=>re.test(d.n)):[];
+}
+function mtLabel(mt){
+  return mt==="entity"?"Entity type":mt==="list"?"Builder":
+         mt==="exact"?"Exact":mt==="wildcard"?"Wildcard":"Regex";
+}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+let filter="all";
+function setF(el){
+  document.querySelectorAll(".fchip").forEach(b=>b.classList.remove("on"));
+  el.classList.add("on"); filter=el.dataset.f; render();
+}
+
+function render(){
+  const q=(document.getElementById("q").value||"").toLowerCase();
+  const show=ALIASES.filter(a=>{
+    if(filter==="cx"&&!a.cx) return false;
+    if(filter==="custom"&&a.cx) return false;
+    return !q || a.name.toLowerCase().includes(q) || a.pat.toLowerCase().includes(q);
+  });
+  let html="", lastGrp=null;
+  show.forEach(a=>{
+    const grp=a.cx?"Predefined by Coralogix":"Custom";
+    if(grp!==lastGrp){ html+='<tr class="grp"><td colspan="7">'+grp+'</td></tr>'; lastGrp=grp; }
+    const hits=resolve(a);
+    html+='<tr class="data" onclick="openEdit(\''+a.name+'\')">'
+      +'<td><div class="nm">'+a.name+'</div><div class="sub">'+a.desc+'</div></td>'
+      +'<td class="mtcell">'+mtLabel(a.mt)+'</td>'
+      +'<td><span class="pat">'+esc(a.pat)+'</span></td>'
+      +'<td><span class="count"><span class="dot"></span><b>'+hits.length+'</b> <span>datasets</span></span></td>'
+      +'<td><span class="refs">'+a.refs+'</span></td>'
+      +'<td>'+(a.cx?'<span class="badge b-cx">Predefined</span>':'<span class="badge b-custom">Custom</span>')
+      +(a.rebind?' <span class="badge b-rebind">Rebind</span>':'')+'</td>'
+      +'<td class="acts">'
+        +'<button class="btn btn-ghost btn-icon" title="Edit" onclick="event.stopPropagation();openEdit(\''+a.name+'\')">&#9998;</button>'
+        +'<button class="btn btn-ghost btn-icon" title="Delete" onclick="event.stopPropagation();">&#128465;</button>'
+      +'</td></tr>';
+  });
+  if(!show.length){
+    html='<tr><td colspan="7"><div class="zero"><span class="ring"><i>&#9782;</i></span>'
+      +'<h3>No aliases match</h3><p>Clear the search or filter to see all aliases.</p></div></td></tr>';
+  }
+  document.getElementById("rows").innerHTML=html;
+  document.getElementById("cnt").textContent=ALIASES.length+" / 50";
+}
+
+let curMT="wildcard";
+let picked=[];
+let pickFilters={Logs:false,Spans:false,Events:false,default:false,system:false};
+
+function setMT(mt){
+  curMT=mt;
+  document.querySelectorAll("#f_mt button").forEach(b=>b.classList.toggle("on",b.dataset.mt===mt));
+  document.getElementById("wrap_builder").hidden = mt!=="list";
+  document.getElementById("wrap_pattern").hidden = mt==="list";
+  if(mt!=="list") closePicker();
+  document.getElementById("pathint").innerHTML = mt==="exact"
+    ? "Matches one dataset by its full name."
+    : mt==="wildcard"
+      ? "Use <code>*</code> for any sequence. <code>logs-eu-*</code> matches every EU regional dataset, including ones created later."
+      : "RE2 syntax, anchored with <code>^</code> and <code>$</code>. Use when a wildcard cannot express the set.";
+  renderPicker(); preview();
+}
+
+/* ---- dataset picker ---- */
+function togglePicker(e){
+  e.stopPropagation();
+  const p=document.getElementById("pickpanel");
+  const open=p.hidden;
+  p.hidden=!open;
+  document.getElementById("pickctl").classList.toggle("open",open);
+  if(open) renderPicker();
+}
+function closePicker(){
+  const p=document.getElementById("pickpanel");
+  if(p){ p.hidden=true; document.getElementById("pickctl").classList.remove("open"); }
+}
+function togglePick(name,e){
+  if(e) e.stopPropagation();
+  const i=picked.indexOf(name);
+  if(i>-1) picked.splice(i,1); else picked.push(name);
+  renderPicker(); preview();
+}
+function toggleFilter(k,e){
+  if(e) e.stopPropagation();
+  pickFilters[k]=!pickFilters[k];
+  renderPicker();
+}
+const ET_GROUP={logs:"Logs",spans:"Spans",logEvents:"Events",metrics:"Events"};
+function passFilters(d){
+  const etOn=["Logs","Spans","Events"].filter(k=>pickFilters[k]);
+  const spOn=["default","system"].filter(k=>pickFilters[k]);
+  if(etOn.length && etOn.indexOf(ET_GROUP[d.et])===-1) return false;
+  if(spOn.length && !spOn.some(p=>d.n.indexOf(p+"/")===0)) return false;
+  return true;
+}
+function renderPicker(){
+  const selBox=document.getElementById("picksel");
+  if(!selBox) return;
+  selBox.innerHTML = picked.length
+    ? picked.map(n=>'<span class="chip"><span>'+n+'</span><b onclick="togglePick(\''+n+'\',event)">&#10005;</b></span>').join("")
+    : '<span class="ph">Select a Span or Log dataset</span>';
+
+  const q=(document.getElementById("pickq").value||"").toLowerCase();
+  const rows=datasets.filter(d=>passFilters(d) && (!q || d.n.toLowerCase().includes(q)));
+  document.getElementById("picklist").innerHTML = rows.length
+    ? rows.map(d=>{
+        const on=picked.indexOf(d.n)>-1;
+        return '<div class="pickrow'+(on?' sel':'')+'" onclick="togglePick(\''+d.n+'\',event)">'
+          +'<span class="cb">'+(on?'&#10003;':'')+'</span>'
+          +'<span class="dn">'+d.n+'</span><span class="et">'+d.et+'</span></div>';
+      }).join("")
+    : '<div class="pickrow" style="color:var(--c-text-secondary);cursor:default">No datasets match.</div>';
+
+  document.getElementById("pickfoot").innerHTML =
+    ["Logs","Spans","Events"].map(k=>fchk(k)).join("")
+    +'<span class="divider"></span>'
+    +["default","system"].map(k=>fchk(k)).join("");
+}
+function fchk(k){
+  return '<label class="'+(pickFilters[k]?'on':'')+'" onclick="toggleFilter(\''+k+'\',event)">'
+    +'<span class="cb">'+(pickFilters[k]?'&#10003;':'')+'</span>'+k+'</label>';
+}
+document.addEventListener("click",function(){ closePicker(); });
+
+function syntaxFor(){
+  const nm=(document.getElementById("f_name").value||"").trim()||"<alias>";
+  let html='source '+nm;
+  if(curMT==="list" && picked.length){
+    html+='<span class="eq">Equivalent to: source '+picked.join(", ")+'</span>';
+  }
+  return html;
+}
+
+function preview(){
+  const n=document.getElementById("pv_n"), sub=document.getElementById("pv_sub");
+  const list=document.getElementById("pv_list"), err=document.getElementById("paterr");
+  const note=document.getElementById("pvnote");
+  err.textContent="";
+  document.getElementById("syntax").innerHTML=syntaxFor();
+
+  let hits=[], msg="";
+  if(curMT==="list"){
+    hits=datasets.filter(d=>picked.indexOf(d.n)>-1);
+    msg = picked.length ? "" : "Select at least one dataset.";
+  }else{
+    const pat=document.getElementById("f_pat").value.trim();
+    const et=document.getElementById("f_et").value;
+    if(!pat){ msg="Enter a pattern to preview."; }
+    else{
+      const re=toRe(pat,curMT);
+      if(!re){ msg="Pattern cannot be evaluated."; err.textContent="Not valid RE2 syntax."; }
+      else{
+        hits=datasets.filter(d=>re.test(d.n));
+        if(et){ const allow=et.split(","); hits=hits.filter(d=>allow.indexOf(d.et)>-1); }
+      }
+    }
+  }
+
+  n.textContent=hits.length; n.classList.toggle("zero",hits.length===0);
+  sub.textContent = msg ? msg
+    : hits.length===0
+      ? "No dataset in the registry matches today. The alias is still valid and resolves when one does."
+      : "of "+datasets.length+" datasets in the registry";
+
+  list.innerHTML = datasets.map(function(d){
+    const hit=hits.indexOf(d)>-1;
+    return '<div class="dsrow'+(hit?'':' miss')+'">'
+      +'<span class="tick">'+(hit?'&#10003;':'&middot;')+'</span>'
+      +'<span class="dn">'+d.n+'</span>'
+      +(d.isNew?'<span class="new">NEW</span>':'')
+      +'<span class="et">'+d.et+'</span></div>';
+  }).join("");
+
+  if(curMT==="list"){
+    note.className="pvnote warn";
+    note.innerHTML='<b>Fixed list.</b> This alias resolves only to the datasets selected above. '
+      +'A dataset created later is not included until someone edits it. Use Wildcard if the set should grow on its own.';
+  }else if(curMT==="exact"){
+    note.className="pvnote";
+    note.innerHTML='<b>Single dataset.</b> Resolved by name on every query, so a rename breaks it loudly rather than silently.';
+  }else{
+    note.className="pvnote";
+    note.innerHTML='<b>Evaluated at query time.</b> The registry is read on every query, so datasets created after this alias is saved are matched automatically. Nothing here is stored as a list.';
+  }
+}
+
+function addDataset(){
+  if(extraUsed>=EXTRA.length){ document.getElementById("simmsg").textContent="No more datasets to add. Reset to run it again."; return; }
+  const d=EXTRA[extraUsed++]; datasets.push(d);
+  preview(); render();
+  document.getElementById("simmsg").textContent=d.n+" was created. No alias was edited.";
+}
+function resetDatasets(){
+  datasets=BASE.slice(); extraUsed=0; preview(); render();
+  document.getElementById("simmsg").textContent="";
+}
+
+function openCreate(){
+  document.getElementById("dtitle").textContent="Create alias";
+  document.getElementById("impact").innerHTML="";
+  document.getElementById("f_name").value="";
+  document.getElementById("f_desc").value="";
+  document.getElementById("f_pat").value="";
+  document.getElementById("f_et").value="";
+  picked=[];
+  setMT("wildcard"); openDrawer();
+}
+function openEdit(name){
+  const a=ALIASES.find(function(x){return x.name===name;}); if(!a) return;
+  document.getElementById("dtitle").textContent="Edit alias";
+  document.getElementById("impact").innerHTML=
+    '<div class="warncard"><span class="ic">&#9888;</span><div>'
+    +'This alias is referenced by <b>'+a.refs+'</b>. Changing what it resolves to changes what all of them return, with no edit on their side.'
+    +(a.cx?'<br><br>This alias is maintained by Coralogix. Editing it opts your organization out of the default.':'')
+    +'</div></div>';
+  document.getElementById("f_name").value=a.name;
+  document.getElementById("f_desc").value=a.desc;
+  picked=[];
+  if(a.mt==="entity"){
+    document.getElementById("f_pat").value="*";
+    document.getElementById("f_et").value=a.ets.join(",");
+    setMT("wildcard");
+  }else if(a.mt==="list"){
+    picked=a.sel.slice();
+    document.getElementById("f_pat").value="";
+    document.getElementById("f_et").value="";
+    setMT("list");
+  }else{
+    document.getElementById("f_pat").value=a.pat;
+    document.getElementById("f_et").value="";
+    setMT(a.mt);
+  }
+  openDrawer();
+}
+function openDrawer(){
+  document.getElementById("drawer").classList.add("on");
+  document.getElementById("scrim").classList.add("on");
+}
+function closeDrawer(){
+  document.getElementById("drawer").classList.remove("on");
+  document.getElementById("scrim").classList.remove("on");
+  document.getElementById("simmsg").textContent="";
+}
+/* ---- drawer resize by dragging the left edge ---- */
+(function(){
+  const dr=document.getElementById("drawer"), grip=document.getElementById("dgrip");
+  let dragging=false;
+  function widthFromX(x){
+    const w=window.innerWidth-x;
+    const min=Math.min(560,window.innerWidth*.98);
+    const max=window.innerWidth*.98;
+    return Math.max(min,Math.min(max,w));
+  }
+  grip.addEventListener("mousedown",function(e){
+    e.preventDefault(); e.stopPropagation();
+    dragging=true; dr.classList.add("resizing");
+    document.body.style.cursor="col-resize";
+  });
+  window.addEventListener("mousemove",function(e){
+    if(!dragging) return;
+    dr.style.width=widthFromX(e.clientX)+"px";
+  });
+  window.addEventListener("mouseup",function(){
+    if(!dragging) return;
+    dragging=false; dr.classList.remove("resizing"); document.body.style.cursor="";
+  });
+  grip.addEventListener("dblclick",function(e){
+    e.stopPropagation(); dr.style.width="75%";
+  });
+})();
+
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeDrawer(); });
+
+setMT("wildcard");
+render();
+</script>
+</body>
+</html>
