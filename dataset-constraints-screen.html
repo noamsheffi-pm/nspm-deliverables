@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dataset Constraints: declare or infer</title>
+<style>
+  :root {
+    --page:      #f7f8f9;
+    --surface:   #ffffff;
+    --sunk:      #f9fafb;
+    --border:    #e5e7eb;
+    --border-2:  #d1d5db;
+    --text:      #111827;
+    --text-2:    #6b7280;
+    --text-3:    #9ca3af;
+    --green:     #16a34a;
+    --green-br:  #22c55e;
+    --green-sf:  #f0fdf4;
+    --blue:      #3b82f6;
+    --blue-sf:   #eff6ff;
+    --amber:     #b45309;
+    --amber-br:  #f59e0b;
+    --amber-sf:  #fffbeb;
+    --red:       #b42318;
+    --red-br:    #f97066;
+    --red-sf:    #fef3f2;
+    --violet:    #6d28d9;
+    --violet-sf: #f5f3ff;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0d1117; --surface: #161b22; --sunk: #11161d;
+      --border: #262e3b; --border-2: #384252;
+      --text: #e6eaf1; --text-2: #9aa4b2; --text-3: #6b7688;
+      --green: #35c586; --green-br: #2ea86f; --green-sf: #0f2419;
+      --blue: #60a5fa; --blue-sf: #10203a;
+      --amber: #e0a860; --amber-br: #9a6b18; --amber-sf: #2a2113;
+      --red: #e07a6d; --red-br: #7f3830; --red-sf: #2b1613;
+      --violet: #b3a9f5; --violet-sf: #221d3d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0d1117; --surface: #161b22; --sunk: #11161d;
+    --border: #262e3b; --border-2: #384252;
+    --text: #e6eaf1; --text-2: #9aa4b2; --text-3: #6b7688;
+    --green: #35c586; --green-br: #2ea86f; --green-sf: #0f2419;
+    --blue: #60a5fa; --blue-sf: #10203a;
+    --amber: #e0a860; --amber-br: #9a6b18; --amber-sf: #2a2113;
+    --red: #e07a6d; --red-br: #7f3830; --red-sf: #2b1613;
+    --violet: #b3a9f5; --violet-sf: #221d3d;
+  }
+
+  * { box-sizing: border-box; }
+  /* Class rules below set display, which outranks the UA sheet's
+     [hidden]{display:none}. Without this every toggled block stays visible. */
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; background: var(--page); color: var(--text);
+    font-family: var(--sans); font-size: 14px; line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; }
+  code { font-family: var(--mono); font-size: .92em; }
+
+  /* ============ frame. Normal document flow throughout: nothing is fixed or
+     overlaid, so no control can end up underneath another layer. ============ */
+  /* zoom, not transform: scale. zoom reflows the layout, so the grids and the
+     wrapping stay correct at the smaller size instead of being squashed.
+     max-width is divided by the same factor so the page still fills the width. */
+  .wrap { zoom: .9; max-width: 1620px; margin: 0 auto; padding: 22px 24px 60px; }
+
+  .top { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .top h1 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -.015em; }
+  .top .sub { margin: 5px 0 0; color: var(--text-2); font-size: 13px; max-width: 780px; }
+  .top .right { margin-left: auto; display: flex; align-items: center; gap: 9px; }
+  .concept { background: var(--violet-sf); color: var(--violet); border-radius: 999px; padding: 4px 11px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .tbtn { background: var(--surface); border: 1px solid var(--border-2); border-radius: 8px; padding: 6px 11px; font-size: 12px; color: var(--text-2); cursor: pointer; }
+  .tbtn:hover { color: var(--text); }
+
+  /* screen switch: big, obvious, and first in the tab order */
+  .switch { display: inline-flex; background: var(--sunk); border: 1px solid var(--border); border-radius: 10px; padding: 3px; margin: 20px 0 0; }
+  .switch button {
+    background: none; border: none; border-radius: 8px; padding: 8px 16px;
+    font-size: 13.5px; font-weight: 600; color: var(--text-2); cursor: pointer; white-space: nowrap;
+  }
+  .switch button:hover { color: var(--text); }
+  .switch button[aria-selected="true"] { background: var(--surface); color: var(--green); box-shadow: 0 1px 3px rgb(16 24 40 / .09); }
+  .switch button .rt { display: block; font-weight: 400; font-size: 10.5px; color: var(--text-3); font-family: var(--mono); margin-top: 2px; }
+
+  /* ============ panel = one screen ============ */
+  /* Centered form at two thirds of the width. min() so it still fills narrow
+     viewports instead of shrinking to an unusable column. */
+  .panel { width: min(100%, 66.6%); margin: 18px auto 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  @media (max-width: 1000px) { .panel { width: 100%; } }
+  .phead { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+  .phead h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+  .phead .xb { background: none; border: none; color: var(--text-2); font-size: 16px; cursor: pointer; padding: 0 2px 0 0; line-height: 1; }
+  .phead .crumb { color: var(--text-3); font-size: 12.5px; font-family: var(--mono); }
+  .phead .right { margin-left: auto; display: flex; align-items: center; gap: 11px; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+  .toggle .tr { width: 33px; height: 19px; border-radius: 999px; background: var(--green-br); position: relative; flex: none; }
+  .toggle .tr::after { content: ""; position: absolute; top: 2px; left: 16px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+  .save { background: var(--sunk); border: 1px solid var(--border); color: var(--text-3); border-radius: 8px; padding: 6px 17px; font-size: 13px; font-weight: 600; }
+  .save.live { background: var(--green); border-color: var(--green); color: #fff; }
+
+  .pbody { display: block; }
+  .main { padding: 18px 20px 24px; min-width: 0; }
+
+  /* ============ section (styled like a CX form section) ============ */
+  .sect { border: 1px solid var(--border); border-radius: 11px; background: var(--surface); padding: 15px 16px 16px; margin-bottom: 14px; }
+  .sect:last-child { margin-bottom: 0; }
+  .sect > h3 { margin: 0; font-size: 15px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+  .sect > h3 .cv { color: var(--text-3); font-size: 11px; }
+  /* Collapsible section. The chevron rotates rather than swapping glyphs, so the
+     open and closed states are the same element and cannot drift apart. */
+  .sect > h3.clk { cursor: pointer; }
+  .sect > h3 .cv { display: inline-block; transition: transform .12s ease; }
+  .sect.closed > h3 .cv { transform: rotate(-90deg); }
+  .sect.closed > .d, .sect.closed > .body { display: none; }
+  .sect > h3 .hint { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--text-3); }
+  .sect > .d { margin: 5px 0 0; color: var(--text-2); font-size: 13px; }
+  .sect.t-empty { border-color: var(--amber-br); }
+  .sect.t-bad { border-color: var(--red-br); }
+
+  /* ============ radio cards ============ */
+  .rg { display: grid; gap: 11px; margin-top: 14px; }
+  .rg.c2 { grid-template-columns: 1fr 1fr; }
+  .rg.c3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 780px) { .rg.c2, .rg.c3 { grid-template-columns: 1fr; } }
+  .rc {
+    display: grid; grid-template-columns: 19px minmax(0,1fr); gap: 10px; align-items: start;
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 13px;
+    background: var(--surface); cursor: pointer; text-align: left;
+  }
+  .rc:hover { border-color: var(--border-2); }
+  .rc .dot { width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid var(--border-2); margin-top: 1px; display: grid; place-items: center; flex: none; }
+  .rc .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+  .rc .ti { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .rc .de { display: block; margin-top: 4px; font-size: 12.5px; color: var(--text-2); }
+  .rc[aria-checked="true"] { border-color: var(--green-br); box-shadow: 0 0 0 1px var(--green-br); }
+  .rc[aria-checked="true"] .dot { border-color: var(--green-br); }
+  .rc[aria-checked="true"] .dot::after { background: var(--green-br); }
+  .rc.empty[aria-checked="true"] { border-color: var(--amber-br); box-shadow: 0 0 0 1px var(--amber-br); background: var(--amber-sf); }
+  .rc.empty[aria-checked="true"] .dot { border-color: var(--amber-br); }
+  .rc.empty[aria-checked="true"] .dot::after { background: var(--amber-br); }
+
+  .pill { border-radius: 5px; padding: 1px 7px; font-size: 10.5px; font-weight: 650; border: 1px solid transparent; white-space: nowrap; }
+  .pill--pillar { background: var(--sunk); color: var(--text-2); border-color: var(--border); font-family: var(--mono); font-weight: 500; }
+
+  /* ============ text fields (Details section) ============ */
+  .field { margin-top: 15px; }
+  .field:first-of-type { margin-top: 14px; }
+  .field > label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; margin-bottom: 7px; }
+  .field > label .req { color: #e5484d; margin-right: 3px; }
+  .field > label .opt { color: var(--text-3); font-weight: 400; }
+  .inp {
+    width: 100%; border: 1px solid var(--border-2); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+    padding: 10px 13px; font: inherit; font-size: 13.5px;
+  }
+  .inp:focus { outline: none; border-color: var(--green-br); box-shadow: 0 0 0 1px var(--green-br); }
+  /* Optional-and-empty renders as a filled well with no border, the same way the
+     product does it, so the eye skips it rather than reading it as a gap. */
+  .inp.dis { background: var(--sunk); border-color: transparent; color: var(--text-3); }
+
+  /* read-only field pair (TCO side) */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 14px; }
+  @media (max-width: 620px) { .two { grid-template-columns: 1fr; } }
+  .fld > label { display: flex; align-items: center; gap: 6px; font-size: 13px; margin-bottom: 6px; color: var(--text-2); }
+  .info { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border-2); color: var(--text-3); font-size: 9px; display: grid; place-items: center; flex: none; }
+  .ro { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; background: var(--sunk); }
+  .ro .mono { font-family: var(--mono); font-size: 12.5px; }
+  .ro .tagr { font-size: 11px; color: var(--text-3); }
+
+  textarea.inp { min-height: 78px; resize: vertical; }
+
+  /* inline radio pair, e.g. Policy order */
+  .inline { display: flex; gap: 22px; margin-top: 8px; }
+  .irad { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; background: none; border: none; padding: 0; color: inherit; }
+  .irad .dot { width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid var(--border-2); display: grid; place-items: center; flex: none; }
+  .irad .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+  .irad[aria-checked="true"] .dot { border-color: var(--green-br); }
+  .irad[aria-checked="true"] .dot::after { background: var(--green-br); }
+
+  /* segmented toggle in a section header, e.g. Builder / Expression */
+  .hseg { margin-left: auto; display: inline-flex; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; }
+  .hseg button { background: var(--surface); border: none; border-right: 1px solid var(--border); padding: 6px 13px; font-size: 12.5px; font-weight: 500; color: var(--text-2); cursor: pointer; }
+  .hseg button:last-child { border-right: none; }
+  .hseg button[aria-selected="true"] { color: var(--green); font-weight: 650; }
+
+  /* filter builder well */
+  .well { margin-top: 14px; background: var(--sunk); border-radius: 10px; padding: 12px; }
+  .frow { display: flex; align-items: center; gap: 10px; }
+  .fbox { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+  .attr { background: #e8eefb; color: #3a5bbf; border-radius: 6px; padding: 3px 9px; font-size: 12.5px; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .attr { background: #1d2a45; color: #9dbaf5; }
+  }
+  :root[data-theme="dark"] .attr { background: #1d2a45; color: #9dbaf5; }
+  .trash { color: var(--text-3); font-size: 14px; background: none; border: none; cursor: pointer; }
+  .addf { margin-top: 10px; background: none; border: none; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; }
+
+  /* dropdown */
+  .dd { position: relative; }
+  .ddt {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    border: 1px solid var(--border-2); border-radius: 8px; background: var(--surface);
+    padding: 9px 12px; font-size: 13.5px; color: var(--text); cursor: pointer; text-align: left;
+  }
+  .dd.open .ddt { border-color: var(--green-br); box-shadow: 0 0 0 1px var(--green-br); }
+  .ddt .cv { color: var(--text-3); font-size: 10px; }
+  .ddp {
+    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 5px);
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: 9px;
+    box-shadow: 0 12px 28px rgb(16 24 40 / .14); max-height: 292px; overflow-y: auto; padding: 5px;
+  }
+  .ddr {
+    width: 100%; display: flex; align-items: center; gap: 10px; justify-content: space-between;
+    background: none; border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; text-align: left;
+  }
+  .ddr:hover { background: var(--sunk); }
+  .ddr[aria-selected="true"] { background: var(--green-sf); }
+  .ddr .nm { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* entityType chip on a dataset row. The unset variant is amber, so the row you
+     have to make a decision about is the one that stands out. */
+  .et { display: inline-flex; align-items: center; gap: 5px; flex: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 11.5px; font-family: var(--mono); color: var(--text-2); background: var(--surface); }
+  .et i { font-style: normal; color: var(--text-3); }
+  .et.unset { border-color: var(--amber-br); background: var(--amber-sf); color: var(--amber); }
+
+  /* destination tabs */
+  .dtabs { display: flex; align-items: center; gap: 12px; margin-top: 14px; border-bottom: 1px solid var(--border); }
+  .dtab { display: inline-flex; align-items: center; gap: 8px; padding: 7px 2px 9px; border-bottom: 2px solid var(--green-br); margin-bottom: -1px; }
+  .dtab .nm { color: var(--green); font-size: 13px; font-family: var(--mono); }
+  .dtab .kb, .dplus { color: var(--text-3); font-size: 15px; }
+
+  /* toggle row, e.g. High priority */
+  .trow { display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 12px; align-items: start; margin-top: 14px; background: var(--sunk); border-radius: 10px; padding: 13px 14px; }
+  .trow .sw { width: 34px; height: 19px; border-radius: 999px; background: var(--border-2); position: relative; cursor: pointer; margin-top: 1px; }
+  .trow .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; transition: left .12s ease; }
+  .trow.on .sw { background: var(--green-br); }
+  .trow.on .sw::after { left: 17px; }
+  .trow .ti { font-size: 13.5px; font-weight: 600; }
+  .trow .de { display: block; margin-top: 4px; font-size: 12.5px; color: var(--text-2); }
+
+  .rc .gl { font-size: 14px; color: var(--text-2); margin-right: 2px; }
+
+  /* announcement */
+  .ann { display: flex; gap: 10px; align-items: flex-start; border: 1px solid; border-radius: 9px; padding: 11px 13px; font-size: 13px; margin-top: 13px; }
+  .ann .ic { flex: none; width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #fff; margin-top: 1px; }
+  .ann b { font-weight: 650; }
+  .ann--warn { background: var(--amber-sf); border-color: var(--amber-br); }  .ann--warn .ic { background: var(--amber-br); }
+  .ann--bad  { background: var(--red-sf);   border-color: var(--red-br); }    .ann--bad .ic  { background: var(--red); }
+  .ann--info { background: var(--blue-sf);  border-color: var(--blue); }      .ann--info .ic { background: var(--blue); }
+
+  .prov { margin: 16px 0 0; font-size: 11px; color: var(--text-3); font-family: var(--mono); line-height: 1.65; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>Dataset constraints: declare at creation, or leave empty and infer on arrival</h1>
+      <p class="sub">
+        Three properties define a dataset. Today none is set at creation, so the first write settles all
+        three silently. These two screens add the option to declare them, and keep leaving them empty a
+        real choice rather than an accident.
+      </p>
+    </div>
+    <div class="right">
+      <span class="concept">Concept, nothing built</span>
+      <button class="tbtn" id="themeBtn" type="button">Dark</button>
+    </div>
+  </div>
+
+  <!-- Screen switch. Plain flow, nothing overlaps it. -->
+  <div class="switch" role="tablist" aria-label="Screen">
+    <button role="tab" id="swDm" aria-selected="true">
+      Dataspace Management <span class="rt">default / dataspace</span>
+    </button>
+    <button role="tab" id="swTco" aria-selected="false">
+      TCO Optimizer <span class="rt">log policy destination</span>
+    </button>
+  </div>
+
+  <!-- ============ the screen ============ -->
+  <section class="panel">
+    <div class="phead">
+      <button class="xb" type="button" aria-label="Close">✕</button>
+      <h2 id="pTitle">Edit dataset</h2>
+      <span class="crumb" id="pCrumb">default / transactions</span>
+      <span class="right">
+        <span class="toggle"><span class="tr"></span> <span id="tgLabel">Enable rule</span></span>
+        <button class="save" id="saveBtn" type="button">Save</button>
+      </span>
+    </div>
+
+    <div class="pbody">
+      <!-- ---------- left: the form ---------- -->
+      <!-- ================= SCREEN 1: dataset (Dataspace Management) ================= -->
+      <div class="main" id="screenDm">
+
+        <div class="sect">
+          <h3><span class="cv">⌄</span> Details</h3>
+          <div class="field">
+            <label for="dsName"><span class="req">*</span>Dataset name</label>
+            <input class="inp" id="dsName" type="text" value="foo" />
+          </div>
+          <div class="field">
+            <label for="dsDesc">Description <span class="opt">(optional)</span></label>
+            <textarea class="inp dis" id="dsDesc" placeholder="Provide a description for this dataset"></textarea>
+          </div>
+          <div class="field">
+            <label for="dsBucket">Bucket name <span class="opt">(optional)</span></label>
+            <input class="inp dis" id="dsBucket" type="text" value="" placeholder="coralogix-onlineboutique" />
+          </div>
+        </div>
+
+        <div class="sect" id="sectMode">
+          <h3><span class="cv">⌄</span> Ingestion mode <span class="info" title="Streaming is written continuously by a routing rule. Summary is written by a background query execution.">i</span></h3>
+          <p class="d">Streaming writes, or summary results produced by a background query.</p>
+          <div class="rg c3" role="radiogroup" aria-label="Ingestion mode" data-group="mode">
+            <button class="rc" role="radio" data-v="streaming" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti">Streaming</span><span class="de">Written continuously as it arrives at the pipeline.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="summary" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Summary</span><span class="de">Written by a background query execution.</span></span>
+            </button>
+            <button class="rc empty" role="radio" data-v="empty" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Leave empty</span><span class="de">Settled by the first write, or by the first request that reserves it.</span></span>
+            </button>
+          </div>
+          <div id="nMode"></div>
+        </div>
+
+        <div class="sect" id="sectEntity">
+          <h3><span class="cv">⌄</span> Entity type <span class="info" title="The dataset carries exactly one entity type. It decides whether alerting and trace correlation can read the data.">i</span></h3>
+          <p class="d">Which telemetry this dataset carries. This is the only surface that sets it.</p>
+          <div class="rg c2" role="radiogroup" aria-label="Entity type" data-group="entity">
+            <button class="rc" role="radio" data-v="logs" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti">logs <span class="pill pill--pillar">Logs</span></span>
+              <span class="de">The operational set. Alerting and trace correlation read this and nothing else.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="logEvents" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">logEvents <span class="pill pill--pillar">Logs</span></span>
+              <span class="de">Kept and governed, with no automatic correlation to traces and alerts.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="jsonData" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">jsonData <span class="pill pill--pillar">Data</span></span>
+              <span class="de">A different pillar, not a kind of logs. What a background query summary lands as.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="spans" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">spans <span class="pill pill--pillar">Spans</span></span>
+              <span class="de">Tracing spans. Has its own event variant, absent from this prototype.</span></span>
+            </button>
+            <button class="rc empty" role="radio" data-v="empty" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Leave empty</span>
+              <span class="de">Settled by what arrives. A streaming route lands logs, a background query lands jsonData.</span></span>
+            </button>
+          </div>
+          <div id="nEntity"></div>
+        </div>
+
+        <div class="sect" id="sectPart">
+          <h3><span class="cv">⌄</span> Partitioning</h3>
+          <p class="d">Time based partitioning, or a single unpartitioned set.</p>
+          <div class="rg c3" role="radiogroup" aria-label="Partitioning" data-group="part">
+            <button class="rc" role="radio" data-v="partitioned" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti">Partitioned</span><span class="de">Time based. Implies the type is already known.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="unpartitioned" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Unpartitioned</span><span class="de">One set, no time dimension.</span></span>
+            </button>
+            <button class="rc empty" role="radio" data-v="empty" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Leave empty</span><span class="de">An implementation detail to the customer, so empty is the expected default here.</span></span>
+            </button>
+          </div>
+          <div id="nPart"></div>
+        </div>
+
+        <div class="sect closed">
+          <h3 class="clk"><span class="cv">⌄</span> Quota limit
+            <span class="info" title="A share of the entity type's allocation, not of the team total.">i</span>
+            <span class="hint">not set</span>
+          </h3>
+          <div class="body">
+            <div class="two">
+              <div class="fld">
+                <label>Daily limit <span class="info">i</span></label>
+                <input class="inp dis" type="text" value="" placeholder="units / day" />
+              </div>
+              <div class="fld">
+                <label>Share of allocation <span class="info">i</span></label>
+                <input class="inp dis" type="text" value="" placeholder="% of available daily quota" />
+              </div>
+            </div>
+            <div class="ann ann--info">
+              <span class="ic">i</span>
+              <span><b>Available quota depends on the entity type's allocation</b>, not on the team total. An
+              entity type with no allocation of its own draws on the allocation of the type it is stored under.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sect closed">
+          <h3 class="clk"><span class="cv">⌄</span> Access policy
+            <span class="info" title="Per-dataset access is expressed as rule-level PBAC, not as a scope on the dataset object.">i</span>
+            <span class="hint">inherited</span>
+          </h3>
+          <div class="body">
+            <p class="d">Who can read and write this dataset.</p>
+            <div class="ann ann--info">
+              <span class="ic">i</span>
+              <span><b>Inherited from the dataspace.</b> Per-dataset access is expressed as rule-level PBAC
+              rather than a scope on the dataset itself, so it is set where the rule is, not here.</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="verdict"></div>
+      </div>
+
+      <!-- ================= SCREEN 2: log policy (TCO Optimizer) ================= -->
+      <div class="main" id="screenTco" hidden>
+
+        <div class="sect">
+          <h3><span class="cv">⌄</span> Details</h3>
+          <div class="field">
+            <label for="polName"><span class="req">*</span>Policy name</label>
+            <input class="inp" id="polName" type="text" value="" placeholder="Enter policy name" />
+          </div>
+          <div class="field">
+            <label for="polDesc">Description <span class="opt">(optional)</span></label>
+            <textarea class="inp dis" id="polDesc" placeholder="Provide a description for this policy"></textarea>
+          </div>
+          <div class="field">
+            <label>Policy order <span class="info" title="Where this policy sits in the first-match sequence.">i</span></label>
+            <div class="inline" role="radiogroup" aria-label="Policy order" data-group="order">
+              <button class="irad" role="radio" data-v="last" aria-checked="true"><span class="dot"></span> Last</button>
+              <button class="irad" role="radio" data-v="first" aria-checked="false"><span class="dot"></span> First</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sect">
+          <h3><span class="cv">⌄</span> Filters
+            <span class="hseg">
+              <button aria-selected="true">Builder</button>
+              <button aria-selected="false">Expression</button>
+            </span>
+          </h3>
+          <div class="well">
+            <div class="frow">
+              <div class="fbox"><span class="attr">Select attribute</span></div>
+              <button class="trash" type="button" aria-label="Remove filter">🗑</button>
+            </div>
+            <button class="addf" type="button">+ Add filter</button>
+          </div>
+        </div>
+
+        <div class="sect">
+          <h3><span class="cv">⌄</span> Action</h3>
+          <p class="d">What should happen to data matched by this filter?</p>
+          <div class="rg c2" role="radiogroup" aria-label="Action" data-group="action">
+            <button class="rc" role="radio" data-v="route" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti"><span class="gl">⇥</span> Route &amp; Store</span>
+              <span class="de">Send matched data to a destination with configured storage.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="block" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti"><span class="gl">⊘</span> Block</span>
+              <span class="de">Drop all matched data. Nothing is stored or forwarded.</span></span>
+            </button>
+          </div>
+          <div id="nAction"></div>
+        </div>
+
+        <div class="sect" id="sectDest">
+          <h3><span class="cv">⌄</span> Destination &amp; Storage</h3>
+          <p class="d">Route matched data to one or more destinations, each with its own storage strategy.</p>
+
+          <div class="dtabs">
+            <span class="dtab"><span class="nm" id="destTab">default/logs</span><span class="kb">⋮</span></span>
+            <span class="dplus">+</span>
+          </div>
+
+          <div class="two">
+            <div class="fld">
+              <label>Dataspace</label>
+              <div class="dd"><button class="ddt" type="button"><span>default</span><span class="cv">⌄</span></button></div>
+            </div>
+            <div class="fld">
+              <label>Dataset</label>
+              <div class="dd" id="ddDataset">
+                <button class="ddt" type="button" id="ddTrigger">
+                  <span id="ddValue">logs</span><span class="cv">⌄</span>
+                </button>
+                <div class="ddp" id="ddPanel" role="listbox" aria-label="Dataset" hidden></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Appears only for a dataset with no entity type yet. This is the
+               reservation: TCO does not set the dataset's type, it claims one for
+               this write so the policy is not rejected later. -->
+          <div id="etPick" hidden>
+            <div class="field">
+              <label><span class="req">*</span>Entity type for this dataset
+                <span class="info" title="This dataset has no entity type yet, so the policy has to say which one it is writing.">i</span>
+              </label>
+              <div class="inline" role="radiogroup" aria-label="Entity type for this dataset" data-group="dsEntity">
+                <button class="irad" role="radio" data-v="logs" aria-checked="true"><span class="dot"></span> logs</button>
+                <button class="irad" role="radio" data-v="logEvents" aria-checked="false"><span class="dot"></span> logEvents</button>
+              </div>
+            </div>
+            <div class="ann ann--info">
+              <span class="ic">i</span>
+              <span><b>This dataset has no entity type yet.</b> Saving reserves it as
+              <b id="etResolved">logs</b> for this destination, so a background query or another policy
+              arriving later cannot claim it as something else. Set it on the dataset to make it permanent.</span>
+            </div>
+          </div>
+
+          <div id="nDest"></div>
+        </div>
+
+        <div class="sect" id="sectPolType">
+          <h3><span class="cv">⌄</span> Policy type</h3>
+          <p class="d">Select how this policy determines priority.</p>
+          <div class="rg c2" role="radiogroup" aria-label="Policy type" data-group="polType">
+            <button class="rc" role="radio" data-v="standard" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti">Standard</span><span class="de">Fixed priority for all matching logs. Simple and predictable.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="quota" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Quota-based</span><span class="de">Different priorities based on daily usage thresholds.</span></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sect" id="sectPriority">
+          <h3><span class="cv">⌄</span> Priority</h3>
+          <p class="d">Where matching logs are stored, and how quickly they can be queried.</p>
+          <div class="trow" id="hiRow">
+            <span class="sw" id="hiSw" role="switch" aria-checked="false" tabindex="0"></span>
+            <span>
+              <span class="ti">High priority, frequentsearch</span>
+              <span class="de">The tier you knew as High. Stored in frequentsearch/logs, queryable for 7 days,
+              with a background S3 archive copy included in the price.</span>
+            </span>
+          </div>
+          <div class="rg c2" role="radiogroup" aria-label="Priority" data-group="prio">
+            <button class="rc" role="radio" data-v="medium" aria-checked="true">
+              <span class="dot"></span>
+              <span><span class="ti">Medium</span><span class="de">Stored in customer-owned S3, queryable via DataPrime, with alerting and dashboarding.</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="low" aria-checked="false">
+              <span class="dot"></span>
+              <span><span class="ti">Low</span><span class="de">Stored in customer-owned S3, instantly queryable via DataPrime for compliance and long-term retention.</span></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sect" id="sectRetention">
+          <h3><span class="cv">⌄</span> Archive retention</h3>
+          <p class="d">Select an archive tag for matching logs.</p>
+          <div class="rg c2" role="radiogroup" aria-label="Archive retention" data-group="ret">
+            <button class="rc" role="radio" data-v="default" aria-checked="true">
+              <span class="dot"></span><span><span class="ti">Default <span class="info">i</span></span></span>
+            </button>
+            <button class="rc" role="radio" data-v="short" aria-checked="false">
+              <span class="dot"></span><span><span class="ti">Short</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="intermediate" aria-checked="false">
+              <span class="dot"></span><span><span class="ti">Intermediate</span></span>
+            </button>
+            <button class="rc" role="radio" data-v="long" aria-checked="false">
+              <span class="dot"></span><span><span class="ti">Long</span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <p class="prov">
+    Concept 2026-08-20 · visual language from internal-cx-web-workspace-design @ 5207f2c (Omer Assa, CX-54632)
+    · entity types and pillars from a live cx-catalog rnd entity-types query, 2026-08-20
+    · sources: the 09:41 and 11:52 sessions · initiative CX-54630
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var state = {
+    screen: "dm",
+    /* dataset screen */
+    mode: "streaming", entity: "logs", part: "partitioned",
+    /* policy screen */
+    order: "last", action: "route", polType: "standard", prio: "medium", ret: "default",
+    high: false, dataset: "logs", dsEntity: "logs"
+  };
+
+  /* Datasets offered as a policy destination. entityType null means the dataset
+     has never been typed, which is the case the extra picker exists for. */
+  var DATASETS = [
+    { id: "logs",                       name: "logs",                          et: "logs" },
+    { id: "default-unclassified-logs",  name: "default-unclassified-logs",     et: "logs" },
+    { id: "aws-prod-payment-logs",      name: "aws-prod-payment-logs",         et: "logEvents" },
+    { id: "aws-prod-payment-logs-eu",   name: "aws-prod-payment-logs-eu-west", et: "logEvents" },
+    { id: "web-frontend-main-logs",     name: "web-frontend-main-logs",        et: "logs" },
+    { id: "aws-prod-payment-logs-us",   name: "aws-prod-payment-logs-us-east", et: "logEvents" },
+    { id: "transactions",               name: "transactions",                  et: null },
+    { id: "web-frontend-error-logs",    name: "web-frontend-error-logs",       et: "logs" },
+    { id: "checkout-summary",           name: "checkout-summary",              et: null },
+    { id: "web-frontend-auth-logs",     name: "web-frontend-auth-logs",        et: "logs" }
+  ];
+  function ds() {
+    return DATASETS.filter(function (d) { return d.id === state.dataset; })[0] || DATASETS[0];
+  }
+
+  /* ---------- theme ---------- */
+  var themeBtn = document.getElementById("themeBtn");
+  function dark() {
+    var a = document.documentElement.getAttribute("data-theme");
+    if (a) { return a === "dark"; }
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  /* Label names the theme you would switch TO, so it is seeded from the system
+     preference rather than hardcoded. */
+  function syncTheme() { themeBtn.textContent = dark() ? "Light" : "Dark"; }
+  themeBtn.addEventListener("click", function () {
+    document.documentElement.setAttribute("data-theme", dark() ? "light" : "dark");
+    syncTheme();
+  });
+  syncTheme();
+
+  /* ---------- screen switch ---------- */
+  var swDm = document.getElementById("swDm"), swTco = document.getElementById("swTco");
+  swDm.addEventListener("click", function () { state.screen = "dm"; render(); });
+  swTco.addEventListener("click", function () { state.screen = "tco"; render(); });
+
+  /* ---------- radio groups (cards and inline pairs share one handler) ---------- */
+  document.querySelectorAll("[data-group]").forEach(function (grp) {
+    var key = grp.getAttribute("data-group");
+    grp.querySelectorAll('[role="radio"]').forEach(function (rc) {
+      rc.addEventListener("click", function () {
+        grp.querySelectorAll('[role="radio"]').forEach(function (o) {
+          o.setAttribute("aria-checked", o === rc ? "true" : "false");
+        });
+        state[key] = rc.getAttribute("data-v");
+        render();
+      });
+    });
+  });
+
+  /* ---------- collapsible sections ---------- */
+  document.querySelectorAll(".sect > h3.clk").forEach(function (h) {
+    h.addEventListener("click", function () { h.parentNode.classList.toggle("closed"); });
+  });
+
+  /* ---------- High priority switch ---------- */
+  var hiSw = document.getElementById("hiSw");
+  function toggleHigh() { state.high = !state.high; render(); }
+  hiSw.addEventListener("click", toggleHigh);
+  hiSw.addEventListener("keydown", function (e) {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggleHigh(); }
+  });
+
+  /* ---------- dataset dropdown ---------- */
+  var ddWrap = document.getElementById("ddDataset");
+  var ddPanel = document.getElementById("ddPanel");
+  document.getElementById("ddTrigger").addEventListener("click", function (e) {
+    e.stopPropagation();
+    var open = ddWrap.classList.toggle("open");
+    ddPanel.hidden = !open;
+  });
+  /* Click-away closes it. Without this the panel stays open over the sections
+     below and looks like part of the page. */
+  document.addEventListener("click", function () {
+    ddWrap.classList.remove("open");
+    ddPanel.hidden = true;
+  });
+  ddPanel.addEventListener("click", function (e) { e.stopPropagation(); });
+
+  function renderPanel() {
+    ddPanel.innerHTML = DATASETS.map(function (d) {
+      var chip = d.et
+        ? '<span class="et"><i>&#8801;</i>' + d.et + "</span>"
+        : '<span class="et unset"><i>&#8801;</i>not set</span>';
+      return '<button class="ddr" type="button" role="option" data-id="' + d.id + '"' +
+             ' aria-selected="' + (d.id === state.dataset ? "true" : "false") + '">' +
+             '<span class="nm">' + d.name + "</span>" + chip + "</button>";
+    }).join("");
+    ddPanel.querySelectorAll(".ddr").forEach(function (r) {
+      r.addEventListener("click", function () {
+        state.dataset = r.getAttribute("data-id");
+        ddWrap.classList.remove("open");
+        ddPanel.hidden = true;
+        render();
+      });
+    });
+  }
+
+  function ann(kind, icon, html) {
+    return '<div class="ann ann--' + kind + '"><span class="ic">' + icon + "</span><span>" + html + "</span></div>";
+  }
+  function entity() { return state.entity === "empty" ? null : state.entity; }
+
+  function render() {
+    var isTco = state.screen === "tco";
+
+    /* ---- chrome ---- */
+    swDm.setAttribute("aria-selected", isTco ? "false" : "true");
+    swTco.setAttribute("aria-selected", isTco ? "true" : "false");
+    document.getElementById("screenDm").hidden = isTco;
+    document.getElementById("screenTco").hidden = !isTco;
+    document.getElementById("pTitle").textContent = isTco ? "Edit log policy" : "Edit dataset";
+    document.getElementById("pCrumb").textContent = isTco ? "Logs · TCO Optimizer" : "default / foo";
+    document.getElementById("tgLabel").textContent = isTco ? "Enable policy" : "Enable dataset";
+
+    /* ================= dataset screen ================= */
+    var mE = state.mode === "empty", eE = state.entity === "empty", pE = state.part === "empty";
+    var emptyCount = (mE ? 1 : 0) + (eE ? 1 : 0) + (pE ? 1 : 0);
+    var bad = (state.part === "partitioned" && eE);
+
+    document.getElementById("sectMode").className = "sect" + (mE ? " t-empty" : "");
+    document.getElementById("sectEntity").className = "sect" + (bad ? " t-bad" : (eE ? " t-empty" : ""));
+    document.getElementById("sectPart").className = "sect" + (pE ? " t-empty" : "");
+
+    document.getElementById("nMode").innerHTML = mE
+      ? ann("warn", "!", "<b>Settled by the first write.</b> A background query arriving later reserves it as summary, a streaming route reserves it as streaming. Whichever lands first holds.")
+      : "";
+    document.getElementById("nEntity").innerHTML = bad
+      ? ann("bad", "!", "<b>Partitioned with an empty entity type is not a valid pair.</b> Partitioned means time based, so the type is already known. This is the combination the persistent background query screen shows today, and <code>jsonData</code> not rendering is likelier than a genuinely missing value.")
+      : eE
+        ? ann("warn", "!", "<b>Settled by what arrives.</b> A streaming route lands <code>logs</code>. A background query summary lands <code>jsonData</code>, which is the Data pillar and not a kind of logs. It will not land as <code>logEvents</code> on its own: that has to be declared here.")
+        : "";
+    document.getElementById("nPart").innerHTML = pE
+      ? ann("warn", "!", "<b>Settled by the first write.</b> Partitioning is an implementation detail to the customer, so leaving it empty is the expected default rather than the exception.")
+      : "";
+    document.getElementById("verdict").innerHTML =
+      bad ? ann("bad", "!", "<b>This combination cannot be saved.</b> Declare the entity type, or leave partitioning empty as well.")
+      : emptyCount === 3 ? ann("warn", "!", "<b>Nothing declared, which is today's behaviour made explicit.</b> The first write settles all three, and a request needing a different shape must reserve the dataset before its own execution runs.")
+      : emptyCount ? ann("warn", "!", "<b>" + emptyCount + " of 3 left empty.</b> The declared constraints are enforced at config time. The empty ones go to whoever writes, or reserves, first.")
+      : "";
+
+    /* ================= policy screen ================= */
+    var d = ds();
+    var blocking = state.action === "block";
+
+    /* Block drops the data, so there is nothing to route, prioritise or retain. */
+    document.getElementById("sectDest").hidden = blocking;
+    document.getElementById("sectPolType").hidden = blocking;
+    document.getElementById("sectPriority").hidden = blocking;
+    document.getElementById("sectRetention").hidden = blocking;
+    document.getElementById("nAction").innerHTML = blocking
+      ? ann("warn", "!", "<b>Nothing is stored or forwarded.</b> Destination, priority and retention do not apply, so they are not shown.")
+      : "";
+
+    document.getElementById("ddValue").textContent = d.name;
+    document.getElementById("destTab").textContent = "default/" + d.name;
+    renderPanel();
+
+    /* The extra picker is the reservation, and it exists only where the dataset
+       has no type of its own. */
+    var needsEt = !d.et;
+    document.getElementById("etPick").hidden = !needsEt;
+    document.getElementById("etResolved").textContent = state.dsEntity;
+    document.getElementById("nDest").innerHTML = needsEt
+      ? ""
+      : ann("info", "i", "<b>" + d.name + " is already " + d.et + ".</b> TCO reads the dataset's entity type and never changes it, so this policy inherits it. Change it on the dataset, not here.");
+
+    /* High priority supersedes the Medium and Low choice. */
+    document.getElementById("hiRow").className = "trow" + (state.high ? " on" : "");
+    hiSw.setAttribute("aria-checked", state.high ? "true" : "false");
+
+    /* Save is live only when the screen has what it needs. */
+    var ok = isTco
+      ? (blocking || !needsEt || !!state.dsEntity)
+      : !bad;
+    document.getElementById("saveBtn").className = "save" + (ok ? " live" : "");
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
