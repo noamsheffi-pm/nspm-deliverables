@@ -107,7 +107,6 @@ tbody tr.grp td{height:30px;background:var(--c-background-surface-primary);color
 .badge{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--r-sm);font:400 12px/1.5 var(--font);white-space:nowrap}
 .b-cx{background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx)}
 .b-custom{background:var(--c-tag-lightgrey-bg);color:var(--c-text-secondary)}
-.b-shadow{background:var(--c-tag-blue-bg);color:var(--c-tag-blue-tx)}
 .count{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--c-text-interactive);flex:0 0 6px}
 .count span{color:var(--c-text-secondary)}
@@ -127,17 +126,14 @@ tbody tr.data:hover .acts .btn-icon{opacity:1}
 .dhead{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--c-border-subtle);background:var(--c-background-surface-secondary)}
 .dhead .lead{display:flex;align-items:center;gap:8px;min-width:0}
 .dhead h2{font:600 16px/1.5 var(--font);white-space:nowrap}
-.dbody{flex:1;display:flex;min-height:0}
+.dbody{flex:1;display:flex;min-height:0;justify-content:center}
 .dform{flex:1 1 52%;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;min-width:0}
-.dprev{flex:1 1 48%;padding:16px;overflow-y:auto;min-width:0;border-left:1px solid var(--c-border-subtle);background:var(--c-background-surface-secondary)}
 .sub-card{background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:16px}
 .sub-card>.st{font:600 16px/1.5 var(--font)}
 .warncard{display:flex;gap:8px;align-items:flex-start;background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:12px;color:var(--c-text-secondary)}
 .warncard.err{border-color:var(--c-text-error);background:#FDF0F1}
-.warncard.prec{border-color:var(--c-tag-blue-tx);background:#EEF5FD}
 .warncard .ic{flex:0 0 auto;line-height:1.3;color:var(--c-icon-warning)}
 .warncard.err .ic{color:var(--c-text-error)}
-.warncard.prec .ic{color:var(--c-tag-blue-tx)}
 .warncard b{color:var(--c-text-primary);font-weight:600}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{display:flex;align-items:center;gap:2px;font:400 12px/1.5 var(--font);color:var(--c-text-primary)}
@@ -184,32 +180,10 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
 .patrow{display:flex;gap:8px;align-items:center}
 .patrow select{flex:0 0 auto;width:auto;min-width:132px}
 .patrow input{flex:1;min-width:0}
-.etgrid{display:flex;flex-wrap:wrap;gap:10px}
-.etgrid label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;height:32px;padding:0 10px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md)}
-.etgrid label.on{border-color:var(--c-button-primary);background:var(--c-background-focus)}
 
 .syntax{border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:8px;background:var(--c-background-surface-primary);font:400 12px/1.6 var(--mono);word-break:break-all}
 .syntax .eq{display:block;margin-top:6px;color:var(--c-text-secondary)}
 
-.pvhead{color:var(--c-text-secondary)}
-.bignum{font:600 28px/1.2 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:2px 0}
-.bignum.zero{color:var(--c-text-error)}
-.pvsub{color:var(--c-text-secondary);margin-bottom:12px}
-.dslist{border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);overflow:hidden}
-.dsrow{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-bottom:1px solid var(--c-border-subtle)}
-.dsrow:last-child{border-bottom:none}
-.dsrow.miss{opacity:.36}
-.dsrow .tick{width:12px;flex:0 0 12px;color:var(--c-text-interactive)}
-.dsrow.miss .tick{color:var(--c-text-placeholder)}
-.dsrow .dn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
-.dsrow .et,.dsrow .new{height:20px;padding:0 6px;border-radius:var(--r-sm);display:inline-flex;align-items:center;white-space:nowrap}
-.dsrow .et{background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx)}
-.dsrow .new{background:var(--c-tag-green-bg);color:var(--c-tag-green-tx);font-weight:600}
-.pvnote{margin-top:12px;border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:12px;color:var(--c-text-secondary);background:var(--c-background-surface-primary)}
-.pvnote.warn{border-color:var(--c-icon-warning);background:#FDF8EC}
-.pvnote b{color:var(--c-text-primary);font-weight:600}
-.sim{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.simmsg{margin-top:8px;color:var(--c-text-interactive);font-weight:600;min-height:18px}
 </style>
 </head>
 <body>
@@ -218,10 +192,10 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
   <div class="row">
     <h1>Dataspace Management</h1>
     <span class="spacer"></span>
-    <span class="badge b-cx">Concept mockup v2 · post 16-08 room</span>
+    <span class="badge b-cx">Concept mockup v4 · unique names, pending Harel + Redlus</span>
   </div>
   <nav class="tabs">
-    <button class="tab">Physical datasets</button>
+    <button class="tab">Datasets</button>
     <button class="tab on">Virtual datasets</button>
   </nav>
 </header>
@@ -231,7 +205,7 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
     <div class="titlesec">
       <div class="txt">
         <h2>Virtual Datasets <span class="cnt" id="cnt"></span></h2>
-        <p>A virtual dataset is a name resolved at query time. It can resolve to a list of datasets, a name pattern, an entity type, or a full DataPrime query. Where a virtual and a physical dataset share a name, the virtual one wins. <button class="btn btn-link">Learn more</button></p>
+        <p>A virtual dataset is a name resolved at query time. It can resolve to a list of datasets, a name pattern, an entity type, or a full DataPrime query. A virtual dataset is a view: it reads like a dataset but has no write path. Its name must be unique across datasets and virtual datasets, so <code>source &lt;name&gt;</code> resolves to exactly one thing. <button class="btn btn-link">Learn more</button></p>
       </div>
       <span class="spacer"></span>
       <button class="btn btn-solid" onclick="openCreate()">+ Create virtual dataset</button>
@@ -240,8 +214,8 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
     <div class="notice">
       <span class="ic">&#9888;</span>
       <div class="bd">
-        <span><b>Coralogix maintains three virtual datasets for you.</b> Operational logs and log events are now separate entity types. Routing continues to write <code>logs</code> while fan-out writes <code>logEvents</code>.</span>
-        <span>The predefined <code>logs</code> virtual dataset resolves to both, so the ~1000 dashboards, alerts and saved views written before the split keep returning the same data. Edit it to opt out.</span>
+        <span><b>Names must be unique across datasets and virtual datasets.</b> A virtual dataset cannot take a name a dataset already uses, so <code>source &lt;name&gt;</code> resolves to exactly one thing. Enforced when the name is entered. Pending confirmation with Harel and Redlus.</span>
+        <span>Operational logs and log events are separate entity types. Routing writes <code>logs</code>, fan-out writes <code>logEvents</code>, and a virtual dataset can read across both.</span>
       </div>
     </div>
 
@@ -301,7 +275,7 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
           <label>Description <span class="opt">(optional)</span></label>
           <input class="input" id="f_desc" placeholder="What this virtual dataset is for">
         </div>
-        <div id="precedence"></div>
+        <div id="nameclash"></div>
       </div>
 
       <div class="sub-card">
@@ -309,14 +283,14 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
         <div class="field">
           <label>Type</label>
           <div class="seg" id="f_mt">
-            <button data-mt="list" onclick="setMT('list')">Dataset list</button>
-            <button data-mt="pattern" class="on" onclick="setMT('pattern')">Name pattern</button>
+            <button data-mt="list" class="on" onclick="setMT('list')">Dataset list</button>
+            <button data-mt="pattern" onclick="setMT('pattern')">Name pattern</button>
             <button data-mt="entity" onclick="setMT('entity')">Entity type</button>
             <button data-mt="query" onclick="setMT('query')">Query</button>
           </div>
         </div>
 
-        <div class="field" id="wrap_list" hidden>
+        <div class="field" id="wrap_list">
           <label>Datasets <span class="req">*</span></label>
           <div class="picker">
             <button class="pickctl" id="pickctl" onclick="togglePicker(event)">
@@ -332,7 +306,7 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
           <span class="hint">Explicit selection. This is the saved form of a DataPrime multi-source query.</span>
         </div>
 
-        <div class="field" id="wrap_pattern">
+        <div class="field" id="wrap_pattern" hidden>
           <label>Pattern <span class="req">*</span></label>
           <div class="patrow">
             <select class="input" id="f_op" onchange="preview()">
@@ -347,15 +321,15 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
         </div>
 
         <div class="field" id="wrap_entity" hidden>
-          <label>Entity types <span class="req">*</span></label>
-          <div class="etgrid" id="etgrid"></div>
-          <span class="hint">Resolves by entity type rather than by name. New datasets of a selected type are included automatically.</span>
+          <label>Entity type <span class="req">*</span></label>
+          <select class="input" id="f_et" onchange="pickEt(this.value)"></select>
+          <span class="hint">One entity type per virtual dataset, the same as a real dataset carries one. Resolves by entity type rather than by name, and new datasets of that type are included automatically.</span>
         </div>
 
         <div class="field" id="wrap_query" hidden>
           <label>Query <span class="req">*</span></label>
-          <textarea class="input mono" id="f_query" oninput="preview()" placeholder="source payments | filter $d.status >= 500"></textarea>
-          <span class="hint">A full DataPrime query. The source may be a physical dataset, a pattern, or another virtual dataset.</span>
+          <textarea class="input mono" id="f_query" oninput="autoQuery=false;preview()" placeholder="source payments | filter $d.status >= 500"></textarea>
+          <span class="hint">A full DataPrime query, up to joins and groupbys. The source may be a dataset, a pattern, or another virtual dataset.</span>
           <span class="err" id="queryerr"></span>
         </div>
 
@@ -366,31 +340,16 @@ textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:ve
       </div>
 
       <div class="sub-card">
-        <span class="st">Scope</span>
-        <div class="field">
-          <label>Visibility</label>
-          <select class="input" id="f_scope">
-            <option>Organization (all teams)</option>
-            <option>This team only</option>
-          </select>
-          <span class="hint">Resolution never grants access. Datasets the user cannot read return zero results, matching the dataset permission model.</span>
+        <span class="st">Access</span>
+        <div class="warncard">
+          <span class="ic">&#128274;</span>
+          <div><b>A virtual dataset never grants access.</b> Who can read what stays driven by the <b>PBAC of each dataset this resolves to</b>, evaluated per caller at query time. There is no visibility setting here to get wrong.
+          <br><br>Members the caller cannot read are translated as a false scope and return no rows. The caller sees one general notice, &ldquo;you may not have access to all the data&rdquo; &mdash; not an error, and deliberately not a per-member warning, which would name the withheld dataset and leak the definition.
+          <br><br>Who may see and manage the definitions themselves is a general role permission, <b>read</b> and <b>manage</b>, set in <b>Settings &rsaquo; Roles</b>.</div>
         </div>
       </div>
     </div>
 
-    <div class="dprev">
-      <div class="pvhead">Resolves now to</div>
-      <div class="bignum" id="pv_n">0</div>
-      <p class="pvsub" id="pv_sub">Enter a definition to preview.</p>
-      <div class="dslist" id="pv_list"></div>
-      <div class="pvnote" id="pvnote"></div>
-      <div class="sim">
-        <span class="hint">Demo:</span>
-        <button class="btn btn-outline" onclick="addDataset()">A new dataset arrives</button>
-        <button class="btn btn-ghost" onclick="resetDatasets()">Reset</button>
-      </div>
-      <div class="simmsg" id="simmsg"></div>
-    </div>
   </div>
 </aside>
 
@@ -409,12 +368,8 @@ let datasets=BASE.slice(), extraUsed=0;
 
 /* mt: list | pattern | entity | query */
 const ALIASES=[
-  {name:"logs",cx:true,mt:"pattern",op:"startsWith",val:"default/log",
-   desc:"Preserves pre-split behaviour for the ~1000 dashboards written before the split",refs:"48 dashboards, 22 alerts"},
-  {name:"spans",cx:true,mt:"list",sel:["default/spans"],
-   desc:"Canonical span source",refs:"17 dashboards, 9 alerts"},
-  {name:"all_logs",cx:true,mt:"entity",ets:["logs","logEvents"],
-   desc:"Every logs and logEvents dataset in the organization",refs:"4 dashboards"},
+  {name:"all_logs",cx:true,mt:"entity",ets:["logs"],
+   desc:"Every logs dataset in the organization. Was logs + logEvents until 23-08; single entity type now",refs:"4 dashboards"},
   {name:"splunk_main",cx:false,mt:"list",sel:["default/logs"],
    desc:"Migration identity for the retired Splunk index",refs:"31 saved views"},
   {name:"checkout_flow",cx:false,mt:"list",sel:["default/logs","payments/logs","payments/log_events","security/logs"],
@@ -462,11 +417,16 @@ function resolve(a){ return resolveDef(a,[]).hits; }
 function dependentsOf(name){
   return ALIASES.filter(x=>x.mt==="query"&&sourceToken(x.query)===name).map(x=>x.name);
 }
-/* a virtual dataset shadows a physical one when default/<name> or <name> exists */
-function shadows(name){
+/* names are unique across datasets and virtual datasets: no collision is allowed (24-08, pending confirmation) */
+function datasetNamed(name){
   if(!name) return null;
   const hit=datasets.find(d=>d.n===name||d.n==="default/"+name);
   return hit?hit.n:null;
+}
+function virtualNamed(name,exceptName){
+  if(!name) return null;
+  const hit=ALIASES.find(a=>a.name===name&&a.name!==exceptName);
+  return hit?hit.name:null;
 }
 function typeLabel(mt){
   return mt==="list"?"Dataset list":mt==="pattern"?"Name pattern":mt==="entity"?"Entity type":"Query";
@@ -474,7 +434,7 @@ function typeLabel(mt){
 function defText(a){
   if(a.mt==="list") return (a.sel||[]).join(", ");
   if(a.mt==="pattern") return (OPS[a.op]||OPS.startsWith).label+'("'+(a.val||"")+'")';
-  if(a.mt==="entity") return "entityType in ("+(a.ets||[]).join(", ")+")";
+  if(a.mt==="entity") return "entityType = "+((a.ets||[])[0]||"");
   return a.query;
 }
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
@@ -493,15 +453,14 @@ function render(){
   show.forEach(a=>{
     const grp=a.cx?"Predefined by Coralogix":"Custom";
     if(grp!==last){html+='<tr class="grp"><td colspan="7">'+grp+'</td></tr>';last=grp;}
-    const r=resolveDef(a,[]), deps=dependentsOf(a.name), sh=shadows(a.name);
+    const r=resolveDef(a,[]), deps=dependentsOf(a.name);
     html+='<tr class="data" onclick="openEdit(\''+a.name+'\')">'
       +'<td><div class="nm">'+a.name+'</div><div class="sub">'+a.desc+'</div></td>'
       +'<td>'+typeLabel(a.mt)+'</td>'
       +'<td><span class="pat">'+esc(defText(a))+'</span></td>'
       +'<td><span class="count"><span class="dot"></span><b>'+r.hits.length+'</b> <span>datasets</span></span></td>'
       +'<td><span class="refs">'+a.refs+'</span></td>'
-      +'<td>'+(a.cx?'<span class="badge b-cx">Predefined</span>':'<span class="badge b-custom">Custom</span>')
-        +(sh?' <span class="badge b-shadow" title="Wins over the physical dataset '+sh+'">Shadows physical</span>':'')+'</td>'
+      +'<td>'+(a.cx?'<span class="badge b-cx">Predefined</span>':'<span class="badge b-custom">Custom</span>')+'</td>'
       +'<td class="acts">'
         +'<button class="btn btn-ghost btn-icon" title="Edit" onclick="event.stopPropagation();openEdit(\''+a.name+'\')">&#9998;</button>'
         +(deps.length
@@ -515,10 +474,17 @@ function render(){
 }
 
 /* ---- drawer state ---- */
-let curMT="pattern", picked=[], pickedEts=[], editing=null;
+let curMT="list", picked=[], pickedEts=[], editing=null, autoQuery=false;
 let pickFilters={Logs:false,Spans:false,Events:false,default:false,system:false};
 
 function setMT(mt){
+  if(mt==="query" && curMT!=="query"){
+    const q=document.getElementById("f_query");
+    if(q && (!q.value.trim() || autoQuery)){
+      const gen=exprFromMode(curMT);
+      if(gen){ q.value=gen; autoQuery=true; }
+    }
+  }
   curMT=mt;
   document.querySelectorAll("#f_mt button").forEach(b=>b.classList.toggle("on",b.dataset.mt===mt));
   document.getElementById("wrap_list").hidden   = mt!=="list";
@@ -552,15 +518,28 @@ function renderPicker(){
     ["Logs","Spans","Events"].map(fchk).join("")+'<span class="divider"></span>'+["default","system"].map(fchk).join("");
 }
 function fchk(k){return '<label class="'+(pickFilters[k]?"on":"")+'" onclick="toggleFilter(\''+k+'\',event)"><span class="cb">'+(pickFilters[k]?"&#10003;":"")+'</span>'+k+'</label>';}
-function toggleEt(t){const i=pickedEts.indexOf(t);i>-1?pickedEts.splice(i,1):pickedEts.push(t);renderEts();preview();}
+/* single-select: one entity type per virtual dataset (23-08 room) */
+function pickEt(t){pickedEts=t?[t]:[];preview();}
 function renderEts(){
-  const g=document.getElementById("etgrid"); if(!g) return;
-  g.innerHTML=ET_ALL.map(t=>{
-    const on=pickedEts.indexOf(t)>-1, c=datasets.filter(d=>d.et===t).length;
-    return '<label class="'+(on?"on":"")+'" onclick="toggleEt(\''+t+'\')"><span class="cb">'+(on?"&#10003;":"")+'</span>'+t+' <span class="hint">('+c+')</span></label>';
+  const g=document.getElementById("f_et"); if(!g) return;
+  const cur=pickedEts[0]||"";
+  g.innerHTML='<option value="">Select an entity type</option>'+ET_ALL.map(t=>{
+    const c=datasets.filter(d=>d.et===t).length;
+    return '<option value="'+t+'"'+(t===cur?' selected':'')+'>'+t+' ('+c+')</option>';
   }).join("");
 }
 
+/* builder-to-expression: selecting Query converts what the other modes hold (Omer, 23-08) */
+function exprFromMode(mode){
+  if(mode==="list")   return picked.length ? "source "+picked.join(", ") : "";
+  if(mode==="entity") return pickedEts[0] ? "source * entityType = "+pickedEts[0] : "";
+  if(mode==="pattern"){
+    const v=(document.getElementById("f_pat").value||"").trim(); if(!v) return "";
+    const op=document.getElementById("f_op").value;
+    return op==="startsWith" ? "source "+v+"*" : op==="endsWith" ? "source *"+v : "source *"+v+"*";
+  }
+  return "";
+}
 function draftAlias(){
   const nm=(document.getElementById("f_name").value||"").trim();
   return {name:nm||"__draft__",mt:curMT,sel:picked.slice(),ets:pickedEts.slice(),
@@ -571,16 +550,17 @@ function draftAlias(){
 
 function preview(){
   const a=draftAlias();
-  const n=document.getElementById("pv_n"),sub=document.getElementById("pv_sub"),list=document.getElementById("pv_list");
-  const note=document.getElementById("pvnote"),paterr=document.getElementById("paterr"),qerr=document.getElementById("queryerr");
+  const paterr=document.getElementById("paterr"),qerr=document.getElementById("queryerr");
   paterr.textContent=""; qerr.textContent="";
 
-  /* precedence callout */
-  const sh=shadows(a.name==="__draft__"?"":a.name);
-  document.getElementById("precedence").innerHTML = sh
-    ? '<div class="warncard prec"><span class="ic">&#8646;</span><div><b>This name wins over the physical dataset <code>'+sh+'</code>.</b> '
-      +'Queries using <code>source '+a.name+'</code> resolve through this virtual dataset, which is what keeps renames and dataset splits from breaking existing dashboards. '
-      +'To reach the physical dataset, quote it: <code>source "'+sh+'"</code>.</div></div>'
+  /* name uniqueness */
+  const typed=a.name==="__draft__"?"":a.name;
+  const clashDs=datasetNamed(typed), clashV=virtualNamed(typed,editing);
+  const nameClash=clashDs||clashV;
+  document.getElementById("nameclash").innerHTML = nameClash
+    ? '<div class="warncard err"><span class="ic">&#9888;</span><div><b>The name <code>'+typed+'</code> is taken by '
+      +(clashDs?'the dataset <code>'+clashDs+'</code>':'the virtual dataset <code>'+clashV+'</code>')+'.</b> '
+      +'A virtual dataset must have a name no dataset and no other virtual dataset already uses, so a reader never has to work out which one <code>source '+typed+'</code> meant. Pick a different name.</div></div>'
     : '';
 
   /* cycle check against the saved set, with the draft substituted in */
@@ -594,23 +574,12 @@ function preview(){
   } else r=resolveDef(a,[]);
 
   let msg="";
-  if(curMT==="list"&&!picked.length) msg="Select at least one dataset.";
-  else if(curMT==="entity"&&!pickedEts.length) msg="Select at least one entity type.";
+  if(nameClash) msg="Name already in use.";
+  else if(curMT==="list"&&!picked.length) msg="Select at least one dataset.";
+  else if(curMT==="entity"&&!pickedEts.length) msg="Select an entity type.";
   else if(curMT==="pattern"&&!a.val) msg="Enter a value to preview.";
   else if(curMT==="query"&&!a.query) msg="Enter a query to preview.";
   else if(r.err){ msg=r.err; (curMT==="query"?qerr:paterr).textContent=r.err; }
-
-  const hits=msg?[]:r.hits;
-  n.textContent=hits.length; n.classList.toggle("zero",hits.length===0);
-  sub.textContent=msg?msg:(hits.length===0
-    ? "No dataset in the registry matches today. The definition is still valid and resolves when one does."
-    : "of "+datasets.length+" datasets in the registry");
-
-  list.innerHTML=datasets.map(d=>{
-    const hit=hits.indexOf(d)>-1;
-    return '<div class="dsrow'+(hit?"":" miss")+'"><span class="tick">'+(hit?"&#10003;":"&middot;")+'</span><span class="dn">'+d.n+'</span>'
-      +(d.isNew?'<span class="new">NEW</span>':'')+'<span class="et">'+d.et+'</span></div>';
-  }).join("");
 
   /* syntax readout */
   const shown=a.name==="__draft__"?"&lt;name&gt;":a.name;
@@ -619,28 +588,9 @@ function preview(){
   if(curMT==="query"&&a.query)      sx+='<span class="eq">Body: '+esc(a.query)+'</span>';
   document.getElementById("syntax").innerHTML=sx;
 
-  /* per-type note */
-  if(curMT==="list"){
-    note.className="pvnote warn";
-    note.innerHTML='<b>Fixed list.</b> Resolves only to the datasets selected above. A dataset created later is not included until someone edits it. Use a name pattern or entity type if the set should grow on its own.';
-  }else if(curMT==="query"){
-    note.className="pvnote";
-    note.innerHTML='<b>Shaped at read time.</b> The virtual dataset carries the whole query, not just the source, so callers get the filtered and grouped result. The source inside it resolves like any other alias.';
-  }else{
-    note.className="pvnote";
-    note.innerHTML='<b>Evaluated at query time.</b> The registry is read on every query, so datasets created after this definition is saved are matched automatically. Nothing here is stored as a list.';
-  }
-
   document.getElementById("savebtn").disabled = !!msg;
 }
 
-function addDataset(){
-  if(extraUsed>=EXTRA.length){document.getElementById("simmsg").textContent="No more datasets to add. Reset to run it again.";return;}
-  const d=EXTRA[extraUsed++]; datasets.push(d);
-  renderPicker(); renderEts(); preview(); render();
-  document.getElementById("simmsg").textContent=d.n+" was created. No definition was edited.";
-}
-function resetDatasets(){datasets=BASE.slice();extraUsed=0;renderPicker();renderEts();preview();render();document.getElementById("simmsg").textContent="";}
 
 function openCreate(){
   editing=null;
@@ -649,7 +599,7 @@ function openCreate(){
   ["f_name","f_desc","f_pat","f_query"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("f_op").value="startsWith";
   picked=[];pickedEts=[];
-  setMT("pattern"); openDrawer();
+  autoQuery=false; setMT("list"); openDrawer();
 }
 function openEdit(name){
   const a=byName(name); if(!a) return;
@@ -668,10 +618,10 @@ function openEdit(name){
   document.getElementById("f_op").value=a.op||"startsWith";
   document.getElementById("f_query").value=a.query||"";
   picked=(a.sel||[]).slice(); pickedEts=(a.ets||[]).slice();
-  setMT(a.mt); openDrawer();
+  autoQuery=false; setMT(a.mt); openDrawer();
 }
 function openDrawer(){document.getElementById("drawer").classList.add("on");document.getElementById("scrim").classList.add("on");}
-function closeDrawer(){document.getElementById("drawer").classList.remove("on");document.getElementById("scrim").classList.remove("on");document.getElementById("simmsg").textContent="";}
+function closeDrawer(){document.getElementById("drawer").classList.remove("on");document.getElementById("scrim").classList.remove("on");}
 
 (function(){
   const dr=document.getElementById("drawer"),grip=document.getElementById("dgrip");let drag=false;
