@@ -578,14 +578,14 @@
     // so the tuple has to track the policy's priority setting, not a fixed value.
     $('prioChip').textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
     $('mType').textContent = value;
-    $('mQuota').textContent = ev ? 'No reservation for logEvents' : 'Reserved under logs';
-    $('mPrice').textContent = '(' + value + ', ' + priority + ')' + (ev ? ' — no row' : '');
+    $('mQuota').textContent = ev ? 'Drawn from the logs reservation' : 'Reserved under logs';
+    $('mPrice').textContent = '(' + value + ', ' + priority + ')' + (ev ? ', priced as logs' : '');
     $('mRead').textContent  = ev ? 'Excluded from the union' : 'In the union';
-    st('mQuotaSt', !ev, 'Covered', 'Unallocated');
-    st('mPriceSt', !ev, 'Priced', 'No price');
+    st('mQuotaSt', true, 'Covered', 'Unallocated');
+    st('mPriceSt', true, 'Priced', 'No price');
     st('mReadSt',  !ev, 'Correlates', 'Excluded');
     $('mFoot').innerHTML = ev
-      ? 'Today <code>logEvents</code> is registered and active in cx-catalog but sits outside every monetization control: absent from the quota-allocation supported-entity-type list, no <code>DimensionPricing</code> row, and <code>ws-quota-grpc</code> caps TCO policy counts on a closed <code>["spans","logs"]</code> union so the limit never fires.'
+      ? 'A write to a <code>logEvents</code> dataset is reported in Data Usage as <code>logEvents</code>, and its units are consumed out of the <code>logs</code> quota rule. The volume is counted and it is enforced. <code>logEvents</code> gets no allocation rule of its own, which is the reconciliation gap the two screens have to bridge: Data Usage names it one way and the quota screen charges it another. Separately, today <code>ws-quota-grpc</code> still caps TCO policy counts on a closed <code>["spans","logs"]</code> union, so that particular limit never fires for it.'
       : 'Unchanged from today: the existing per-entity-type reservation and price dimension both apply, and the destination stays in the related-logs union.';
   }
 
