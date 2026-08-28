@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Claude Layer — Part 2, commands</title>
+<style>
+:root{
+  --bg:#000000; --surface:#0a0a0a; --surface-alt:#111111;
+  --border:#1f1f1f; --border-strong:#2a2a2a; --code-bg:#050505;
+  --text:#ffffff; --text-2:#a1a1aa; --text-muted:#52525b;
+  --mint:#22dd92; --mint-dim:#1ab677;
+  --mint-soft:rgba(34,221,146,0.15); --mint-faint:rgba(34,221,146,0.06);
+  --warning:#f59e0b;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --max-width:1100px; --radius:12px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text); font-family:var(--font);
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at top,rgba(34,221,146,0.05),transparent 60%);
+  background-repeat:no-repeat;
+}
+.wrap{max-width:var(--max-width);margin:0 auto;padding:56px 24px 80px;}
+header.top{margin-bottom:44px;}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--mint);box-shadow:0 0 16px rgba(34,221,146,0.5);}
+.brand span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text);font-weight:600;}
+h1{font-size:38px;line-height:1.15;margin:0 0 12px;font-weight:700;letter-spacing:-0.02em;}
+.accent{color:var(--mint);}
+.sub{color:var(--text-2);font-size:17px;max-width:660px;margin:0;}
+
+section{margin-top:56px;}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);
+   margin:0 0 6px;font-weight:700;}
+.h2sub{font-size:24px;font-weight:650;margin:0 0 20px;letter-spacing:-0.01em;}
+p.lead{color:var(--text-2);margin:0 0 20px;max-width:700px;}
+
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;}
+.stat .n{font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.02em;}
+.stat .n.m{color:var(--mint);}
+.stat .l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-top:9px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:18px;transition:transform .15s ease,border-color .15s ease;}
+.card:hover{transform:translateY(-2px);border-color:var(--border-strong);}
+.card .t{font-family:var(--mono);font-size:13.5px;color:var(--mint);margin-bottom:7px;font-weight:600;}
+.card .d{color:var(--text-2);font-size:14.5px;}
+
+.steps{list-style:none;padding:0;margin:0;}
+.step{display:flex;gap:18px;padding-bottom:26px;position:relative;}
+.step:not(:last-child):before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:1px;background:var(--border-strong);}
+.num{flex:0 0 36px;height:36px;border-radius:50%;background:var(--surface-alt);
+     border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;
+     font-weight:700;font-size:14px;color:var(--text);z-index:1;}
+.step.now .num{background:var(--mint-soft);border-color:var(--mint-dim);color:var(--mint);}
+.step .body{flex:1;min-width:0;padding-top:5px;}
+.step .body h3{margin:0 0 6px;font-size:16.5px;font-weight:650;}
+.step .body p{margin:0 0 10px;color:var(--text-2);font-size:14.5px;}
+
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;margin:0 0 12px;}
+code{font-family:var(--mono);font-size:13px;color:#d4d4d8;}
+code .c{color:var(--text-muted);}
+code .k{color:var(--mint);}
+p code,li code,td code{background:var(--surface-alt);border:1px solid var(--border);
+    padding:1px 6px;border-radius:5px;font-size:12.5px;color:var(--mint);}
+
+.callout{background:var(--mint-faint);border:1px solid var(--border);border-left:3px solid var(--mint);
+         border-radius:0 10px 10px 0;padding:18px 20px;margin-top:20px;}
+.callout.warn{background:rgba(245,158,11,0.07);border-left-color:var(--warning);}
+.callout .ct{font-weight:650;margin:0 0 6px;font-size:15px;}
+.callout p{margin:0;color:var(--text-2);font-size:14.5px;}
+.callout p + p{margin-top:9px;}
+
+.tw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px;}
+th{background:var(--surface-alt);text-align:left;padding:11px 16px;font-size:11px;
+   letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:700;
+   border-bottom:1px solid var(--border);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text-2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:var(--surface);}
+td strong{color:var(--text);font-weight:600;}
+
+.levels{display:grid;gap:12px;}
+.level{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.level .tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--mint-soft);color:var(--mint);border-radius:20px;padding:3px 11px;font-weight:700;margin-bottom:10px;}
+.level h3{margin:0 0 8px;font-size:17px;font-weight:650;}
+.level p{margin:0 0 12px;color:var(--text-2);font-size:14.5px;}
+.level p:last-child{margin-bottom:0;}
+
+.week{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
+.week li{display:flex;gap:16px;align-items:flex-start;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.week .day{flex:0 0 66px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--mint);font-weight:700;padding-top:2px;}
+.week .what{color:var(--text-2);font-size:14.5px;}
+
+footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--border);
+  color:var(--text-muted);font-size:12.5px;}
+
+@media(max-width:760px){
+  .counters{grid-template-columns:repeat(2,1fr);}
+  h1{font-size:27px;}
+  .wrap{padding:36px 18px 60px;}
+  .week li{flex-direction:column;gap:5px;}
+}
+</style></head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand"><div class="dot"></div><span>Coralogix · NSPM</span></div>
+  <h1>The Claude layer<span class="accent">.</span></h1>
+  <p class="sub">Part 2: your identity file and four commands. It reads the vault you built in part 1. Do not start here.</p>
+
+  <div class="counters">
+    <div class="stat"><div class="n m">1</div><div class="l">Identity file</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">Commands</div></div>
+    <div class="stat"><div class="n">15</div><div class="l">Minutes to set up</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">Agents, on purpose</div></div>
+  </div>
+</header>
+
+<section>
+  <h2>Prerequisite</h2>
+  <div class="h2sub">Part 1 first, and not only the install</div>
+  <p class="lead">The commands write into folders and frontmatter that part 1 creates. The same script installs both, so nothing extra to run. What you cannot skip is the week of using the vault on its own.</p>
+  <div class="callout warn">
+    <p class="ct">Why the week matters</p>
+    <p>These commands read your vault and write back into it. On an empty vault they have nothing to read, so they produce generic output and you stop trusting them. Ten real notes and two real workplans change that completely.</p>
+    <p>Part 1 is here: <a href="obsidian-pack.html" style="color:var(--mint)">the Obsidian pack &#x2197;</a></p>
+  </div>
+</section>
+
+<section>
+  <h2>Step 1</h2>
+  <div class="h2sub">Fill CLAUDE.md before anything else</div>
+  <p class="lead">The install script put <code>CLAUDE.md</code> in your vault root. Claude reads it at the start of every session. It is the single biggest difference between output that sounds like you and output that sounds like a PM textbook. About 15 minutes, once.</p>
+  <pre><code>grep -n <span class="k">'{{'</span> ~/Vault/CLAUDE.md</code></pre>
+  <p class="lead">Nine placeholders. What each part of the file does:</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Section</th><th>What it changes in the output</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Role</strong></td><td>Stops the explaining. It says you know tracing, OpenTelemetry, sampling and query engines, so nothing gets explained back to you.</td></tr>
+        <tr><td><strong>Portfolio</strong></td><td>Says which areas are yours and which are not. Keeps monetization, datasets and RUM out of your answers.</td></tr>
+        <tr><td><strong>Vault contract</strong></td><td>Three rules on where files go and how frontmatter is written. This is what stops orphan files.</td></tr>
+        <tr><td><strong>Hard rules</strong></td><td>Your invariants. Two are filled in as examples, the rest are yours. These are what a review actually gets checked against.</td></tr>
+        <tr><td><strong>How to answer me</strong></td><td>Decision first, short sentences, no filler, a banned word list. This one you will feel immediately.</td></tr>
+        <tr><td><strong>Depth</strong></td><td>Two modes: refine a draft you wrote, or review a spec. Applied silently, never announced.</td></tr>
+        <tr><td><strong>Session protocol</strong></td><td>Read the folder before answering. Ask before writing outside the vault. Show drafts in chat, never send on your behalf.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <p class="ct">The two seeded invariants</p>
+    <p>A trace is only useful if the user can get from a symptom to a span without knowing the schema first. And: sampling decisions are product decisions, so if we drop data the user has to see what was dropped and why.</p>
+    <p>Change them if you disagree. That is the point of the file.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Step 2</h2>
+  <div class="h2sub">Four commands, on purpose</div>
+  <p class="lead">More would be worse. Each writes into the structure the vault already has, and none of them need Jira, Slack or Notion. Type the name with a slash inside a Claude session.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Command</th><th>Use it when</th><th>Writes to</th></tr></thead>
+      <tbody>
+        <tr><td><strong>/workplan</strong></td><td>You start an initiative, or something on it moved</td><td><code>{Area}/{Initiative}/00-workplan.md</code></td></tr>
+        <tr><td><strong>/prd</strong></td><td>You need to define what gets built</td><td>The initiative folder</td></tr>
+        <tr><td><strong>/meeting-prep</strong></td><td>Before a meeting</td><td><code>Meetings/{Person}/</code></td></tr>
+        <tr><td><strong>/meeting-summary</strong></td><td>Right after a meeting</td><td><code>Meetings/{Person}/</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <p class="ct">Where they live</p>
+    <p>The script puts them in <code>System/Agents/Claude/commands</code> inside the vault, and links <code>~/.claude/commands</code> to that folder. So you can read and edit a command in Obsidian and Claude picks up the change on the next run. If you already have a real <code>~/.claude/commands</code> folder, the script leaves it alone and prints the command to link it yourself.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The commands</h2>
+  <div class="h2sub">What each one actually does</div>
+  <div class="levels">
+
+    <div class="level">
+      <div class="tag">Start here</div>
+      <h3>/workplan</h3>
+      <p>Creates or updates an initiative's <code>00-workplan.md</code>. It is the only command that writes the frontmatter spine, so every other command and every dashboard view depends on what it produces.</p>
+      <p>It asks for three things: a short name, the area, and one line on the problem. Not the solution.</p>
+      <p>Run it a second time on the same initiative and it switches to update mode. It never overwrites the file. It changes only what moved, stamps <code>last-reviewed</code>, and appends one line to the session log.</p>
+      <div class="callout" style="margin-top:6px">
+        <p class="ct">Two rules it holds you to</p>
+        <p><code>next-action</code> is one concrete sentence with an owner in it, not "follow up". And if it sets a <code>blocker</code>, it moves <code>status</code> to blocked in the same edit, so the two never drift apart.</p>
+      </div>
+    </div>
+
+    <div class="level">
+      <div class="tag">Core artifact</div>
+      <h3>/prd</h3>
+      <p>Writes a PRD into the initiative folder and links it back to the workplan. It reads the workplan first, because the problem statement lives there, not in the PRD.</p>
+      <p>The rule that decides quality: the problem section must not contain the solution. If your input mixes them, it pushes back before writing. A PRD whose problem section already assumes the answer cannot be disagreed with usefully.</p>
+      <p>Every requirement needs an acceptance line someone could check. If it cannot write the acceptance, it says the requirement is not ready. Claims with no evidence are marked <code>no evidence yet</code> and left visible rather than smoothed over.</p>
+    </div>
+
+    <div class="level">
+      <div class="tag">Week 2</div>
+      <h3>/meeting-prep</h3>
+      <p>One page before a meeting: what is still open from last time, where your initiatives in that area stand, three questions to ask, and what they will likely ask you.</p>
+      <p>Three questions maximum. A list of ten is a dump, not a prep. Every open item names the note and date it came from, so you can check it.</p>
+      <p>It works only from the vault. If there are no previous notes it says so and gives you the agenda section alone. That is why it gets useful in week 2 and not on day 1.</p>
+    </div>
+
+    <div class="level">
+      <div class="tag">Closes the loop</div>
+      <h3>/meeting-summary</h3>
+      <p>Paste a transcript or your own rough notes. It pulls four things apart and keeps them separate: decisions, actions, open questions, and everything else. Most people write all four as one paragraph, and then nothing is findable later.</p>
+      <p>Every action needs an owner and a date. No owner means it is not an action, it is a wish, and it gets flagged as unassigned. If the room did not reach a conclusion, the note says unresolved. It will not smooth a disagreement into agreement.</p>
+      <p>Then it updates the initiative's workplan: decision rows, <code>next-action</code>, <code>blocker</code>, <code>last-reviewed</code>. It shows you those edits before making them.</p>
+      <div class="callout" style="margin-top:6px">
+        <p class="ct">This is the loop that keeps the vault alive</p>
+        <p>Meeting happens, summary writes the workplan, dashboard shows the change. Without this step the frontmatter goes stale in about two weeks and the views start lying to you.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>How to use them</h2>
+  <div class="h2sub">Four habits</div>
+  <div class="grid">
+    <div class="card"><div class="t">Reject freely</div><div class="d">Every command produces a draft, not a result. Deleting half of what it writes is normal use, not failure.</div></div>
+    <div class="card"><div class="t">Edit the command itself</div><div class="d">If it keeps getting something wrong, open the file in Obsidian and change the instruction. That is faster than correcting it every run.</div></div>
+    <div class="card"><div class="t">Feed it real input</div><div class="d">A rough paste of your own notes beats a clean summary you wrote by hand. The mess is the information.</div></div>
+    <div class="card"><div class="t">Never let it send</div><div class="d">Drafts get shown in the chat. Nothing goes to Slack, Jira or anyone else without you looking at it first.</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>First week with commands</h2>
+  <div class="h2sub">After the vault week, not during it</div>
+  <ul class="week">
+    <li><div class="day">Day 1</div><div class="what">Fill <code>CLAUDE.md</code>. Run nothing else.</div></li>
+    <li><div class="day">Day 2</div><div class="what">Run <code>/workplan</code> on one real initiative. Read what it wrote and fix what is wrong.</div></li>
+    <li><div class="day">Day 3</div><div class="what">Run <code>/meeting-summary</code> on a real meeting. Check the workplan edits it proposes.</div></li>
+    <li><div class="day">Day 4</div><div class="what">Run <code>/meeting-prep</code> before a meeting. It now has notes to read.</div></li>
+    <li><div class="day">Day 5</div><div class="what">Run <code>/prd</code> on the initiative from day 2.</div></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Not yet</h2>
+  <div class="h2sub">Agents come later, and the gate is not a date</div>
+  <p class="lead">Agents are jobs that run on a clock and leave you a short read in the morning. They work by reading frontmatter across many initiatives at once and reporting what changed.</p>
+  <div class="callout warn">
+    <p class="ct">Why they are not here</p>
+    <p>With two workplans an agent has nothing to correlate, so it produces confident nonsense. The gate is roughly ten live workplans whose <code>next-action</code> and <code>last-reviewed</code> you actually keep current.</p>
+    <p>That is a few weeks of habit, not a date on a calendar. Tell Noam when you get there.</p>
+  </div>
+</section>
+
+<footer>Part 2 of 2 · Generated from: AI PM/starter-kit-lior/ · August 2026</footer>
+
+</div>
+</body>
+</html>
