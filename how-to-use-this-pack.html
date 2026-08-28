@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian Starter Pack — How to use it</title>
+<style>
+:root{
+  --bg:#000000; --surface:#0a0a0a; --surface-alt:#111111;
+  --border:#1f1f1f; --border-strong:#2a2a2a; --code-bg:#050505;
+  --text:#ffffff; --text-2:#a1a1aa; --text-muted:#52525b;
+  --mint:#22dd92; --mint-dim:#1ab677;
+  --mint-soft:rgba(34,221,146,0.15); --mint-faint:rgba(34,221,146,0.06);
+  --warning:#f59e0b;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --max-width:1100px; --radius:12px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text); font-family:var(--font);
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at top,rgba(34,221,146,0.05),transparent 60%);
+  background-repeat:no-repeat;
+}
+.wrap{max-width:var(--max-width);margin:0 auto;padding:56px 24px 80px;}
+header.top{margin-bottom:44px;}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--mint);box-shadow:0 0 16px rgba(34,221,146,0.5);}
+.brand span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text);font-weight:600;}
+h1{font-size:38px;line-height:1.15;margin:0 0 12px;font-weight:700;letter-spacing:-0.02em;}
+.accent{color:var(--mint);}
+.sub{color:var(--text-2);font-size:17px;max-width:660px;margin:0;}
+
+section{margin-top:56px;}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);
+   margin:0 0 6px;font-weight:700;}
+.h2sub{font-size:24px;font-weight:650;margin:0 0 20px;letter-spacing:-0.01em;}
+p.lead{color:var(--text-2);margin:0 0 20px;max-width:700px;}
+
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;}
+.stat .n{font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.02em;}
+.stat .n.m{color:var(--mint);}
+.stat .l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-top:9px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+      padding:18px;transition:transform .15s ease,border-color .15s ease;}
+.card:hover{transform:translateY(-2px);border-color:var(--border-strong);}
+.card .t{font-family:var(--mono);font-size:13.5px;color:var(--mint);margin-bottom:7px;font-weight:600;}
+.card .d{color:var(--text-2);font-size:14.5px;}
+
+.steps{list-style:none;padding:0;margin:0;}
+.step{display:flex;gap:18px;padding-bottom:26px;position:relative;}
+.step:not(:last-child):before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:1px;background:var(--border-strong);}
+.num{flex:0 0 36px;height:36px;border-radius:50%;background:var(--surface-alt);
+     border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;
+     font-weight:700;font-size:14px;color:var(--text);z-index:1;}
+.step.now .num{background:var(--mint-soft);border-color:var(--mint-dim);color:var(--mint);}
+.step .body{flex:1;min-width:0;padding-top:5px;}
+.step .body h3{margin:0 0 6px;font-size:16.5px;font-weight:650;}
+.step .body p{margin:0 0 10px;color:var(--text-2);font-size:14.5px;}
+
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;margin:0 0 12px;}
+code{font-family:var(--mono);font-size:13px;color:#d4d4d8;}
+code .c{color:var(--text-muted);}
+code .k{color:var(--mint);}
+p code,li code,td code{background:var(--surface-alt);border:1px solid var(--border);
+    padding:1px 6px;border-radius:5px;font-size:12.5px;color:var(--mint);}
+
+.callout{background:var(--mint-faint);border:1px solid var(--border);border-left:3px solid var(--mint);
+         border-radius:0 10px 10px 0;padding:18px 20px;margin-top:20px;}
+.callout.warn{background:rgba(245,158,11,0.07);border-left-color:var(--warning);}
+.callout .ct{font-weight:650;margin:0 0 6px;font-size:15px;}
+.callout p{margin:0;color:var(--text-2);font-size:14.5px;}
+.callout p + p{margin-top:9px;}
+
+.tw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px;}
+th{background:var(--surface-alt);text-align:left;padding:11px 16px;font-size:11px;
+   letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:700;
+   border-bottom:1px solid var(--border);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text-2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:var(--surface);}
+td strong{color:var(--text);font-weight:600;}
+
+.levels{display:grid;gap:12px;}
+.level{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.level .tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--mint-soft);color:var(--mint);border-radius:20px;padding:3px 11px;font-weight:700;margin-bottom:10px;}
+.level h3{margin:0 0 8px;font-size:17px;font-weight:650;}
+.level p{margin:0 0 12px;color:var(--text-2);font-size:14.5px;}
+.level p:last-child{margin-bottom:0;}
+
+.week{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
+.week li{display:flex;gap:16px;align-items:flex-start;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.week .day{flex:0 0 66px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--mint);font-weight:700;padding-top:2px;}
+.week .what{color:var(--text-2);font-size:14.5px;}
+
+footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--border);
+  color:var(--text-muted);font-size:12.5px;}
+
+@media(max-width:760px){
+  .counters{grid-template-columns:repeat(2,1fr);}
+  h1{font-size:27px;}
+  .wrap{padding:36px 18px 60px;}
+  .week li{flex-direction:column;gap:5px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand"><div class="dot"></div><span>Coralogix · NSPM</span></div>
+  <h1>Obsidian starter pack<span class="accent">.</span></h1>
+  <p class="sub">Part 1 of the setup: the vault. It builds the structure that everything later runs on. About 30 minutes.</p>
+
+  <div class="counters">
+    <div class="stat"><div class="n m">30</div><div class="l">Minutes to install</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">Command to run</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">Plugins you need</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">Fields to keep fresh</div></div>
+  </div>
+</header>
+
+<section>
+  <h2>The idea</h2>
+  <div class="h2sub">A vault is a schema, not a pile of notes</div>
+  <p class="lead">Notes you write freely are only useful to you. Notes that follow one shape are useful to tools. This pack gives you that shape. You get live portfolio views on day one. Later, the same shape is what lets Claude agents read your work without guessing.</p>
+  <div class="callout">
+    <p class="ct">Why the structure comes first</p>
+    <p>Part 2 of this setup adds Claude Code: slash commands, vault search, scheduled agents. Those only work if the structure is already there. Build the vault now, add the automation after.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Contents</h2>
+  <div class="h2sub">What is in the box</div>
+  <div class="grid">
+    <div class="card"><div class="t">install.sh</div><div class="d">The one thing you run. It creates the folders, templates, dashboard and settings.</div></div>
+    <div class="card"><div class="t">README.md</div><div class="d">Install in three commands. Start here if you only read one file.</div></div>
+    <div class="card"><div class="t">obsidian-setup.md</div><div class="d">Which plugins to install, which settings to flip, how to check it worked.</div></div>
+    <div class="card"><div class="t">conventions.md</div><div class="d">The contract. Frontmatter, tags, naming. One page. Read it once.</div></div>
+    <div class="card"><div class="t">templates/</div><div class="d">Four note types: workplan, meeting, daily, PRD.</div></div>
+    <div class="card"><div class="t">obsidian-config/</div><div class="d">Settings preset the script copies into the vault for you.</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Install</h2>
+  <div class="h2sub">Four steps</div>
+  <ol class="steps">
+    <li class="step now">
+      <div class="num">1</div>
+      <div class="body">
+        <h3>Set your product areas</h3>
+        <p>Open <code>install.sh</code> and edit the <code>PORTFOLIO</code> list near the top. One entry per area you own. It ships with Tracing and Explore.</p>
+        <pre><code><span class="c"># --- EDIT ME ---</span>
+PORTFOLIO=(
+  <span class="k">"Tracing"</span>
+  <span class="k">"Explore"</span>
+)</code></pre>
+      </div>
+    </li>
+    <li class="step">
+      <div class="num">2</div>
+      <div class="body">
+        <h3>Run the script</h3>
+        <p>Pick any local folder. Avoid iCloud Drive, it causes sync conflicts on large vaults.</p>
+        <pre><code>bash install.sh ~/Vault</code></pre>
+        <p>Safe to run again. It never overwrites a file that already exists.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="num">3</div>
+      <div class="body">
+        <h3>Open the vault in Obsidian</h3>
+        <p>Install Obsidian from obsidian.md, choose <strong>Open folder as vault</strong>, pick the folder you just built.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="num">4</div>
+      <div class="body">
+        <h3>Install four plugins</h3>
+        <p>Settings, then Community plugins, then Browse. Install and enable these:</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Plugin</th><th>What it does for you</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Dataview</strong></td><td>Builds live tables from your frontmatter. This is what makes the dashboard work.</td></tr>
+        <tr><td><strong>Templater</strong></td><td>Turns the four templates into one keystroke.</td></tr>
+        <tr><td><strong>Tasks</strong></td><td>Finds every open <code>#Task</code> across the whole vault.</td></tr>
+        <tr><td><strong>Omnisearch</strong></td><td>Fast full text search. Better than the built in one.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <p class="ct">Do not add more plugins in week 1</p>
+    <p>The setup guide lists six more as recommended and a longer list to skip. Add one only when you feel the problem it solves. More plugins early makes the setup harder to trust.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Structure</h2>
+  <div class="h2sub">Three levels, top to bottom</div>
+  <div class="levels">
+    <div class="level">
+      <div class="tag">Level 1</div>
+      <h3>Product folders</h3>
+      <p>Top level folders map one to one to the areas you own. Same names you use at work. Plus the cross cutting folders the script creates: Meetings, Daily Notes, Roadmap, Customers, Dashboards, System, Archive.</p>
+      <p>Anything looking for your work knows which folder it belongs to before reading a word.</p>
+    </div>
+    <div class="level">
+      <div class="tag">Level 2</div>
+      <h3>Initiative folder</h3>
+      <p>Every initiative is a folder, not a file, and every one has the same shape.</p>
+      <pre><code>Tracing/Trace Sampling Controls/
+├── 00-workplan.md      <span class="c"># source of truth</span>
+├── prd-*.md            <span class="c"># the PRD</span>
+├── spec-review-*.md    <span class="c"># architecture review</span>
+├── Meetings/           <span class="c"># meetings on this work</span>
+└── 04-dev/             <span class="c"># epics, breakdown</span></code></pre>
+      <p>Every artifact links back to the workplan. The folder is the context you hand over later.</p>
+    </div>
+    <div class="level">
+      <div class="tag">Level 3</div>
+      <h3>Frontmatter</h3>
+      <p>The YAML block at the top of <code>00-workplan.md</code>. This is the spine. It is what the dashboard reads today and what agents read later.</p>
+      <pre><code>---
+type: workplan
+area: Tracing
+phase: discovery | definition | dev | release | done
+status: active | paused | done
+blocker: ""
+next-action: <span class="k">"Get sizing from the team lead"</span>
+owner: Lior
+last-reviewed: 2026-08-29
+---</code></pre>
+    </div>
+  </div>
+
+  <div class="tw" style="margin-top:20px">
+    <table>
+      <thead><tr><th>Field</th><th>The question it answers</th></tr></thead>
+      <tbody>
+        <tr><td><strong>phase</strong></td><td>What stage the work is in. Gate everything on this.</td></tr>
+        <tr><td><strong>next-action</strong></td><td>What is owed right now, and by whom.</td></tr>
+        <tr><td><strong>blocker</strong></td><td>Empty means not blocked. Anything else means blocked.</td></tr>
+        <tr><td><strong>last-reviewed</strong></td><td>Freshness. If it is old, the note is lying to you.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <p class="ct">One YAML rule that breaks people</p>
+    <p>If a value contains a colon followed by a space, put it in quotes. Without quotes the block breaks and Obsidian stops showing Properties. This is the most common reason a row does not appear on the dashboard.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Daily use</h2>
+  <div class="h2sub">Tags go at the end of the line</div>
+  <p class="lead">Tools read tags by position, so put them last. Four tags cover almost everything.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Tag</th><th>Meaning</th><th>Example line</th></tr></thead>
+      <tbody>
+        <tr><td><code>#Task</code></td><td>You need to do this</td><td>Ask the team lead for sizing <code>#Task</code></td></tr>
+        <tr><td><code>#follow-up</code></td><td>Waiting on someone else</td><td>Waiting on the customer to confirm volume <code>#follow-up</code></td></tr>
+        <tr><td><code>#decision</code></td><td>A decision was made</td><td>Spans stay out of v1 scope <code>#decision</code></td></tr>
+        <tr><td><code>#open-question</code></td><td>Still unresolved</td><td>Is sampling per service or per tenant <code>#open-question</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <p class="ct">The one habit that makes all of it work</p>
+    <p>When you finish working on an initiative, update two fields in its workplan: <code>next-action</code> and <code>last-reviewed</code>.</p>
+    <p>That is the whole discipline. The dashboard, the stale view, and everything in part 2 run off those two fields. Skip them and the vault becomes a pile of notes again.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Dashboard</h2>
+  <div class="h2sub">What you get on day one</div>
+  <p class="lead">The script writes <code>Dashboards/portfolio.md</code>. It is empty until you have workplans, which is correct. Four live views, no work to maintain them.</p>
+  <div class="grid">
+    <div class="card"><div class="t">Needs a next action</div><div class="d">Every open initiative with its phase and what is owed.</div></div>
+    <div class="card"><div class="t">Stale</div><div class="d">Anything not reviewed in 14 days. Your weekly cleanup list.</div></div>
+    <div class="card"><div class="t">Blocked</div><div class="d">Everything with a blocker set, and who owns it.</div></div>
+    <div class="card"><div class="t">Open tasks</div><div class="d">Every unfinished task in the vault, sorted by due date.</div></div>
+  </div>
+  <div class="callout">
+    <p class="ct">Test that it works</p>
+    <p>Copy <code>System/Templates/00-workplan.md</code> into a real initiative folder, fill <code>area</code>, <code>phase</code> and <code>next-action</code>, then open the dashboard. The row should appear. If it does not, check the YAML quoting rule above.</p>
+  </div>
+</section>
+
+<section>
+  <h2>First week</h2>
+  <div class="h2sub">Get the structure into your hands</div>
+  <ul class="week">
+    <li><div class="day">Day 1</div><div class="what">Run the script, install the four plugins, read <code>conventions.md</code>.</div></li>
+    <li><div class="day">Day 2</div><div class="what">Take every meeting note in the vault using the meeting template.</div></li>
+    <li><div class="day">Day 3</div><div class="what">Create one real <code>00-workplan.md</code> for a live initiative. Fill it honestly.</div></li>
+    <li><div class="day">Day 4</div><div class="what">Create workplans for the rest. Check the dashboard shows them all.</div></li>
+    <li><div class="day">Day 5</div><div class="what">Update <code>next-action</code> and <code>last-reviewed</code> on every one of them.</div></li>
+  </ul>
+</section>
+
+<section>
+  <h2>What comes next</h2>
+  <div class="h2sub">Part 2: the Claude layer</div>
+  <p class="lead">Once the vault has real content and the frontmatter is a habit, the automation goes on top. It reads the same fields you filled in this week.</p>
+  <div class="grid">
+    <div class="card"><div class="t">CLAUDE.md</div><div class="d">Your identity file. Who you are, what you own, how you want output written.</div></div>
+    <div class="card"><div class="t">Slash commands</div><div class="d">Repeatable jobs: meeting prep, meeting summary, weekly plan, PRD drafting.</div></div>
+    <div class="card"><div class="t">Vault search</div><div class="d">Semantic search across every note, so a command can pull the right context on its own.</div></div>
+    <div class="card"><div class="t">Scheduled agents</div><div class="d">Jobs that run on a clock and leave you a short read in the morning.</div></div>
+  </div>
+  <div class="callout">
+    <p class="ct">Ready when you are</p>
+    <p>The script already created <code>System/Agents/Claude/commands</code> and <code>skills</code> for this. Ping Noam once the first week is done.</p>
+  </div>
+</section>
+
+<footer>Generated from: AI PM/starter-kit-lior/ · August 2026</footer>
+
+</div>
+</body>
+</html>
