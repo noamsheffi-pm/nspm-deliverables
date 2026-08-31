@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint Demo 01-09-2026 &middot; Data Pipeline</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-alt: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --code-bg: #050505;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #00d4aa;
+    --mint-dim: #0aa888;
+    --mint-soft: rgba(0, 212, 170, 0.15);
+    --mint-faint: rgba(0, 212, 170, 0.06);
+    --warning: #ff9f43;
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(0, 212, 170, 0.06), transparent 60%),
+      var(--bg);
+  }
+
+  /* ---- Deck stage (16:9 landscape) ---- */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw 9vh;
+  }
+  .slide {
+    display: none;
+    width: min(100%, 1280px);
+    height: min(100%, 720px);
+    aspect-ratio: 16 / 9;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 56px 72px;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* lead slides */
+  .slide.lead { justify-content: center; text-align: left; }
+  .slide.lead::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 20% 30%, rgba(0,212,170,0.10), transparent 55%);
+    pointer-events: none;
+  }
+  .slide.invert { background: var(--mint); color: #03110b; }
+  .slide.invert .kicker { color: #03110b; opacity: .7; }
+
+  .kicker {
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--mint); font-weight: 700; margin-bottom: 20px;
+  }
+  h1 { font-size: 52px; line-height: 1.08; font-weight: 800; letter-spacing: -.02em; }
+  h1 .accent { color: var(--mint); }
+  h2 { font-size: 38px; line-height: 1.12; font-weight: 800; letter-spacing: -.01em; margin-bottom: 28px; }
+  .sub { font-size: 24px; color: var(--text-2); margin-top: 18px; font-weight: 500; }
+
+  ul { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+  li {
+    font-size: 23px; line-height: 1.4; color: var(--text); padding-left: 30px; position: relative;
+  }
+  li::before {
+    content: ""; position: absolute; left: 0; top: 13px;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--mint);
+    box-shadow: 0 0 12px rgba(0,212,170,.5);
+  }
+  li b { color: var(--mint); font-weight: 700; }
+  .grouplabel { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 12px; font-weight: 700; }
+  .grouplabel:first-of-type { margin-top: 0; }
+
+  .callout {
+    margin-top: 26px; padding: 18px 24px; border-left: 3px solid var(--mint);
+    background: var(--mint-faint); border-radius: 8px; font-size: 21px; color: var(--text-2);
+  }
+  .callout b { color: #fff; }
+  .big-quote { font-size: 30px; font-weight: 700; line-height: 1.3; max-width: 22ch; }
+
+  code, .mono { font-family: var(--mono); background: var(--code-bg); padding: 2px 8px; border-radius: 6px; color: var(--mint); font-size: .9em; }
+
+  /* slide number tag */
+  .tag {
+    position: absolute; top: 28px; right: 32px; font-size: 13px; color: var(--text-muted);
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  }
+  .brand { position: absolute; top: 28px; left: 32px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); letter-spacing: .04em; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px rgba(0,212,170,.6); }
+  .invert .dot { background: #03110b; box-shadow: none; }
+  .invert .brand { color: #03110b; }
+
+  /* ---- nav bar ---- */
+  .navbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 7vh; min-height: 48px;
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    background: rgba(0,0,0,.6); border-top: 1px solid var(--border); backdrop-filter: blur(8px); z-index: 10;
+  }
+  .navbar button {
+    background: var(--surface-alt); color: var(--text); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 8px 18px; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); transition: .15s;
+  }
+  .navbar button:hover { border-color: var(--mint-dim); color: var(--mint); }
+  .navbar button:disabled { opacity: .3; cursor: default; }
+  .counter { font-size: 14px; color: var(--text-2); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--mint); z-index: 20; transition: width .3s; box-shadow: 0 0 10px rgba(0,212,170,.6); }
+
+  /* speaker notes */
+  .notes {
+    position: fixed; bottom: 7vh; left: 0; right: 0; max-height: 32vh; overflow-y: auto;
+    background: rgba(5,5,5,.96); border-top: 1px solid var(--mint-dim); padding: 18px 32px;
+    font-size: 16px; line-height: 1.5; color: var(--text-2); display: none; z-index: 9;
+  }
+  .notes.show { display: block; }
+  .notes b { color: var(--mint); }
+  .notes code { font-size: 15px; }
+  .hint { position: fixed; bottom: calc(7vh + 8px); right: 16px; font-size: 12px; color: var(--text-muted); z-index: 11; }
+
+  /* ================= sprint-demo v2 feature card, ported ================= */
+  .slide.card { justify-content: center; padding: 62px 72px 48px; }
+
+  .chip { font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; padding: 4px 11px; border-radius: 7px; color: var(--mint); background: var(--mint-soft); border: 1px solid var(--mint-dim); white-space: nowrap; }
+  .chip.roll { color: var(--warning); background: rgba(255,159,67,.12); border-color: rgba(255,159,67,.4); }
+
+  .fc-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .fc-title { font-size: 36px; font-weight: 800; letter-spacing: -.01em; line-height: 1.1; }
+
+  .pitch { font-size: 22px; line-height: 1.35; color: var(--mint); font-weight: 600; max-width: 46ch; margin-bottom: 22px; }
+
+  .shift { display: flex; align-items: stretch; gap: 16px; margin-bottom: 18px; }
+  .shift .half { flex: 1; border-radius: 12px; padding: 16px 20px; }
+  .shift .before { background: var(--surface-alt); border: 1px solid var(--border-strong); opacity: .72; }
+  .shift .after { background: var(--mint-faint); border: 1px solid var(--mint-dim); }
+  .shift .lab { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
+  .shift .after .lab { color: var(--mint); }
+  .shift .half p { font-size: 17px; line-height: 1.36; color: var(--text-2); }
+  .shift .after p { color: var(--text); }
+  .shift .arrow { display: flex; align-items: center; font-size: 26px; color: var(--mint); flex: 0 0 auto; }
+
+  .value { display: flex; gap: 14px; align-items: baseline; margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .value .k { flex: 0 0 62px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--mint); }
+  .value p { font-size: 18px; line-height: 1.38; color: var(--text); max-width: 82ch; }
+
+  .foot { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .foot .rc { font-size: 12px; color: var(--mint); text-decoration: none; border: 1px solid var(--mint-dim); border-radius: 6px; padding: 3px 10px; }
+  .foot .keys { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .foot .teams { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+  .foot .team { font-size: 11px; color: var(--text-2); background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 20px; padding: 3px 10px; }
+  .foot .team.cut { text-decoration: line-through; opacity: .45; }
+
+  /* section opener: title + the cards it contains */
+  .agenda { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+  .agenda-row { display: flex; align-items: center; gap: 14px; font-size: 22px; }
+  .agenda-row .n { flex: 0 0 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: var(--mint-soft); color: var(--mint); border: 1px solid var(--mint-dim); }
+  .agenda-row .t { font-weight: 600; }
+
+  /* stats row */
+  .stats { display: flex; gap: 18px; margin-top: 8px; }
+  .stat { flex: 1; background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 14px; padding: 26px 22px; text-align: center; }
+  .stat .n { font-size: 46px; font-weight: 800; color: var(--mint); line-height: 1; }
+  .stat .l { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-top: 10px; }
+
+  /* two-up teaser grid (Coming Next) */
+  .teaser { display: flex; gap: 20px; margin-top: 6px; }
+  .teaser .t-card { flex: 1; background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 14px; padding: 24px 26px; display: flex; flex-direction: column; }
+  .teaser .t-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .teaser .t-title { font-size: 25px; font-weight: 800; line-height: 1.12; }
+  .teaser .t-pitch { font-size: 18px; line-height: 1.35; color: var(--mint); font-weight: 600; margin-bottom: 14px; }
+  .teaser .t-body { font-size: 16px; line-height: 1.38; color: var(--text-2); }
+  .teaser .t-keys { font-family: var(--mono); font-size: 12px; color: var(--text-muted); margin-top: auto; padding-top: 14px; }
+
+  /* mentions grid */
+  .mentions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 6px; }
+  .mention { background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 12px; padding: 20px 22px; }
+  .mention h4 { font-size: 20px; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+  .mention p { font-size: 16px; line-height: 1.36; color: var(--text-2); }
+
+  /* thank-you grid */
+  .teams-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px; }
+  .tcard { background: rgba(3,17,11,.10); border: 1px solid rgba(3,17,11,.22); border-radius: 12px; padding: 14px 16px; }
+  .tcard .tn { font-size: 16px; font-weight: 800; color: #03110b; line-height: 1.2; }
+  .tcard .tm { font-size: 13px; color: rgba(3,17,11,.72); margin-top: 5px; line-height: 1.3; }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="stage" id="stage">
+
+  <!-- 0 · TITLE -->
+  <section class="slide lead active">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Sprint Demo &middot; 01-09-2026</span>
+    <div class="kicker">Pipeline &middot; Governance &middot; Monetization</div>
+    <h1 style="font-size:64px;">Data Pipeline<br><span class="accent">What We Shipped</span></h1>
+    <p class="sub" style="font-size:22px;">Noam Sheffi &middot; Product Manager</p>
+    <p class="sub" style="font-size:18px;color:var(--text-muted);margin-top:26px;">Four weeks &middot; 04-08 to 01-09-2026</p>
+    <div class="notes-data" hidden>Let the title sit. Three shifts this cycle: new data types now arrive already priced, DPXL becomes the single language for cost, and the thing you saw as Coming Next last time is live. Talk use case, not screen.</div>
+  </section>
+
+  <!-- 1 · THEME + STATS -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">This cycle</span>
+    <h2>New data types arrive already priced, and DPXL becomes the one language you write <span style="color:var(--mint)">cost</span> in.</h2>
+    <div class="stats">
+      <div class="stat"><div class="n">4</div><div class="l">Shipped</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Rolling Out</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Coming Next</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Teams</div></div>
+    </div>
+    <div class="callout">Cards marked <span class="chip roll">Rolling Out</span> are built and merged but not yet closed as released, so treat them as <b>available rather than final</b>.</div>
+    <div class="notes-data" hidden>Set the Rolling Out expectation once here so you never re-explain it per card. Shipped means show a customer freely. Rolling Out means check with me first.</div>
+  </section>
+
+  <!-- 2 · SECTION 1 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Metering</span>
+    <div class="kicker">Section one</div>
+    <h1>Every New Data Type<br>Arrives <span class="accent">Priced</span></h1>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">1</span><span class="t">Memory Profiles Become Their Own Data Type</span></div>
+      <div class="agenda-row"><span class="n">2</span><span class="t">Every AI Cost on One Screen</span></div>
+      <div class="agenda-row"><span class="n">3</span><span class="t">AI Units in Quota Rules</span></div>
+      <div class="agenda-row"><span class="n">4</span><span class="t">RUM Gets Its Own Cost Controls</span></div>
+    </div>
+    <div class="notes-data" hidden>The frame: for years a new data type showed up first and got priced later, which is how we ended up absorbing cost. These four close that gap. A type is metered, visible and enforceable on the day it arrives, and it stops hiding inside another type.</div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Metering</span>
+    <div class="fc-head"><span class="fc-title">Memory Profiles Become Their Own Data Type</span><span class="chip roll">Rolling Out</span></div>
+    <p class="pitch">See and control what memory profiling costs you, separately from CPU.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Memory-allocation profiles rode inside cpuProfiles. One line covered both, so a customer could not tell what memory profiling cost and could not budget it on its own.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>memoryProfiles is its own entityType, charged the same way as continuous profiling profiles. It is metered, billed and enforced, and it has its own line in Data Usage.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>Continuous profiling stops being an unpriced blind spot. Customers who asked us for units on memory profiling can now be sold it, and we can hold a budget on it instead of absorbing it.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/p/395c048defad81ef8a43dfaa258f45cf" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-49077</span>
+      <span class="teams"><span class="team">Halo</span><span class="team">Nimbus</span><span class="team">Anemia</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage</code> filter to memoryProfiles and point at its own row, separate from cpuProfiles. <b>&#9888; Say plainly:</b> the metering and the screen are done, the ingestion split is still landing, so a customer enabling it this week may still see it ride cpuProfiles. Slice Global asked for exactly this on 18 August.</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; AI</span>
+    <div class="fc-head"><span class="fc-title">Every AI Cost on One Screen</span><span class="chip">Shipped</span></div>
+    <p class="pitch">One screen answers what AI is costing you, instead of three.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>AI usage was spread across separate views. Nobody could give one answer to what AI cost this month, so the number got estimated in the meeting or skipped.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>A single AI usage screen in Data Usage, with the breakdown in one place.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>The AI cost conversation stops starting with which screen to open. One number in one place means the budget owner can act during the meeting rather than after it.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/p/390c048defad8134b9b2ccbc9e401623" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-47868</span>
+      <span class="teams"><span class="team">Nimbus</span><span class="team">Product Design</span><span class="team">Tech Writing</span><span class="team cut">Halo</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage &rsaquo; AI</code> open the consolidated screen and read one total out loud. <b>&#9888; Do not claim</b> this covers every AI capability. The Halo leg that would have surfaced all AI-capability usage and totals was cancelled as a scope change, so scope is the screen, not full coverage.</div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Quota</span>
+    <div class="fc-head"><span class="fc-title">AI Units in Quota Rules</span><span class="chip roll">Rolling Out</span></div>
+    <p class="pitch">The unit model you already sell now covers AI.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Units covered the data pillars. AI consumption sat outside the quota model, so there was no way to allocate it, cap it, or reset it alongside everything else.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>AI Units appear in Quota Rules with allocation, limits and reset, running on the existing feature-group mechanism rather than a new primitive.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>One contract number keeps covering everything, AI included. A customer does not need a separate AI agreement to put a ceiling on AI spend.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/p/382c048defad81749158cb0150a1012d" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-47887</span>
+      <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Quota Rules</code> open the AI Units allocation section and set a limit. AI Units also have their own tab in Org Quota Manager (CX-44033) if anyone asks where they see it across teams, though allocating between teams is still Backlog. <b>&#9888; The screen is live, enforcement is not.</b> The Halo feature-group quota rules are still in progress, so do not promise blocking behaviour. Frame it as the unit model extending to AI, not as a new capability.</div>
+  </section>
+
+
+  <!-- RUM TCO -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="fc-head"><span class="fc-title">RUM Gets Its Own Cost Controls</span><span class="chip roll">Rolling Out</span></div>
+    <p class="pitch">Price RUM on its own terms, instead of whatever your logs policy happens to be doing.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>RUM rode the same TCO policies as logs. Tuning log cost moved RUM cost as a side effect, and browser and mobile traffic could not be priced on its own terms.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>RUM has its own TCO policies, separate from logs and on by default, with Terraform support alongside the UI.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>Customers control RUM spend without touching their log strategy. RUM stops being a cost that moves when nobody was looking at it, which is the precondition for selling RUM at volume.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://www.notion.so/2d7c048defad805eb401d7f68a6b9799" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-32890 &middot; CX-46090</span>
+      <span class="teams"><span class="team">Radiant</span><span class="team">Nimbus</span><span class="team">Product Design</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>TCO</code> open the policy list and show a RUM policy sitting separately from the logs policies. <b>&#9888; Confirm on the tenant first.</b> Radiant shipped the policy split (CX-46090), turned the flag on by default (CX-54642, 18 Aug) and added Terraform (CX-51595, 25 Aug). The Nimbus enhancement CX-56217 was opened 26 Aug, after the ship, so it is phase two rather than a gap. The Notion card went Released on 29 Aug.</div>
+  </section>
+
+  <!-- 6 · SECTION 2 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="kicker">Section two</div>
+    <h1>DPXL Becomes<br>The <span class="accent">One Language</span></h1>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">1</span><span class="t">Span Policies, Written in DPXL</span></div>
+      <div class="agenda-row"><span class="n">2</span><span class="t">DPXL Quick Action Assistant</span></div>
+    </div>
+    <div class="notes-data" hidden>Careful here. Last demo the span story was cost control. This section is not about spans getting cost control, it is about spans and logs finally sharing one way to express it. Lead on the language, not the saving.</div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="fc-head"><span class="fc-title">Span Policies, Written in DPXL</span><span class="chip">Shipped</span></div>
+    <p class="pitch">Write a span cost policy in the same language you already use for logs.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Span policies were authored in their own editor with their own rules. Anyone already fluent in DPXL for logs had to learn a second way to say the same thing.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>Spans use the DPXL policy editor, with quota-triggered priority demotion behind it. One expression language across logs and spans.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>One language means one skill. A customer already writing DPXL for logs controls span cost on day one, with no second learning curve and no second place to get it wrong.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://www.notion.so/366c048defad81f998efebf831dab54a" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-43350</span>
+      <span class="teams"><span class="team">Radiant</span><span class="team">Halo</span><span class="team">Nimbus</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>TCO &rsaquo; Spans</code> open the policy editor and write one DPXL expression against a span attribute. If someone says we already did spans last time, agree, and say that was the enforcement, this is the authoring.</div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="fc-head"><span class="fc-title">DPXL Quick Action Assistant</span><span class="chip">Shipped</span></div>
+    <p class="pitch">Take the expression you are looking at straight into Explore.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>You read a DPXL expression on a policy, then retyped it by hand into Explore to find out what it actually matched. Most people did not bother.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>Copy the DPXL from where you are and jump into Explore with it already loaded.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>Closes the gap between writing a cost rule and seeing what it catches. Customers verify a policy before it costs them, instead of discovering the mistake on the next invoice.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/p/396c048defad8119b869f21b2648c9e5" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-48224</span>
+      <span class="teams"><span class="team">Nimbus</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> open a TCO policy, hit the quick action, land in Explore with the expression loaded, and point at the matched rows. This is the most visual card in the deck, so give it room. It is deterministic, not conversational, so distinguish it from Olly if asked.</div>
+  </section>
+
+  <!-- 9 · SECTION 3 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Governance &middot; Schema</span>
+    <div class="kicker">Section three</div>
+    <h1>Schema Browsing Becomes<br>a <span class="accent">Cost Conversation</span></h1>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">1</span><span class="t">Keypath Drill-Down Drawer</span></div>
+    </div>
+    <div class="notes-data" hidden>Short section, one card, and it is the callback. You showed this to this same room four weeks ago as Coming Next. Open by saying that out loud, it is the strongest close you have.</div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Governance &middot; Schema</span>
+    <div class="fc-head"><span class="fc-title">Keypath Drill-Down Drawer</span><span class="chip">Shipped</span></div>
+    <p class="pitch">Click a keypath and understand the field without leaving Schema Explorer.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Shown to you last demo as Coming Next, behind a flag. Browsing schema told you a field exists. It did not tell you what the field costs or whether anyone still needs it.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>A drawer with attribution, volume trend charts, and a jump to the query behind the field. On for everyone.</p></div>
+    </div>
+    <div class="value"><span class="k">Value</span><p>Seeing a field's volume next to who sends it is what makes a customer decide to stop sending it. That decision is the whole point of schema governance, and it now happens without leaving the screen.</p></div>
+    <div class="foot">
+      <a class="rc" href="https://www.notion.so/366c048defad81d585eed165e37a12fe" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-43123</span>
+      <span class="teams"><span class="team">Phoenix</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Schema Explorer</code> click a high-volume keypath, open the drawer, then jump to the query. Say "this is the one I showed you as Coming Next last time" before you click anything. <b>&#9888; Not claimed on this card:</b> the AI-generated field description. Both Phoenix legs for it are Cancelled/Obsolete (CX-34998, CX-35002) and only the API shipped (CX-38798). Check the tenant. If the drawer shows an editable description, add it out loud. If it does not, you have promised nothing.</div>
+  </section>
+
+  <!-- 11 · COMING NEXT -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Coming Next</span>
+    <h2 style="margin-bottom:20px;">Coming Next</h2>
+    <div class="teaser">
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Traffic Management Phase 1</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">Shape traffic where you can see the whole pipeline, not in scattered rules.</p>
+        <p class="t-body">Backend model and engine in build on Radiant, with the pipeline builder design and the graph framework in progress. The goal is one place that answers where traffic goes and what happens to it on the way.</p>
+        <div class="t-keys">CX-49207 &middot; Radiant &middot; Nimbus &middot; Product Design</div>
+      </div>
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Expression-Based Retention</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">Let a record keep the retention its content earns, not the one its dataset assumes.</p>
+        <p class="t-body">A dataset rule holds an ordered list of DPXL condition to retention-tag rules plus a required default, so every record gets exactly one tag. Rule model in build on Citadel, the dataset UI still ahead of us.</p>
+        <div class="t-keys">CX-48426 &middot; Citadel &middot; Phoenix &middot; Tech Writing</div>
+      </div>
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Monthly Team Quota</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">Enforce against the monthly budget you contract on, not a daily slice of it.</p>
+        <p class="t-body">Shown to you last demo, and here is what moved. Plan ownership is consolidating into one service, and the team and entityType blockers are learning monthly. The screens are the open part: every screen that sets a quota number still assumes a day, so a monthly plan reads one number and enforces another.</p>
+        <div class="t-keys">CX-40018 &middot; Halo &middot; Radiant &middot; Nimbus &middot; Product Design</div>
+      </div>
+    </div>
+    <div class="notes-data" hidden>Nothing live for any of the three. Say so plainly rather than implying a date. Monthly Team Quota is the one this room saw last time, so lead with what moved rather than re-pitching it. If asked when, the honest answer is that the blockers are being taught monthly now and the screens have not been reworked yet.</div>
+  </section>
+
+  <!-- 12 · WORTH A MENTION -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Also shipped</span>
+    <h2 style="margin-bottom:20px;">Worth a Mention</h2>
+    <div class="mentions">
+      <div class="mention"><h4>Org Quota Manager, block visibility</h4><p>Block visibility columns plus a max usage visual, so an admin can see which teams are near the ceiling.</p></div>
+      <div class="mention"><h4>Per-Dataset TCO Quota Routing</h4><p>The routing UI reworked. Front end only this cycle, the backend leg was cut.</p></div>
+      <div class="mention"><h4>TCO quota percentage fix</h4><p>The percentage is now calculated against allocated daily quota, so the number on screen matches the number that enforces.</p></div>
+      <div class="mention"><h4>Parsing rule limit visibility</h4><p>You can see how close you are to the parsing rule limit before you hit it.</p></div>
+      <div class="mention"><h4>Dataset Access Policy Revamp</h4><p>Dataset access policies reworked on the Citadel backend with the Phoenix front end wired through.</p></div>
+    </div>
+    <div class="callout">Now generally available, shown last demo as <span class="chip roll">Rolling Out</span>: Priority Block on Ingest &middot; Move Units Between Teams &middot; Olly on the Quota Surfaces &middot; Team API Keys in Data Usage &middot; Reserved Fields for Every Dataset.</div>
+    <div class="notes-data" hidden>Read these fast, demo none of them. Each failed the Value test as a card, which is why it is here. The callout line is the one worth pausing on, because those five were caveated last time and are now closed.</div>
+  </section>
+
+  <!-- 13 · THANK YOU -->
+  <section class="slide invert">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <div class="kicker">Thank you</div>
+    <h1 style="font-size:44px;color:#03110b;margin-bottom:6px;">This cycle was powered by these teams</h1>
+    <div class="teams-grid">
+      <div class="tcard"><div class="tn">Nimbus</div><div class="tm">Wiktor, Ruben, Iulian</div></div>
+      <div class="tcard"><div class="tn">Phoenix</div><div class="tm">Gili, Nahar</div></div>
+      <div class="tcard"><div class="tn">Halo</div><div class="tm">Gaspare, Rafael</div></div>
+      <div class="tcard"><div class="tn">Radiant</div><div class="tm">Anton, Linoy, Naor, Tamir, Tomer, Itay</div></div>
+      <div class="tcard"><div class="tn">Anemia</div><div class="tm">Nimrod</div></div>
+      <div class="tcard"><div class="tn">Product Design</div><div class="tm">Omer</div></div>
+      <div class="tcard"><div class="tn">Technical Writing</div><div class="tm">Maya</div></div>
+    </div>
+    <div class="notes-data" hidden>Name the teams out loud. Then hand over to questions.</div>
+  </section>
+
+</div>
+
+<div class="notes" id="notes"></div>
+<div class="hint">&larr; &rarr; navigate &middot; N notes &middot; F fullscreen</div>
+<div class="navbar">
+  <button id="prev">&larr; Back</button>
+  <span class="counter" id="counter">1 / 15</span>
+  <button id="next">Next &rarr;</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const notes = document.getElementById('notes');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  let notesOn = false;
+
+  function render() {
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    counter.textContent = (i + 1) + ' / ' + total;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === total - 1;
+    const note = slides[i].querySelector('.notes-data');
+    notes.innerHTML = note ? '<b>Speaker note &middot;</b> ' + note.innerHTML : '';
+  }
+  function go(n) { i = Math.max(0, Math.min(total - 1, n)); render(); }
+
+  prevBtn.onclick = () => go(i - 1);
+  nextBtn.onclick = () => go(i + 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { go(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(i - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(total - 1); }
+    else if (e.key.toLowerCase() === 'n') { notesOn = !notesOn; notes.classList.toggle('show', notesOn); }
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  render();
+</script>
+</body>
+</html>
