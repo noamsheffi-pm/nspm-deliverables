@@ -266,11 +266,11 @@
     </div>
     <div class="value"><span class="k">Value</span><p>Continuous profiling stops being an unpriced blind spot. Customers who asked us for units on memory profiling can now be sold it, and we can hold a budget on it instead of absorbing it.</p></div>
     <div class="foot">
-      <a class="rc" href="https://app.notion.com/p/395c048defad81ef8a43dfaa258f45cf" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <a class="rc" href="https://app.notion.com/p/3cec048defad81cea10fe92905a6a5fa" target="_blank" rel="noopener">&#8599; Roadmap card</a>
       <span class="keys">CX-49077</span>
       <span class="teams"><span class="team">Halo</span><span class="team">Nimbus</span><span class="team">Anemia</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage</code> filter to memoryProfiles and point at its own row, separate from cpuProfiles. <b>&#9888; Say plainly:</b> the metering and the screen are done, the ingestion split is still landing, so a customer enabling it this week may still see it ride cpuProfiles. Slice Global asked for exactly this on 18 August.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage</code> filter to memoryProfiles and point at its own row, separate from cpuProfiles. <b>&#9888; Say plainly:</b> the metering and the screen are done, the ingestion split is still landing, so a customer enabling it this week may still see it ride cpuProfiles. Nimrod wrote &quot;It&#39;s done&quot; on 31-08 14:34, but CX-49078 is still <code>In Progress</code> (last touched 25-08) and CX-49082 is still <code>To Do</code>, so the ticket state does not back the claim yet. Slice Global asked for exactly this on 18 August.</div>
   </section>
 
   <!-- 4 -->
@@ -290,7 +290,7 @@
       <span class="keys">CX-47868</span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Product Design</span><span class="team">Tech Writing</span><span class="team cut">Halo</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage &rsaquo; AI</code> open the consolidated screen and read one total out loud. <b>&#9888; Do not claim</b> this covers every AI capability. The Halo leg that would have surfaced all AI-capability usage and totals was cancelled as a scope change, so scope is the screen, not full coverage.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Data Usage &rsaquo; AI</code> open the consolidated screen and read one total out loud. The three old screens now sit under one tab as sub-tabs, each with its own filters and grouping (Iulian, 31-08). <b>&#9888; Do not claim</b> this covers every AI capability. The Halo leg that would have surfaced all AI-capability usage and totals was cancelled as a scope change, so scope is the screen, not full coverage.</div>
   </section>
 
   <!-- 5 -->
@@ -310,7 +310,7 @@
       <span class="keys">CX-47887</span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> <code>Quota Rules</code> open the AI Units allocation section and set a limit. AI Units also have their own tab in Org Quota Manager (CX-44033) if anyone asks where they see it across teams, though allocating between teams is still Backlog. <b>&#9888; The screen is live, enforcement is not.</b> The Halo feature-group quota rules are still in progress, so do not promise blocking behaviour. Frame it as the unit model extending to AI, not as a new capability.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Quota Rules</code> open the AI Units allocation section and set a limit. AI Units also have their own tab in Org Quota Manager (CX-44033) if anyone asks where they see it across teams, though allocating between teams is still Backlog. <b>&#9888; The screen is live, enforcement is not.</b> The Halo feature-group quota rules are still in progress, so do not promise blocking behaviour. <b>Tenant check:</b> Iulian reported 31-08 that the AI Units bucket is there but the Olly bucket is still shown next to it. Omer&#39;s UI fix is in (CX-51563 <code>Completed</code>) and the Overview now scrolls away, so open the section before the room sees it and skip the Olly bucket if it is still there. Frame it as the unit model extending to AI, not as a new capability.</div>
   </section>
 
 
@@ -331,7 +331,7 @@
       <span class="keys">CX-32890 &middot; CX-46090</span>
       <span class="teams"><span class="team">Radiant</span><span class="team">Nimbus</span><span class="team">Product Design</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> <code>TCO</code> open the policy list and show a RUM policy sitting separately from the logs policies. <b>&#9888; Confirm on the tenant first.</b> Radiant shipped the policy split (CX-46090), turned the flag on by default (CX-54642, 18 Aug) and added Terraform (CX-51595, 25 Aug). The Nimbus enhancement CX-56217 was opened 26 Aug, after the ship, so it is phase two rather than a gap. The Notion card went Released on 29 Aug.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>TCO</code> open the policy list and show a RUM policy sitting separately from the logs policies. <b>&#9888; Confirm on the tenant first.</b> Radiant shipped the policy split (CX-46090), turned the flag on by default (CX-54642, 18 Aug) and added Terraform (CX-51595, 25 Aug). The Nimbus enhancement CX-56217 was opened 26 Aug, after the ship, so it is phase two rather than a gap. <b>Not confirmed:</b> Itay wrote 25-08 that Radiant finished and the last gap sits in Nimbus. Asked #spectra-leaders 31-08 18:58, no answer yet. The Notion card Description still reads &quot;Halo - ready. Nimbus must expose it&quot;, which is the same gap. If the tenant does not render a RUM policy, move this card to Coming Next instead of demoing it. The Notion card went Released on 29 Aug.</div>
   </section>
 
   <!-- 6 · SECTION 2 OPENER -->
@@ -453,9 +453,7 @@
     <span class="tag">Also shipped</span>
     <h2 style="margin-bottom:20px;">Worth a Mention</h2>
     <div class="mentions">
-      <div class="mention"><h4>Org Quota Manager, block visibility</h4><p>Block visibility columns plus a max usage visual, so an admin can see which teams are near the ceiling.</p></div>
       <div class="mention"><h4>Per-Dataset TCO Quota Routing</h4><p>The routing UI reworked. Front end only this cycle, the backend leg was cut.</p></div>
-      <div class="mention"><h4>TCO quota percentage fix</h4><p>The percentage is now calculated against allocated daily quota, so the number on screen matches the number that enforces.</p></div>
       <div class="mention"><h4>Parsing rule limit visibility</h4><p>You can see how close you are to the parsing rule limit before you hit it.</p></div>
       <div class="mention"><h4>Dataset Access Policy Revamp</h4><p>Dataset access policies reworked on the Citadel backend with the Phoenix front end wired through.</p></div>
     </div>
