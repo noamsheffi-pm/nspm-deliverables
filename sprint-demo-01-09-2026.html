@@ -174,6 +174,18 @@
   .foot .team { font-size: 11px; color: var(--text-2); background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 20px; padding: 3px 10px; }
   .foot .team.cut { text-decoration: line-through; opacity: .45; }
 
+  /* visible framing line: the stake, said on screen not in the notes */
+  .frame { font-size: 21px; line-height: 1.42; color: var(--text-2); max-width: 74ch; margin-top: 18px; padding-left: 16px; border-left: 3px solid var(--mint-dim); }
+  .frame b { color: var(--text); font-weight: 700; }
+
+  /* closing argument */
+  .close-claim { font-size: 27px; line-height: 1.34; font-weight: 700; max-width: 62ch; margin-top: 4px; }
+  .proof { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+  .proof .p { background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 12px; padding: 18px 20px; }
+  .proof .p .h { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+  .proof .p .d { font-size: 17px; line-height: 1.38; color: var(--text-2); }
+  .proof .p .d b { color: var(--text); font-weight: 700; }
+
   /* section opener: title + the cards it contains */
   .agenda { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
   .agenda-row { display: flex; align-items: center; gap: 14px; font-size: 22px; }
@@ -228,6 +240,7 @@
     <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
     <span class="tag">This cycle</span>
     <h2>New data types arrive already priced, and DPXL becomes the one language you write <span style="color:var(--mint)">cost</span> in.</h2>
+    <div class="frame">For years a new data type showed up first and got priced later. The gap between arriving and being priced is cost <b>we absorbed</b>. This cycle closes that gap, and makes DPXL the single language cost is written in.</div>
     <div class="stats">
       <div class="stat"><div class="n">4</div><div class="l">Shipped</div></div>
       <div class="stat"><div class="n">3</div><div class="l">Rolling Out</div></div>
@@ -244,10 +257,11 @@
     <span class="tag">Monetization &middot; Metering</span>
     <div class="kicker">Section one</div>
     <h1>Every New Data Type<br>Arrives <span class="accent">Priced</span></h1>
+    <div class="frame">A new data type used to show up first and get priced later, which is how we ended up <b>absorbing the cost</b>. These four close that gap. A type is metered, visible and enforceable on the day it arrives, and it stops hiding inside another type.</div>
     <div class="agenda">
       <div class="agenda-row"><span class="n">1</span><span class="t">Memory Profiles Become Their Own Data Type</span></div>
       <div class="agenda-row"><span class="n">2</span><span class="t">Every AI Cost on One Screen</span></div>
-      <div class="agenda-row"><span class="n">3</span><span class="t">AI Units in Quota Rules</span></div>
+      <div class="agenda-row"><span class="n">3</span><span class="t">AI Gets Its Own Units Plan</span></div>
       <div class="agenda-row"><span class="n">4</span><span class="t">RUM Gets Its Own Cost Controls</span></div>
     </div>
     <div class="notes-data" hidden>The frame: for years a new data type showed up first and got priced later, which is how we ended up absorbing cost. These four close that gap. A type is metered, visible and enforceable on the day it arrives, and it stops hiding inside another type.</div>
@@ -297,20 +311,20 @@
   <section class="slide card">
     <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
     <span class="tag">Monetization &middot; Quota</span>
-    <div class="fc-head"><span class="fc-title">AI Units in Quota Rules</span><span class="chip roll">Rolling Out</span></div>
-    <p class="pitch">The unit model you already sell now covers AI.</p>
+    <div class="fc-head"><span class="fc-title">AI Gets Its Own Units Plan</span><span class="chip roll">Rolling Out</span></div>
+    <p class="pitch">AI runs on its own units plan, separate from the CX units that cover telemetry.</p>
     <div class="shift">
-      <div class="half before"><div class="lab">Before</div><p>Units covered the data pillars. AI consumption sat outside the quota model, so there was no way to allocate it, cap it, or reset it alongside everything else.</p></div>
+      <div class="half before"><div class="lab">Before</div><p>Every AI capability had its own usage line. Olly sat in the entity-type list, evaluations and guardrails were counted somewhere else, and there was no single AI limit to allocate or enforce.</p></div>
       <div class="arrow">&#8594;</div>
-      <div class="half after"><div class="lab">Now</div><p>AI Units appear in Quota Rules with allocation, limits and reset, running on the existing feature-group mechanism rather than a new primitive.</p></div>
+      <div class="half after"><div class="lab">Now</div><p>One AI Units plan covers every AI capability, in its own allocation section on Quota Rules. Olly is no longer an entity type.</p></div>
     </div>
-    <div class="value"><span class="k">Value</span><p>One contract number keeps covering everything, AI included. A customer does not need a separate AI agreement to put a ceiling on AI spend.</p></div>
+    <div class="value"><span class="k">Value</span><p>Two plans, priced separately. CX units cover telemetry, AI units cover AI, and units do not move between them. AI spend cannot quietly eat the telemetry budget, and AI stops being sold as a bolt-on.</p></div>
     <div class="foot">
       <a class="rc" href="https://app.notion.com/p/382c048defad81749158cb0150a1012d" target="_blank" rel="noopener">&#8599; Roadmap card</a>
       <span class="keys">CX-47887</span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> <code>Quota Rules</code> open the AI Units allocation section and set a limit. AI Units also have their own tab in Org Quota Manager (CX-44033) if anyone asks where they see it across teams, though allocating between teams is still Backlog. <b>&#9888; The screen is live, enforcement is not.</b> The Halo feature-group quota rules are still in progress, so do not promise blocking behaviour. <b>Tenant check:</b> Iulian reported 31-08 that the AI Units bucket is there but the Olly bucket is still shown next to it. Omer&#39;s UI fix is in (CX-51563 <code>Completed</code>) and the Overview now scrolls away, so open the section before the room sees it and skip the Olly bucket if it is still there. Frame it as the unit model extending to AI, not as a new capability.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> <code>Quota Rules</code> open the AI Units allocation section and set a limit. AI Units also have their own tab in Org Quota Manager (CX-44033) if anyone asks where they see it across teams, though allocating between teams is still Backlog. <b>&#9888; The screen is live, enforcement is not.</b> The Halo feature-group quota rules are still in progress, so do not promise blocking behaviour. <b>Tenant check:</b> Iulian reported 31-08 that the AI Units bucket is there but the Olly bucket is still shown next to it. Omer&#39;s UI fix is in (CX-51563 <code>Completed</code>) and the Overview now scrolls away, so open the section before the room sees it and skip the Olly bucket if it is still there. <b>Frame it as two plans, not one pool.</b> CX units and AI units are priced differently and units cannot move between them. AI units are absolute locked units, set by us, not a percentage, sized at roughly 15 to 20 percent of contract value at sale. Do not say a customer can shift units between the two.</div>
   </section>
 
 
@@ -340,6 +354,7 @@
     <span class="tag">Pipeline &middot; TCO</span>
     <div class="kicker">Section two</div>
     <h1>DPXL Becomes<br>The <span class="accent">One Language</span></h1>
+    <div class="frame">Not spans getting cost control, they had that. Spans and logs now share <b>one way to express it</b>. A customer fluent in DPXL for logs controls span cost on day one, with no second thing to learn and no second place to get it wrong.</div>
     <div class="agenda">
       <div class="agenda-row"><span class="n">1</span><span class="t">Span Policies, Written in DPXL</span></div>
       <div class="agenda-row"><span class="n">2</span><span class="t">DPXL Quick Action Assistant</span></div>
@@ -393,6 +408,7 @@
     <span class="tag">Governance &middot; Schema</span>
     <div class="kicker">Section three</div>
     <h1>Schema Browsing Becomes<br>a <span class="accent">Cost Conversation</span></h1>
+    <div class="frame">Schema browsing told you a field exists. It never told you what the field costs or who sends it, so nobody acted on it. <b>You saw this as Coming Next four weeks ago.</b> It is live.</div>
     <div class="agenda">
       <div class="agenda-row"><span class="n">1</span><span class="t">Keypath Drill-Down Drawer</span></div>
     </div>
@@ -457,11 +473,28 @@
       <div class="mention"><h4>Parsing rule limit visibility</h4><p>You can see how close you are to the parsing rule limit before you hit it.</p></div>
       <div class="mention"><h4>Dataset Access Policy Revamp</h4><p>Dataset access policies reworked on the Citadel backend with the Phoenix front end wired through.</p></div>
     </div>
-    <div class="callout">Now generally available, shown last demo as <span class="chip roll">Rolling Out</span>: Priority Block on Ingest &middot; Move Units Between Teams &middot; Olly on the Quota Surfaces &middot; Team API Keys in Data Usage &middot; Reserved Fields for Every Dataset.</div>
-    <div class="notes-data" hidden>Read these fast, demo none of them. Each failed the Value test as a card, which is why it is here. The callout line is the one worth pausing on, because those five were caveated last time and are now closed.</div>
+    <div class="callout"><b>Closed since 04-08.</b> Shown last demo as <span class="chip roll">Rolling Out</span>, now generally available: span priority block on ingest &middot; move units between teams, phase 1 &middot; Olly in the data pipeline &middot; team API keys in Data Usage &middot; reserved fields for every dataset.</div>
+    <div class="notes-data" hidden>Read these fast, demo none of them. Each failed the Value test as a card, which is why it is here. The callout is the line worth pausing on: five things you caveated on 04-08 are now closed. <b>&#9888; Say &quot;span priority block&quot;, not &quot;priority block on ingest&quot;</b>, CX-45493 is spans only. <b>Olly here is CX-49228, Olly in the data pipeline, not Olly on the quota surfaces.</b> Card 3 said Olly is leaving the quota entity-type list, so do not let these two sound like the same thing.</div>
   </section>
 
-  <!-- 13 · THANK YOU -->
+  <!-- 13 · THE CLOSE -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">What changed</span>
+    <h2 style="margin-bottom:14px;">What you can sell now</h2>
+    <div class="close-claim">Four things you could not put a price on last month. <span style="color:var(--mint)">You can price all four today.</span></div>
+    <div class="frame" style="margin-top:14px;font-size:19px;">All four came from customer requests. <b>Every card in this deck has demand behind it.</b></div>
+    <div class="proof">
+      <div class="p"><div class="h">Sell memory profiling</div><div class="d">Memory profiling now has its own price and its own line in Data Usage. <b>Customers budget it separately from CPU profiling.</b></div></div>
+      <div class="p"><div class="h">Sell RUM at volume</div><div class="d">RUM now has its own cost policies, separate from logs. <b>Customers cut RUM spend without touching their log strategy.</b></div></div>
+      <div class="p"><div class="h">Sell AI inside the deal</div><div class="d">AI now has its own units plan, sized at 15 to 20 percent of contract. <b>Customers get an AI budget without a second negotiation.</b></div></div>
+      <div class="p"><div class="h">Sell span cost control</div><div class="d">Spans now use the same DPXL customers already write for logs. <b>Customers control span cost with no second language to learn.</b></div></div>
+    </div>
+    <div class="callout" style="margin-top:20px;"><b>Two caveats, same as on the cards.</b> AI units show on screen but do not block yet. The memory profiles ingestion split is still landing.</div>
+    <div class="notes-data" hidden>This is the close. Say the claim, then stop and let them read. Four sell-lines, one caveat line. <b>Names stay off the slide, keep them for questions:</b> memory profiling came from a Slice Global request on 18 August, which we covered with a manual two week quota grant that has now expired. Spans came from calialfa, Currencies Direct and Sony. <b>&#9888; The caveat line is not optional.</b> Four boxes of good news with no limits reads as marketing and the room stops believing the other four. On AI units, say plan, not pool: CX units and AI units are priced differently and units do not move between them. Then hand to the teams slide.</div>
+  </section>
+
+  <!-- 14 &middot; THANK YOU -->
   <section class="slide invert">
     <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
     <div class="kicker">Thank you</div>
