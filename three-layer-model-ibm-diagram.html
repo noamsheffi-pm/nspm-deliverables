@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataspaces and datasets: the three layers</title>
+<style>
+  :root {
+    --bg: #0d0d0f; --panel: #17171a; --panel-2: #1b1d21; --line: #2a2a2e;
+    --fg: #f4f4f5; --muted: #9ca3af; --faint: #6b7280;
+    --green: #22c55e; --green-bg: #0e2318;
+    --sky: #38bdf8; --sky-bg: #10202b;
+    --amber: #f59e0b; --amber-bg: #2a1d08;
+    --slate: #94a3b8; --slate-bg: #1b1d21;
+    --red: #ef4444; --red-bg: #2a1214;
+  }
+  * { box-sizing: border-box; min-width: 0; }
+  body {
+    margin: 0; padding: 36px 24px 32px; background: var(--bg); color: var(--fg); overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .sq { width: 16px; height: 16px; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px rgba(34,197,94,.45); }
+  .brand span { font-size: 13px; letter-spacing: .02em; color: var(--muted); }
+  h1 { font-size: 29px; margin: 0 0 12px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
+  .lede { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 880px; }
+  h2 { font-size: 12px; letter-spacing: .1em; color: var(--green); margin: 40px 0 4px; font-weight: 600; }
+  h2 + p { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 880px; }
+  figure { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 0; overflow-x: auto; }
+  svg { width: 100%; height: auto; display: block; }
+  g.node { cursor: pointer; }
+  g.node rect { transition: stroke-width .2s ease; }
+  g.node:hover rect { stroke-width: 3; }
+  .dimmed { opacity: .22; }
+  g.node, path.edge, text.elabel { transition: opacity .3s ease; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 14px 0 0; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .step b { display: block; font-size: 12px; color: var(--green); margin-bottom: 8px; letter-spacing: .06em; }
+  .step p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  footer { margin-top: 36px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+  .source { margin-top: 14px; font-size: 12px; color: var(--faint); line-height: 1.6; }
+  @media (max-width: 720px) { h1 { font-size: 23px; } body { padding: 26px 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brand"><span class="sq"></span><span>IBM Cloud Logs · dataspaces and datasets · concept for review</span></div>
+<header>
+  <h1>Where does the data go, and what does each layer know?</h1>
+  <p class="lede">Three layers, and each one knows only the layer below it. That is why a TCO policy can route data without naming a bucket or a topic: it names a dataset, and the dataset knows where its data is kept. The same three layers are the three screens an admin fills in, in order.</p>
+</header>
+
+<h2>THE THREE LAYERS</h2>
+<p>Read it bottom up. Storage at the bottom, the data collections in the middle, routing on top.</p>
+<figure>
+<svg viewBox="0 0 1120 250" role="img" aria-label="Three layers: physical location at the bottom, datasets in the middle, TCO on top">
+  <defs>
+    <marker id="ah-mute" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/></marker>
+  </defs>
+  <path id="l-knows" d="M 150 34 L 150 214" stroke="#9ca3af" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#ah-mute)">
+    <title>Each layer knows only the layer directly below it</title></path>
+  <text x="138" y="118" text-anchor="end" fill="#9ca3af" font-size="11.5">each layer knows</text>
+  <text x="138" y="133" text-anchor="end" fill="#9ca3af" font-size="11.5">only the one below</text>
+
+  <g id="l-3">
+    <title>Layer 3, TCO: routes data to a dataset by name. It never sees the physical location.</title>
+    <rect x="200" y="20" width="880" height="62" rx="8" fill="#10202b" stroke="#38bdf8" stroke-width="2"/>
+    <text x="224" y="46" fill="#f4f4f5" font-size="15" font-weight="600">Layer 3 · TCO</text>
+    <text x="224" y="67" fill="#9ca3af" font-size="12.5">Routes data to a dataset by name. Never sees the physical location.</text>
+  </g>
+  <g id="l-2">
+    <title>Layer 2, datasets: related data collections that rules configure.</title>
+    <rect x="200" y="94" width="880" height="62" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="2"/>
+    <text x="224" y="120" fill="#f4f4f5" font-size="15" font-weight="600">Layer 2 · Datasets</text>
+    <text x="224" y="141" fill="#9ca3af" font-size="12.5">Related data collections that rules configure.</text>
+  </g>
+  <g id="l-1">
+    <title>Layer 1, physical location: the object storage bucket or the Event Streams topic where the bytes land.</title>
+    <rect x="200" y="168" width="880" height="62" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="2"/>
+    <text x="224" y="194" fill="#f4f4f5" font-size="15" font-weight="600">Layer 1 · Physical location</text>
+    <text x="224" y="215" fill="#9ca3af" font-size="12.5">The object storage bucket or the Event Streams topic. Where the bytes land.</text>
+  </g>
+</svg>
+</figure>
+
+<h2>HOW DATA REACHES A DATASET</h2>
+<p>The top row is what an admin configures, in order. Below it, what happens when data arrives: a policy routes to one dataset by name, or to many at once through a pattern, and each dataset is stored in one of the buckets or sent to one of the streams. Click any box to isolate what it touches.</p>
+<figure>
+<svg viewBox="0 0 1240 670" role="img" aria-label="Configuration across three screens, then the runtime path from incoming data to a dataset and on to a bucket or a stream">
+  <defs>
+    <marker id="ah-sky" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8"/></marker>
+    <marker id="ah-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/></marker>
+    <marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker>
+    <marker id="ah-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/></marker>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
+  </defs>
+
+  <text x="20" y="28" fill="#6b7280" font-size="11" letter-spacing=".08em">WHAT THE ADMIN CONFIGURES</text>
+  <text x="20" y="300" fill="#6b7280" font-size="11" letter-spacing=".08em">WHAT HAPPENS WHEN DATA ARRIVES</text>
+  <text x="930" y="300" fill="#6b7280" font-size="11" letter-spacing=".08em">TWO KINDS OF TARGET, SEVERAL OF EACH</text>
+
+  <path class="edge" id="e-s1-s2" d="M 220 100 L 262 100" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#ah-slate)">
+    <title>A dataset rule points at one physical location, so the location is configured first</title></path>
+  <text class="elabel" x="241" y="52" text-anchor="middle" fill="#9ca3af" font-size="11">then</text>
+
+  <path class="edge" id="e-s2-s3" d="M 470 100 L 512 100" stroke="#22c55e" stroke-width="1.5" fill="none" marker-end="url(#ah-green)">
+    <title>Once rules exist, a TCO policy can route data to them</title></path>
+  <text class="elabel" x="491" y="52" text-anchor="middle" fill="#9ca3af" font-size="11">then</text>
+
+  <path class="edge" id="e-s3-tco" d="M 620 158 L 620 236 L 345 236 L 345 364" stroke="#38bdf8" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#ah-sky)">
+    <title>What the admin configured on these three screens is what runs when data arrives</title></path>
+  <text class="elabel" x="632" y="200" text-anchor="start" fill="#9ca3af" font-size="11">the configuration above is what runs below</text>
+
+  <path class="edge" id="e-in-tco" d="M 210 412 L 242 412" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#ah-amber)">
+    <title>Logs and spans arrive and are evaluated by the TCO policies</title></path>
+  <text class="elabel" x="226" y="356" text-anchor="middle" fill="#9ca3af" font-size="11">logs, spans</text>
+
+  <path class="edge" id="e-tco-dsx" d="M 440 395 L 552 358" stroke="#38bdf8" stroke-width="2" fill="none" marker-end="url(#ah-sky)">
+    <title>A policy can name one dataset explicitly</title></path>
+  <text class="elabel" x="496" y="330" text-anchor="middle" fill="#9ca3af" font-size="11">exact name</text>
+
+  <path class="edge" id="e-tco-dsp" d="M 440 420 L 552 452" stroke="#38bdf8" stroke-width="2" fill="none" marker-end="url(#ah-sky)">
+    <title>Or a name pattern, so one route fans out across every dataset the pattern creates</title></path>
+  <text class="elabel" x="500" y="408" text-anchor="middle" fill="#9ca3af" font-size="11">pattern, fans out</text>
+
+  <path class="edge" id="e-tco-fb" d="M 440 440 L 552 588" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#ah-red)">
+    <title>Data that matches no earlier rule lands in the default dataset, because the last rule in the list matches everything</title></path>
+  <text class="elabel" x="470" y="560" text-anchor="middle" fill="#9ca3af" font-size="11">no rule matched</text>
+
+  <path class="edge" id="e-dsx-cos" d="M 810 352 L 922 362" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#ah-green)">
+    <title>Stored in the bucket the matching rule names</title></path>
+  <text class="elabel" x="866" y="334" text-anchor="middle" fill="#9ca3af" font-size="11">stored</text>
+
+  <path class="edge" id="e-dsp-cos" d="M 830 442 L 922 392" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#ah-green)">
+    <title>Each dataset the pattern created is stored in the bucket its rule names, and there can be several buckets</title></path>
+  <text class="elabel" x="876" y="404" text-anchor="middle" fill="#9ca3af" font-size="11">stored</text>
+
+  <path class="edge" id="e-dsp-fwd" d="M 830 472 L 922 498" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#ah-slate)">
+    <title>Or sent to one of the streams. Data sent to a stream is not queryable, so a rule with a stream target shows no access policy.</title></path>
+  <text class="elabel" x="876" y="520" text-anchor="middle" fill="#9ca3af" font-size="11">streams</text>
+
+  <g class="node" id="n-s1" role="img" aria-label="Screen 1, physical location">
+    <title>Screen 1, Physical location: add the object storage bucket or the Event Streams topic. Retention tags are set here, per location.</title>
+    <rect x="20" y="58" width="200" height="100" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="2"/>
+    <text x="40" y="84" fill="#94a3b8" font-size="11" letter-spacing=".06em">SCREEN 1</text>
+    <text x="40" y="108" fill="#f4f4f5" font-size="15" font-weight="600">Physical location</text>
+    <text x="40" y="128" fill="#9ca3af" font-size="11.5">bucket or topic,</text>
+    <text x="40" y="145" fill="#9ca3af" font-size="11.5">plus its retention tags</text>
+  </g>
+  <g class="node" id="n-s2" role="img" aria-label="Screen 2, dataset rules, the ordered list">
+    <title>Screen 2, Dataset management: an ordered list of rules. Each rule says which names it matches, where the data is kept, its retention and its access policy. One rule can configure many datasets and the first match wins.</title>
+    <rect x="270" y="58" width="200" height="100" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="2"/>
+    <text x="290" y="84" fill="#22c55e" font-size="11" letter-spacing=".06em">SCREEN 2</text>
+    <text x="290" y="108" fill="#f4f4f5" font-size="15" font-weight="600">Dataset rules</text>
+    <text x="290" y="128" fill="#9ca3af" font-size="11.5">ordered list, first match</text>
+    <text x="290" y="145" fill="#9ca3af" font-size="11.5">wins. One rule, many datasets</text>
+  </g>
+  <g class="node" id="n-s3" role="img" aria-label="Screen 3, TCO policy">
+    <title>Screen 3, TCO: route data to a dataset, by an exact name or by a pattern.</title>
+    <rect x="520" y="58" width="200" height="100" rx="8" fill="#10202b" stroke="#38bdf8" stroke-width="2"/>
+    <text x="540" y="84" fill="#38bdf8" font-size="11" letter-spacing=".06em">SCREEN 3</text>
+    <text x="540" y="108" fill="#f4f4f5" font-size="15" font-weight="600">TCO policy</text>
+    <text x="540" y="128" fill="#9ca3af" font-size="11.5">which data goes</text>
+    <text x="540" y="145" fill="#9ca3af" font-size="11.5">to which dataset</text>
+  </g>
+
+  <g class="node" id="n-in" role="img" aria-label="Incoming data">
+    <title>Incoming data: the logs and spans the customer sends</title>
+    <rect x="20" y="372" width="190" height="80" rx="8" fill="#2a1d08" stroke="#f59e0b" stroke-width="2"/>
+    <text x="115" y="406" text-anchor="middle" fill="#f4f4f5" font-size="15" font-weight="600">Incoming data</text>
+    <text x="115" y="427" text-anchor="middle" fill="#9ca3af" font-size="11.5">logs and spans</text>
+  </g>
+  <g class="node" id="n-tco" role="img" aria-label="TCO policy at runtime">
+    <title>The TCO policy names the dataset the data is routed to. The name is an exact dataset name, or a pattern.</title>
+    <rect x="250" y="372" width="190" height="80" rx="8" fill="#10202b" stroke="#38bdf8" stroke-width="2"/>
+    <text x="345" y="406" text-anchor="middle" fill="#f4f4f5" font-size="15" font-weight="600">TCO policy</text>
+    <text x="345" y="427" text-anchor="middle" fill="#9ca3af" font-size="11.5">names a dataset</text>
+  </g>
+
+  <g class="node" id="n-dsx" role="img" aria-label="One dataset, routed by its exact name">
+    <title>Routing to one dataset by its exact name. The rule that matches that name configures it.</title>
+    <rect x="560" y="316" width="250" height="72" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="2"/>
+    <text x="580" y="344" fill="#f4f4f5" font-size="14.5" font-weight="600">One dataset, by name</text>
+    <text x="580" y="367" fill="#9ca3af" font-size="12">eng-prod</text>
+  </g>
+
+  <g class="node" id="n-dsp" role="img" aria-label="Many datasets, created by one pattern rule">
+    <title>Routing by a name pattern. One route and one rule fan out across every dataset the pattern creates: eng-01, eng-02, eng-03 and any new one that appears later.</title>
+    <rect x="576" y="430" width="250" height="72" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="1.5" opacity=".45"/>
+    <rect x="568" y="424" width="250" height="72" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="1.5" opacity=".7"/>
+    <rect x="560" y="418" width="250" height="72" rx="8" fill="#0e2318" stroke="#22c55e" stroke-width="2.5"/>
+    <text x="580" y="446" fill="#f4f4f5" font-size="14.5" font-weight="600">Many datasets, by pattern</text>
+    <text x="580" y="469" fill="#9ca3af" font-size="12">eng-01, eng-02, eng-03 …</text>
+    <text x="580" y="486" fill="#9ca3af" font-size="11.5">one rule configures all of them</text>
+  </g>
+
+  <g class="node" id="n-fb" role="img" aria-label="Default dataset, the fallback">
+    <title>The default dataset: where data lands when no earlier rule matches, because the last rule in the list matches everything. In the first phase it stays on the existing screen and is hidden from dataset management.</title>
+    <rect x="560" y="562" width="250" height="64" rx="8" fill="#2a1214" stroke="#ef4444" stroke-width="2"/>
+    <text x="580" y="590" fill="#f4f4f5" font-size="14.5" font-weight="600">Default dataset</text>
+    <text x="580" y="610" fill="#9ca3af" font-size="11.5">the last rule matches everything</text>
+  </g>
+
+  <g class="node" id="n-cos" role="img" aria-label="Object storage buckets, one or many">
+    <title>Object storage buckets. There can be several, and a rule sends its datasets to one of them. Each bucket carries its own retention tags. Data here stays queryable.</title>
+    <rect x="946" y="346" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="1.5" opacity=".45"/>
+    <rect x="938" y="338" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="1.5" opacity=".7"/>
+    <rect x="930" y="330" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="2.5"/>
+    <text x="950" y="356" fill="#f4f4f5" font-size="14.5" font-weight="600">COS buckets</text>
+    <text x="950" y="378" fill="#9ca3af" font-size="12">bucket-eu, bucket-il …</text>
+    <text x="950" y="395" fill="#9ca3af" font-size="11.5">queryable, own retention tags</text>
+  </g>
+  <g class="node" id="n-fwd" role="img" aria-label="Streams, one or many Event Streams topics">
+    <title>Streams. A rule can send its datasets to one of several Event Streams topics. Data sent to a stream leaves the platform and is not queryable, so a rule pointing at a stream shows no access policy.</title>
+    <rect x="946" y="486" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="1.5" opacity=".45"/>
+    <rect x="938" y="478" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="1.5" opacity=".7"/>
+    <rect x="930" y="470" width="230" height="76" rx="8" fill="#1b1d21" stroke="#94a3b8" stroke-width="2.5"/>
+    <text x="950" y="496" fill="#f4f4f5" font-size="14.5" font-weight="600">Streams</text>
+    <text x="950" y="518" fill="#9ca3af" font-size="12">topic-a, topic-b …</text>
+    <text x="950" y="535" fill="#9ca3af" font-size="11.5">not queryable, no access policy</text>
+  </g>
+</svg>
+</figure>
+
+<h2>THE THREE SCREENS, IN ORDER</h2>
+<div class="steps">
+  <div class="step"><b>SCREEN 1 · PHYSICAL LOCATION</b><p>Add the object storage bucket or the Event Streams topic. Retention tags are set here, per location, because each bucket keeps its own. Today there is one predefined Event Streams entry.</p></div>
+  <div class="step"><b>SCREEN 2 · DATASET RULES</b><p>Create a rule: which dataset names it matches, where the data is kept, its retention and its access policy. One rule can configure many datasets, and the list is ordered so the first match wins.</p></div>
+  <div class="step"><b>SCREEN 3 · TCO</b><p>Route data to a dataset. A dataset appears in the list once data has actually been routed to it, so a new environment starts with rules and an empty dataset list.</p></div>
+</div>
+
+<footer>
+  <div class="legend">
+    <span><i style="background:#94a3b8"></i>Physical location and targets</span>
+    <span><i style="background:#22c55e"></i>Datasets and rules</span>
+    <span><i style="background:#38bdf8"></i>TCO routing</span>
+    <span><i style="background:#f59e0b"></i>Incoming data</span>
+    <span><i style="background:#ef4444"></i>Fallback</span>
+  </div>
+  <div class="source">Concept for review, not shipped behaviour. There can be several buckets and several streams, and a rule points at one of them. Access policy on a rule is hidden when the target is a stream, because data sent to a stream cannot be queried. The default dataset stays on the existing screen in the first phase.</div>
+</footer>
+
+</div>
+<script>
+(function () {
+  var adj = {
+    "n-s1": ["n-s2"], "n-s2": ["n-s1", "n-s3"], "n-s3": ["n-s2", "n-tco"],
+    "n-in": ["n-tco"], "n-tco": ["n-in", "n-dsx", "n-dsp", "n-fb", "n-s3"],
+    "n-dsx": ["n-tco", "n-cos"], "n-dsp": ["n-tco", "n-cos", "n-fwd"],
+    "n-fb": ["n-tco"], "n-cos": ["n-dsx", "n-dsp"], "n-fwd": ["n-dsp"]
+  };
+  var pairs = {
+    "e-s1-s2": ["n-s1", "n-s2"], "e-s2-s3": ["n-s2", "n-s3"], "e-s3-tco": ["n-s3", "n-tco"],
+    "e-in-tco": ["n-in", "n-tco"], "e-tco-dsx": ["n-tco", "n-dsx"], "e-tco-dsp": ["n-tco", "n-dsp"],
+    "e-tco-fb": ["n-tco", "n-fb"], "e-dsx-cos": ["n-dsx", "n-cos"],
+    "e-dsp-cos": ["n-dsp", "n-cos"], "e-dsp-fwd": ["n-dsp", "n-fwd"]
+  };
+  var svg = document.querySelectorAll('svg')[1];
+  if (!svg) return;
+  var nodes = Array.prototype.slice.call(svg.querySelectorAll('g.node'));
+  var edges = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+  var labels = Array.prototype.slice.call(svg.querySelectorAll('text.elabel'));
+  function reset() { nodes.concat(edges).concat(labels).forEach(function (el) { el.classList.remove('dimmed'); }); }
+  function focus(id) {
+    var keep = {}; keep[id] = true;
+    (adj[id] || []).forEach(function (n) { keep[n] = true; });
+    nodes.forEach(function (el) { el.classList.toggle('dimmed', !keep[el.id]); });
+    edges.concat(labels).forEach(function (el) { el.classList.add('dimmed'); });
+    edges.forEach(function (el) {
+      var p = pairs[el.id];
+      if (p && (p[0] === id || p[1] === id)) { el.classList.remove('dimmed'); }
+    });
+  }
+  svg.addEventListener('click', function (ev) {
+    var g = ev.target.closest ? ev.target.closest('g.node') : null;
+    if (g) { focus(g.id); } else { reset(); }
+  });
+})();
+</script>
+</body>
+</html>
