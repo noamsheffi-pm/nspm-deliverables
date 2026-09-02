@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Units: billing model, cx-catalog gap, V2 plan</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#000;background-image:radial-gradient(ellipse at top,rgba(34,221,146,.05),transparent 60%);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff;padding:28px 20px 40px}
+  header{max-width:1560px;margin:0 auto 22px}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .dot{width:18px;height:18px;border-radius:50%;background:#22dd92;box-shadow:0 0 16px rgba(34,221,146,.5)}
+  .brand span{font-size:13px;letter-spacing:.04em;color:#fff}
+  h1{font-size:24px;margin:0 0 8px;font-weight:650;letter-spacing:-.01em}
+  .sub{color:#a1a1aa;font-size:14px;max-width:820px;line-height:1.5;margin:0}
+  main{max-width:1560px;margin:0 auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:8px;overflow-x:auto}
+  svg{width:100%;height:auto;min-width:1100px;display:block}
+  g.node{cursor:pointer}
+  g.node rect{transition:stroke-width .2s ease,filter .2s ease}
+  g.node:hover rect{stroke-width:3.5;filter:url(#glow)}
+  .dimmed{opacity:.18;transition:opacity .3s ease}
+  .lit{opacity:1;transition:opacity .3s ease}
+  g.node,path.edge,text.elabel{transition:opacity .3s ease}
+  footer{max-width:1560px;margin:22px auto 0}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:14px}
+  .lg{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#a1a1aa}
+  .sw{width:13px;height:13px;border-radius:4px;border:2px solid}
+  .source{color:#52525b;font-size:12px;line-height:1.6}
+  .hint{color:#52525b;font-size:12px;margin-bottom:10px}
+  @media (max-width:768px){h1{font-size:19px}.legend{gap:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="dot"></div><span>Coralogix &middot; NSPM</span></div>
+  <h1>AI Units: how we bill it, where cx-catalog stops, what Harel is building</h1>
+  <p class="sub">Token use is the only classifier. The billing model is settled. The reporting layer is not: cx-catalog shows CX units only, and the AI half waits on a usage dataset with no date.</p>
+</header>
+
+<main>
+<svg viewBox="0 0 1580 760" role="img" aria-label="AI Units billing model and cx-catalog reporting gap">
+<defs>
+  <marker id="ar-mint" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#1ab677"/></marker>
+  <marker id="ar-purple" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#A855F7"/></marker>
+  <marker id="ar-amber" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#F59E0B"/></marker>
+  <marker id="ar-red" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#EF4444"/></marker>
+  <marker id="ar-indigo" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#6366F1"/></marker>
+  <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="3" result="b"/>
+    <feFlood flood-color="#22dd92" flood-opacity="0.6" result="c"/>
+    <feComposite in="c" in2="b" operator="in" result="g"/>
+    <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<text x="40" y="34" fill="#52525b" font-size="12" letter-spacing="0.08em">THE BILLING MODEL — SETTLED 02-09</text>
+<line x1="40" y1="46" x2="1540" y2="46" stroke="#1a1a1a" stroke-width="1"/>
+<text x="40" y="430" fill="#52525b" font-size="12" letter-spacing="0.08em">WHAT CS CAN ACTUALLY SEE — THE GAP</text>
+<line x1="40" y1="442" x2="1540" y2="442" stroke="#1a1a1a" stroke-width="1"/>
+
+<!-- EDGES -->
+<path class="edge" data-e="n1-n2" d="M232,210 L296,210" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+<text class="elabel" data-e="n1-n2" x="264" y="200" fill="#a1a1aa" font-size="11" text-anchor="middle">feature use</text>
+
+<path class="edge" data-e="n2-n3" d="M516,190 C570,190 570,140 596,140" stroke="#A855F7" stroke-width="2" fill="none" marker-end="url(#ar-purple)"/>
+<text class="elabel" data-e="n2-n3" x="543" y="120" fill="#22dd92" font-size="11.5" text-anchor="middle" font-weight="600">tokens burned</text>
+
+<path class="edge" data-e="n2-n4" d="M516,232 C570,232 570,330 596,330" stroke="#A855F7" stroke-width="2" fill="none" marker-end="url(#ar-purple)"/>
+<text class="elabel" data-e="n2-n4" x="566" y="352" fill="#a1a1aa" font-size="11.5" text-anchor="middle" font-weight="600">no tokens</text>
+
+<path class="edge" data-e="n3-n5" d="M816,140 L866,140" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+<text class="elabel" data-e="n3-n5" x="841" y="130" fill="#a1a1aa" font-size="11" text-anchor="middle">one pool</text>
+
+<path class="edge" data-e="n5-n6" d="M1086,140 L1136,140" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+<text class="elabel" data-e="n5-n6" x="1111" y="130" fill="#a1a1aa" font-size="11" text-anchor="middle">one total</text>
+
+<path class="edge" data-e="n4-n7" d="M816,330 L1136,330" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+<text class="elabel" data-e="n4-n7" x="976" y="320" fill="#a1a1aa" font-size="11" text-anchor="middle">ingest, storage, query, AI Session Cloud</text>
+
+<path class="edge" data-e="n6-n8" d="M1316,140 C1370,140 1370,205 1396,205" stroke="#F59E0B" stroke-width="2" fill="none" marker-end="url(#ar-amber)"/>
+<path class="edge" data-e="n7-n8" d="M1316,330 C1370,330 1370,250 1396,250" stroke="#F59E0B" stroke-width="2" fill="none" marker-end="url(#ar-amber)"/>
+<text class="elabel" data-e="n6-n8" x="1372" y="182" fill="#a1a1aa" font-size="11" text-anchor="middle">quota line</text>
+
+<path class="edge" data-e="n8-n9" d="M1469,300 L1469,406 L210,406 L210,542" stroke="#6366F1" stroke-width="2" fill="none" marker-end="url(#ar-indigo)" stroke-dasharray="6 5"/>
+<text class="elabel" data-e="n8-n9" x="1200" y="396" fill="#a1a1aa" font-size="11" text-anchor="end">CS reads usage against these two lines</text>
+
+<path class="edge" data-e="n9-n10" d="M320,590 L376,590" stroke="#F59E0B" stroke-width="2" fill="none" marker-end="url(#ar-amber)"/>
+<text class="elabel" data-e="n9-n10" x="348" y="580" fill="#a1a1aa" font-size="11" text-anchor="middle">CX only</text>
+
+<path class="edge" data-e="n10-n11" d="M616,570 C670,570 670,520 696,520" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+<text class="elabel" data-e="n10-n11" x="666" y="504" fill="#a1a1aa" font-size="11" text-anchor="middle">CX half</text>
+
+<path class="edge" data-e="n10-n12" d="M616,612 C670,612 670,668 696,668" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+<text class="elabel" data-e="n10-n12" x="666" y="690" fill="#a1a1aa" font-size="11" text-anchor="middle">AI half</text>
+
+<path class="edge" data-e="n11-n13" d="M916,520 C970,520 970,570 996,570" stroke="#6366F1" stroke-width="2" fill="none" marker-end="url(#ar-indigo)"/>
+<path class="edge" data-e="n12-n13" d="M916,668 C970,668 970,612 996,612" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+<text class="elabel" data-e="n12-n13" x="962" y="700" fill="#a1a1aa" font-size="11" text-anchor="middle">blocks it</text>
+
+<path class="edge" data-e="n6-n12" d="M1226,180 C1226,250 806,250 806,644" stroke="#1ab677" stroke-width="1.6" fill="none" marker-end="url(#ar-mint)" stroke-dasharray="4 4"/>
+<text class="elabel" data-e="n6-n12" x="1010" y="242" fill="#22dd92" font-size="11" text-anchor="middle">needs its own AI field, name and date unknown</text>
+
+<path class="edge" data-e="n13-n14" d="M1216,590 L1276,590" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+<text class="elabel" data-e="n13-n14" x="1246" y="580" fill="#a1a1aa" font-size="11" text-anchor="middle">then</text>
+
+<!-- NODES -->
+<g class="node" id="n1" role="img" aria-label="Customer uses a Coralogix feature: any product action that may or may not call an LLM">
+  <rect x="40" y="170" width="192" height="80" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+  <text x="136" y="203" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">Customer uses</text>
+  <text x="136" y="221" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">a feature</text>
+  <text x="136" y="240" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">ingest, query, Olly, AI Center</text>
+</g>
+
+<g class="node" id="n2" role="img" aria-label="Decision: does Coralogix call an LLM. Token use is the only classifier">
+  <rect x="296" y="164" width="220" height="94" rx="12" fill="#2e1a3d" stroke="#A855F7" stroke-width="2"/>
+  <text x="406" y="194" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">Does Coralogix</text>
+  <text x="406" y="212" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">call an LLM?</text>
+  <text x="406" y="232" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">token use is the only</text>
+  <text x="406" y="246" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">classifier, not the product</text>
+</g>
+
+<g class="node" id="n3" role="img" aria-label="AI Units pool: Olly and AI Center share one pool">
+  <rect x="596" y="94" width="220" height="94" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+  <text x="706" y="124" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">AI Units</text>
+  <text x="706" y="145" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Olly + AI Center</text>
+  <text x="706" y="160" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">(Evals, Guardrails)</text>
+  <text x="706" y="177" fill="#22dd92" font-size="11.5" opacity="0.85" text-anchor="middle">one shared pool</text>
+</g>
+
+<g class="node" id="n4" role="img" aria-label="CX Units: everything that does not burn tokens, for example AI Session Cloud">
+  <rect x="596" y="288" width="220" height="86" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+  <text x="706" y="316" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">CX Units</text>
+  <text x="706" y="337" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">everything else</text>
+  <text x="706" y="356" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">e.g. AI Session Cloud</text>
+</g>
+
+<g class="node" id="n5" role="img" aria-label="entityType aggregates itself, so the sub-type name does not matter at budget level">
+  <rect x="866" y="94" width="220" height="94" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+  <text x="976" y="124" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">entityType</text>
+  <text x="976" y="142" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">self-aggregates</text>
+  <text x="976" y="161" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">aiEvaluations, agents,</text>
+  <text x="976" y="175" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">all normalize to AI units</text>
+</g>
+
+<g class="node" id="n6" role="img" aria-label="budget AI plan, exposed by Halo and cx-catalog">
+  <rect x="1136" y="106" width="180" height="74" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+  <text x="1226" y="136" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">budget AI plan</text>
+  <text x="1226" y="157" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">one field, no filtering</text>
+  <text x="1226" y="171" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">by CS</text>
+</g>
+
+<g class="node" id="n7" role="img" aria-label="budget CX plan">
+  <rect x="1136" y="296" width="180" height="70" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+  <text x="1226" y="326" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">budget CX plan</text>
+  <text x="1226" y="347" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">the existing line</text>
+</g>
+
+<g class="node" id="n8" role="img" aria-label="Contract carries CX Units and AI Units as two separate quota lines">
+  <rect x="1396" y="180" width="146" height="120" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+  <text x="1469" y="212" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">Contract</text>
+  <text x="1469" y="236" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">two separate</text>
+  <text x="1469" y="250" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">quota lines:</text>
+  <text x="1469" y="270" fill="#22dd92" font-size="11.5" text-anchor="middle">CX Units</text>
+  <text x="1469" y="286" fill="#22dd92" font-size="11.5" text-anchor="middle">AI Units</text>
+</g>
+
+<g class="node" id="n9" role="img" aria-label="cx-catalog today shows CX units only">
+  <rect x="100" y="546" width="220" height="88" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+  <text x="210" y="576" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">cx-catalog today</text>
+  <text x="210" y="597" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">source of truth for</text>
+  <text x="210" y="611" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">decentralized usage,</text>
+  <text x="210" y="625" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">replacing MyMetric</text>
+</g>
+
+<g class="node" id="n10" role="img" aria-label="The gap: no AI breakdown and no team level">
+  <rect x="376" y="542" width="240" height="96" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2.4"/>
+  <text x="496" y="572" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">The gap</text>
+  <text x="496" y="593" fill="#fff" font-size="11.5" opacity="0.85" text-anchor="middle">no AI breakdown,</text>
+  <text x="496" y="608" fill="#fff" font-size="11.5" opacity="0.85" text-anchor="middle">no team level</text>
+  <text x="496" y="627" fill="#EF4444" font-size="11.5" text-anchor="middle">CS cannot answer Shani</text>
+</g>
+
+<g class="node" id="n11" role="img" aria-label="CX half exists as the metric cx_data_plan_units_per_day, enabled per team">
+  <rect x="696" y="476" width="220" height="88" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+  <text x="806" y="504" fill="#fff" font-size="13" font-weight="650" text-anchor="middle">cx_data_plan_</text>
+  <text x="806" y="521" fill="#fff" font-size="13" font-weight="650" text-anchor="middle">units_per_day</text>
+  <text x="806" y="540" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">exists, but enabled</text>
+  <text x="806" y="554" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">per team</text>
+</g>
+
+<g class="node" id="n12" role="img" aria-label="AI half waits on Harel's V2 usage dataset, no date">
+  <rect x="696" y="624" width="220" height="88" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+  <text x="806" y="652" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">V2 usage dataset</text>
+  <text x="806" y="672" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Harel owns it, Rafael</text>
+  <text x="806" y="686" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">gave him the method</text>
+  <text x="806" y="703" fill="#EF4444" font-size="11.5" text-anchor="middle">not started</text>
+</g>
+
+<g class="node" id="n13" role="img" aria-label="data usage v2 moves into cx-catalog, behind seven workstreams, no date">
+  <rect x="996" y="546" width="220" height="96" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+  <text x="1106" y="574" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">data usage v2</text>
+  <text x="1106" y="592" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">into cx-catalog</text>
+  <text x="1106" y="612" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Harel: next big item,</text>
+  <text x="1106" y="626" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">7 workstreams first</text>
+</g>
+
+<g class="node" id="n14" role="img" aria-label="CS sees AI units per team, no date committed">
+  <rect x="1276" y="546" width="240" height="96" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+  <text x="1396" y="576" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">CS sees AI units</text>
+  <text x="1396" y="594" fill="#fff" font-size="14.5" font-weight="650" text-anchor="middle">per team</text>
+  <text x="1396" y="614" fill="#EF4444" font-size="12" font-weight="600" text-anchor="middle">NO DATE COMMITTED</text>
+  <text x="1396" y="630" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">field name still unknown</text>
+</g>
+</svg>
+</main>
+
+<footer>
+  <p class="hint">Click a box to isolate it and its connections. Click the background to reset.</p>
+  <div class="legend">
+    <div class="lg"><span class="sw" style="border-color:#22dd92;background:#0c2419"></span>Trigger / Governance</div>
+    <div class="lg"><span class="sw" style="border-color:#1ab677;background:#0c2419"></span>Processing</div>
+    <div class="lg"><span class="sw" style="border-color:#F59E0B;background:#3d2e1a"></span>Service / System</div>
+    <div class="lg"><span class="sw" style="border-color:#EF4444;background:#3d1a1a"></span>Output / Gap</div>
+    <div class="lg"><span class="sw" style="border-color:#6366F1;background:#1a1a2e"></span>Data Store</div>
+    <div class="lg"><span class="sw" style="border-color:#A855F7;background:#2e1a3d"></span>Decision</div>
+  </div>
+  <p class="source">Generated from: Shani CS sync 12:20, Rafael ad hoc 14:05, Harel ad hoc 15:14, all 2026-09-02. Vault: <code>Aporia CXAI/cx AI Units/</code>, <code>Meetings/Rafael/2026/09/</code>, <code>Meetings/Harel/2026/09/</code>.<br>Open: the AI field name in the V2 dataset, and a date. Asked in the Harel and Rafael group DM, no reply.</p>
+</footer>
+
+<script>
+(function(){
+  var adj={n1:["n2"],n2:["n1","n3","n4"],n3:["n2","n5"],n4:["n2","n7"],n5:["n3","n6"],
+           n6:["n5","n8","n12"],n7:["n4","n8"],n8:["n6","n7","n9"],n9:["n8","n10"],
+           n10:["n9","n11","n12"],n11:["n10","n13"],n12:["n10","n13","n6"],
+           n13:["n11","n12","n14"],n14:["n13"]};
+  var svg=document.querySelector('svg');
+  var nodes=Array.prototype.slice.call(svg.querySelectorAll('g.node'));
+  var edges=Array.prototype.slice.call(svg.querySelectorAll('.edge,.elabel'));
+  function reset(){nodes.forEach(function(n){n.classList.remove('dimmed','lit')});
+                   edges.forEach(function(e){e.classList.remove('dimmed','lit')});}
+  function focus(id){
+    var keep={};keep[id]=1;(adj[id]||[]).forEach(function(k){keep[k]=1});
+    nodes.forEach(function(n){n.classList.toggle('dimmed',!keep[n.id]);n.classList.toggle('lit',!!keep[n.id]);});
+    edges.forEach(function(e){
+      var p=(e.getAttribute('data-e')||'').split('-');
+      var on=p.length===2&&((p[0]===id&&keep[p[1]])||(p[1]===id&&keep[p[0]]));
+      e.classList.toggle('dimmed',!on);e.classList.toggle('lit',on);
+    });
+  }
+  svg.addEventListener('click',function(ev){
+    var g=ev.target.closest?ev.target.closest('g.node'):null;
+    if(g&&g.id){focus(g.id);}else{reset();}
+  });
+})();
+</script>
+</body>
+</html>
