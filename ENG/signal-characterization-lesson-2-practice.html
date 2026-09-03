@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#C8B99A">
+  <meta name="description" content="מסלול תרגול עצמי לשיעור 2: אותות, פורייה, Wi-Fi, ניחות, רעש ומסנן BPF">
+  <title>מסלול האות — מערכת תרגול אינטראקטיבית לשיעור 2</title>
+  <style>
+    :root{--khaki:#C8B99A;--khaki2:#B8A98A;--green:#008F4D;--green2:#00A85D;--ink:#1A1A1A;--paper:#F4EFE6;--muted:#5B5347;--red:#9C3340;--amber:#B66A1D}
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--khaki);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif}
+    button,input,select{font:inherit}
+    button{color:inherit}
+    :focus-visible{outline:4px solid var(--green);outline-offset:3px}
+    .grain{position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.065;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.67' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+    .app{height:100%;display:grid;grid-template-columns:270px 1fr;grid-template-rows:70px 1fr 64px;grid-template-areas:"top top" "side main" "side bottom"}
+    .top{grid-area:top;background:rgba(200,185,154,.97);border-bottom:3px solid var(--ink);display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:0 24px;z-index:20}
+    .brand{font-weight:900;font-size:18px;white-space:nowrap}.brand small{display:block;color:var(--green);font:700 11px "Arial Narrow",Arial,sans-serif;letter-spacing:.16em;direction:ltr;text-align:right}
+    .progress-wrap{height:14px;border:3px solid var(--ink);background:var(--paper);position:relative}.progress{height:100%;width:0;background:var(--green);transition:width .35s}.progress-label{font:700 12px Arial,sans-serif;white-space:nowrap}
+    .score-chip{background:var(--ink);color:var(--paper);border:2px solid var(--green);padding:8px 13px;transform:rotate(-3deg);font:900 14px Arial,sans-serif;white-space:nowrap}.score-chip b{color:var(--green2);font-size:20px}
+    .side{grid-area:side;background:var(--ink);color:var(--paper);border-left:3px solid var(--ink);overflow:auto;padding:18px 15px 86px;z-index:15}
+    .side h2{margin:0 5px 14px;color:var(--green2);font-size:18px}.module-nav{display:grid;gap:8px}
+    .nav-item{width:100%;border:2px solid #5b554b;background:transparent;color:var(--paper);padding:11px 10px;cursor:pointer;text-align:right;display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px}
+    .nav-item:hover{border-color:var(--paper)}.nav-item.active{background:var(--paper);color:var(--ink);border-color:var(--paper);box-shadow:5px 5px 0 var(--green)}
+    .nav-num{font:900 17px "Arial Narrow",Arial,sans-serif;color:var(--green2)}.nav-item.active .nav-num{color:var(--green)}
+    .nav-title{font-size:13px;font-weight:800}.nav-done{font-size:15px;color:var(--green2)}
+    .reset{margin-top:18px;width:100%;border:2px solid var(--paper);background:transparent;color:var(--paper);padding:9px;cursor:pointer;font-weight:700}
+    .main{grid-area:main;position:relative;overflow:hidden}
+    .module{position:absolute;inset:0;padding:34px 42px 46px;overflow:auto;opacity:0;pointer-events:none;transform:translateY(14px);transition:.28s}
+    .module.active{opacity:1;pointer-events:auto;transform:none}
+    .module-inner{max-width:1220px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+    .module-head{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;border-bottom:3px solid var(--ink);padding-bottom:13px;margin-bottom:22px}
+    .eyebrow{color:var(--green);font:900 13px "Arial Narrow",Arial,sans-serif;letter-spacing:.15em;direction:ltr;text-align:right}
+    h1,h2,h3,p{margin-top:0}.module-head h1{font-size:clamp(30px,4vw,58px);line-height:1;margin:5px 0 0;font-weight:900}.time-badge{background:var(--ink);color:var(--green2);border:2px solid var(--green);padding:7px 12px;transform:rotate(-5deg);font-weight:900;white-space:nowrap}
+    .lead{font-size:clamp(17px,1.6vw,22px);line-height:1.55;font-weight:700;max-width:930px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.stack{display:grid;gap:18px}
+    .paper{background:var(--paper);border:3px solid var(--ink);padding:22px;position:relative}.paper.offset{box-shadow:9px 9px 0 var(--green);margin-left:9px;margin-bottom:9px}.paper.khaki{background:var(--khaki2)}.paper.dark{background:var(--ink);color:var(--paper)}.paper h2{font-size:25px;margin-bottom:12px}.paper h3{font-size:19px;margin-bottom:8px}.paper p,.paper li{font-size:15px;line-height:1.55}.paper ul{padding-right:20px;margin-bottom:0}
+    .ribbon{display:inline-block;background:var(--green);color:var(--paper);padding:5px 12px;margin-bottom:10px;font-weight:900;font-size:13px}.stamp{display:inline-block;background:var(--ink);color:var(--green2);border:2px solid var(--green);padding:7px 13px;transform:rotate(-5deg);font-weight:900}
+    .hand{font-family:"Segoe Print","Comic Sans MS",cursive;color:var(--green);font-size:22px;font-weight:700;transform:rotate(-2deg);display:inline-block}
+    .formula{direction:ltr;text-align:center;background:var(--paper);border:3px solid var(--ink);padding:14px;color:var(--green);font:900 clamp(25px,3vw,43px) "Arial Narrow",Arial,sans-serif}
+    .formula.sm{font-size:clamp(20px,2.2vw,31px)}
+    .canvas-card{background:var(--paper);border:3px solid var(--ink);box-shadow:9px 9px 0 var(--green);padding:14px;min-height:330px;display:flex;flex-direction:column}
+    canvas{display:block;width:100%;height:270px;min-height:210px;background:var(--paper)}
+    .canvas-caption{border-top:2px solid var(--ink);padding-top:9px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    .controls{display:grid;gap:15px}.control label{display:flex;justify-content:space-between;gap:16px;font-weight:800;margin-bottom:7px}.value{direction:ltr;color:var(--green);font-weight:900}.control input[type=range]{width:100%;accent-color:var(--green)}.control input[type=number],.control select,.answer-input{width:100%;background:var(--paper);border:3px solid var(--ink);padding:10px;direction:ltr;font-size:16px}
+    .button-row{display:flex;gap:10px;flex-wrap:wrap}.btn{border:3px solid var(--ink);background:var(--paper);padding:10px 15px;cursor:pointer;font-weight:900;box-shadow:4px 4px 0 var(--ink)}.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}.btn.primary{background:var(--green);color:var(--paper)}.btn.dark{background:var(--ink);color:var(--paper)}.btn.selected{background:var(--green);color:var(--paper)}
+    .feedback{border:3px solid var(--ink);background:var(--khaki2);padding:13px 16px;min-height:55px;font-weight:700;line-height:1.5}.feedback.good{background:var(--green);color:var(--paper)}.feedback.bad{background:#d8a1a8}.feedback[aria-live]{scroll-margin-top:20px}
+    details{border:3px solid var(--ink);background:var(--paper)}details summary{cursor:pointer;padding:12px 15px;font-weight:900;color:var(--green)}details .deep{border-top:2px solid var(--ink);padding:15px;line-height:1.6;font-size:14px}
+    .mission-list{display:grid;grid-template-columns:repeat(4,1fr);border:3px solid var(--ink);background:var(--paper)}.mission{padding:18px;border-left:1.5px solid var(--ink)}.mission:last-child{border-left:0}.mission b{display:block;color:var(--green);font-size:28px}.mission span{font-size:14px;line-height:1.4}
+    .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.choice{border:3px solid var(--ink);background:var(--paper);padding:12px;cursor:pointer;text-align:right;font-weight:800}.choice:hover{background:var(--khaki2)}.choice.correct{background:var(--green);color:var(--paper)}.choice.wrong{background:#d8a1a8}.choice:disabled{cursor:default}
+    .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.metric{border:3px solid var(--ink);background:var(--paper);padding:15px;text-align:center}.metric strong{display:block;color:var(--green);font:900 clamp(28px,3vw,46px) "Arial Narrow",Arial,sans-serif;direction:ltr}.metric span{font-size:13px;font-weight:800}
+    .spectrum-bars{height:240px;border:3px solid var(--ink);background:var(--paper);display:flex;align-items:end;justify-content:space-around;padding:20px 30px 38px;position:relative;direction:ltr}.spectrum-bars::after{content:"f [Hz]";position:absolute;bottom:7px;right:13px;font-weight:800}.bar-stick{width:14px;background:var(--green);border:2px solid var(--ink);position:relative;min-height:2px;transition:height .2s}.bar-stick span{position:absolute;top:100%;left:50%;transform:translate(-50%,8px);font-size:12px;white-space:nowrap}.bar-stick em{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-5px);font-size:12px;font-style:normal;font-weight:900}
+    .channel-viz{height:260px;border:3px solid var(--ink);background:var(--paper);position:relative;direction:ltr;overflow:hidden}.channel-axis{position:absolute;left:6%;right:4%;bottom:42px;height:3px;background:var(--ink)}.chan{position:absolute;bottom:45px;height:135px;border:3px solid var(--ink);background:rgba(0,143,77,.72);transition:.25s}.chan.neighbor{height:100px;background:rgba(184,169,138,.8);border-style:dashed}.chan-label{position:absolute;top:10px;left:12px;font-weight:900}
+    .instrument-tabs{display:flex;gap:10px;margin-bottom:14px}.instrument-screen{background:var(--ink);border:5px solid #484238;padding:14px}.instrument-screen canvas{background:#101713;height:300px}
+    .stepper{display:grid;grid-template-columns:repeat(4,1fr);border:3px solid var(--ink)}.step{padding:15px;background:var(--paper);border-left:1.5px solid var(--ink)}.step:last-child{border-left:0}.step b{display:block;color:var(--green);font-size:29px}.step span{font-size:13px;line-height:1.4}
+    .equation{direction:ltr;text-align:center;font:900 clamp(21px,2.5vw,35px) "Arial Narrow",Arial,sans-serif;background:var(--ink);color:var(--paper);padding:17px;border:3px solid var(--green)}.answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.answer-grid label{font-weight:800;font-size:13px}.answer-grid input{margin-top:6px}
+    .trap-card{background:var(--paper);border:3px solid var(--ink);padding:18px}.trap-card h3{color:var(--green)}.trap-card .mini{font-size:13px;color:var(--muted)}
+    .bottom{grid-area:bottom;border-top:3px solid var(--ink);background:rgba(200,185,154,.97);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:20}.bottom .center{font-size:13px;font-weight:800;color:var(--muted)}
+    .confetti{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}.confetti i{position:absolute;width:10px;height:22px;background:var(--green);animation:fall 1.5s ease-out forwards}@keyframes fall{from{transform:translateY(-30px) rotate(0);opacity:1}to{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+    .readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.readout{border:3px solid var(--ink);background:var(--paper);padding:10px;text-align:center}.readout small{display:block;font-weight:800}.readout strong{display:block;color:var(--green);font-size:20px;direction:ltr}
+    .room-card,.filter-card{background:var(--paper);border:3px solid var(--ink);box-shadow:9px 9px 0 var(--green);padding:12px}.room-card canvas,.filter-card canvas{height:340px;touch-action:none}
+    .status-card{border:4px solid var(--ink);background:var(--paper);padding:10px;text-align:center;font-weight:800}.status-card strong{display:block;font-size:30px}.status-card.clear{background:var(--green);color:var(--paper)}.status-card.mid{background:#D6B956}.status-card.bad{background:#C8747D}
+    .quality{height:22px;border:3px solid var(--ink);background:var(--paper);position:relative;direction:ltr}.quality i{display:block;height:100%;width:0;background:var(--green);transition:width .2s}.quality span{position:absolute;inset:0;text-align:center;font-size:12px;font-weight:900;line-height:16px}
+    .micro-btn.active{background:var(--red);color:var(--paper)}select{background:var(--paper);border:3px solid var(--ink);padding:9px;width:100%;font-weight:800}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){html,body{overflow:auto}.app{min-height:100%;height:auto;grid-template-columns:1fr;grid-template-rows:auto auto minmax(650px,1fr) auto;grid-template-areas:"top" "side" "main" "bottom"}.top{grid-template-columns:1fr auto;padding:12px 15px}.top .progress-wrap{grid-column:1/-1}.side{display:flex;padding:10px;overflow-x:auto;border-left:0;border-bottom:3px solid var(--ink)}.side h2,.reset{display:none}.module-nav{display:flex;gap:7px}.nav-item{min-width:155px}.main{min-height:760px}.module{padding:24px 17px 40px}.module-head{grid-template-columns:1fr}.time-badge{justify-self:start}.grid2,.grid3,.metric-row,.answer-grid{grid-template-columns:1fr}.mission-list,.stepper{grid-template-columns:1fr 1fr}.bottom{padding:10px 14px;gap:9px}.bottom .center{display:none}.canvas-card{min-height:300px}.choice-grid{grid-template-columns:1fr}}
+    @media(max-width:520px){.brand{font-size:15px}.score-chip{padding:5px 8px}.mission-list,.stepper{grid-template-columns:1fr}.top{position:sticky;top:0}.bottom{position:sticky;bottom:0}.module-head h1{font-size:31px}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="app">
+  <header class="top">
+    <div class="brand">מסלול האות <small>UNIFIED COMMUNICATION LAB · LESSON 02</small></div>
+    <div><div class="progress-wrap" id="progressWrap" role="progressbar" aria-label="התקדמות" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><div class="progress" id="progress"></div></div><div class="progress-label" id="progressLabel">0 מתוך 8 מעבדות הושלמו</div></div>
+    <div class="score-chip">נקודות <b id="score">0</b> / 93</div>
+  </header>
+
+  <aside class="side">
+    <h2>מסלול הלמידה</h2>
+    <nav class="module-nav" id="moduleNav" aria-label="מעבדות">
+      <button class="nav-item active" data-go="0"><span class="nav-num">00</span><span class="nav-title">תחנת פתיחה</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="1"><span class="nav-num">01</span><span class="nav-title">בונים אות</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="2"><span class="nav-num">02</span><span class="nav-title">מחזורי או אקראי?</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="3"><span class="nav-num">03</span><span class="nav-title">זמן מול תדר</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="4"><span class="nav-num">04</span><span class="nav-title">מערבל הרמוניות</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="5"><span class="nav-num">05</span><span class="nav-title">רוחב פס ו־Wi‑Fi</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="6"><span class="nav-num">06</span><span class="nav-title">גל, מרחק וקיר</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="7"><span class="nav-num">07</span><span class="nav-title">רעש ומסנן BPF</span><span class="nav-done"></span></button>
+      <button class="nav-item" data-go="8"><span class="nav-num">08</span><span class="nav-title">משימת הסיום</span><span class="nav-done"></span></button>
+    </nav>
+    <button class="reset" id="resetBtn">איפוס התקדמות</button>
+  </aside>
+
+  <main class="main">
+    <section class="module active" data-module="0">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">SELF-PACED SIGNAL LAB · START</div><h1>מהסינוס ועד הודעת ה־Wi‑Fi</h1></div><div class="time-badge">55–80 MIN</div></header>
+        <p class="lead">קובץ הסיכום של שיעור 2: בונים אות, מפרקים אותו לתדרים, שולחים אותו דרך קיר, מכניסים הפרעה ומחלצים את המידע. בכל תחנה מנבאים, משנים, רואים ומסבירים.</p>
+        <div class="mission-list">
+          <div class="mission"><b>01</b><span>משנים פרמטר ורואים את הגל בזמן אמת.</span></div>
+          <div class="mission"><b>02</b><span>מפרקים אות מורכב לרכיבי תדר.</span></div>
+          <div class="mission"><b>03</b><span>מקשרים תדר, אורך גל וקירות ל־Wi‑Fi.</span></div>
+          <div class="mission"><b>04</b><span>מחלצים מידע בעזרת מסנן ומסבירים תקלה.</span></div>
+        </div>
+        <div class="grid2" style="margin-top:24px">
+          <div class="paper offset"><span class="ribbon">איך עובדים?</span><ol><li>קודם מנבאים — אחר כך מזיזים את הבקר.</li><li>קוראים את המשוב ואת “למה זה קורה”.</li><li>מסיימים את האתגר כדי לסמן מעבדה כהושלמה.</li><li>אפשר לחזור על כל סימולציה; הניקוד ניתן בהשלמה הראשונה.</li></ol></div>
+          <div class="paper dark"><span class="stamp">THE BIG IDEA</span><h2 style="margin-top:18px;color:var(--green2)">אל תבלבלו בין השלושה</h2><p><b>מסר</b> הוא מה שרוצים להעביר; <b>מידע</b> הוא התוכן והמשמעות; <b>אות</b> הוא הגודל הפיזיקלי שמשתנה בזמן ונושא אותם דרך המערכת.</p><span class="hand">הגל הוא השליח</span></div>
+        </div>
+        <div style="margin-top:auto;padding-top:25px"><button class="btn primary" data-next>התחילו במעבדה 1 ←</button></div>
+      </div>
+    </section>
+
+    <section class="module" data-module="1">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 01 · SIGNAL ANATOMY</div><h1>בנו גל סינוס וגלו מה כל פרמטר עושה</h1></div><div class="time-badge">8–10 MIN</div></header>
+        <div class="grid2">
+          <div class="canvas-card"><canvas id="signalCanvas" aria-label="גרף אות סינוס בחלון זמן קבוע של 0.6 שנייה"></canvas><div class="canvas-caption"><span id="signalEquation">x(t)=2 sin(2π·5t)</span><span id="signalPeriod">T=0.200 s · 3 מחזורים בחלון</span><span>חלון זמן קבוע: 0–0.6s</span></div></div>
+          <div class="stack">
+            <div class="paper">
+              <div class="controls">
+                <div class="control"><label for="amp"><span>תנופה A</span><span class="value" id="ampVal">2.0 V</span></label><input id="amp" type="range" min=".5" max="5" step=".1" value="2"></div>
+                <div class="control"><label for="freq"><span>תדר f</span><span class="value" id="freqVal">5 Hz</span></label><input id="freq" type="range" min="1" max="12" step="1" value="5"></div>
+                <div class="control"><label for="phase"><span>מופע φ</span><span class="value" id="phaseVal">0°</span></label><input id="phase" type="range" min="-180" max="180" step="15" value="0"></div>
+                <div class="control"><label for="offset"><span>רכיב DC</span><span class="value" id="offsetVal">0.0 V</span></label><input id="offset" type="range" min="-2" max="2" step=".25" value="0"></div>
+              </div>
+            </div>
+            <div class="formula sm">x(t)=D + A sin(2πft + φ)</div>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:22px">
+          <div class="paper khaki"><h3>ניסוי חובה</h3><p>הכפילו את התדר מ־5Hz ל־10Hz בלי לשנות תנופה. מה קורה למספר המחזורים ולזמן המחזור?</p><div class="choice-grid"><button class="choice lab1q" data-ok="1">מספר המחזורים מוכפל ו־T נחצה</button><button class="choice lab1q">התנופה מוכפלת</button><button class="choice lab1q">המופע מתאפס</button><button class="choice lab1q">אין שינוי בצורה</button></div></div>
+          <div><div class="feedback" id="lab1Feedback" aria-live="polite">שנו את הבקרים ואז בחרו תשובה.</div><details style="margin-top:14px"><summary>העמקה: למה מופע אינו משנה תדר?</summary><div class="deep">המופע φ מזיז את אותה צורה שמאלה או ימינה בזמן. המרחק בין שתי נקודות זהות בגל נשאר T, ולכן מספר המחזורים בשנייה אינו משתנה. גם התנופה נשארת A.</div></details></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="module" data-module="2">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 02 · PERIODIC OR RANDOM</div><h1>האם אפשר לחזות את החלק הבא של האות?</h1></div><div class="time-badge">6–8 MIN</div></header>
+        <div class="grid2">
+          <div class="canvas-card"><canvas id="classCanvas" aria-label="אות לסיווג כמחזורי או אקראי"></canvas><div class="canvas-caption"><span>סיבוב <b id="roundNum">1</b> מתוך 6</span><span id="classHint">חפשו חזרה מדויקת של הצורה</span></div></div>
+          <div class="stack">
+            <div class="paper offset"><span class="ribbon">כלל ההכרעה</span><div class="formula sm">x(t)=x(t+T)</div><p>אות מחזורי חוזר בדיוק לאחר T קבוע. דמיון כללי אינו מספיק; כל הצורה חייבת להתאים.</p></div>
+            <div class="button-row"><button class="btn primary" id="periodicBtn">מחזורי</button><button class="btn dark" id="randomBtn">אקראי / לא מחזורי</button><button class="btn" id="newClassBtn">אות הבא</button></div>
+            <div class="feedback" id="classFeedback" aria-live="polite">בחרו סיווג והסבירו לעצמכם מה הייתה הראיה.</div>
+            <div class="metric-row"><div class="metric"><strong id="classCorrect">0</strong><span>תשובות נכונות</span></div><div class="metric"><strong id="classStreak">0</strong><span>רצף</span></div><div class="metric"><strong>6</strong><span>סיבובים להשלמה</span></div></div>
+          </div>
+        </div>
+        <details style="margin-top:22px"><summary>העמקה: מדוע אות דיבור נחשב אקראי?</summary><div class="deep">לא מפני שאין בו כלל מבנה, אלא מפני שלא ניתן לחזות במדויק את הערך הבא מתוך מחזור קבוע. לדיבור יש מאפיינים סטטיסטיים וטווח תדרים, אבל המשפט הבא והצורה המדויקת של גל המתח אינם חוזרים באופן דטרמיניסטי.</div></details>
+      </div>
+    </section>
+
+    <section class="module" data-module="3">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 03 · TWO VIEWS, ONE SIGNAL</div><h1>תחום הזמן אומר “מתי”; תחום התדר אומר “ממה”</h1></div><div class="time-badge">7–9 MIN</div></header>
+        <div class="grid2">
+          <div class="canvas-card"><span class="ribbon">TIME DOMAIN</span><canvas id="timeCanvas" aria-label="האות בתחום הזמן"></canvas><div class="canvas-caption"><span>ציר x: זמן [ms]</span><span>ציר y: מתח [V]</span></div></div>
+          <div class="canvas-card"><span class="ribbon">FREQUENCY DOMAIN</span><canvas id="freqCanvas" aria-label="ספקטרום התנופה"></canvas><div class="canvas-caption"><span>ציר x: תדר [Hz]</span><span>ציר y: תנופה [V]</span></div></div>
+        </div>
+        <div class="paper khaki" style="margin-top:22px">
+          <h3>אות נוכחי: שני רכיבים סינוסואידליים</h3><div class="formula sm">x(t)=3sin(2π·500t)+2sin(2π·1500t+30°)</div>
+          <div class="choice-grid" style="margin-top:13px"><button class="choice lab3q">בזמן רואים ישירות שתי מחטים</button><button class="choice lab3q" data-ok="1">בתדר רואים ישירות אילו סינוסים מרכיבים את האות</button><button class="choice lab3q">המופע קובע את גובה מחט התנופה</button><button class="choice lab3q">שני התחומים מתארים אותות שונים</button></div>
+        </div>
+        <div class="feedback" id="lab3Feedback" aria-live="polite" style="margin-top:13px">בחרו את המשפט המדויק ביותר.</div>
+      </div>
+    </section>
+
+    <section class="module" data-module="4">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 04 · HARMONIC MIXER</div><h1>ערבבו הרמוניות ובנו צורת גל מורכבת</h1></div><div class="time-badge">8–12 MIN</div></header>
+        <div class="grid2">
+          <div class="stack">
+            <div class="canvas-card"><canvas id="mixCanvas" aria-label="אות המורכב מסכום הרמוניות"></canvas><div class="canvas-caption"><span id="mixLabel">f₀=100 Hz</span><span>האות עדיין מחזורי</span></div></div>
+            <div class="button-row"><button class="btn preset" data-preset="sine">סינוס טהור</button><button class="btn preset" data-preset="square">קירוב לריבוע</button><button class="btn preset" data-preset="custom">תערובת</button></div>
+          </div>
+          <div class="paper offset">
+            <div class="control"><label for="baseFreq"><span>תדר יסודי f₀</span><span class="value" id="baseFreqVal">100 Hz</span></label><input id="baseFreq" type="range" min="50" max="500" step="50" value="100"></div>
+            <div class="control"><label for="h1"><span>הרמוניה 1 · f₀</span><span class="value" id="h1Val">1.00</span></label><input id="h1" type="range" min="0" max="1" step=".05" value="1"></div>
+            <div class="control"><label for="h2"><span>הרמוניה 2 · 2f₀</span><span class="value" id="h2Val">0.00</span></label><input id="h2" type="range" min="0" max="1" step=".05" value="0"></div>
+            <div class="control"><label for="h3"><span>הרמוניה 3 · 3f₀</span><span class="value" id="h3Val">0.33</span></label><input id="h3" type="range" min="0" max="1" step=".05" value=".33"></div>
+            <div class="control"><label for="h5"><span>הרמוניה 5 · 5f₀</span><span class="value" id="h5Val">0.20</span></label><input id="h5" type="range" min="0" max="1" step=".05" value=".2"></div>
+            <div class="spectrum-bars" id="mixSpectrum" style="height:180px;margin-top:16px"></div>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:22px">
+          <div class="paper khaki"><h3>אתגר</h3><p>בחרו “קירוב לריבוע”. מדוע הקצוות נעשים חדים יותר כשמוסיפים הרמוניות אי־זוגיות?</p><div class="choice-grid"><button class="choice lab4q" data-ok="1">התדרים הגבוהים מאפשרים שינוי מהיר יותר בזמן</button><button class="choice lab4q">התדר היסודי נעלם</button><button class="choice lab4q">זמן המחזור גדל</button><button class="choice lab4q">כל ההרמוניות הופכות ל־DC</button></div></div>
+          <div><div class="feedback" id="lab4Feedback" aria-live="polite">נסו קודם את המצבים המוכנים ואז ענו.</div><details style="margin-top:14px"><summary>העמקה: פורייה במשפט אחד</summary><div class="deep">כל אות מחזורי מעשי ניתן לייצוג כסכום של סינוסים בתדר היסודי ובכפולות שלמות שלו. ככל שנדרשת צורה חדה יותר בזמן, נדרשים בדרך כלל רכיבי תדר גבוהים יותר — ולכן רוחב פס גדול יותר.</div></details></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="module" data-module="5">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 05 · BANDWIDTH & WIFI</div><h1>ערוץ רחב יכול להעביר יותר — וגם להפריע ליותר שכנים</h1></div><div class="time-badge">7–10 MIN</div></header>
+        <div class="grid2">
+          <div class="stack">
+            <div class="channel-viz"><div class="chan-label">ספקטרום ערוץ סכמטי</div><div class="channel-axis"></div><div class="chan" id="myChan"></div><div class="chan neighbor" id="neighborChan"></div></div>
+            <div class="button-row"><button class="btn widthBtn selected" data-width="20">20 MHz</button><button class="btn widthBtn" data-width="40">40 MHz</button><button class="btn widthBtn" data-width="80">80 MHz</button></div>
+          </div>
+          <div class="stack">
+            <div class="formula sm">BW=f<sub>max</sub>−f<sub>min</sub></div>
+            <div class="metric-row"><div class="metric"><strong id="bwValue">20</strong><span>MHz רוחב ערוץ</span></div><div class="metric"><strong id="overlapValue">נמוכה</strong><span>חפיפה צפויה</span></div><div class="metric"><strong id="capacityValue">בסיסי</strong><span>פוטנציאל קצב</span></div></div>
+            <div class="feedback" id="bwFeedback" aria-live="polite">20MHz תופס פחות ספקטרום. בדירה צפופה הוא עשוי להיות יציב יותר, אף שפוטנציאל הקצב נמוך יותר.</div>
+            <div class="paper"><h3>אל תערבבו</h3><ul><li><b>5GHz</b> — תחום תדרי העבודה/הנושא.</li><li><b>80MHz</b> — רוחב הערוץ שהאות תופס.</li><li><b>−67dBm</b> — הספק האות שמגיע למקלט.</li></ul></div>
+          </div>
+        </div>
+        <div class="paper khaki" style="margin-top:22px"><h3>החלטת מהנדס</h3><p>בדירה עם 12 רשתות שכנות יש ניתוקים בערוץ 80MHz. מה הצעד הראשון הסביר לבדיקה?</p><div class="choice-grid"><button class="choice lab5q" data-ok="1">לנסות 40MHz או 20MHz ולמדוד שוב</button><button class="choice lab5q">להגדיל תמיד ל־160MHz</button><button class="choice lab5q">להחליף את יחידת dBm ל־Mbps</button><button class="choice lab5q">להוריד את התדר ל־0Hz</button></div><div class="feedback" id="lab5Feedback" aria-live="polite" style="margin-top:12px">בחרו פעולה והסבירו איזו פשרה היא יוצרת.</div></div>
+      </div>
+    </section>
+
+    <section class="module" data-module="6">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 06 · THE PHYSICAL WAVE</div><h1>מה קורה לגל בדרך מהנתב לטלפון?</h1></div><div class="time-badge">8–10 MIN</div></header>
+        <div class="grid2">
+          <div class="stack">
+            <div class="room-card"><canvas id="roomCanvas" aria-label="גל נע מהנתב אל הטלפון דרך קיר"></canvas></div>
+            <div class="feedback" id="roomNote">כיוון ההתפשטות מסומן בחץ: מהנתב משמאל אל הטלפון מימין.</div>
+          </div>
+          <div class="stack">
+            <div class="paper offset controls">
+              <div class="control"><label for="roomAmp"><span>תנופה A</span><span class="value" id="roomAmpVal">0.80</span></label><input id="roomAmp" type="range" min=".2" max="1" step=".05" value=".8"></div>
+              <div class="control"><label for="roomFreq"><span>תדר נושא f</span><span class="value" id="roomFreqVal">2.40 GHz</span></label><input id="roomFreq" type="range" min="2.4" max="5.8" step=".1" value="2.4"></div>
+              <div class="control"><label for="wallMat"><span>המכשול בדרך</span></label><select id="wallMat"><option value="none">קו ראייה — ללא קיר</option><option value="dry">קיר גבס</option><option value="concrete">קיר בטון</option></select></div>
+              <div class="button-row"><button class="btn room-mode selected" data-room-mode="carrier">גל נושא</button><button class="btn room-mode" data-room-mode="am">נושא מידע</button></div>
+            </div>
+            <div class="readouts"><div class="readout"><small>T</small><strong id="roomT">0.417 ns</strong></div><div class="readout"><small>λ</small><strong id="roomLambda">12.49 cm</strong></div><div class="readout"><small>הפסד</small><strong id="roomLoss">0.0 dB</strong></div><div class="readout"><small>תנופה במקלט</small><strong id="roomRx">0.80</strong></div></div>
+            <div class="formula sm">T=1/f &nbsp; · &nbsp; λ=c/f</div>
+          </div>
+        </div>
+        <div class="paper khaki" style="margin-top:22px"><h3>ניסוי</h3><p>בחרו קיר בטון והשוו בין 2.4GHz ל־5.8GHz. איזה משפט מתאר את מה שראיתם?</p><div class="choice-grid"><button class="choice lab6q" data-ok="1">התדר הגבוה מקצר את T ואת λ, ובמודל סובל מניחות גדול יותר</button><button class="choice lab6q">התדר הגבוה מגדיל את λ</button><button class="choice lab6q">הקיר מגביר את האות</button><button class="choice lab6q">תדר ותנופה הם אותו גודל</button></div><div class="feedback" id="lab6Feedback" aria-live="polite" style="margin-top:12px">שנו את התדר והקיר לפני שתענו.</div></div>
+        <details style="margin-top:18px"><summary>העמקה: האם 5GHz תמיד מהיר יותר?</summary><div class="deep">לא בהכרח. תדר הנושא לבדו אינו קובע קצב. רוחב הערוץ, שיטת האפנון והקידוד, SNR, עומס הרשת ומספר הזרמים חשובים גם הם. תדר גבוה מאפשר הקצאות רחבות יותר במערכות מסוימות, אך החדירה דרך מכשולים עלולה להיות חלשה יותר.</div></details>
+      </div>
+    </section>
+
+    <section class="module" data-module="7">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">LAB 07 · FILTER THE NOISE</div><h1>חלצו את ה־Wi‑Fi מתוך הרעש</h1></div><div class="time-badge">10–14 MIN</div></header>
+        <div class="grid2">
+          <div class="stack">
+            <div class="filter-card"><canvas id="filterCanvas" aria-label="מנתח ספקטרום עם אות, מיקרוגל ומסנן BPF שניתן לגרירה"></canvas></div>
+            <div class="status-card clear" id="rxStatus"><strong>SIGNAL CLEAR</strong><span>האות עובר וה־SNR גבוה.</span></div>
+            <div class="quality"><i id="qualityFill"></i><span id="qualityText">איכות 100%</span></div>
+          </div>
+          <div class="stack">
+            <div class="paper offset controls">
+              <div class="control"><label><span>ערוץ האות הרצוי</span></label><div class="button-row"><button class="btn filt-channel" data-filt-channel="1">CH 1</button><button class="btn filt-channel selected" data-filt-channel="6">CH 6</button><button class="btn filt-channel" data-filt-channel="11">CH 11</button></div></div>
+              <div class="control"><label for="signalPower"><span>עוצמת אות</span><span class="value" id="signalPowerVal">−58 dBm</span></label><input id="signalPower" type="range" min="-78" max="-42" value="-58" step="1"></div>
+              <div class="control"><label for="filterWidth"><span>רוחב BPF</span><span class="value" id="filterWidthVal">22 MHz</span></label><input id="filterWidth" type="range" min="8" max="45" value="22" step="1"></div>
+              <button class="btn micro-btn" id="microwaveBtn" aria-pressed="false">הפעילו מיקרוגל ב־2.45GHz</button>
+            </div>
+            <div class="readouts"><div class="readout"><small>מרכז BPF</small><strong id="filterCenterOut">2.437 GHz</strong></div><div class="readout"><small>כיסוי מידע</small><strong id="coverageOut">100%</strong></div><div class="readout"><small>רעש</small><strong id="noiseOut">−95.6 dBm</strong></div><div class="readout"><small>SNR</small><strong id="snrOut">37.6 dB</strong></div></div>
+            <div class="feedback">גררו את המסגרת הירוקה בספקטרום. מסנן צר מדי חותך מידע; מסנן רחב מדי מכניס יותר רעש.</div>
+          </div>
+        </div>
+        <div class="paper khaki" style="margin-top:22px"><h3>משימת חילוץ</h3><p>הפעילו את המיקרוגל והשיגו SIGNAL CLEAR עם לפחות 95% כיסוי מידע.</p><button class="btn primary" id="checkFilter">בדיקת התוצאה</button><div class="feedback" id="lab7Feedback" aria-live="polite" style="margin-top:12px">רמז: אם ההפרעה חופפת לאות, מסנן לבדו אינו מספיק—נסו ערוץ אחר.</div></div>
+        <details style="margin-top:18px"><summary>העמקה: כיצד מחושב SNR?</summary><div class="deep">SNR הוא ההפרש בדציבלים בין הספק האות להספק הרעש הכולל בתוך המסנן. הרחבת המסנן מכניסה יותר רעש. אם המיקרוגל חופף לחלון המסנן, ההפרעה מצטרפת לרעש ועלולה להוריד את ה־SNR מתחת לסף קליטה שימושי.</div></details>
+      </div>
+    </section>
+
+    <section class="module" data-module="8">
+      <div class="module-inner">
+        <header class="module-head"><div><div class="eyebrow">FINAL MISSION · EXPLAIN THE INVISIBLE</div><h1>הסבירו את המסע מהמסר אל המקלט</h1></div><div class="time-badge">8–12 MIN</div></header>
+        <div class="grid2">
+          <div class="paper offset"><span class="ribbon">התרחיש</span><h2>וידאו נתקע בחדר המרוחק</h2><p>הטלפון מחובר ל־Wi‑Fi, בין הנתב לטלפון יש קיר בטון, ערוץ 6 פעיל, והמיקרוגל מופעל. בנו אבחנה שמשתמשת בכל שכבות המודל.</p><h3>סמנו את ארבע אבני הבניין</h3><div class="choice-grid" id="finalChoices"><button class="choice final-choice" data-key="wave">תדר גבוה מקצר T ואת λ</button><button class="choice final-choice" data-key="wall">הקיר גורם לניחות</button><button class="choice final-choice" data-key="bandwidth">וידאו דורש רוחב פס</button><button class="choice final-choice" data-key="noise">חפיפה מורידה SNR</button></div></div>
+          <div class="stack">
+            <div class="paper dark"><h2 style="color:var(--green2)">מסגרת הסבר</h2><p><b>מסר:</b> איזה מידע מנסים להעביר?<br><b>אות:</b> מהו התדר ורוחב הפס?<br><b>ערוץ:</b> מה הקיר והרעש עושים?<br><b>מקלט:</b> כיצד BPF ו־SNR קובעים אם המידע מתקבל?</p></div>
+            <label class="paper"><b>הסבר במילים שלכם</b><textarea id="finalText" rows="7" style="width:100%;margin-top:10px;border:3px solid var(--ink);background:var(--paper);padding:10px;font:16px/1.5 Arial,sans-serif" placeholder="כתבו לפחות שני משפטים שמקשרים בין קיר, רוחב פס, רעש ו־SNR..."></textarea></label>
+            <button class="btn primary" id="finishBtn">בדיקת משימת הסיום</button>
+            <div class="feedback" id="finalFeedback" aria-live="polite">סמנו את ארבע אבני הבניין וכתבו הסבר של לפחות שני משפטים.</div>
+          </div>
+        </div>
+        <details style="margin-top:22px"><summary>פתרון אפשרי — פתחו רק אחרי שכתבתם</summary><div class="deep">וידאו דורש קצב נתונים ורוחב פס משמעותיים. קיר הבטון מנחית את האות, והמיקרוגל חופף לחלק מתחום 2.4GHz ולכן מגדיל את הרעש ומקטין SNR. יש למדוד במישור התדר, לנסות ערוץ שאינו חופף, למקם BPF כך שיעביר את כל האות, ולבחון מיקום טוב יותר לנתב. אות חזק לבדו אינו מבטיח קצב גבוה.</div></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <button class="btn" id="prevBtn">→ הקודם</button>
+    <div class="center" id="moduleLabel">תחנת פתיחה · למידה עצמית</div>
+    <button class="btn primary" id="nextBtn">הבא ←</button>
+  </footer>
+</div>
+
+<script>
+(()=>{
+  const moduleNames=['תחנת פתיחה','בונים אות','מחזורי או אקראי?','זמן מול תדר','מערבל הרמוניות','רוחב פס ו־Wi‑Fi','גל, מרחק וקיר','רעש ומסנן BPF','משימת הסיום'];
+  const modules=[...document.querySelectorAll('.module')],nav=[...document.querySelectorAll('.nav-item')];
+  const state={current:0,score:0,done:Array(9).fill(false),classRound:0,classCorrect:0,classStreak:0,classAnswered:false,finalKeys:new Set(),roomPhase:0,roomMode:'carrier',filterChannel:6,signalPower:-58,microwave:false,filterCenter:2.437,filterBW:22};
+  const E=Object.fromEntries([...document.querySelectorAll('[id]')].map(el=>[el.id,el]));
+  const {amp,freq,phase,offset,ampVal,freqVal,phaseVal,offsetVal,signalEquation,signalPeriod,signalCanvas,
+    classCanvas,roundNum,classFeedback,classCorrect,classStreak,periodicBtn,randomBtn,newClassBtn,
+    timeCanvas,freqCanvas,baseFreq,baseFreqVal,h1,h2,h3,h5,h1Val,h2Val,h3Val,h5Val,mixCanvas,mixLabel,mixSpectrum,
+    myChan,neighborChan,bwValue,overlapValue,capacityValue,bwFeedback,roomCanvas,roomAmp,roomFreq,wallMat,roomAmpVal,roomFreqVal,roomT,roomLambda,roomLoss,roomRx,
+    filterCanvas,signalPower,signalPowerVal,filterWidth,filterWidthVal,microwaveBtn,filterCenterOut,coverageOut,noiseOut,snrOut,rxStatus,qualityFill,qualityText,checkFilter,
+    finalText,finalFeedback,finishBtn}=E;
+  try{const saved=JSON.parse(localStorage.getItem('unifiedSignalLabV2'));if(saved){state.score=saved.score||0;state.done=(saved.done||state.done).slice(0,9);while(state.done.length<9)state.done.push(false);state.current=Math.max(0,Math.min(8,saved.current||0));state.classRound=saved.classRound||0;state.classCorrect=saved.classCorrect||0;state.classStreak=saved.classStreak||0;state.finalKeys=new Set(saved.finalKeys||[]);if(saved.finalText)finalText.value=saved.finalText}}catch(e){}
+  function save(){try{localStorage.setItem('unifiedSignalLabV2',JSON.stringify({score:state.score,done:state.done,current:state.current,classRound:state.classRound,classCorrect:state.classCorrect,classStreak:state.classStreak,finalKeys:[...state.finalKeys],finalText:finalText.value}))}catch(e){}}
+  function paintState(){
+    document.getElementById('score').textContent=state.score;
+    const count=state.done.slice(1).filter(Boolean).length;
+    document.getElementById('progress').style.width=(count/8*100)+'%';
+    document.getElementById('progressLabel').textContent=count+' מתוך 8 מעבדות הושלמו';
+    document.getElementById('progressWrap').setAttribute('aria-valuenow',count);
+    nav.forEach((b,i)=>{b.classList.toggle('active',i===state.current);b.querySelector('.nav-done').textContent=state.done[i]?'✓':''});
+    document.querySelectorAll('.final-choice').forEach(b=>b.classList.toggle('correct',state.finalKeys.has(b.dataset.key)));
+    document.getElementById('moduleLabel').textContent=moduleNames[state.current]+' · למידה עצמית';
+    document.getElementById('prevBtn').disabled=state.current===0;
+    document.getElementById('nextBtn').disabled=state.current===modules.length-1;
+  }
+  function go(i){state.current=Math.max(0,Math.min(modules.length-1,i));modules.forEach((m,n)=>m.classList.toggle('active',n===state.current));paintState();save();modules[state.current].scrollTop=0;setTimeout(redrawAll,30)}
+  function award(module,points){
+    if(!state.done[module]){state.done[module]=true;state.score+=points;save();paintState();burst()}
+  }
+  function burst(){const box=document.getElementById('confetti');box.innerHTML='';for(let i=0;i<28;i++){const x=document.createElement('i');x.style.left=(Math.random()*100)+'vw';x.style.animationDelay=(Math.random()*.25)+'s';x.style.background=i%3===0?'#008F4D':i%3===1?'#1A1A1A':'#F4EFE6';box.appendChild(x)}setTimeout(()=>box.innerHTML='',1900)}
+  nav.forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.go))));
+  document.getElementById('prevBtn').addEventListener('click',()=>go(state.current-1));
+  document.getElementById('nextBtn').addEventListener('click',()=>go(state.current+1));
+  document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(state.current+1)));
+  document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(e.key==='ArrowLeft')go(state.current+1);if(e.key==='ArrowRight')go(state.current-1)});
+  document.getElementById('resetBtn').addEventListener('click',()=>{if(confirm('לאפס את הציון וההתקדמות?')){localStorage.removeItem('unifiedSignalLabV2');location.reload()}});
+
+  function fit(canvas){
+    const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),w=Math.max(300,r.width),h=Math.max(210,r.height);
+    if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
+    const c=canvas.getContext('2d');c.setTransform(d,0,0,d,0,0);return{c,w,h};
+  }
+  function colors(){const s=getComputedStyle(document.documentElement);return{ink:s.getPropertyValue('--ink').trim(),paper:s.getPropertyValue('--paper').trim(),green:s.getPropertyValue('--green').trim(),khaki:s.getPropertyValue('--khaki2').trim()}}
+  function axes(c,w,h,xLabel,yLabel,dark){
+    const C=colors(),ink=dark?'#BFD9C9':C.ink;c.clearRect(0,0,w,h);c.strokeStyle=ink;c.fillStyle=ink;c.lineWidth=2;
+    c.beginPath();c.moveTo(48,h/2);c.lineTo(w-18,h/2);c.moveTo(48,18);c.lineTo(48,h-30);c.stroke();
+    c.font='12px Arial';c.fillText(xLabel,w-55,h-9);c.fillText(yLabel,9,22);
+  }
+  function plot(canvas,fn,opts){
+    const z=fit(canvas),c=z.c,w=z.w,h=z.h,C=colors(),dark=opts&&opts.dark;axes(c,w,h,(opts&&opts.x)||'t',(opts&&opts.y)||'x(t)',dark);
+    c.strokeStyle=dark?'#00C66A':C.green;c.lineWidth=3;c.beginPath();
+    const max=opts&&opts.max||4,dur=opts&&opts.duration||1;
+    for(let px=48;px<w-18;px++){const t=(px-48)/(w-66)*dur,y=fn(t),py=h/2-y/max*(h*.39);if(px===48)c.moveTo(px,py);else c.lineTo(px,py)}c.stroke();
+  }
+  const ids=['amp','freq','phase','offset'];
+  function drawSignal(){
+    const A=+amp.value,f=+freq.value,ph=+phase.value*Math.PI/180,D=+offset.value,dur=.6;
+    ampVal.textContent=A.toFixed(1)+' V';freqVal.textContent=f+' Hz';phaseVal.textContent=phase.value+'°';offsetVal.textContent=D.toFixed(2)+' V';
+    signalEquation.textContent='x(t)='+D.toFixed(1)+' + '+A.toFixed(1)+' sin(2π·'+f+'t '+(ph>=0?'+ ':'− ')+Math.abs(+phase.value)+'°)';
+    signalPeriod.textContent='T='+(1/f).toFixed(3)+' s · '+(f*dur).toFixed(1)+' מחזורים בחלון';
+    plot(signalCanvas,t=>D+A*Math.sin(2*Math.PI*f*t+ph),{duration:dur,max:7,x:'t [s]',y:'V'});
+  }
+  ids.forEach(id=>document.getElementById(id).addEventListener('input',drawSignal));
+  document.querySelectorAll('.lab1q').forEach(b=>b.addEventListener('click',()=>answerGroup('.lab1q',b,'lab1Feedback',1,'נכון. f מוכפל ולכן T=1/f נחצה; התנופה והמופע אינם חייבים להשתנות.','זכרו: תדר הוא מספר המחזורים בשנייה, ו־T=1/f.')));
+
+  const classCases=[
+    {type:'periodic',name:'סינוס',fn:t=>Math.sin(2*Math.PI*3*t),why:'זהו סינוס שחוזר בדיוק בכל T=1/3 שנייה.'},
+    {type:'random',name:'רעש',fn:t=>noise(t),why:'הערכים אינם חוזרים בתבנית קבועה ולכן אין T יחיד.'},
+    {type:'periodic',name:'גל ריבועי',fn:t=>Math.sin(2*Math.PI*4*t)>=0?1:-1,why:'גם גל שאינו סינוס יכול להיות מחזורי; הצורה חוזרת בדיוק.'},
+    {type:'random',name:'דיבור סכמטי',fn:t=>(.5+.5*Math.sin(2*Math.PI*.7*t))*noise(t*1.7),why:'המעטפת משתנה והפרטים אינם חוזרים בדיוק במחזור קבוע.'},
+    {type:'periodic',name:'שתי הרמוניות',fn:t=>Math.sin(2*Math.PI*2*t)+.35*Math.sin(2*Math.PI*6*t),why:'שני התדרים הם כפולות של 2Hz ולכן הסכום חוזר.'},
+    {type:'random',name:'פולסים לא סדירים',fn:t=>pulseNoise(t),why:'הפולסים מופיעים בזמנים לא קבועים ואין חזרה מדויקת.'}
+  ];
+  function noise(t){const x=Math.sin(t*129.31)*43758.5453;return((x-Math.floor(x))*2-1)}
+  function pulseNoise(t){const a=noise(Math.floor(t*25));return a>.56?1:a<-.62?-1:0}
+  function drawClass(){const q=classCases[state.classRound%classCases.length];plot(classCanvas,q.fn,{duration:1,max:1.6,x:'t',y:'x(t)'});roundNum.textContent=state.classRound+1;state.classAnswered=false;classFeedback.className='feedback';classFeedback.textContent='בחרו סיווג והסבירו לעצמכם מה הייתה הראיה.'}
+  function classify(choice){
+    if(state.classAnswered)return;state.classAnswered=true;const q=classCases[state.classRound%classCases.length],ok=choice===q.type;
+    if(ok){state.classCorrect++;state.classStreak++;classFeedback.className='feedback good';classFeedback.textContent='נכון — '+q.why}else{state.classStreak=0;classFeedback.className='feedback bad';classFeedback.textContent='לא הפעם — '+q.why}
+    classCorrect.textContent=state.classCorrect;classStreak.textContent=state.classStreak;save();paintState();if(state.classRound===5&&state.classCorrect>=4)award(2,8)
+  }
+  periodicBtn.addEventListener('click',()=>classify('periodic'));randomBtn.addEventListener('click',()=>classify('random'));newClassBtn.addEventListener('click',()=>{if(state.classRound<5)state.classRound++;else state.classRound=0;drawClass()});
+
+  function drawDual(){
+    const fn=t=>3*Math.sin(2*Math.PI*500*t)+2*Math.sin(2*Math.PI*1500*t+Math.PI/6);
+    plot(timeCanvas,fn,{duration:.006,max:6,x:'t [s]',y:'V'});
+    const z=fit(freqCanvas),c=z.c,w=z.w,h=z.h,C=colors();axes(c,w,h,'f [Hz]','A [V]');
+    [[500,3],[1500,2]].forEach(pair=>{const x=60+pair[0]/1800*(w-95),y=h/2-pair[1]/4*(h*.38);c.strokeStyle=C.green;c.lineWidth=10;c.beginPath();c.moveTo(x,h/2);c.lineTo(x,y);c.stroke();c.fillStyle=C.ink;c.font='bold 12px Arial';c.fillText(pair[0]+'Hz',x-22,h/2+21);c.fillText(pair[1]+'V',x-8,y-8)});
+  }
+  document.querySelectorAll('.lab3q').forEach(b=>b.addEventListener('click',()=>answerGroup('.lab3q',b,'lab3Feedback',3,'נכון. ספקטרום התנופה מציג מחט עבור כל רכיב סינוסואידלי.','נסו לזהות היכן רואים ישירות את 500Hz ואת 1500Hz.')));
+
+  function mixValues(){return[+h1.value,+h2.value,+h3.value,0,+h5.value]}
+  function drawMix(){
+    const f0=+baseFreq.value,a=mixValues();baseFreqVal.textContent=f0+' Hz';[h1Val,h2Val,h3Val,h5Val].forEach((el,i)=>el.textContent=[a[0],a[1],a[2],a[4]][i].toFixed(2));
+    plot(mixCanvas,t=>a.reduce((sum,v,i)=>sum+v*Math.sin(2*Math.PI*(i+1)*f0*t),0),{duration:3/f0,max:2.4,x:'t',y:'x(t)'});
+    mixLabel.textContent='f₀='+f0+' Hz · T='+(1000/f0).toFixed(1)+' ms';
+    mixSpectrum.innerHTML='';a.forEach((v,i)=>{if(v<=0)return;const b=document.createElement('div');b.className='bar-stick';b.style.height=(20+v*95)+'px';b.innerHTML='<em>'+v.toFixed(2)+'</em><span>'+(i+1)+'f₀</span>';mixSpectrum.appendChild(b)});
+  }
+  ['baseFreq','h1','h2','h3','h5'].forEach(id=>document.getElementById(id).addEventListener('input',drawMix));
+  document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;if(p==='sine'){h1.value=1;h2.value=0;h3.value=0;h5.value=0}if(p==='square'){h1.value=1;h2.value=0;h3.value=.33;h5.value=.2}if(p==='custom'){h1.value=.65;h2.value=.55;h3.value=.3;h5.value=.7}drawMix()}));
+  document.querySelectorAll('.lab4q').forEach(b=>b.addEventListener('click',()=>answerGroup('.lab4q',b,'lab4Feedback',4,'נכון. רכיבים מהירים מאפשרים לאות להשתנות במהירות וליצור קצוות חדים יותר.','קצה חד הוא שינוי מהיר בזמן. איזה סוג רכיב מסוגל להשתנות מהר?')));
+
+  function setWidth(w){
+    document.querySelectorAll('.widthBtn').forEach(b=>b.classList.toggle('selected',+b.dataset.width===w));
+    const pct={20:22,40:40,80:67}[w];myChan.style.left=(50-pct/2)+'%';myChan.style.width=pct+'%';neighborChan.style.left='66%';neighborChan.style.width='23%';
+    bwValue.textContent=w;overlapValue.textContent=w===20?'נמוכה':w===40?'בינונית':'גבוהה';capacityValue.textContent=w===20?'בסיסי':w===40?'גבוה':'גבוה מאוד';
+    bwFeedback.textContent=w===20?'20MHz תופס פחות ספקטרום. בדירה צפופה הוא עשוי להיות יציב יותר, אף שפוטנציאל הקצב נמוך יותר.':w===40?'40MHz הוא פשרה: יותר רוחב לפוטנציאל קצב, אך יותר סיכוי לחפיפה.':'80MHz מאפשר פוטנציאל קצב גבוה, אך תופס תחום רחב ועלול לחפוף לרשתות שכנות.';
+  }
+  document.querySelectorAll('.widthBtn').forEach(b=>b.addEventListener('click',()=>setWidth(+b.dataset.width)));
+  document.querySelectorAll('.lab5q').forEach(b=>b.addEventListener('click',()=>answerGroup('.lab5q',b,'lab5Feedback',5,'נכון. מצמצמים רוחב ערוץ ובודקים אם הירידה בחפיפה משפרת יציבות.','חפיפה היא בעיה בתחום התדר. איזו פעולה מפחיתה את התחום שהרשת תופסת?')));
+
+  const wifiChannels={1:2.412,6:2.437,11:2.462};
+  function wallLoss(){if(wallMat.value==='none')return 0;const base=wallMat.value==='dry'?3:10;return base*Math.pow(+roomFreq.value/2.4,.72)}
+  function arrow(c,x1,y1,x2,y2,color){c.strokeStyle=c.fillStyle=color;c.lineWidth=3;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();const a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));c.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));c.closePath();c.fill()}
+  function updateRoom(){const f=+roomFreq.value,A=+roomAmp.value,l=wallLoss(),factor=Math.min(1,Math.pow(10,-l/20));roomFreqVal.textContent=f.toFixed(2)+' GHz';roomAmpVal.textContent=A.toFixed(2);roomT.textContent=(1/f).toFixed(3)+' ns';roomLambda.textContent=(29.9792458/f).toFixed(2)+' cm';roomLoss.textContent=l.toFixed(1)+' dB';roomRx.textContent=(A*factor).toFixed(2)}
+  function drawRoom(){
+    const z=fit(roomCanvas),c=z.c,w=z.w,h=z.h,C=colors(),floor=h*.78,routerX=w*.09,phoneX=w*.89,wallX=w*.54,A=+roomAmp.value*h*.16,f=+roomFreq.value,loss=wallLoss(),factor=Math.min(1,Math.pow(10,-loss/20)),cycles=f*1.5;
+    c.clearRect(0,0,w,h);c.strokeStyle='rgba(26,26,26,.15)';c.lineWidth=1;for(let x=0;x<w;x+=32){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke()}for(let y=0;y<h;y+=32){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke()}c.fillStyle=C.khaki;c.fillRect(0,floor,w,h-floor);
+    c.strokeStyle=C.ink;c.lineWidth=4;c.strokeRect(routerX-25,floor-62,50,40);c.fillStyle=C.green;c.fillRect(routerX-17,floor-51,34,16);c.fillStyle=C.ink;c.font='bold 13px Arial';c.textAlign='center';c.fillText('נתב',routerX,floor-6);c.lineWidth=5;c.strokeRect(phoneX-17,floor-74,34,57);c.fillStyle=C.green;c.fillRect(phoneX-10,floor-65,20,37);c.fillStyle=C.ink;c.fillText('טלפון',phoneX,floor-4);
+    if(wallMat.value!=='none'){c.fillStyle=wallMat.value==='dry'?C.paper:'#918570';c.fillRect(wallX-22,h*.16,44,floor-h*.16);c.strokeStyle=C.ink;c.lineWidth=4;c.strokeRect(wallX-22,h*.16,44,floor-h*.16)}
+    c.beginPath();for(let x=routerX+28;x<phoneX-22;x+=2){const u=(x-(routerX+28))/(phoneX-routerX-50),after=wallMat.value!=='none'&&x>wallX,localA=A*(after?factor:1),envelope=state.roomMode==='am'?1+.35*Math.sin(u*Math.PI*4-state.roomPhase*.3):1,y=h*.43+localA*envelope*Math.sin(u*Math.PI*2*cycles-state.roomPhase);x===routerX+28?c.moveTo(x,y):c.lineTo(x,y)}c.strokeStyle=C.green;c.lineWidth=4;c.stroke();arrow(c,routerX+48,h*.11,phoneX-48,h*.11,C.green);c.fillStyle=C.green;c.font='bold 12px Arial';c.fillText('מהנתב אל הטלפון',(routerX+phoneX)/2,h*.08);c.fillStyle=C.ink;c.textAlign='left';c.fillText('λ='+(29.9792458/f).toFixed(2)+'cm',w*.39,h*.2);if(wallMat.value!=='none'){c.fillStyle='#9C3340';c.fillText('−'+loss.toFixed(1)+'dB',wallX+26,h*.23)}state.roomPhase+=.055;requestAnimationFrame(drawRoom)
+  }
+  [roomAmp,roomFreq,wallMat].forEach(x=>x.addEventListener('input',updateRoom));document.querySelectorAll('.room-mode').forEach(b=>b.addEventListener('click',()=>{state.roomMode=b.dataset.roomMode;document.querySelectorAll('.room-mode').forEach(x=>x.classList.toggle('selected',x===b))}));document.querySelectorAll('.lab6q').forEach(b=>b.addEventListener('click',()=>answerGroup('.lab6q',b,'lab6Feedback',6,'נכון. f גבוה יותר פירושו T ו־λ קצרים יותר; הקיר מנחית ואינו מגביר.','בדקו את הערכים T, λ והאחוז אחרי הקיר.')));
+
+  function filterMetrics(){const center=wifiChannels[state.filterChannel],sigHalf=.011,fh=state.filterBW/2000,sL=center-sigHalf,sR=center+sigHalf,fL=state.filterCenter-fh,fR=state.filterCenter+fh,overlap=Math.max(0,Math.min(sR,fR)-Math.max(sL,fL)),coverage=Math.min(1,overlap/(sR-sL));let noise=-96+10*Math.log10(state.filterBW/20),micOverlap=state.microwave?Math.max(0,Math.min(fR,2.458)-Math.max(fL,2.442)):0;if(micOverlap>0){const mic=-54+10*Math.log10(Math.max(.02,micOverlap/.016));noise=10*Math.log10(Math.pow(10,noise/10)+Math.pow(10,mic/10))}const snr=state.signalPower-noise;return{center,coverage,noise,snr,clear:coverage>=.95&&snr>=20,mid:coverage>=.95&&snr>=10}}
+  function updateFilter(){state.signalPower=+signalPower.value;state.filterBW=+filterWidth.value;signalPowerVal.textContent='−'+Math.abs(state.signalPower)+' dBm';filterWidthVal.textContent=state.filterBW+' MHz';const m=filterMetrics();filterCenterOut.textContent=state.filterCenter.toFixed(3)+' GHz';coverageOut.textContent=Math.round(m.coverage*100)+'%';noiseOut.textContent='−'+Math.abs(m.noise).toFixed(1)+' dBm';snrOut.textContent=m.snr.toFixed(1)+' dB';rxStatus.className='status-card '+(m.clear?'clear':m.mid?'mid':'bad');rxStatus.innerHTML=m.clear?'<strong>SIGNAL CLEAR</strong><span>כל המידע עובר וה־SNR מספק.</span>':m.mid?'<strong>BUFFERING…</strong><span>האות עובר, אך הרעש פוגע בקצב.</span>':'<strong>DATA LOST</strong><span>'+(m.coverage<.95?'המסנן חותך מידע.':'ההפרעה חזקה מדי.')+'</span>';const q=Math.max(0,Math.min(100,m.coverage*55+Math.max(0,Math.min(45,(m.snr-5)*2))));qualityFill.style.width=q+'%';qualityText.textContent='איכות '+Math.round(q)+'%';drawFilter()}
+  function drawFilter(){const z=fit(filterCanvas),c=z.c,w=z.w,h=z.h,C=colors(),l=48,r=w-24,base=h-42,xFor=f=>l+(f-2.39)/.10*(r-l);c.clearRect(0,0,w,h);c.strokeStyle=C.ink;c.lineWidth=3;c.beginPath();c.moveTo(l,base);c.lineTo(r,base);c.stroke();c.fillStyle='rgba(26,26,26,.22)';for(let x=l;x<r;x+=4){const y=base-12-Math.abs(Math.sin(x*8.1))*18;c.fillRect(x,y,2,base-y)}const center=wifiChannels[state.filterChannel],sigL=xFor(center-.011),sigR=xFor(center+.011),sigTop=Math.max(48,base-(state.signalPower+85)*5);c.fillStyle='rgba(26,26,26,.72)';c.fillRect(sigL,sigTop,sigR-sigL,base-sigTop);c.fillStyle=C.paper;c.font='bold 12px Arial';c.textAlign='center';c.fillText('CH '+state.filterChannel,(sigL+sigR)/2,sigTop+18);if(state.microwave){const ml=xFor(2.442),mr=xFor(2.458);c.fillStyle='rgba(156,51,64,.75)';c.fillRect(ml,48,mr-ml,base-48);c.fillStyle=C.paper;c.fillText('MICROWAVE',(ml+mr)/2,67)}const fl=xFor(state.filterCenter-state.filterBW/2000),fr=xFor(state.filterCenter+state.filterBW/2000);c.fillStyle='rgba(0,143,77,.18)';c.fillRect(fl,25,fr-fl,base-25);c.strokeStyle=C.green;c.lineWidth=6;c.strokeRect(fl,25,fr-fl,base-25);c.fillStyle=C.green;c.fillText('BPF · גררו',(fl+fr)/2,17);c.fillStyle=C.ink;for(let f=2.40;f<=2.48+.001;f+=.02)c.fillText(f.toFixed(2),xFor(f),base+18)}
+  [signalPower,filterWidth].forEach(x=>x.addEventListener('input',updateFilter));document.querySelectorAll('.filt-channel').forEach(b=>b.addEventListener('click',()=>{state.filterChannel=+b.dataset.filtChannel;document.querySelectorAll('.filt-channel').forEach(x=>x.classList.toggle('selected',x===b));updateFilter()}));microwaveBtn.addEventListener('click',()=>{state.microwave=!state.microwave;microwaveBtn.classList.toggle('active',state.microwave);microwaveBtn.setAttribute('aria-pressed',state.microwave);microwaveBtn.textContent=state.microwave?'המיקרוגל פועל — 2.45GHz':'הפעילו מיקרוגל ב־2.45GHz';updateFilter()});let draggingFilter=false;filterCanvas.addEventListener('pointerdown',e=>{draggingFilter=true;filterCanvas.setPointerCapture(e.pointerId);moveFilter(e)});filterCanvas.addEventListener('pointermove',e=>{if(draggingFilter)moveFilter(e)});filterCanvas.addEventListener('pointerup',()=>draggingFilter=false);function moveFilter(e){const r=filterCanvas.getBoundingClientRect(),p=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));state.filterCenter=Math.max(2.394+state.filterBW/2000,Math.min(2.486-state.filterBW/2000,2.39+p*.10));updateFilter()}checkFilter.addEventListener('click',()=>{const m=filterMetrics(),f=document.getElementById('lab7Feedback'),ok=state.microwave&&m.clear&&m.coverage>=.95;f.className='feedback '+(ok?'good':'bad');f.textContent=ok?'הצלחתם ✓ האות כולו בתוך המסנן וההפרעה נשארה בחוץ.':!state.microwave?'הפעילו קודם את המיקרוגל.':m.coverage<.95?'המסנן חותך חלק מרוחב הפס של האות.':'ההפרעה עדיין בתוך חלון המסנן. נסו ערוץ אחר.';if(ok)award(7,15)});
+
+  document.querySelectorAll('.final-choice').forEach(b=>b.addEventListener('click',()=>{b.classList.toggle('correct');if(b.classList.contains('correct'))state.finalKeys.add(b.dataset.key);else state.finalKeys.delete(b.dataset.key)}));
+  finishBtn.addEventListener('click',()=>{const words=finalText.value.trim().split(/\s+/).filter(Boolean).length;if(state.finalKeys.size===4&&words>=18){finalFeedback.className='feedback good';finalFeedback.textContent='משימה הושלמה ✓ חיברתם בין תדר ואורך גל, ניחות בקיר, רוחב פס, הפרעה ו־SNR.';award(8,20);save()}else{finalFeedback.className='feedback bad';finalFeedback.textContent='עדיין חסר: סמנו את כל ארבע אבני הבניין וכתבו לפחות 18 מילים שמקשרות בין האות, הערוץ, הרעש והמקלט.'}});finalText.addEventListener('input',save);
+
+  function answerGroup(selector,chosen,feedbackId,module,goodText,badText){
+    const all=[...document.querySelectorAll(selector)];if(all.some(x=>x.disabled))return;all.forEach(x=>{x.disabled=true;if(x.dataset.ok==='1')x.classList.add('correct')});
+    const ok=chosen.dataset.ok==='1';if(!ok)chosen.classList.add('wrong');const f=document.getElementById(feedbackId);f.className='feedback '+(ok?'good':'bad');f.textContent=ok?goodText:badText;award(module,ok?10:5);
+  }
+  function redrawAll(){drawSignal();drawClass();drawDual();drawMix();setWidth(+document.querySelector('.widthBtn.selected').dataset.width);drawFilter()}
+  window.addEventListener('resize',()=>setTimeout(redrawAll,80));
+  classCorrect.textContent=state.classCorrect;classStreak.textContent=state.classStreak;drawSignal();drawClass();drawDual();drawMix();setWidth(20);updateRoom();updateFilter();drawRoom();go(state.current);
+})();
+</script>
+</body>
+</html>
