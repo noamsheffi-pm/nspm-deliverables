@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מערכות תקשורת 11.9004 — שיעור 1: מבוא והתפשטות גלים</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    :root{--bg:#C8B99A;--bg2:#B8A98A;--green:#008F4D;--green2:#00A85D;--black:#1A1A1A;--paper:#F4EFE6;--muted:#585044;--red:#9C3340}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--black);font-family:'Space Grotesk',Arial,sans-serif}
+    button,input,select{font:inherit}
+    .grain{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{position:absolute;inset:0;padding:46px 58px 62px;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(18px);transition:.42s ease;overflow:hidden}
+    .slide.active{opacity:1;pointer-events:auto;transform:none}
+    .slide>header.head{display:grid;grid-template-columns:1fr auto;align-items:start;gap:24px;padding-bottom:13px;border-bottom:3px solid var(--black)}
+    .kicker,.tag,.counter,.metric,.formula,.step-n{font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;letter-spacing:.08em}
+    .kicker{font-size:16px;color:var(--green);letter-spacing:.18em}
+    h1,h2,h3{font-family:Arial,sans-serif;font-weight:900}
+    .title{font-size:clamp(30px,4.4vw,65px);line-height:1.02;margin-top:4px;max-width:1100px}
+    .time{background:var(--black);color:var(--green);border:2px solid var(--green);padding:7px 13px;transform:rotate(-5deg);font-family:'Bebas Neue',Arial,sans-serif;letter-spacing:.08em;white-space:nowrap}
+    .body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+    .footer{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--black);padding-top:8px;font-size:12px;font-weight:700;color:var(--muted)}
+    .hour{background:var(--green);color:var(--paper);padding:4px 10px;letter-spacing:.08em}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:stretch}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:3px solid var(--black)}
+    .card{position:relative;background:var(--paper);border:3px solid var(--black);padding:24px}
+    .card.offset{box-shadow:10px 10px 0 var(--green);margin-left:10px;margin-bottom:10px}
+    .card.khaki{background:var(--bg2)}
+    .card.green{background:var(--green);color:var(--paper)}
+    .card.black{background:var(--black);color:var(--paper)}
+    .card h3{font-size:clamp(19px,2vw,28px);margin-bottom:10px}
+    .card p,.text{font:500 clamp(15px,1.35vw,20px)/1.55 Arial,sans-serif}
+    .card ul{padding-right:20px;font:500 clamp(14px,1.25vw,19px)/1.65 Arial,sans-serif}
+    .label{display:inline-block;background:var(--green);color:var(--paper);padding:4px 11px;margin-bottom:12px;font:700 13px Arial,sans-serif}
+    .ribbon{display:inline-block;background:var(--green);color:var(--paper);padding:7px 18px;font-weight:800}
+    .hand{font-family:'Caveat',Arial,cursive;font-size:clamp(22px,2.6vw,36px);font-weight:700;color:var(--green)}
+    .formula{direction:ltr;text-align:center;background:var(--paper);border:3px solid var(--black);padding:17px;font-size:clamp(30px,4vw,62px);color:var(--green)}
+    .formula.sm{font-size:clamp(22px,2.6vw,39px)}
+    .metric{direction:ltr;font-size:clamp(48px,6vw,92px);line-height:1;color:var(--green)}
+    .metric-cap{font:800 15px Arial,sans-serif;margin-top:8px}
+    .checkpoint{background:var(--black);color:var(--bg);padding:13px 20px;font:800 clamp(15px,1.4vw,20px)/1.4 Arial,sans-serif}
+    .diagram{background:var(--paper);border:3px solid var(--black);padding:12px;min-height:250px;display:flex;align-items:center;justify-content:center}
+    .diagram svg{display:block;width:100%;height:100%;max-height:330px}
+    .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:10px;direction:rtl}
+    .block{background:var(--paper);border:3px solid var(--black);padding:22px 12px;text-align:center;min-height:112px;display:flex;flex-direction:column;justify-content:center}
+    .block strong{font-size:20px}.block small{font-size:13px;margin-top:7px;color:var(--muted)}
+    .arrow{font-size:38px;color:var(--green);font-weight:900}
+    .noise{position:absolute;left:49%;top:56%;background:var(--black);color:var(--paper);padding:7px 12px;transform:rotate(-5deg)}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);border:3px solid var(--black)}
+    .step{background:var(--paper);padding:20px;border-left:1.5px solid var(--black)}
+    .step:last-child{border-left:0}.step-n{font-size:38px;color:var(--green)}.step strong{display:block;font-size:18px}.step p{font:14px/1.45 Arial,sans-serif;margin-top:6px}
+    .choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .choice{border:3px solid var(--black);background:var(--paper);padding:22px;cursor:pointer;text-align:right;transition:.15s}
+    .choice:hover,.choice.active{background:var(--green);color:var(--paper);transform:translateY(-3px)}
+    .choice strong{display:block;font-size:23px}.choice span{display:block;margin-top:8px;font:15px/1.45 Arial,sans-serif}
+    .answer{margin-top:18px;background:var(--bg2);border:3px solid var(--black);padding:16px 20px;min-height:78px;font:700 17px/1.5 Arial,sans-serif}
+    .calc{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:end}
+    .field label{display:block;font:800 14px Arial,sans-serif;margin-bottom:7px}
+    .field input,.field select{width:100%;border:3px solid var(--black);background:var(--paper);padding:11px;color:var(--black);direction:ltr}
+    .result{grid-column:1/-1;background:var(--black);color:var(--paper);padding:16px 20px;border:3px solid var(--black);font:700 18px Arial,sans-serif}
+    .result strong{color:var(--green2);font-size:26px}
+    .spectrum{height:260px;border:3px solid var(--black);background:var(--paper);position:relative;direction:ltr}
+    .axis-x{position:absolute;left:8%;right:4%;bottom:40px;height:3px;background:var(--black)}
+    .axis-y{position:absolute;left:8%;top:9%;bottom:40px;width:3px;background:var(--black)}
+    .needle{position:absolute;bottom:43px;width:11px;background:var(--green);border:2px solid var(--black)}
+    .needle::after{content:attr(data-f);position:absolute;top:100%;left:50%;transform:translate(-50%,7px);font:700 13px Arial,sans-serif;white-space:nowrap}
+    .matrix{border:3px solid var(--black);background:var(--paper)}
+    .row{display:grid;grid-template-columns:1.1fr repeat(3,1fr);border-bottom:1.5px solid var(--black)}
+    .row:last-child{border-bottom:0}.row>*{padding:12px;border-left:1.5px solid var(--black);font:700 14px Arial,sans-serif}.row>*:last-child{border-left:0}
+    .row.head{background:var(--green);color:var(--paper)}
+    .quiz-q{background:var(--paper);border:3px solid var(--black);padding:20px}
+    .quiz-q h3{font-size:20px;margin-bottom:12px}.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .opts button{border:2px solid var(--black);background:var(--bg);padding:10px;cursor:pointer;font-weight:700;text-align:right}
+    .opts button:hover{background:var(--black);color:var(--paper)}.opts button.correct{background:var(--green);color:var(--paper)}.opts button.wrong{background:var(--red);color:var(--paper)}
+    .feedback{min-height:22px;margin-top:8px;font-weight:800}
+    .notes-btn{position:fixed;top:18px;left:20px;z-index:120;border:3px solid var(--black);background:var(--paper);padding:8px 13px;font-weight:800;cursor:pointer}
+    .notes{position:fixed;top:0;left:0;width:min(430px,92vw);height:100%;z-index:10001;background:var(--paper);border-right:4px solid var(--black);padding:70px 28px 30px;transform:translateX(-105%);transition:.3s;overflow:auto}
+    .notes.open{transform:none}.notes h2{color:var(--green);font-size:28px;margin-bottom:18px}.note-content{white-space:pre-line;font:16px/1.6 Arial,sans-serif}.speaker{display:none}.source{display:block;border-top:2px solid var(--black);margin-top:12px;padding-top:10px;font-size:12px;color:var(--muted)}
+    .counter{position:fixed;right:22px;bottom:20px;z-index:120;background:var(--paper);border:2px solid var(--black);padding:6px 12px;font-size:15px}
+    .progress{position:fixed;bottom:0;left:0;height:5px;background:var(--green);z-index:120;transition:.3s}
+    .nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:110;background:var(--black);color:var(--bg);padding:7px 16px;font-size:11px;letter-spacing:.08em;opacity:0;transition:.25s}
+    body:hover .nav{opacity:1}
+    .hero{justify-content:center;text-align:center}.hero .kicker{font-size:18px}.hero h1{font-family:Arial,sans-serif;font-size:clamp(52px,8vw,118px);line-height:.86;color:var(--green);margin:16px 0}.hero-sub{font-size:clamp(17px,2vw,26px);font-weight:800}.hero-mark{width:min(590px,72vw);margin:22px auto 0}
+    .hero-mark svg{width:100%;height:120px}
+    .stamp{display:inline-block;background:var(--black);color:var(--green);border:2px solid var(--green);padding:8px 18px;transform:rotate(-6deg);font:20px 'Bebas Neue',Arial,sans-serif;letter-spacing:.1em}
+    .latin{direction:ltr;unicode-bidi:isolate}
+    @media(max-width:900px){.slide{padding:30px 24px 55px;overflow-y:auto}.slide>header.head{grid-template-columns:1fr}.time{justify-self:start}.two,.three,.choice-grid{grid-template-columns:1fr}.four,.steps{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);text-align:center}.noise{display:none}.title{font-size:34px}.diagram{min-height:210px}.footer{margin-top:14px}.opts{grid-template-columns:1fr}}
+    @media print{html,body{height:auto;overflow:visible}.slide{position:relative;opacity:1;pointer-events:auto;transform:none;page-break-after:always;min-height:100vh}.notes-btn,.notes,.nav,.counter,.progress,.grain{display:none!important}}
+    @media(prefers-reduced-motion:reduce){.slide,.notes,.progress{transition:none}}
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="progress" id="progress"></div>
+  <div class="counter" id="counter">01 / 20</div>
+  <div class="nav">← הקודם · רווח / לחיצה · הבא →</div>
+  <button class="notes-btn" id="notesBtn">הערות מרצה · N</button>
+  <aside class="notes" id="notes"><h2>הערות מרצה</h2><div class="note-content" id="noteContent"></div></aside>
+
+  <main class="deck" id="deck">
+    <!-- 01 -->
+    <section class="slide hero active" data-time="3 דקות">
+      <div class="kicker">COMMUNICATION SYSTEMS · LESSON 01</div>
+      <h1>מבוא למערכות<br>תקשורת</h1>
+      <div class="hero-sub">ממידע במכשיר — לאות בתווך — ובחזרה למידע</div>
+      <div class="hero-mark">
+        <svg viewBox="0 0 900 150" aria-label="אות אלקטרומגנטי">
+          <line x1="20" y1="75" x2="880" y2="75" stroke="#1A1A1A" stroke-width="4"/>
+          <path d="M20 75 C65 5 110 5 155 75 S245 145 290 75 S380 5 425 75 S515 145 560 75 S650 5 695 75 S785 145 830 75 S865 35 880 52" fill="none" stroke="#008F4D" stroke-width="10"/>
+          <circle cx="20" cy="75" r="12" fill="#1A1A1A"/><circle cx="880" cy="52" r="12" fill="#1A1A1A"/>
+        </svg>
+      </div>
+      <div style="margin-top:18px"><span class="stamp">135 MIN · 3 ACADEMIC HOURS</span></div>
+      <div class="footer" style="position:absolute;right:58px;left:58px;bottom:28px"><span class="hour">HOUR A · 00:00–00:03</span><span>סעיפים 1.1–1.4 · מבוא ומעגלי יסוד</span></div>
+      <template class="speaker">זמן: 3 דקות.
+פתח בשאלה: “כשאני שולח הודעת WhatsApp — מה באמת עובר באוויר?” אסוף שלוש תשובות בלי לתקן מיד.
+משפט המסגרת: הודעה אינה עפה באוויר; מערכת התקשורת ממירה מידע לאות פיזיקלי, מעבירה אותו, ואז משחזרת את המידע.
+<span class="source">מקור: תוכנית הלימודים 11.9004, פרק 1, סעיפים 1.1–1.4.</span></template>
+    </section>
+
+    <!-- 02 -->
+    <section class="slide" data-time="5 דקות">
+      <header class="head"><div><div class="kicker">135 MINUTES · ROADMAP</div><h2 class="title">מה נצליח להסביר בסוף השיעור</h2></div><div class="time">5 MIN</div></header>
+      <div class="body">
+        <div class="three">
+          <div class="card offset"><div class="metric">01</div><h3>המערכת</h3><p>לזהות מקור, משדר, תווך, רעש, מקלט ויעד — ולתאר את תפקידם.</p></div>
+          <div class="card khaki"><div class="metric">02</div><h3>הדרך</h3><p>להבדיל בין תווך קווי ואלחוטי ובין גל ישיר, גל קרקע וגל רקיע.</p></div>
+          <div class="card green"><div class="metric" style="color:var(--paper)">03</div><h3>ההחלטה</h3><p>לבחור פתרון קשר לפי טווח, תדר, מכשולים, אמינות ועלות.</p></div>
+        </div>
+        <div class="checkpoint" style="margin-top:26px">יעד ביצוע: לקבל תרחיש אמיתי — ולנמק איזו מערכת תקשורת מתאימה לו</div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:03–00:08</span><span>מפת דרכים</span></footer>
+      <template class="speaker">זמן: 5 דקות.
+הצג את שלושת היעדים. הדגש שלא נלמד היום “רשימת הגדרות”; נשתמש בכל מושג כדי לקבל החלטה הנדסית.
+בקש מהסטודנטים לבחור יעד אחד שנראה להם הכי שימושי בחיים.
+<span class="source">מקור: מטרות פרק 1 בתוכנית הלימודים.</span></template>
+    </section>
+
+    <!-- 03 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">YOUR HOME IS A RADIO LAB</div><h2 class="title">למה ה־Wi‑Fi מהיר ליד הנתב — ונחלש מאחורי שני קירות?</h2></div><div class="time">7 MIN</div></header>
+      <div class="body two">
+        <div class="card offset">
+          <span class="label">הימור כיתתי</span>
+          <h3>מה השתנה בדרך?</h3>
+          <div class="choice-grid" style="grid-template-columns:1fr;margin-top:12px">
+            <button class="choice hook-choice" data-hook="distance"><strong>המרחק</strong><span>האות מתפזר ונחלש ככל שמתרחקים.</span></button>
+            <button class="choice hook-choice" data-hook="walls"><strong>הקירות</strong><span>חומרים בולעים, מחזירים ומעקמים את הגל.</span></button>
+            <button class="choice hook-choice" data-hook="noise"><strong>הרעש</strong><span>רשתות ומכשירים אחרים מתחרים באותו תווך.</span></button>
+          </div>
+        </div>
+        <div>
+          <div class="diagram">
+            <svg viewBox="0 0 620 360" aria-label="נתב טלפון ושני קירות">
+              <rect x="45" y="230" width="120" height="65" fill="#008F4D" stroke="#1A1A1A" stroke-width="5"/><line x1="75" y1="230" x2="75" y2="175" stroke="#1A1A1A" stroke-width="6"/><line x1="135" y1="230" x2="135" y2="175" stroke="#1A1A1A" stroke-width="6"/>
+              <path d="M165 210 Q245 130 325 210" fill="none" stroke="#008F4D" stroke-width="9"/><path d="M180 235 Q245 175 310 235" fill="none" stroke="#008F4D" stroke-width="7"/>
+              <rect x="330" y="45" width="25" height="270" fill="#B8A98A" stroke="#1A1A1A" stroke-width="5"/><rect x="455" y="45" width="25" height="270" fill="#B8A98A" stroke="#1A1A1A" stroke-width="5"/>
+              <rect x="525" y="190" width="58" height="105" rx="5" fill="#F4EFE6" stroke="#1A1A1A" stroke-width="6"/><circle cx="554" cy="276" r="6" fill="#008F4D"/>
+              <path d="M355 175 Q390 145 430 175 M480 160 Q510 145 535 168" fill="none" stroke="#1A1A1A" stroke-width="5" stroke-dasharray="11 9"/>
+            </svg>
+          </div>
+          <div class="answer" id="hookAnswer">בחרו גורם. בסוף נגלה שהתשובה ההנדסית היא: <b>כולם פועלים יחד.</b></div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:08–00:15</span><span>הוק Wi‑Fi</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+בקש הצבעה לפני הלחיצה. לאחר שלוש הבחירות חבר את המושגים: מרחק ועוצמה, תווך ומכשולים, רעש והפרעות.
+אל תיכנס עדיין לנוסחאות. המטרה היא לייצר שאלה שנחזור אליה לאורך השיעור.
+<span class="source">חיבור יישומי לסעיפים 1.2–1.4: מערכת, תווך והתפשטות.</span></template>
+    </section>
+
+    <!-- 04 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">THE ENGINEERING TASK</div><h2 class="title">מערכת תקשורת מעבירה מידע — למרות מרחק, רעש ומגבלות</h2></div><div class="time">7 MIN</div></header>
+      <div class="body">
+        <div class="four">
+          <div class="step"><div class="step-n">01</div><strong>ייצוג</strong><p>הופכים קול, תמונה או נתונים לאות.</p></div>
+          <div class="step"><div class="step-n">02</div><strong>התאמה</strong><p>מתאימים את האות לתווך ולמרחק.</p></div>
+          <div class="step"><div class="step-n">03</div><strong>העברה</strong><p>האות מתקדם ונפגע מהנחתה ורעש.</p></div>
+          <div class="step"><div class="step-n">04</div><strong>שחזור</strong><p>המקלט מחלץ את המידע השימושי.</p></div>
+        </div>
+        <div class="two" style="margin-top:24px">
+          <div class="card"><span class="label">דוגמה</span><h3>שיחת טלפון</h3><p>קול → אות חשמלי → אות רדיו → תחנת בסיס → רשת → טלפון אחר → קול.</p></div>
+          <div class="card black"><h3 style="color:var(--green2)">מדד ההצלחה</h3><p>לא “האם הגיע משהו”, אלא: האם המידע הגיע <b>באמינות, בזמן, ובאיכות הנדרשת</b>?</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:15–00:22</span><span>המשימה ההנדסית</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+העבר את הדוגמה בקול ובקש מהסטודנטים לזהות בכל שלב שינוי של ייצוג.
+הדגש שמערכת נבחנת לפי דרישות: איכות שיחה שונה מדרישת חיישן טמפרטורה או שידור וידאו חי.
+<span class="source">מקור: תרשים מלבנים של מערכת תקשורת, סעיף 1.2.</span></template>
+    </section>
+
+    <!-- 05 -->
+    <section class="slide" data-time="8 דקות">
+      <header class="head"><div><div class="kicker">THE UNIVERSAL BLOCK DIAGRAM</div><h2 class="title">אותו תרשים מתאים ל־Wi‑Fi, רדיו, סיב אופטי ולוויין</h2></div><div class="time">8 MIN</div></header>
+      <div class="body">
+        <div class="card offset" style="padding:34px;position:relative">
+          <div class="flow">
+            <div class="block"><strong>מקור מידע</strong><small>קול · תמונה · נתונים</small></div><div class="arrow">←</div>
+            <div class="block"><strong>משדר</strong><small>עיבוד · אפנון · הגברה</small></div><div class="arrow">←</div>
+            <div class="block" style="background:var(--bg2)"><strong>תווך</strong><small>כבל · סיב · אוויר</small></div><div class="arrow">←</div>
+            <div class="block"><strong>מקלט + יעד</strong><small>גילוי · שחזור · הצגה</small></div>
+          </div>
+          <div class="noise">+ רעש והפרעות</div>
+        </div>
+        <div class="three" style="margin-top:25px">
+          <div class="card"><h3>משדר</h3><p>לא “שולח מידע” ישירות — הוא יוצר אות שמתאים לערוץ.</p></div>
+          <div class="card khaki"><h3>תווך</h3><p>אינו צינור מושלם; הוא מנחית, מעוות ומכניס מגבלות.</p></div>
+          <div class="card green"><h3>מקלט</h3><p>מחליט מה מתוך האות הוא מידע ומה הוא רעש.</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:22–00:30</span><span>תרשים מלבנים</span></footer>
+      <template class="speaker">זמן: 8 דקות.
+צייר את התרשים גם על הלוח. שאל בכל בלוק: “מה נכנס ומה יוצא?”
+דוגמת Wi‑Fi: הסרטון הוא המקור; שבב הרדיו הוא המשדר; האוויר והקירות הם התווך; שבב הטלפון הוא המקלט.
+הדגש שהרעש נוסף לאורך התווך ואינו בלוק שהמהנדס “רוצה”.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.2.</span></template>
+    </section>
+
+    <!-- 06 -->
+    <section class="slide" data-time="8 דקות">
+      <header class="head"><div><div class="kicker">WHO CAN TALK — AND WHEN?</div><h2 class="title">חד־כיווני, חצי דו־כיווני או דו־כיווני מלא</h2></div><div class="time">8 MIN</div></header>
+      <div class="body">
+        <div class="choice-grid">
+          <button class="choice mode-choice" data-mode="simplex"><strong>Simplex · חד־כיווני</strong><span>A → B בלבד<br>דוגמה: שידור רדיו</span></button>
+          <button class="choice mode-choice" data-mode="half"><strong>Half Duplex · חצי דו־כיווני</strong><span>A ↔ B, אבל בתורות<br>דוגמה: מכשיר קשר</span></button>
+          <button class="choice mode-choice" data-mode="full"><strong>Full Duplex · דו־כיווני מלא</strong><span>A ⇄ B בו־זמנית<br>דוגמה: שיחת טלפון</span></button>
+        </div>
+        <div class="answer" id="modeAnswer">בחרו תצורה, ואז נסו לסווג: שידור טלוויזיה, מכשיר קשר ושיחת WhatsApp.</div>
+        <div class="checkpoint" style="margin-top:18px">שאלת מפתח: האם שני הצדדים יכולים לשדר באותו רגע?</div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:30–00:38</span><span>כיווניות שידור</span></footer>
+      <template class="speaker">זמן: 8 דקות.
+השתמש בשלוש הדוגמאות. ב־Half Duplex הדגש שהמערכת דו־כיוונית אך לא סימולטנית.
+דיוק לגבי Wi‑Fi: ברמת הערוץ המשותף התחנות מתאמות שימוש בזמן; אל תציג Wi‑Fi כדוגמת Full Duplex פשוטה.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.2.</span></template>
+    </section>
+
+    <!-- 07 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">HOUR A · CHECKPOINT</div><h2 class="title">מי עושה מה במערכת?</h2></div><div class="time">7 MIN</div></header>
+      <div class="body two">
+        <div class="quiz-q"><h3>1. איזה רכיב מתאים את המידע לתווך?</h3><div class="opts"><button data-correct="1">המשדר</button><button>היעד</button><button>הרעש</button><button>התווך</button></div><div class="feedback"></div></div>
+        <div class="quiz-q"><h3>2. מכשיר קשר הוא בדרך כלל…</h3><div class="opts"><button>Simplex</button><button data-correct="1">Half Duplex</button><button>Full Duplex</button><button>ללא כיווניות</button></div><div class="feedback"></div></div>
+        <div class="quiz-q"><h3>3. קיר בטון שייך בעיקר ל…</h3><div class="opts"><button>מקור</button><button>משדר</button><button data-correct="1">תווך</button><button>יעד</button></div><div class="feedback"></div></div>
+        <div class="card green"><h3>עצירת 60 שניות</h3><p>הסבירו לבן/בת הזוג את מסלול הודעת WhatsApp באמצעות ארבעת הבלוקים.</p></div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR A · 00:38–00:45</span><span>סיכום שעה א׳</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+תן לסטודנטים לענות לפני החשיפה. לאחר מכן בצע את משימת הזוגות.
+אם רוב הכיתה טועה בשאלה 1, חזור לתרשים והפרד בין מידע לבין אות.
+<span class="source">בדיקת הבנה לסעיף 1.2.</span></template>
+    </section>
+
+    <!-- 08 -->
+    <section class="slide" data-time="8 דקות">
+      <header class="head"><div><div class="kicker">THE MEDIUM SETS THE RULES</div><h2 class="title">קווי או אלחוטי? אין “טוב יותר” בלי דרישות</h2></div><div class="time">8 MIN</div></header>
+      <div class="body two">
+        <div class="card offset"><span class="label">תווך מונחה</span><h3>נחושת וסיב אופטי</h3><ul><li>האנרגיה מונחית במסלול פיזי</li><li>בידוד טוב יחסית מהסביבה</li><li>קצב גבוה ויציבות</li><li>דורש פריסה, חיבור ותחזוקה</li></ul><div class="hand">stable path · physical cost</div></div>
+        <div class="card khaki"><span class="label">תווך לא־מונחה</span><h3>אוויר וחלל</h3><ul><li>ניידות וכיסוי ללא כבל</li><li>שיתוף ספקטרום עם משתמשים אחרים</li><li>רגישות למרחק, מכשולים והפרעות</li><li>אנטנות הן ממשק הכניסה והיציאה</li></ul><div class="hand">freedom · shared space</div></div>
+      </div>
+      <div class="checkpoint" style="margin-top:24px">סיב לבניין, Wi‑Fi בתוך הבית, סלולר בתנועה — מערכות משלבות תווכים</div>
+      <footer class="footer"><span class="hour">HOUR B · 00:45–00:53</span><span>סעיף 1.3</span></footer>
+      <template class="speaker">זמן: 8 דקות.
+בקש דוגמאות מהכיתה. כתוב שתי דרישות לכל דוגמה: ניידות, טווח, קצב, עלות או אמינות.
+הראה שהאינטרנט הביתי הוא מערכת היברידית: סיב/כבל עד הבית, Ethernet או Wi‑Fi בתוך הבית.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.3.</span></template>
+    </section>
+
+    <!-- 09 -->
+    <section class="slide" data-time="8 דקות">
+      <header class="head"><div><div class="kicker">ELECTROMAGNETIC PROPAGATION</div><h2 class="title">שדה חשמלי, שדה מגנטי וכיוון התקדמות</h2></div><div class="time">8 MIN</div></header>
+      <div class="body two">
+        <div class="diagram">
+          <svg viewBox="0 0 700 410" aria-label="גל אלקטרומגנטי">
+            <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1A1A1A"/></marker></defs>
+            <line x1="70" y1="215" x2="635" y2="215" stroke="#1A1A1A" stroke-width="4" marker-end="url(#arr)"/>
+            <path d="M80 215 C125 85 170 85 215 215 S305 345 350 215 S440 85 485 215 S575 345 620 215" fill="none" stroke="#008F4D" stroke-width="10"/>
+            <path d="M80 215 C125 160 170 160 215 215 S305 270 350 215 S440 160 485 215 S575 270 620 215" fill="none" stroke="#1A1A1A" stroke-width="7" stroke-dasharray="13 8"/>
+            <text x="105" y="85" font-size="26" fill="#008F4D">E — שדה חשמלי</text><text x="375" y="315" font-size="24">H — שדה מגנטי</text><text x="500" y="195" font-size="23">כיוון התקדמות</text>
+          </svg>
+        </div>
+        <div>
+          <div class="card offset"><h3>שלושה כיוונים מאונכים</h3><p>השדה החשמלי E, השדה המגנטי H וכיוון התקדמות הגל ניצבים זה לזה.</p></div>
+          <div class="card black" style="margin-top:20px"><h3 style="color:var(--green2)">מה באמת נע?</h3><p>האנרגיה והמידע מתקדמים במרחב. החומר עצמו אינו “נוסע” מהאנטנה אל הטלפון.</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR B · 00:53–01:01</span><span>הבסיס הפיזיקלי</span></footer>
+      <template class="speaker">זמן: 8 דקות.
+שרטט שלושה חצים מאונכים על הלוח. אין צורך להעמיק במשוואות מקסוול.
+הדגש: תדר קובע כמה מהר השדה מתנודד; מהירות ההתפשטות בתווך היא גודל אחר.
+<span class="source">מקור: חומר הקורס — התפשטות גלים אלקטרומגנטיים.</span></template>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-time="10 דקות">
+      <header class="head"><div><div class="kicker">FREQUENCY ↔ WAVELENGTH</div><h2 class="title">ככל שהתדר עולה — אורך הגל מתקצר</h2></div><div class="time">10 MIN</div></header>
+      <div class="body two">
+        <div>
+          <div class="formula">c = fλ</div>
+          <div class="calc" style="margin-top:22px">
+            <div class="field"><label for="freq">תדר</label><input id="freq" type="number" min=".001" step=".1" value="2.4"></div>
+            <div class="field"><label for="freqUnit">יחידה</label><select id="freqUnit"><option value="1e9">GHz</option><option value="1e6">MHz</option><option value="1e3">kHz</option><option value="1">Hz</option></select></div>
+            <div class="result">אורך הגל: <strong id="lambdaResult">12.49 cm</strong></div>
+          </div>
+          <div class="hand" style="margin-top:14px">enter 5 GHz and compare</div>
+        </div>
+        <div class="card offset">
+          <span class="label">השוואת Wi‑Fi</span>
+          <div class="metric">2.4 GHz</div><p>λ ≈ 12.5 cm</p>
+          <hr style="border:0;border-top:3px solid var(--black);margin:18px 0">
+          <div class="metric">5 GHz</div><p>λ ≈ 6.0 cm</p>
+          <div class="checkpoint" style="margin-top:18px">התדר לא אומר לבדו מה תהיה מהירות הגלישה</div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR B · 01:01–01:11</span><span>חישוב λ</span></footer>
+      <template class="speaker">זמן: 10 דקות.
+כתוב c≈3×10⁸ m/s. חשב עם הכיתה 2.4 GHz ואז 5 GHz.
+הדגש יחידות: יש להמיר GHz ל־Hz לפני ההצבה.
+דיוק: ההבדל בכיסוי בין תחומי Wi‑Fi אינו נובע רק מאורך הגל; גם הספק, אנטנות, תקינה, חומרי המבנה ותכנון הרשת משפיעים.
+<span class="source">מקור: נוסחאון מערכות תקשורת — הקשר c=fλ.</span></template>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">THREE WAYS THROUGH SPACE</div><h2 class="title">גל ישיר, גל קרקע וגל רקיע — אותה אנרגיה, מסלולים שונים</h2></div><div class="time">7 MIN</div></header>
+      <div class="body three">
+        <div class="card offset"><span class="label">LINE OF SIGHT</span><h3>גל ישיר</h3><svg viewBox="0 0 360 170"><line x1="45" y1="135" x2="45" y2="40" stroke="#1A1A1A" stroke-width="8"/><line x1="315" y1="135" x2="315" y2="65" stroke="#1A1A1A" stroke-width="8"/><path d="M52 45 L307 70" stroke="#008F4D" stroke-width="8"/><path d="M10 140 Q180 115 350 140" fill="none" stroke="#1A1A1A" stroke-width="4"/></svg><p>מסלול כמעט ישר בין אנטנות. נפוץ ב־VHF/UHF, מיקרוגל, סלולר ו־Wi‑Fi.</p></div>
+        <div class="card khaki"><span class="label">GROUND WAVE</span><h3>גל קרקע</h3><svg viewBox="0 0 360 170"><path d="M10 135 Q180 90 350 135" fill="none" stroke="#1A1A1A" stroke-width="5"/><path d="M30 115 Q175 70 325 116" fill="none" stroke="#008F4D" stroke-width="9"/><line x1="35" y1="120" x2="35" y2="55" stroke="#1A1A1A" stroke-width="7"/></svg><p>הגל עוקב במידה מסוימת אחר פני הקרקע. שימושי בעיקר בתדרים נמוכים.</p></div>
+        <div class="card green"><span class="label" style="background:var(--black)">SKY WAVE</span><h3>גל רקיע</h3><svg viewBox="0 0 360 170"><path d="M10 140 Q180 120 350 140" fill="none" stroke="#F4EFE6" stroke-width="4"/><path d="M35 125 Q175 -15 325 125" fill="none" stroke="#1A1A1A" stroke-width="9" stroke-dasharray="14 7"/><path d="M30 40 Q180 5 330 40" fill="none" stroke="#F4EFE6" stroke-width="4"/></svg><p>חזרה לאזור הקרקע דרך שכבות היונוספרה; מאפשר קשר HF לטווחים גדולים.</p></div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR B · 01:11–01:18</span><span>מפת התפשטות</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+הצג תחילה את המסלול, אחר כך את תחום התדר והשימוש. אין לומר שכל גל “קופץ” באותה צורה.
+שאל: איזה מסלול מתאים לרשת Wi‑Fi ביתית? גל ישיר, עם החזרות וחדירה דרך מכשולים.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.4.</span></template>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">BEYOND THE HORIZON</div><h2 class="title">איך תחנת רדיו רחוקה מגיעה בלי לוויין?</h2></div><div class="time">7 MIN</div></header>
+      <div class="body two">
+        <div class="diagram">
+          <svg viewBox="0 0 720 400" aria-label="גל קרקע וגל רקיע">
+            <path d="M25 330 Q360 215 695 330" fill="#B8A98A" stroke="#1A1A1A" stroke-width="6"/>
+            <path d="M55 300 Q360 15 665 300" fill="none" stroke="#1A1A1A" stroke-width="8" stroke-dasharray="16 10"/>
+            <path d="M70 285 Q350 180 650 294" fill="none" stroke="#008F4D" stroke-width="10"/>
+            <path d="M80 90 Q360 25 640 90" fill="none" stroke="#008F4D" stroke-width="5"/>
+            <text x="285" y="63" font-size="24" fill="#008F4D">יונוספרה</text><text x="286" y="155" font-size="24">גל רקיע</text><text x="285" y="270" font-size="24" fill="#008F4D">גל קרקע</text>
+          </svg>
+        </div>
+        <div>
+          <div class="card offset"><h3>גל קרקע</h3><p>נצמד יחסית לפני הקרקע; ההנחתה תלויה בתדר ובמוליכות הקרקע.</p></div>
+          <div class="card black" style="margin-top:20px"><h3 style="color:var(--green2)">גל רקיע</h3><p>בתחומי HF מסוימים היונוספרה יכולה להחזיר/לשבור את המסלול חזרה לכדור הארץ.</p></div>
+          <div class="hand" style="margin-top:12px">frequency chooses the route</div>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR B · 01:18–01:25</span><span>גל קרקע וגל רקיע</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+השתמש ברדיו AM ובקשר חובבים כדוגמאות. הדגש שתנאי היונוספרה משתנים בין יום ולילה.
+מנע הכללת יתר: גל רקיע אינו מנגנון רגיל ל־Wi‑Fi או לסלולר.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.4 — אופן התפשטות, טווח, תדירות ושימושים.</span></template>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide" data-time="5 דקות">
+      <header class="head"><div><div class="kicker">RADIO HORIZON</div><h2 class="title">גם עם עוצמה גבוהה — עקמומיות כדור הארץ מגבילה קו ראייה</h2></div><div class="time">5 MIN</div></header>
+      <div class="body two">
+        <div>
+          <div class="formula sm">d ≈ 3.57(√hₜ + √hᵣ) km</div>
+          <div class="calc" style="margin-top:20px">
+            <div class="field"><label for="ht">גובה אנטנת משדר [m]</label><input id="ht" type="number" min="0" value="30"></div>
+            <div class="field"><label for="hr">גובה אנטנת מקלט [m]</label><input id="hr" type="number" min="0" value="2"></div>
+            <div class="result">אופק רדיו מקורב: <strong id="horizonResult">24.6 km</strong></div>
+          </div>
+        </div>
+        <div class="diagram">
+          <svg viewBox="0 0 680 390" aria-label="קו ראייה ואופק">
+            <path d="M25 355 Q340 120 655 355" fill="#B8A98A" stroke="#1A1A1A" stroke-width="6"/>
+            <line x1="115" y1="300" x2="115" y2="105" stroke="#1A1A1A" stroke-width="9"/><line x1="555" y1="300" x2="555" y2="225" stroke="#1A1A1A" stroke-width="9"/>
+            <line x1="115" y1="105" x2="555" y2="225" stroke="#008F4D" stroke-width="9"/>
+            <path d="M115 115 Q340 200 555 235" fill="none" stroke="#1A1A1A" stroke-width="4" stroke-dasharray="12 9"/>
+            <text x="230" y="125" font-size="23" fill="#008F4D">קו ראייה</text><text x="250" y="245" font-size="20">חסימה עקב עקמומיות</text>
+          </svg>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR B · 01:25–01:30</span><span>מחשבון טווח LOS</span></footer>
+      <template class="speaker">זמן: 5 דקות.
+הכנס 30 m ו־2 m. לאחר מכן הכפל את גובה המשדר פי 4 ושאל האם הטווח יגדל פי 4. התשובה: לא, בגלל השורש — תרומת הגובה תוכפל פי 2.
+ציין שזו הערכת אופק רדיו גיאומטרית; שטח, הפרעות, הספק ורגישות עשויים לקצר את הטווח בפועל.
+<span class="source">המחשת גל ישיר וטווח לפי סעיף 1.4.</span></template>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide" data-time="10 דקות">
+      <header class="head"><div><div class="kicker">LINK BUDGET · THE TRADE-OFF</div><h2 class="title">כדי שהקשר יעבוד, ההספק במקלט חייב לעבור את סף הקליטה</h2></div><div class="time">10 MIN</div></header>
+      <div class="body">
+        <div class="formula sm">Pᵣ ∝ Pₜ · Gₜ · Gᵣ · (λ / 4πd)²</div>
+        <div class="four" style="margin-top:22px">
+          <div class="step"><div class="step-n">Pₜ</div><strong>הספק שידור</strong><p>יותר הספק מסייע, אך מוגבל בתקינה ובאנרגיה.</p></div>
+          <div class="step"><div class="step-n">G</div><strong>שבח אנטנות</strong><p>ריכוז האנרגיה בכיוון הרצוי.</p></div>
+          <div class="step"><div class="step-n">λ</div><strong>אורך גל</strong><p>קשור ישירות לתדר העבודה.</p></div>
+          <div class="step"><div class="step-n">d²</div><strong>מרחק</strong><p>במרחב חופשי ההספק יורד בקירוב עם ריבוע המרחק.</p></div>
+        </div>
+        <div class="checkpoint" style="margin-top:23px">פי 2 מרחק → בקירוב רבע מההספק הנקלט, לפני הפסדים נוספים</div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR C · 01:30–01:40</span><span>אינטואיציית מאזן קשר</span></footer>
+      <template class="speaker">זמן: 10 דקות.
+הצג את הקשר כאינטואיציה, לא כתרגיל אלגברי מלא. שאל אילו משתנים בשליטת המהנדס.
+חזור להוק: מעבר חדר משנה d ומוסיף הפסדי קירות והחזרות, ולכן הקליטה נחלשת.
+<span class="source">מקור: נוסחאון מערכות תקשורת — נוסחת פריס למרחב חופשי.</span></template>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">SPACE DOMAIN VS TIME DOMAIN</div><h2 class="title">איפה האות נמצא — לעומת איך הוא משתנה בזמן</h2></div><div class="time">7 MIN</div></header>
+      <div class="body two">
+        <div class="card offset">
+          <span class="label">מימד המרחב</span><h3>עוצמה כפונקציה של מקום</h3>
+          <div class="diagram" style="min-height:230px;border-width:2px"><svg viewBox="0 0 560 260"><line x1="55" y1="210" x2="520" y2="210" stroke="#1A1A1A" stroke-width="4"/><line x1="55" y1="35" x2="55" y2="210" stroke="#1A1A1A" stroke-width="4"/><path d="M60 60 C150 85 220 115 300 155 S430 190 510 198" fill="none" stroke="#008F4D" stroke-width="10"/><text x="470" y="242" font-size="20">d</text><text x="12" y="48" font-size="20">P</text></svg></div>
+          <p>מתרחקים מהאנטנה — ובדרך כלל ההספק הנקלט יורד.</p>
+        </div>
+        <div class="card khaki">
+          <span class="label">מימד הזמן</span><h3>ערך האות כפונקציה של זמן</h3>
+          <div class="diagram" style="min-height:230px;border-width:2px"><svg viewBox="0 0 560 260"><line x1="45" y1="130" x2="525" y2="130" stroke="#1A1A1A" stroke-width="4"/><path d="M45 130 C85 35 125 35 165 130 S245 225 285 130 S365 35 405 130 S485 225 525 130" fill="none" stroke="#008F4D" stroke-width="10"/><text x="500" y="158" font-size="20">t</text></svg></div>
+          <p>נשארים בנקודת מדידה אחת — ורואים את התנודות בזמן.</p>
+        </div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR C · 01:40–01:47</span><span>הכנה לשיעור 2</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+הפרד במפורש בין שני גרפים: הראשון מחליף מיקום, השני מחליף זמן.
+זהו גשר לשיעור 2: שם נעמוד בנקודה אחת ונאפיין את x(t), התדר והספקטרום.
+<span class="source">קישור פדגוגי בין סעיף 1.4 לסעיף 1.5.</span></template>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">ANTENNA = INTERFACE TO SPACE</div><h2 class="title">האנטנה אינה “מגבירה קסם” — היא מעצבת לאן האנרגיה הולכת</h2></div><div class="time">7 MIN</div></header>
+      <div class="body three">
+        <div class="card offset"><span class="label">OMNI</span><h3>מונופול / דיפול</h3><div class="diagram" style="min-height:180px;border-width:2px"><svg viewBox="0 0 320 220"><line x1="160" y1="190" x2="160" y2="45" stroke="#1A1A1A" stroke-width="9"/><ellipse cx="160" cy="115" rx="120" ry="52" fill="none" stroke="#008F4D" stroke-width="9"/><ellipse cx="160" cy="115" rx="75" ry="30" fill="none" stroke="#008F4D" stroke-width="5"/></svg></div><p>כיסוי רחב סביב האנטנה; מתאים לניידות ולמרחב סביב נקודת הגישה.</p></div>
+        <div class="card khaki"><span class="label">DIRECTIONAL</span><h3>יאגי</h3><div class="diagram" style="min-height:180px;border-width:2px"><svg viewBox="0 0 320 220"><line x1="55" y1="110" x2="245" y2="110" stroke="#1A1A1A" stroke-width="8"/><g stroke="#1A1A1A" stroke-width="6"><line x1="90" y1="50" x2="90" y2="170"/><line x1="130" y1="65" x2="130" y2="155"/><line x1="170" y1="75" x2="170" y2="145"/><line x1="210" y1="83" x2="210" y2="137"/></g><path d="M220 110 Q270 70 310 110 Q270 150 220 110" fill="#008F4D" stroke="#1A1A1A" stroke-width="4"/></svg></div><p>ריכוז לכיוון מסוים; מתאים לקישור נקודה־לנקודה או לקליטת כיוון.</p></div>
+        <div class="card green"><span class="label" style="background:var(--black)">HIGH GAIN</span><h3>צלחת</h3><div class="diagram" style="min-height:180px;border-width:2px;background:var(--paper)"><svg viewBox="0 0 320 220"><path d="M85 45 Q55 115 130 170" fill="none" stroke="#1A1A1A" stroke-width="12"/><line x1="110" y1="110" x2="190" y2="90" stroke="#1A1A1A" stroke-width="6"/><circle cx="195" cy="89" r="10" fill="#008F4D"/><path d="M205 88 L305 60 M205 88 L310 88 M205 88 L305 118" stroke="#008F4D" stroke-width="7"/></svg></div><p>אלומה צרה ושבח גבוה; דורשת כיוון מדויק וקו ראייה.</p></div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR C · 01:47–01:54</span><span>טעימה מסעיף 1.7</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+הצג אנטנה כממיר בין אות חשמלי לגל אלקטרומגנטי.
+הדגש את הפשרה: אלומה צרה מגדילה ריכוז ושבח אך מקטינה כיסוי ודורשת כיוון.
+זהו מבוא בלבד; החישובים המלאים יגיעו ביחידת האנטנות.
+<span class="source">מקור: תוכנית הלימודים, סעיף 1.7 — מושגים וסוגי אנטנות.</span></template>
+    </section>
+
+    <!-- 17 -->
+    <section class="slide" data-time="7 דקות">
+      <header class="head"><div><div class="kicker">ENGINEERING TRADE-OFF MATRIX</div><h2 class="title">בחירה נכונה מתחילה בדרישות — לא בטכנולוגיה אהובה</h2></div><div class="time">7 MIN</div></header>
+      <div class="body">
+        <div class="matrix">
+          <div class="row head"><div>פתרון</div><div>ניידות</div><div>טווח / יציבות</div><div>מחיר פריסה</div></div>
+          <div class="row"><div>סיב אופטי</div><div>נמוכה</div><div>גבוהים מאוד</div><div>גבוה</div></div>
+          <div class="row"><div>Wi‑Fi</div><div>גבוהה בתוך אזור</div><div>קצר / תלוי סביבה</div><div>נמוך</div></div>
+          <div class="row"><div>סלולר</div><div>גבוהה</div><div>כיסוי רחב</div><div>תשתית מורכבת</div></div>
+          <div class="row"><div>קשר HF</div><div>בינונית</div><div>ארוך מאוד בתנאים מתאימים</div><div>ציוד ומיומנות</div></div>
+          <div class="row"><div>קישור מיקרוגל</div><div>נמוכה</div><div>גבוה בקו ראייה</div><div>כיוון ואתרים</div></div>
+        </div>
+        <div class="checkpoint" style="margin-top:22px">דרישות → תווך → תדר → מסלול התפשטות → אנטנות → מאזן קשר</div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR C · 01:54–02:01</span><span>מטריצת החלטה</span></footer>
+      <template class="speaker">זמן: 7 דקות.
+בחר שתי שורות והשווה. שאל: מה משתנה אם הדרישה החשובה ביותר היא ניידות? ומה אם היא אמינות?
+הדגש שהטבלה איכותית ומפשטת; תכנון אמיתי דורש נתונים מספריים ותקינה.
+<span class="source">סינתזה של סעיפים 1.2–1.4.</span></template>
+    </section>
+
+    <!-- 18 -->
+    <section class="slide" data-time="9 דקות">
+      <header class="head"><div><div class="kicker">TEAM CHALLENGE · TACTICAL LINK</div><h2 class="title">תכננו קשר בין צוות חילוץ למפקדה במרחק 18 ק״מ</h2></div><div class="time">9 MIN</div></header>
+      <div class="body two">
+        <div class="card offset">
+          <span class="label">התרחיש</span>
+          <ul><li>אזור הררי; אין תשתית סלולר יציבה</li><li>נדרשות הודעות קול קצרות</li><li>שני הצדדים צריכים לדבר, לא בו־זמנית</li><li>ציוד נייד וסוללה מוגבלת</li><li>ייתכן שאין קו ראייה ישיר</li></ul>
+        </div>
+        <div class="card khaki">
+          <h3>הגישו החלטה בארבע שורות</h3>
+          <div class="steps" style="grid-template-columns:1fr 1fr;margin-top:18px">
+            <div class="step"><div class="step-n">1</div><strong>כיווניות</strong><p>Simplex / Half / Full?</p></div>
+            <div class="step"><div class="step-n">2</div><strong>תווך</strong><p>קווי או אלחוטי?</p></div>
+            <div class="step"><div class="step-n">3</div><strong>מסלול</strong><p>ישיר / קרקע / רקיע / ממסר?</p></div>
+            <div class="step"><div class="step-n">4</div><strong>סיכון</strong><p>מה עלול להפיל את הקשר?</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint" style="margin-top:20px">אין תשובה יחידה — יש נימוק טוב יותר או פחות לפי הנתונים</div>
+      <footer class="footer"><span class="hour">HOUR C · 02:01–02:10</span><span>תרגול מסכם</span></footer>
+      <template class="speaker">זמן: 9 דקות.
+חלק לזוגות ל־4 דקות, אחר כך שמע שתי הצעות.
+פתרון אפשרי: אלחוטי, Half Duplex. אם יש נקודת גובה — קשר VHF/UHF דרך ממסר; אם אין תשתית וקו ראייה, אפשר לשקול HF לפי תנאים וציוד. הסיכון: חסימת שטח, סוללה, רעש, אנטנה לא מתאימה.
+אל תציג את הפתרון היחיד; תן נקודות על נימוק וקישור לדרישות.
+<span class="source">תרגיל יישום מסכם לסעיפים 1.2–1.4.</span></template>
+    </section>
+
+    <!-- 19 -->
+    <section class="slide" data-time="5 דקות">
+      <header class="head"><div><div class="kicker">EXIT TICKET · INDIVIDUAL</div><h2 class="title">חמש דקות לבד — מסלול של הודעה אחת</h2></div><div class="time">5 MIN</div></header>
+      <div class="body">
+        <div class="card offset" style="padding:32px 42px">
+          <h3>בחרו: הודעת WhatsApp, שיחת טלפון או שידור רדיו</h3>
+          <div class="four" style="margin-top:24px">
+            <div class="step"><div class="step-n">01</div><strong>תרשים</strong><p>מקור → משדר → תווך → מקלט → יעד</p></div>
+            <div class="step"><div class="step-n">02</div><strong>כיווניות</strong><p>איזה סוג ומדוע?</p></div>
+            <div class="step"><div class="step-n">03</div><strong>הפרעה</strong><p>גורם אחד שעלול לפגוע בקשר.</p></div>
+            <div class="step"><div class="step-n">04</div><strong>שיפור</strong><p>שינוי הנדסי אחד שיעזור.</p></div>
+          </div>
+        </div>
+        <div class="hand" style="text-align:center;margin-top:22px">if you can explain the path — you understand the system</div>
+      </div>
+      <footer class="footer"><span class="hour">HOUR C · 02:10–02:15</span><span>סיום · 135 דקות</span></footer>
+      <template class="speaker">זמן: 5 דקות.
+אסוף את התשובות או בקש משלושה סטודנטים להקריא.
+בדוק ארבעה דברים: רצף בלוקים נכון, סיווג כיווניות, הפרעה ששייכת לתווך, ושיפור שמטפל בבעיה.
+סגור: בשיעור 2 נעבור מהמערכת כולה אל האות עצמו — זמן, תדר וספקטרום.
+<span class="source">הערכה מסכמת לשיעור 1.</span></template>
+    </section>
+
+    <!-- 20 -->
+    <section class="slide" data-time="רשות">
+      <header class="head"><div><div class="kicker">OPTIONAL · RAPID FIRE</div><h2 class="title">שמונה מושגים — משפט אחד לכל מושג</h2></div><div class="time">BONUS</div></header>
+      <div class="body">
+        <div class="four">
+          <div class="step"><div class="step-n">TX</div><strong>משדר</strong><p>מתאים את האות לתווך.</p></div>
+          <div class="step"><div class="step-n">RX</div><strong>מקלט</strong><p>משחזר מידע מן האות.</p></div>
+          <div class="step"><div class="step-n">CH</div><strong>ערוץ</strong><p>הדרך הפיזיקלית בין הצדדים.</p></div>
+          <div class="step"><div class="step-n">N</div><strong>רעש</strong><p>שינוי לא רצוי שמקשה על הקליטה.</p></div>
+          <div class="step"><div class="step-n">LOS</div><strong>גל ישיר</strong><p>מסלול כמעט ישר בין אנטנות.</p></div>
+          <div class="step"><div class="step-n">GW</div><strong>גל קרקע</strong><p>מתקדם סמוך לפני הקרקע.</p></div>
+          <div class="step"><div class="step-n">SW</div><strong>גל רקיע</strong><p>חוזר לארץ דרך היונוספרה.</p></div>
+          <div class="step"><div class="step-n">λ</div><strong>אורך גל</strong><p>המרחק המרחבי של מחזור אחד.</p></div>
+        </div>
+        <div class="checkpoint" style="margin-top:24px">השיעור הבא: מהו אות, מהו מחזור, ומה רואים בתחום התדר?</div>
+      </div>
+      <footer class="footer"><span class="hour">APPENDIX</span><span>חזרה / שיעורי בית</span></footer>
+      <template class="speaker">שקף רשות — אינו נכלל ב־135 הדקות.
+הפעל כמשחק: הצבע על מושג, בחר סטודנט ובקש הגדרה ומשפט דוגמה. אפשר לתת את המושגים ככרטיסיות חזרה.
+<span class="source">מונחון מסכם לשיעור 1.</span></template>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const slides=[...document.querySelectorAll('.slide')], progress=document.getElementById('progress'), counter=document.getElementById('counter');
+      const notes=document.getElementById('notes'), noteContent=document.getElementById('noteContent'), notesBtn=document.getElementById('notesBtn');
+      let current=0;
+      function show(i){
+        current=Math.max(0,Math.min(slides.length-1,i));
+        slides.forEach((s,n)=>s.classList.toggle('active',n===current));
+        progress.style.width=((current+1)/slides.length*100)+'%';
+        counter.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+        const t=slides[current].querySelector('.speaker'); noteContent.innerHTML=t?t.innerHTML:'אין הערות לשקף זה.';
+      }
+      const next=()=>show(current+1), prev=()=>show(current-1);
+      document.addEventListener('keydown',e=>{
+        if(e.key.toLowerCase()==='n'){e.preventDefault();notes.classList.toggle('open');return}
+        if(e.key==='Home'){e.preventDefault();show(0);return}
+        if(e.key==='End'){e.preventDefault();show(slides.length-1);return}
+        if(['ArrowRight','ArrowDown',' ','Enter','PageDown'].includes(e.key)){e.preventDefault();next()}
+        if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prev()}
+      });
+      document.addEventListener('click',e=>{
+        if(e.target.closest('button,input,select,.notes'))return;
+        e.clientX>innerWidth/2?next():prev();
+      });
+      notesBtn.addEventListener('click',()=>notes.classList.toggle('open'));
+      const hookText={
+        distance:'<b>מרחק:</b> האנרגיה מתפזרת במרחב, ולכן פחות הספק מגיע למקלט.',
+        walls:'<b>קירות:</b> בטון, מתכת ומים יכולים לבלוע, להחזיר או לשנות את מסלול הגל.',
+        noise:'<b>רעש והפרעות:</b> אותות אחרים מקטינים את היכולת של המקלט להבדיל בין מידע לרעש.'
+      };
+      document.querySelectorAll('.hook-choice').forEach(b=>b.addEventListener('click',e=>{
+        e.stopPropagation();document.querySelectorAll('.hook-choice').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('hookAnswer').innerHTML=hookText[b.dataset.hook];
+      }));
+      const modeText={
+        simplex:'<b>Simplex:</b> המידע זורם בכיוון אחד בלבד. המקלט אינו מחזיר מידע באותו קישור.',
+        half:'<b>Half Duplex:</b> שני הצדדים יכולים לשדר, אך חולקים את הזמן — אחד מדבר והשני מאזין.',
+        full:'<b>Full Duplex:</b> שני הצדדים משדרים ומקבלים בו־זמנית באמצעות הפרדה מתאימה.'
+      };
+      document.querySelectorAll('.mode-choice').forEach(b=>b.addEventListener('click',e=>{
+        e.stopPropagation();document.querySelectorAll('.mode-choice').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('modeAnswer').innerHTML=modeText[b.dataset.mode];
+      }));
+      function wavelength(){
+        const f=Number(document.getElementById('freq').value)*Number(document.getElementById('freqUnit').value);
+        const l=f>0?299792458/f:0;
+        let out=l>=1?l.toFixed(3)+' m':l>=.01?(l*100).toFixed(2)+' cm':(l*1000).toFixed(2)+' mm';
+        document.getElementById('lambdaResult').textContent=out;
+      }
+      ['freq','freqUnit'].forEach(id=>document.getElementById(id).addEventListener('input',wavelength));
+      function horizon(){
+        const ht=Math.max(0,Number(document.getElementById('ht').value)||0),hr=Math.max(0,Number(document.getElementById('hr').value)||0);
+        document.getElementById('horizonResult').textContent=(3.57*(Math.sqrt(ht)+Math.sqrt(hr))).toFixed(1)+' km';
+      }
+      ['ht','hr'].forEach(id=>document.getElementById(id).addEventListener('input',horizon));
+      document.querySelectorAll('.quiz-q').forEach(q=>q.querySelectorAll('.opts button').forEach(b=>b.addEventListener('click',e=>{
+        e.stopPropagation();q.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.toggle('correct',x.dataset.correct==='1')});
+        const ok=b.dataset.correct==='1';if(!ok)b.classList.add('wrong');q.querySelector('.feedback').textContent=ok?'נכון ✓':'לא בדיוק — התשובה הנכונה מסומנת בירוק.';
+      })));
+      wavelength();horizon();show(0);
+    })();
+  </script>
+</body>
+</html>
