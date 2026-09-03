@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Center Units Migration Gap</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#000;background-image:radial-gradient(ellipse at top,rgba(34,221,146,.05),transparent 60%);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff;padding:32px 24px 48px}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+  .dot{width:18px;height:18px;border-radius:50%;background:#22dd92;box-shadow:0 0 16px rgba(34,221,146,.5)}
+  .brand span{font-size:13px;letter-spacing:.04em;color:#fff}
+  header h1{font-size:26px;margin:0 0 8px;font-weight:650;letter-spacing:-.01em}
+  header p{margin:0 0 28px;color:#a1a1aa;font-size:14px;max-width:840px;line-height:1.55}
+  main{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:16px;padding:8px;overflow-x:auto}
+  svg{width:100%;min-width:900px;display:block}
+  g.node{cursor:pointer}
+  g.node rect{transition:stroke-width .2s ease,filter .2s ease}
+  g.node:hover rect{stroke-width:3;filter:url(#glow)}
+  .dimmed{opacity:.2;transition:opacity .3s ease}
+  .highlighted{opacity:1;transition:opacity .3s ease}
+  g.node,path.edge,text.elabel{transition:opacity .3s ease}
+  footer{margin-top:28px}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:14px}
+  .legend div{display:flex;align-items:center;gap:8px;font-size:12px;color:#a1a1aa}
+  .sw{width:12px;height:12px;border-radius:3px;border-width:2px;border-style:solid}
+  .source{font-size:12px;color:#52525b}
+  .hint{font-size:12px;color:#52525b;margin-top:6px}
+  @media(max-width:768px){header h1{font-size:20px}.legend{gap:12px}}
+</style>
+</head>
+<body>
+<div class="brand"><div class="dot"></div><span>Coralogix · NSPM</span></div>
+<header>
+  <h1>AI Center units: the accounts with no bucket</h1>
+  <p>One daily quota pool is splitting into two. Accounts that bought AI Center before the split had that compute
+     taken out of their CX units, so no AI units were ever allocated to them. They are the case nobody owns.</p>
+</header>
+
+<main>
+<svg viewBox="0 0 1420 660" role="img" aria-label="AI Center units migration gap flow">
+  <defs>
+    <marker id="ar-mint" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#1ab677"/></marker>
+    <marker id="ar-purple" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#A855F7"/></marker>
+    <marker id="ar-red" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#EF4444"/></marker>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feFlood flood-color="#22dd92" flood-opacity="0.6" result="c"/>
+      <feComposite in="c" in2="b" operator="in" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- edges -->
+  <path class="edge" data-from="n1" data-to="n2" d="M250,170 H310" stroke="#22dd92" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+  <text class="elabel" data-from="n1" data-to="n2" x="280" y="160" fill="#a1a1aa" font-size="11" text-anchor="middle">one pool</text>
+
+  <path class="edge" data-from="n2" data-to="n3" d="M500,150 C535,150 525,85 560,85" stroke="#A855F7" stroke-width="2" fill="none" marker-end="url(#ar-purple)"/>
+  <text class="elabel" data-from="n2" data-to="n3" x="530" y="103" fill="#a1a1aa" font-size="11" text-anchor="middle">no token</text>
+
+  <path class="edge" data-from="n2" data-to="n4" d="M500,190 C535,190 525,255 560,255" stroke="#A855F7" stroke-width="2" fill="none" marker-end="url(#ar-purple)"/>
+  <text class="elabel" data-from="n2" data-to="n4" x="530" y="245" fill="#a1a1aa" font-size="11" text-anchor="middle">token</text>
+
+  <path class="edge" data-from="n3" data-to="n5" d="M740,85 C775,85 765,150 800,150" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+  <path class="edge" data-from="n4" data-to="n5" d="M740,255 C775,255 765,190 800,190" stroke="#1ab677" stroke-width="2" fill="none" marker-end="url(#ar-mint)"/>
+  <text class="elabel" data-from="n4" data-to="n5" x="772" y="185" fill="#a1a1aa" font-size="11" text-anchor="middle">two pools</text>
+
+  <path class="edge" data-from="n5" data-to="n6" d="M1000,150 C1040,150 1040,85 1080,85" stroke="#A855F7" stroke-width="2" fill="none" marker-end="url(#ar-purple)"/>
+  <text class="elabel" data-from="n5" data-to="n6" x="1012" y="100" fill="#a1a1aa" font-size="11" text-anchor="middle">bought AI units</text>
+
+  <path class="edge" data-from="n5" data-to="n7" d="M1000,190 C1040,190 1040,265 1080,265" stroke="#EF4444" stroke-width="2.5" fill="none" marker-end="url(#ar-red)"/>
+  <text class="elabel" data-from="n5" data-to="n7" x="1010" y="247" fill="#a1a1aa" font-size="11" text-anchor="middle">bought AI Center</text>
+
+  <!-- gap consequences: bus at y=390 -->
+  <path class="edge" data-from="n7" data-to="n8" d="M1210,320 V390 H185 V430" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+  <path class="edge" data-from="n7" data-to="n9" d="M1210,320 V390 H495 V430" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+  <path class="edge" data-from="n7" data-to="n10" d="M1210,320 V390 H805 V430" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+  <path class="edge" data-from="n7" data-to="n11" d="M1210,320 V390 H1165 V430" stroke="#EF4444" stroke-width="2" fill="none" marker-end="url(#ar-red)"/>
+  <text class="elabel" data-from="n7" data-to="n8" x="185" y="412" fill="#a1a1aa" font-size="11" text-anchor="middle">capped by hand</text>
+  <text class="elabel" data-from="n7" data-to="n9" x="495" y="412" fill="#a1a1aa" font-size="11" text-anchor="middle">wrong SKU</text>
+  <text class="elabel" data-from="n7" data-to="n10" x="805" y="412" fill="#a1a1aa" font-size="11" text-anchor="middle">one line</text>
+  <text class="elabel" data-from="n7" data-to="n11" x="1165" y="412" fill="#a1a1aa" font-size="11" text-anchor="middle">unowned</text>
+
+  <!-- nodes -->
+  <g class="node" id="n1" role="img" aria-label="Single daily quota pool: ingestion and AI compute drew from one pool">
+    <rect x="40" y="120" width="210" height="100" rx="12" fill="#0c2419" stroke="#22dd92" stroke-width="2"/>
+    <text x="145" y="158" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">Single daily pool</text>
+    <text x="145" y="180" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Ingestion and AI compute</text>
+    <text x="145" y="196" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">both came from here</text>
+  </g>
+
+  <g class="node" id="n2" role="img" aria-label="The split rule: no token is a CX unit, token is an AI unit">
+    <rect x="310" y="120" width="190" height="100" rx="12" fill="#2e1a3d" stroke="#A855F7" stroke-width="2"/>
+    <text x="405" y="158" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">The split rule</text>
+    <text x="405" y="180" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">No token = CX unit</text>
+    <text x="405" y="196" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Token = AI unit</text>
+  </g>
+
+  <g class="node" id="n3" role="img" aria-label="CX units: logs, metrics, traces and AI sessions">
+    <rect x="560" y="40" width="180" height="90" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+    <text x="650" y="74" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">CX units</text>
+    <text x="650" y="96" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Logs, metrics, traces,</text>
+    <text x="650" y="112" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">AI sessions</text>
+  </g>
+
+  <g class="node" id="n4" role="img" aria-label="AI units: evals, guardrails and Olly">
+    <rect x="560" y="210" width="180" height="90" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+    <text x="650" y="244" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">AI units</text>
+    <text x="650" y="266" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Evals, guardrails,</text>
+    <text x="650" y="282" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Olly</text>
+  </g>
+
+  <g class="node" id="n5" role="img" aria-label="Which account: what did this customer actually buy">
+    <rect x="800" y="120" width="200" height="100" rx="12" fill="#2e1a3d" stroke="#A855F7" stroke-width="2"/>
+    <text x="900" y="158" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">Which account?</text>
+    <text x="900" y="180" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">What did they buy,</text>
+    <text x="900" y="196" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">and when</text>
+  </g>
+
+  <g class="node" id="n6" role="img" aria-label="Bought AI units: has a bucket and migrates cleanly">
+    <rect x="1080" y="40" width="260" height="90" rx="12" fill="#0c2419" stroke="#1ab677" stroke-width="2"/>
+    <text x="1210" y="74" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">Bought AI units</text>
+    <text x="1210" y="96" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Has a bucket already.</text>
+    <text x="1210" y="112" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Moves cleanly.</text>
+  </g>
+
+  <g class="node" id="n7" role="img" aria-label="AI Center before the split: compute came out of CX units so no AI bucket exists">
+    <rect x="1080" y="210" width="260" height="110" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2.5"/>
+    <text x="1210" y="246" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">AI Center, pre-split</text>
+    <text x="1210" y="268" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Compute came out of</text>
+    <text x="1210" y="284" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">their CX units, so no</text>
+    <text x="1210" y="300" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">AI bucket was created</text>
+  </g>
+
+  <g class="node" id="n8" role="img" aria-label="Quota rules by hand: the AI share is capped inside CX units today">
+    <rect x="60" y="430" width="250" height="100" rx="12" fill="#3d2e1a" stroke="#F59E0B" stroke-width="2"/>
+    <text x="185" y="468" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">Quota rules, by hand</text>
+    <text x="185" y="490" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">We cap the AI share</text>
+    <text x="185" y="506" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">inside their CX units</text>
+  </g>
+
+  <g class="node" id="n9" role="img" aria-label="Salesforce: the contract line carries no AI SKU">
+    <rect x="370" y="430" width="250" height="100" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="495" y="468" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">Salesforce</text>
+    <text x="495" y="490" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Contract line carries</text>
+    <text x="495" y="506" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">no AI SKU</text>
+  </g>
+
+  <g class="node" id="n10" role="img" aria-label="NetSuite: one invoice line, no split per pool">
+    <rect x="680" y="430" width="250" height="100" rx="12" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+    <text x="805" y="468" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">NetSuite</text>
+    <text x="805" y="490" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">One invoice line.</text>
+    <text x="805" y="506" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">No split per pool.</text>
+  </g>
+
+  <g class="node" id="n11" role="img" aria-label="About 35 teams flagged with a Friday switchover, no ticket and no named owner">
+    <rect x="990" y="430" width="350" height="100" rx="12" fill="#3d1a1a" stroke="#EF4444" stroke-width="2"/>
+    <text x="1165" y="468" fill="#fff" font-size="15" font-weight="650" text-anchor="middle">~35 teams flagged</text>
+    <text x="1165" y="490" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">Switchover stated for Friday.</text>
+    <text x="1165" y="506" fill="#fff" font-size="11.5" opacity="0.7" text-anchor="middle">No ticket, no named owner.</text>
+  </g>
+</svg>
+</main>
+
+<footer>
+  <div class="legend">
+    <div><span class="sw" style="background:#0c2419;border-color:#22dd92"></span>Starting state</div>
+    <div><span class="sw" style="background:#2e1a3d;border-color:#A855F7"></span>Decision</div>
+    <div><span class="sw" style="background:#0c2419;border-color:#1ab677"></span>Unit pool</div>
+    <div><span class="sw" style="background:#3d2e1a;border-color:#F59E0B"></span>Manual workaround</div>
+    <div><span class="sw" style="background:#1a1a2e;border-color:#6366F1"></span>Commercial system</div>
+    <div><span class="sw" style="background:#3d1a1a;border-color:#EF4444"></span>The gap</div>
+  </div>
+  <div class="source">Generated from: Switching to Monthly Plan rollout discussion, 02-09-2026 · Quota Plan Monthly / cx AI Units</div>
+  <div class="hint">Click a box to isolate it and what it touches. Click the background to reset.</div>
+</footer>
+
+<script>
+(function(){
+  var svg=document.querySelector('svg');
+  var adj={n1:['n2'],n2:['n1','n3','n4'],n3:['n2','n5'],n4:['n2','n5'],n5:['n3','n4','n6','n7'],
+           n6:['n5'],n7:['n5','n8','n9','n10','n11'],n8:['n7'],n9:['n7'],n10:['n7'],n11:['n7']};
+  var nodes=Array.prototype.slice.call(svg.querySelectorAll('g.node'));
+  var lines=Array.prototype.slice.call(svg.querySelectorAll('path.edge, text.elabel'));
+  function reset(){nodes.concat(lines).forEach(function(e){e.classList.remove('dimmed','highlighted');});}
+  function focus(id){
+    var keep={}; keep[id]=1; (adj[id]||[]).forEach(function(n){keep[n]=1;});
+    nodes.forEach(function(n){n.classList.toggle('dimmed',!keep[n.id]);});
+    lines.forEach(function(l){
+      var a=l.getAttribute('data-from'),b=l.getAttribute('data-to');
+      l.classList.toggle('dimmed',!(keep[a]&&keep[b]));
+    });
+  }
+  svg.addEventListener('click',function(e){
+    var g=e.target.closest('g.node');
+    if(g){focus(g.id);}else{reset();}
+  });
+})();
+</script>
+</body>
+</html>
