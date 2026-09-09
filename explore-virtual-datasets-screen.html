@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore — Virtual Datasets</title>
+<style>
+:root{
+  --c-background-surface-primary:#F8FAFC;
+  --c-background-surface-secondary:#FFFFFF;
+  --c-background-card:#FFFFFF;
+  --c-background-hover:#0000000D;
+  --c-background-focus:#E6FFF2;
+  --c-text-primary:#1C1C1C;
+  --c-text-secondary:#68686D;
+  --c-text-placeholder:#A9A9AE;
+  --c-text-interactive:#029449;
+  --c-text-on-color:#FFFFFF;
+  --c-border-subtle:#ECECEE;
+  --c-border-strong:#DEDEE0;
+  --c-border-interactive:#029449;
+  --c-button-primary:#02763A;
+  --c-icon-primary:#68686D;
+  --c-icon-warning:#E4B83C;
+  --c-tag-lightgrey-bg:#C9D1D933;
+  --c-tag-lightgrey-tx:#323D4E;
+  --c-tag-blue-bg:#5095ED33;
+  --c-tag-blue-tx:#1E6F81;
+  --c-tag-green-bg:#3CC67E33;
+  --c-tag-green-tx:#24734B;
+  --c-tag-purple-bg:#8B5CF622;
+  --c-tag-purple-tx:#6D3FD1;
+  --r-sm:4px; --r-md:6px; --r-lg:8px;
+  --font:'Nunito Sans',Helvetica,Roboto,Arial,sans-serif;
+  --mono:'Inconsolata','SF Mono',monospace;
+  --shadow-dropdown:0 5px 10px 0 rgba(33,43,59,.1);
+  --shadow-pop:0 8px 24px 0 rgba(33,43,59,.16);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{background:var(--c-background-surface-primary);color:var(--c-text-primary);font:400 12px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+code,.mono{font-family:var(--mono)}
+
+.pagehead{background:var(--c-background-surface-secondary);border-bottom:1px solid var(--c-border-subtle);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.pagehead h1{font:600 20px/1.5 var(--font)}
+.pagehead .spacer{flex:1}
+.note{font:400 11px/1.5 var(--font);color:var(--c-text-secondary)}
+
+.statebar{display:flex;gap:6px;padding:10px 16px;background:var(--c-background-surface-secondary);border-bottom:1px solid var(--c-border-subtle);flex-wrap:wrap;align-items:center}
+.statebar b{font:700 11px/1.5 var(--font);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.sbtn{padding:5px 10px;font:600 12px/1.4 var(--font);color:var(--c-text-secondary);background:var(--c-background-surface-primary);border:1px solid var(--c-border-strong);border-radius:var(--r-md);cursor:pointer}
+.sbtn:hover{color:var(--c-text-interactive);border-color:var(--c-border-interactive)}
+.sbtn.on{color:var(--c-text-on-color);background:var(--c-button-primary);border-color:var(--c-button-primary)}
+
+main{padding:16px;display:flex;flex-direction:column;gap:16px;max-width:1160px}
+.card{background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font:600 14px/1.5 var(--font)}
+.card .sub{font:400 12px/1.5 var(--font);color:var(--c-text-secondary)}
+
+/* toolbar */
+.toolbar{display:flex;gap:8px;align-items:stretch}
+.field{position:relative;flex:0 0 320px}
+.fieldlabel{font:600 11px/1.5 var(--font);color:var(--c-text-secondary);display:block;margin-bottom:4px}
+.control{display:flex;align-items:center;gap:6px;min-height:32px;padding:4px 8px;background:var(--c-background-surface-secondary);border:1px solid var(--c-border-strong);border-radius:var(--r-md);cursor:pointer}
+.control:hover{border-color:var(--c-border-interactive)}
+.control.open{border-color:var(--c-border-interactive);box-shadow:0 0 0 2px var(--c-background-focus)}
+.caret{margin-left:auto;color:var(--c-icon-primary)}
+
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;border-radius:var(--r-sm);font:600 10px/1.6 var(--font);white-space:nowrap}
+.tag--logs{background:var(--c-tag-green-bg);color:var(--c-tag-green-tx)}
+.tag--spans{background:var(--c-tag-blue-bg);color:var(--c-tag-blue-tx)}
+.tag--metrics{background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx)}
+.tag--virtual{background:var(--c-tag-purple-bg);color:var(--c-tag-purple-tx)}
+
+.panel{position:absolute;z-index:30;top:calc(100% + 4px);left:0;width:100%;background:var(--c-background-surface-secondary);border:1px solid var(--c-border-strong);border-radius:var(--r-md);box-shadow:var(--shadow-dropdown);padding:4px;max-height:300px;overflow:auto}
+.opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r-sm);cursor:pointer}
+.opt:hover{background:var(--c-background-hover)}
+.opt .nm{font:400 12px/1.5 var(--mono)}
+.opt .rt{margin-left:auto;display:flex;gap:4px;align-items:center}
+.grouphd{padding:6px 8px 2px;font:700 10px/1.5 var(--font);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.05em}
+
+/* query editor */
+.editor{position:relative;flex:1;display:flex;align-items:center;gap:2px;flex-wrap:wrap;min-height:32px;padding:5px 8px;background:var(--c-background-surface-secondary);border:1px solid var(--c-border-strong);border-radius:var(--r-md);font:400 13px/1.6 var(--mono)}
+.editor .kw{color:#6D3FD1}
+.editor .op{color:var(--c-text-secondary)}
+.editor .lit{color:#1E6F81}
+.caretbar{display:inline-block;width:1px;height:16px;background:var(--c-text-primary);animation:blink 1s step-end infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+
+.vref{position:relative;display:inline-flex;align-items:center;gap:4px;padding:0 5px;border-radius:var(--r-sm);background:var(--c-tag-purple-bg);color:var(--c-tag-purple-tx);font:600 13px/1.5 var(--mono);cursor:pointer;border:1px solid transparent}
+.vref:hover{border-color:var(--c-tag-purple-tx)}
+.vref .vicon{font-size:10px;opacity:.8}
+
+/* hover card */
+.hovercard{position:absolute;z-index:40;top:calc(100% + 8px);left:0;width:460px;background:var(--c-background-surface-secondary);border:1px solid var(--c-border-strong);border-radius:var(--r-lg);box-shadow:var(--shadow-pop);padding:12px;display:flex;flex-direction:column;gap:10px}
+.hovercard .hc-hd{display:flex;align-items:center;gap:6px}
+.hovercard .hc-hd .nm{font:600 13px/1.5 var(--mono)}
+.hovercard .lbl{font:700 10px/1.5 var(--font);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.codebox{background:var(--c-background-surface-primary);border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:8px;font:400 12px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word}
+.dslist{display:flex;flex-wrap:wrap;gap:4px}
+.dspill{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:100px;background:var(--c-background-surface-primary);border:1px solid var(--c-border-subtle);font:400 11px/1.5 var(--mono)}
+.hc-ft{display:flex;align-items:center;gap:8px;border-top:1px solid var(--c-border-subtle);padding-top:8px}
+.kbd{display:inline-block;padding:1px 5px;border:1px solid var(--c-border-strong);border-bottom-width:2px;border-radius:var(--r-sm);background:var(--c-background-surface-primary);font:600 10px/1.5 var(--font)}
+.linkish{color:var(--c-text-interactive);font:600 11px/1.5 var(--font);cursor:pointer}
+
+/* results */
+.results{border:1px solid var(--c-border-subtle);border-radius:var(--r-md);overflow:hidden}
+.rrow{display:grid;grid-template-columns:130px 120px 1fr;gap:12px;padding:7px 10px;border-bottom:1px solid var(--c-border-subtle);font:400 12px/1.5 var(--mono)}
+.rrow:last-child{border-bottom:none}
+.rrow.hd{background:var(--c-background-surface-primary);font:700 10px/1.5 var(--font);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.rrow .muted{color:var(--c-text-secondary)}
+
+.banner{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:var(--r-md);background:#FDF6E3;border:1px solid #E4B83C55;font:400 12px/1.5 var(--font)}
+.banner .ic{color:var(--c-icon-warning);font-weight:700}
+
+.callouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.callout{border:1px solid var(--c-border-subtle);border-left:3px solid var(--c-border-interactive);border-radius:var(--r-md);padding:9px 11px;background:var(--c-background-surface-primary)}
+.callout b{display:block;font:700 11px/1.5 var(--font);margin-bottom:3px}
+.callout span{font:400 11px/1.5 var(--font);color:var(--c-text-secondary)}
+.callout.warn{border-left-color:var(--c-icon-warning)}
+footer{padding:0 16px 24px;max-width:1160px;color:var(--c-text-secondary);font:400 11px/1.6 var(--font)}
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+  <h1>Explore</h1>
+  <span class="tag tag--virtual">virtual datasets</span>
+  <div class="spacer"></div>
+  <span class="note">Reference screen, 2026-09-09 · built from the 23-08 Harel and Redlus session (R7)</span>
+</div>
+
+<div class="statebar">
+  <b>State</b>
+  <button class="sbtn on" data-state="picker">1 · Dataset picker</button>
+  <button class="sbtn" data-state="typing">2 · Autocomplete while typing</button>
+  <button class="sbtn" data-state="chip">3 · Reference chip in the editor</button>
+  <button class="sbtn" data-state="hover">4 · Hover the reference</button>
+  <button class="sbtn" data-state="partial">5 · Partial access</button>
+  <button class="sbtn" data-state="noquery">6 · No query permission</button>
+</div>
+
+<main>
+
+  <div class="card">
+    <div>
+      <h2 id="stateTitle">Dataset picker shows what is virtual</h2>
+      <p class="sub" id="stateSub">A virtual dataset sits in the same picker as a real one, with its type shown on the row.</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <span class="fieldlabel">Dataset</span>
+        <div class="control" id="dsControl">
+          <span class="mono" id="dsValue">noam-all</span>
+          <span class="tag tag--virtual" id="dsTag">virtual</span>
+          <span class="caret">▾</span>
+        </div>
+        <div class="panel" id="dsPanel" hidden>
+          <div class="grouphd">Virtual datasets</div>
+          <div class="opt"><span class="nm">noam-all</span><span class="rt"><span class="tag tag--virtual">virtual</span><span class="tag tag--logs">logs</span></span></div>
+          <div class="opt"><span class="nm">platform_data</span><span class="rt"><span class="tag tag--virtual">virtual</span><span class="tag tag--logs">logs</span></span></div>
+          <div class="grouphd">Datasets</div>
+          <div class="opt"><span class="nm">default/logs</span><span class="rt"><span class="tag tag--logs">logs</span></span></div>
+          <div class="opt"><span class="nm">default/log_events</span><span class="rt"><span class="tag tag--logs">logEvents</span></span></div>
+          <div class="opt"><span class="nm">default/spans</span><span class="rt"><span class="tag tag--spans">spans</span></span></div>
+          <div class="opt"><span class="nm">payments-eu-west-1</span><span class="rt"><span class="tag tag--logs">logs</span></span></div>
+          <div class="opt"><span class="nm">payments-us-east-1</span><span class="rt"><span class="tag tag--logs">logs</span></span></div>
+        </div>
+      </div>
+
+      <div class="field" style="flex:1">
+        <span class="fieldlabel">Query</span>
+        <div class="editor" id="editor"></div>
+        <div class="panel" id="acPanel" hidden style="width:520px">
+          <div class="grouphd">Virtual datasets</div>
+          <div class="opt" id="acHoverRow"><span class="nm">noam-all</span><span class="rt"><span class="tag tag--virtual">virtual</span><span class="tag tag--logs">logs</span></span></div>
+          <div class="opt"><span class="nm">noam-payments</span><span class="rt"><span class="tag tag--virtual">virtual</span><span class="tag tag--logs">logs</span></span></div>
+          <div class="grouphd">Datasets</div>
+          <div class="opt"><span class="nm">noam-sandbox</span><span class="rt"><span class="tag tag--logs">logs</span></span></div>
+        </div>
+        <div class="hovercard" id="hoverCard" hidden></div>
+      </div>
+    </div>
+
+    <div class="banner" id="partialBanner" hidden>
+      <span class="ic">!</span>
+      <span>You may not have access to all the data.</span>
+    </div>
+
+    <div class="results" id="results">
+      <div class="rrow hd"><span>Timestamp</span><span>Dataset</span><span>Message</span></div>
+      <div class="rrow"><span class="muted">12:04:11.220</span><span>payments-eu-west-1</span><span>checkout completed order=8812</span></div>
+      <div class="rrow"><span class="muted">12:04:11.208</span><span>payments-us-east-1</span><span>settlement batch accepted</span></div>
+      <div class="rrow"><span class="muted">12:04:10.981</span><span>payments-ap-south-1</span><span>retry scheduled attempt=2</span></div>
+      <div class="rrow"><span class="muted">12:04:10.774</span><span>default/logs</span><span>gateway healthy</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>What this screen has to answer</h2>
+    <div class="callouts">
+      <div class="callout"><b>The name is enough</b><span>The user types one name instead of nine, and the platform expands it when the query runs.</span></div>
+      <div class="callout"><b>The user can tell it is virtual</b><span>The picker row and the editor both mark it, so nobody mistakes it for a real dataset.</span></div>
+      <div class="callout"><b>The user can see what it covers</b><span>Hover shows the definition and the datasets it resolves to now, without leaving the query.</span></div>
+      <div class="callout"><b>The user can open it</b><span>Command-click on the reference opens the definition on the Virtual datasets page.</span></div>
+      <div class="callout warn"><b>Partial access says nothing specific</b><span>The unreachable part returns nothing and the user gets one general notice. It never names a dataset.</span></div>
+      <div class="callout warn"><b>No query permission, no name</b><span>Without the query permission the name is absent from the picker and from autocomplete, and a query naming it returns nothing.</span></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Source: 23-08 Harel and Redlus session, item R7 (hover shows the definition, command-click opens it, a chip marks a virtual reference on the DataPrime parser, Explore Log shows dataset type).
+  Constraints from the same session: expansion is server-side, and a user without read must never learn a dataset is virtual.
+  This is a reference for a design ticket. It is not production behaviour.
+</footer>
+
+<script>
+let pinned = false, hideTimer = null;
+const DEF = "source payments-eu-west-1, payments-us-east-1, payments-ap-south-1, default/logs";
+const COVERS = ["payments-eu-west-1","payments-us-east-1","payments-ap-south-1","default/logs"];
+
+const el = id => document.getElementById(id);
+const editor = el('editor'), dsPanel = el('dsPanel'), dsControl = el('dsControl');
+const acPanel = el('acPanel'), hoverCard = el('hoverCard'), partial = el('partialBanner');
+const results = el('results'), title = el('stateTitle'), sub = el('stateSub');
+const dsValue = el('dsValue'), dsTag = el('dsTag');
+
+function refChip(){
+  return '<span class="vref" id="vref"><span class="vicon">◆</span>noam-all</span>';
+}
+function editorHTML(opts){
+  const o = opts || {};
+  if (o.typing) return '<span class="kw">source</span>&nbsp;<span class="lit">noam-</span><span class="caretbar"></span>';
+  if (o.plain)  return '<span class="kw">source</span>&nbsp;<span class="lit">noam-all</span>&nbsp;<span class="op">|</span>&nbsp;<span class="kw">filter</span>&nbsp;<span class="lit">$d.status &gt;= 500</span>';
+  return '<span class="kw">source</span>&nbsp;' + refChip() + '&nbsp;<span class="op">|</span>&nbsp;<span class="kw">filter</span>&nbsp;<span class="lit">$d.status &gt;= 500</span>';
+}
+function hoverHTML(){
+  return '<div class="hc-hd"><span class="vicon" style="color:var(--c-tag-purple-tx)">◆</span>'
+    + '<span class="nm">noam-all</span><span class="tag tag--virtual">virtual</span><span class="tag tag--logs">logs</span></div>'
+    + '<div><div class="lbl">Definition</div><div class="codebox">' + DEF + '</div></div>'
+    + '<div><div class="lbl">Resolves to now · ' + COVERS.length + '</div><div class="dslist">'
+    + COVERS.map(d => '<span class="dspill">' + d + '</span>').join('') + '</div></div>'
+    + '<div class="hc-ft"><span class="kbd">⌘</span><span class="note">click to open the definition</span>'
+    + '<span style="flex:1"></span><span class="linkish">Open virtual dataset</span></div>';
+}
+
+const STATES = {
+  picker: {
+    t:'Dataset picker shows what is virtual',
+    s:'A virtual dataset sits in the same picker as a real one, with its type shown on the row.',
+    apply(){ openDrawer(true); editor.innerHTML=editorHTML(); }
+  },
+  typing: {
+    t:'Autocomplete offers the name while the user types',
+    s:'Suggestions separate virtual datasets from real ones. Hovering a suggestion shows the same definition card.',
+    apply(){ acPanel.hidden=false; editor.innerHTML=editorHTML({typing:true}); }
+  },
+  chip: {
+    t:'The reference is marked in the editor',
+    s:'A chip marks the name as a virtual reference. Harel put this on the DataPrime parser.',
+    apply(){ editor.innerHTML=editorHTML(); }
+  },
+  hover: {
+    t:'Hover shows the definition and what it covers',
+    s:'The card shows the query the name stands for and the datasets it resolves to right now. Command-click opens the definition. Shown pinned here; elsewhere it follows the pointer.',
+    apply(){ editor.innerHTML=editorHTML(); showCard(); pinned=true;
+             const v=el('vref'); if(v) v.style.borderColor='var(--c-tag-purple-tx)'; }
+  },
+  partial: {
+    t:'Partial access returns less, and says so once',
+    s:'The datasets the user cannot reach return nothing. One general notice appears, and it never names a dataset.',
+    apply(){ editor.innerHTML=editorHTML(); partial.hidden=false;
+             results.querySelectorAll('.rrow:not(.hd)').forEach((r,i)=>{ if(i>1) r.hidden=true; }); }
+  },
+  noquery: {
+    t:'Without the query permission the name does not exist',
+    s:'The name is absent from the picker and from autocomplete, and a query naming it returns nothing. The user is never told a virtual dataset is there.',
+    apply(){ editor.innerHTML=editorHTML({plain:true});
+             dsValue.textContent='default/logs'; dsTag.className='tag tag--logs'; dsTag.textContent='logs';
+             dsPanel.querySelectorAll('.grouphd')[0].hidden=true;
+             dsPanel.querySelectorAll('.opt')[0].hidden=true;
+             dsPanel.querySelectorAll('.opt')[1].hidden=true;
+             openDrawer(true);
+             results.querySelectorAll('.rrow:not(.hd)').forEach(r=>r.hidden=true);
+             results.insertAdjacentHTML('beforeend','<div class="rrow" id="emptyRow"><span class="muted">—</span><span class="muted">—</span><span class="muted">No results</span></div>'); }
+  }
+};
+
+function reset(){
+  pinned=false; clearTimeout(hideTimer);
+  dsPanel.hidden=true; acPanel.hidden=true; hoverCard.hidden=true; partial.hidden=true;
+  dsControl.classList.remove('open');
+  dsValue.textContent='noam-all'; dsTag.className='tag tag--virtual'; dsTag.textContent='virtual';
+  dsPanel.querySelectorAll('.grouphd').forEach(g=>g.hidden=false);
+  dsPanel.querySelectorAll('.opt').forEach(o=>o.hidden=false);
+  results.querySelectorAll('.rrow:not(.hd)').forEach(r=>r.hidden=false);
+  const er=el('emptyRow'); if(er) er.remove();
+}
+function go(key){
+  reset();
+  const st=STATES[key]; if(!st) return;
+  title.textContent=st.t; sub.textContent=st.s; st.apply();
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('on', b.dataset.state===key));
+}
+document.querySelectorAll('.sbtn').forEach(b=>b.addEventListener('click',()=>go(b.dataset.state)));
+
+/* The card must follow the pointer: it opens on the reference, survives a move
+   into the card itself (so the CTA is reachable), and closes on the way out.
+   State 4 pins it open so the state is inspectable without a mouse. */
+function showCard(){ clearTimeout(hideTimer); hoverCard.innerHTML=hoverHTML(); hoverCard.hidden=false; }
+function hideCard(){ if(!pinned) hoverCard.hidden=true; }
+function scheduleHide(){ if(pinned) return; clearTimeout(hideTimer); hideTimer=setTimeout(hideCard,120); }
+
+function isCardTarget(t){ return !!(t && t.closest && (t.closest('.vref') || t.closest('#hoverCard') || (t.closest('#acHoverRow')))); }
+
+editor.addEventListener('mouseover', e=>{ if(e.target.closest('.vref')) showCard(); });
+editor.addEventListener('mouseout',  e=>{ if(e.target.closest('.vref') && !isCardTarget(e.relatedTarget)) scheduleHide(); });
+
+acPanel.addEventListener('mouseover', e=>{ if(e.target.closest('#acHoverRow')) showCard(); });
+acPanel.addEventListener('mouseout',  e=>{ if(e.target.closest('#acHoverRow') && !isCardTarget(e.relatedTarget)) scheduleHide(); });
+
+hoverCard.addEventListener('mouseenter', ()=>clearTimeout(hideTimer));
+hoverCard.addEventListener('mouseleave', ()=>scheduleHide());
+
+/* The dataset drawer opens and closes like the real picker: click the control to
+   toggle, click a row to choose it, click anywhere else to dismiss. */
+function openDrawer(open){
+  dsPanel.hidden = !open;
+  dsControl.classList.toggle('open', open);
+}
+dsControl.addEventListener('click', e=>{
+  e.stopPropagation();
+  acPanel.hidden = true;
+  openDrawer(dsPanel.hidden);
+});
+dsPanel.addEventListener('click', e=>{
+  e.stopPropagation();
+  const row = e.target.closest('.opt');
+  if(!row) return;
+  dsValue.textContent = row.querySelector('.nm').textContent;
+  const virtual = !!row.querySelector('.tag--virtual');
+  const type = row.querySelector('.rt .tag:last-child');
+  dsTag.className = virtual ? 'tag tag--virtual' : (type ? type.className : 'tag tag--logs');
+  dsTag.textContent = virtual ? 'virtual' : (type ? type.textContent : 'logs');
+  openDrawer(false);
+});
+acPanel.addEventListener('click', e=>e.stopPropagation());
+document.addEventListener('click', ()=>{ openDrawer(false); acPanel.hidden = true; });
+const initial = new URLSearchParams(location.search).get('state');
+go(STATES[initial] ? initial : 'picker');
+</script>
+</body>
+</html>
