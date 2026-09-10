@@ -455,7 +455,7 @@ ul.r li::marker{color:var(--text-4)}
   <!-- ══ screen 1 · dataset definitions ══ -->
   <div id="s-def">
     <h1 class="page">Dataset Definitions</h1>
-    <p class="pagesub">The dataset <b>name is the key</b>. There is no matcher on this screen. A definition holds description, optional bucket name, dataset type, physical location, ingestion mode, entityType, partitioning, retention, quota and access. Creating a name that already exists is an error.</p>
+    <p class="pagesub">The dataset <b>name is the key</b>. There is no matcher on this screen. A definition holds description, dataset type, physical location, ingestion mode, entityType, partitioning, retention, quota and access. Creating a name that already exists is an error.</p>
 
     <div class="card">
       <div class="card__hd">
@@ -633,7 +633,7 @@ ul.r li::marker{color:var(--text-4)}
           <h4>Dataset Definitions</h4>
           <p>The dataset <b>name is the key</b>. No matcher field at all.</p>
           <ul class="r">
-            <li>Fields: description, optional bucket name, ingestion mode, entityType, physical location, retention, partitioning, PBAC.</li>
+            <li>Fields: description, ingestion mode, entityType, physical location, retention, partitioning, PBAC.</li>
             <li>A duplicate name returns an error.</li>
             <li>It is a list of configured datasets and nothing more.</li>
           </ul>
@@ -669,7 +669,7 @@ ul.r li::marker{color:var(--text-4)}
 
         <div class="sect sect--wide">
           <h4>The three declared properties, and why empty is not one of them</h4>
-          <p>The 20-08 constraints concept put three properties on the create form and offered two paths for each: declare it now, or leave it empty and let the first write settle it. The second path is gone by agreement. <b>Ingestion mode, entityType and partitioning are declared at creation and cannot be left empty</b>, so a new definition starts with all three unset and the save is refused until each one is picked. The page keeps a fourth field from that concept, the optional bucket name, which the platform may name itself.</p>
+          <p>The 20-08 constraints concept put three properties on the create form and offered two paths for each: declare it now, or leave it empty and let the first write settle it. The second path is gone by agreement. <b>Ingestion mode, entityType and partitioning are declared at creation and cannot be left empty</b>, so a new definition starts with all three unset and the save is refused until each one is picked. The concept's fourth field, an optional bucket name, is out of this page: the platform names the bucket.</p>
           <p><b>Ingestion mode</b> decides who writes the dataset: streaming, written continuously as it arrives at the pipeline, or summary, written by a background query execution. It also decides the pillar in practice, because a summary lands as <span class="mono">jsonData</span> rather than as logs. It locks at creation, since the two write paths cannot be mixed on one dataset.</p>
         </div>
 
@@ -834,7 +834,7 @@ ul.r li::marker{color:var(--text-4)}
     return {
       id:o.id || ('d'+(++defSeq)), name:o.name, desc:o.desc||'',
       type:o.type||'archive', entityType:o.entityType||'logs',
-      ingestion:o.ingestion||'streaming', bucket:o.bucket||'',
+      ingestion:o.ingestion||'streaming',
       location:o.location||'s3-eu-west-1',
       retention:o.retention||'Default', quota:(o.quota===undefined?'':o.quota),
       access:o.access||'Default Policy', partitioning:o.partitioning||'Partitioned',
@@ -882,7 +882,7 @@ ul.r li::marker{color:var(--text-4)}
           desc:'Defined by hand ahead of next year\'s audit. Nothing has been written to it yet.',
           history:[{when:'2026-09-04', what:'Created at S3 · il-central-1 by sarah.chen@company.com'}] }),
     def({ name:'ml-feature-export', from:null, createdBy:'olivier.combe@company.com', entityType:'jsonData',
-          ingestion:'summary', bucket:'cx-ml-features-eu',
+          ingestion:'summary',
           location:'gcs-eu-west-4', retention:'Short', quota:'', access:'Team Only', hasData:false,
           desc:'Written by a background query, not by the pipeline. Defined by hand so a TCO rule could target it before any data arrived.',
           history:[{when:'2026-09-05', what:'Created at GCS · eu-west-4 by olivier.combe@company.com'}] }),
@@ -1240,12 +1240,8 @@ ul.r li::marker{color:var(--text-4)}
       + '<div class="f"><label class="fl">Dataset name <span class="req">*</span></label>'
       + '<input class="inp mono" id="f-name" value="' + esc(d.name) + '"' + (isNew?'':' readonly') + ' placeholder="e.g. logs-me-south-1">'
       + '<span class="err hide" id="f-name-err"></span></div>'
-      + '<div class="f2"><div class="f"><label class="fl">Description <span class="opt">(optional)</span></label>'
-      + '<input class="inp" id="f-desc" value="' + esc(d.desc) + '"></div>'
-      + '<div class="f"><label class="fl">Bucket name <span class="opt">(optional)</span></label>'
-      + '<input class="inp mono" id="f-bucket" value="' + esc(d.bucket) + '" placeholder="platform picks one">'
-      + '<span class="hint">From the 20-08 constraints concept. Empty is allowed here, because the platform can name the bucket itself. '
-      + 'That is not true of the three declared properties below.</span></div></div></div>';
+      + '<div class="f"><label class="fl">Description <span class="opt">(optional)</span></label>'
+      + '<input class="inp" id="f-desc" value="' + esc(d.desc) + '"></div></div>';
 
     h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">2</span>Type, then location</span>'
       + '<span class="grow"></span>' + typeBadge(d.type) + '</div>'
@@ -1333,7 +1329,7 @@ ul.r li::marker{color:var(--text-4)}
         if (redraw) drawDefBody();
       });
     }
-    on('f-name','name'); on('f-desc','desc'); on('f-quota','quota'); on('f-bucket','bucket');
+    on('f-name','name'); on('f-desc','desc'); on('f-quota','quota');
     on('f-ret','retention','change'); on('f-acc','access','change');
     on('f-ent','entityType','change'); on('f-part','partitioning','change');
     on('f-ing','ingestion','change'); on('f-loc','location','change');
@@ -1533,8 +1529,7 @@ ul.r li::marker{color:var(--text-4)}
     var t = r.targets[ti];
 
     h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">2</span>Destination</span></div>'
-      + '<p class="dsec__desc">A rule routes matched data to one or more destinations. Each destination is one dataspace and one dataset, '
-      + 'The dataspace is read-only while it is the default one. The dataset type comes first, because it decides which datasets this destination can reach.</p>';
+      + '<p class="dsec__desc">One tab per destination, each a dataspace and a dataset. The type comes first, because it decides which datasets this destination can reach.</p>';
 
     h += '<div class="ttabs" id="h-tabs">'
       + r.targets.map(function(x, i){
@@ -1553,25 +1548,21 @@ ul.r li::marker{color:var(--text-4)}
         + 'Fan-out is a cost decision, not a routing convenience.</div></div>';
     }
 
-    h += '<div class="f"><label class="fl">Dataset type</label>'
+    h += '<div class="f2"><div class="f"><label class="fl">Dataset type</label>'
       + selHTML('h-dstype', [
           {v:'archive',   l:'Archive · stored and queryable'},
           {v:'forwarder', l:'Forwarder · streamed out, not stored'}
         ], t.dstype)
-      + '<span class="hint">Archive covers S3, GCS and COS. Forwarder covers MSK, Custom Kafka and IBM Event Streams. '
-      + 'Pick the type first: it filters the dataset list below to datasets of that type, and on a dynamic destination it is '
-      + 'the type the dataset is created with.</span></div>';
-
-    h += '<div class="f"><label class="fl">Target mode</label>' + selHTML('h-mode', [
+      + '<span class="hint">Archive is S3, GCS, COS. Forwarder is MSK, Custom Kafka, IBM Event Streams. It filters the dataset list below.</span></div>'
+      + '<div class="f"><label class="fl">Target mode</label>' + selHTML('h-mode', [
           {v:'static',  l:'Static dataset · pick from datasets that exist'},
           {v:'dynamic', l:'Dynamic dataset · a validated name template'}
         ], t.mode)
-      + '<span class="hint">Set per destination. Which one you pick decides whether this destination can be enumerated '
-      + 'before any data arrives.</span></div>';
+      + '<span class="hint">Decides whether this destination can be named before any data arrives.</span></div></div>';
 
     var dsSel = '<div class="f"><label class="fl">Dataspace</label>'
       + '<select class="sel" id="h-dataspace" disabled><option>Default</option></select>'
-      + '<span class="hint">Read-only. The default dataspace is the only one this page models.</span></div>';
+      + '<span class="hint">Read-only on the default dataspace.</span></div>';
 
     if (t.mode === 'static') {
       var used = r.targets.filter(function(x){ return x.id !== t.id; }).map(function(x){ return x.dataset; });
@@ -1586,10 +1577,8 @@ ul.r li::marker{color:var(--text-4)}
           }).join('')
         + '</select>'
         + '<span class="hint">' + names.length + ' of ' + definitions.length + ' definitions are '
-        + (t.dstype === 'archive' ? 'archive' : 'forwarder') + ' datasets, and only those are listed. '
-        + 'You cannot select a dataset that does not exist, and there is a create path next to it. '
-        + 'A dataset already used by another destination on this rule is greyed out, because a name is unique inside a dataspace.'
-        + '</span></div></div>';
+        + (t.dstype === 'archive' ? 'archive' : 'forwarder') + ' datasets, and only those are listed. A dataset already used by '
+        + 'another destination on this rule is greyed out, because a name is unique inside a dataspace.</span></div></div>';
     } else {
       var tplTip = '<span class="tipwrap" tabindex="0"><span class="tipic">i</span><span class="tipbox">'
         + 'The template <b>produces</b> the name from the data, so no dropdown is possible. '
@@ -1613,7 +1602,10 @@ ul.r li::marker{color:var(--text-4)}
 
       var refTip = '<span class="tipwrap" tabindex="0"><span class="tipic">i</span><span class="tipbox">'
         + 'Refresh runs a <b>DataPrime query over historical data</b> to read the placeholder values already received, '
-        + 'and rebuilds this list from them. It reports what has arrived. It cannot report a value that has never arrived.'
+        + 'and rebuilds this list from them.<br>'
+        + '<b>This is the part to make clear to the user.</b> Until data that matches the template has been sent there is nothing '
+        + 'to list, no dataset exists, and the admin cannot see what this rule will produce. A value that has never arrived will '
+        + 'not appear, and the dataset for it is created the first time it does.'
         + '</span></span>';
 
       h += '<div class="f"><label class="fl">Names this template produces '
@@ -1621,12 +1613,9 @@ ul.r li::marker{color:var(--text-4)}
         + '<span class="grow"></span>'
         + '<button class="tbtn" type="button" id="h-refresh">Refresh</button>' + refTip + '</label>'
         + '<div id="h-madewrap">' + madeHTML(t) + '</div>'
-        + (t.queried ? '<span class="hint">DataPrime query run ' + esc(t.queried) + '.</span>' : '')
-        + '<span class="hint">The name is built <b>per event, at write time</b>, from the template and the value on that event, '
-        + 'so this list is not a prediction. It can only show names built from placeholder values we have <b>already received</b>.<br>'
-        + '<b>This is the part to make clear to the user.</b> Until data that matches the template has been sent there is nothing '
-        + 'to list here, no dataset exists, and the admin cannot see what this rule will produce. A value that has never arrived '
-        + 'will not appear, and the dataset for it is created the first time it does.</span></div>';
+        + '<span class="hint">Built <b>per event, at write time</b>: values already received, not a prediction.'
+        + (t.queried ? ' Query run ' + esc(t.queried) + '.' : '')
+        + '</span></div>';
     }
 
     h += '</div>';
