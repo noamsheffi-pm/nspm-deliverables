@@ -1,0 +1,2045 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dataset Definitions and Config Templates — working simulation</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Tokens. Carried over from the 31-08 simulation: a neutral ramp plus five
+   semantic hues, each with a surface and a border, so state never has to be
+   carried by text colour alone.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --n0:#ffffff; --n1:#fcfcfd; --n2:#f7f8fa; --n3:#f1f3f7; --n4:#e7eaf0;
+  --n5:#d9dee6; --n6:#b7bfca; --n7:#7d8798; --n8:#5a6472; --n9:#343b46; --n10:#13171e;
+
+  --page:var(--n2); --surface:var(--n0); --sunk:var(--n1); --sunk-2:var(--n3);
+  --border:var(--n4); --border-2:var(--n5); --rail:var(--n4);
+  --text:var(--n10); --text-2:var(--n8); --text-3:var(--n7); --text-4:var(--n6);
+
+  --blue:#2563eb;   --blue-sf:#eff4ff; --blue-br:#c2d5ff;
+  --green:#067a4e;  --green-sf:#ecfdf5; --green-br:#a9e9cb;
+  --amber:#96470c;  --amber-sf:#fffaeb; --amber-br:#fbd89f;
+  --red:#b42318;    --red-sf:#fef3f2;  --red-br:#fbc9c4;
+  --violet:#6431c8; --violet-sf:#f5f3ff; --violet-br:#d8cffc;
+
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+
+  --r-sm:6px; --r:8px; --r-md:10px; --r-lg:14px;
+  --sh-1:0 1px 2px rgba(19,23,30,.05);
+  --sh-2:0 1px 2px rgba(19,23,30,.05), 0 2px 6px rgba(19,23,30,.05);
+  --sh-3:0 1px 3px rgba(19,23,30,.08), 0 12px 32px -8px rgba(19,23,30,.16);
+  --sh-4:0 2px 6px rgba(19,23,30,.10), 0 32px 64px -16px rgba(19,23,30,.28);
+  --ring:0 0 0 3px rgba(37,99,235,.16);
+  --t:130ms cubic-bezier(.4,0,.2,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#0d1015; --surface:#14181f; --sunk:#171c23; --sunk-2:#1d232b;
+  --border:#262d37; --border-2:#333b46; --rail:#2b333e;
+  --text:#e9edf3; --text-2:#a4aeba; --text-3:#74808e; --text-4:#5a6472;
+  --blue:#6ea6ff;   --blue-sf:#111f38;  --blue-br:#2b4a80;
+  --green:#3fcf8e;  --green-sf:#0c2a1d; --green-br:#1e5f42;
+  --amber:#e6ab60;  --amber-sf:#2a2011; --amber-br:#6b4a15;
+  --red:#f18b7e;    --red-sf:#2b1513;   --red-br:#7a352e;
+  --violet:#b7abf8; --violet-sf:#1f1a3b;--violet-br:#473c7a;
+  --sh-1:0 1px 2px rgba(0,0,0,.5);
+  --sh-2:0 1px 2px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.35);
+  --sh-3:0 1px 3px rgba(0,0,0,.6), 0 12px 32px -8px rgba(0,0,0,.6);
+  --sh-4:0 2px 8px rgba(0,0,0,.6), 0 32px 64px -16px rgba(0,0,0,.75);
+  --ring:0 0 0 3px rgba(110,166,255,.22);
+}}
+[data-theme="dark"]{
+  --page:#0d1015; --surface:#14181f; --sunk:#171c23; --sunk-2:#1d232b;
+  --border:#262d37; --border-2:#333b46; --rail:#2b333e;
+  --text:#e9edf3; --text-2:#a4aeba; --text-3:#74808e; --text-4:#5a6472;
+  --blue:#6ea6ff;   --blue-sf:#111f38;  --blue-br:#2b4a80;
+  --green:#3fcf8e;  --green-sf:#0c2a1d; --green-br:#1e5f42;
+  --amber:#e6ab60;  --amber-sf:#2a2011; --amber-br:#6b4a15;
+  --red:#f18b7e;    --red-sf:#2b1513;   --red-br:#7a352e;
+  --violet:#b7abf8; --violet-sf:#1f1a3b;--violet-br:#473c7a;
+  --sh-1:0 1px 2px rgba(0,0,0,.5);
+  --sh-2:0 1px 2px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.35);
+  --sh-3:0 1px 3px rgba(0,0,0,.6), 0 12px 32px -8px rgba(0,0,0,.6);
+  --sh-4:0 2px 8px rgba(0,0,0,.6), 0 32px 64px -16px rgba(0,0,0,.75);
+  --ring:0 0 0 3px rgba(110,166,255,.22);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--page);color:var(--text);
+  font-family:var(--sans);font-size:13.5px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  font-feature-settings:"kern" 1,"liga" 1,"cv05" 1;
+}
+.hide{display:none !important}
+.mono{font-family:var(--mono);font-size:.925em;letter-spacing:-.01em;font-variant-ligatures:none}
+.grow{flex:1 1 auto;min-width:0}
+.sep{width:1px;height:20px;background:var(--border);flex:none}
+::selection{background:var(--blue-sf)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+
+.drawer__body,.pvlist,.tablewrap,.modal__box{scrollbar-width:thin;scrollbar-color:var(--border-2) transparent}
+.drawer__body::-webkit-scrollbar,.pvlist::-webkit-scrollbar,.tablewrap::-webkit-scrollbar,.modal__box::-webkit-scrollbar{width:9px;height:9px}
+.drawer__body::-webkit-scrollbar-thumb,.pvlist::-webkit-scrollbar-thumb,.tablewrap::-webkit-scrollbar-thumb,.modal__box::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px;border:2px solid transparent;background-clip:content-box}
+
+/* ── app bar ─────────────────────────────────────────────────────────── */
+.appbar{
+  display:flex;align-items:center;gap:14px;padding:0 22px;height:52px;min-height:52px;
+  border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
+  position:sticky;top:0;z-index:30;flex-wrap:wrap;
+}
+.brandmark{font-weight:650;font-size:12.5px;color:var(--text-2);letter-spacing:-.005em;white-space:nowrap}
+.navtabs{display:flex;gap:2px}
+.navtabs button{
+  background:none;border:1px solid transparent;border-radius:var(--r-sm);
+  color:var(--text-3);font-family:inherit;font-size:13px;font-weight:550;
+  padding:6px 11px;cursor:pointer;transition:color var(--t),background var(--t);letter-spacing:-.005em;
+}
+.navtabs button:hover{color:var(--text-2);background:var(--sunk-2)}
+.navtabs button.on{color:var(--text);background:var(--sunk-2);border-color:var(--border);box-shadow:var(--sh-1)}
+.tbtn{
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-sm);
+  color:var(--text-2);font-family:inherit;font-size:11.5px;font-weight:600;
+  padding:5px 10px;cursor:pointer;transition:border-color var(--t),color var(--t);
+}
+.tbtn:hover{border-color:var(--text-4);color:var(--text)}
+.notreal{
+  display:inline-flex;align-items:center;gap:5px;background:var(--violet-sf);color:var(--violet);
+  border:1px solid var(--violet-br);border-radius:var(--r-sm);padding:3px 9px;
+  font-size:10.5px;font-weight:650;letter-spacing:.01em;white-space:nowrap;
+}
+.notreal::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
+
+.shell{max-width:1460px;margin:0 auto;padding:22px 22px 96px}
+h1.page{font-size:22px;font-weight:680;margin:0 0 3px;letter-spacing:-.021em;line-height:1.25}
+.pagesub{color:var(--text-3);font-size:13px;margin:0 0 18px;max-width:82ch}
+.pagesub b{color:var(--text-2);font-weight:650}
+
+/* ── the control strip ───────────────────────────────────────────────── */
+.strip{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:11px 14px;box-shadow:var(--sh-2);margin-bottom:20px;
+}
+.strip__lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-4);white-space:nowrap}
+.strip__verdict{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px}
+.whybtn{
+  background:none;border:none;color:var(--blue);font-family:inherit;font-size:12px;
+  font-weight:600;cursor:pointer;padding:2px 0;position:relative;white-space:nowrap;
+}
+.whybtn::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;opacity:.35;transition:opacity var(--t)}
+.whybtn:hover::after{opacity:1}
+
+/* ── cards ───────────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-2);margin-bottom:18px;overflow:hidden}
+.card__hd{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.card__title{font-size:14.5px;font-weight:650;margin:0;letter-spacing:-.012em}
+.card__sub{font-size:12px;color:var(--text-3);letter-spacing:-.002em}
+.cardpad{padding:14px 16px}
+.counter{
+  display:inline-flex;align-items:center;font-family:var(--mono);font-size:11px;font-weight:600;
+  padding:2px 8px;border-radius:99px;background:var(--sunk-2);color:var(--text-2);
+  border:1px solid var(--border);font-variant-numeric:tabular-nums;transition:all var(--t);
+}
+.counter--amber{background:var(--amber-sf);color:var(--amber);border-color:var(--amber-br)}
+.counter--red{background:var(--red-sf);color:var(--red);border-color:var(--red-br)}
+
+/* ── segmented control ───────────────────────────────────────────────── */
+.btngroup{
+  display:inline-flex;border:1px solid var(--border-2);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--sunk-2);padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(19,23,30,.03);
+}
+.btngroup button{
+  background:none;border:none;border-radius:5px;color:var(--text-3);font-family:inherit;
+  font-size:11.5px;font-weight:600;padding:5px 11px;cursor:pointer;white-space:nowrap;
+  transition:all var(--t);letter-spacing:-.003em;
+}
+.btngroup button:hover:not(:disabled):not(.on){color:var(--text);background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.btngroup button.on{background:var(--surface);color:var(--blue);box-shadow:var(--sh-1),inset 0 0 0 1px var(--blue-br)}
+.btngroup button.on.on--retired{color:var(--red);box-shadow:var(--sh-1),inset 0 0 0 1px var(--red-br)}
+.btngroup button:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── buttons ─────────────────────────────────────────────────────────── */
+.btn{
+  border-radius:var(--r-sm);font-family:inherit;font-size:12.5px;font-weight:600;
+  padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  white-space:nowrap;transition:all var(--t);letter-spacing:-.005em;
+}
+.btn--solid{background:var(--blue);border:1px solid transparent;color:#fff;box-shadow:var(--sh-1)}
+.btn--solid:hover{filter:brightness(1.07);box-shadow:var(--sh-2)}
+.btn--solid:active{filter:brightness(.95);transform:translateY(.5px)}
+.btn--ghost{background:var(--surface);border:1px solid var(--border-2);color:var(--text-2)}
+.btn--ghost:hover{border-color:var(--text-4);color:var(--text);background:var(--sunk)}
+.btn--danger{background:var(--surface);border:1px solid var(--red-br);color:var(--red)}
+.btn--danger:hover{background:var(--red-sf)}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;filter:none}
+
+/* ── tables ──────────────────────────────────────────────────────────── */
+.tablewrap{overflow-x:auto}
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px}
+table.grid th{
+  text-align:left;font-weight:600;font-size:10px;letter-spacing:.075em;text-transform:uppercase;
+  color:var(--text-4);padding:10px 13px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--sunk);
+}
+table.grid td{padding:0 13px;height:44px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.grid tbody tr:last-child td{border-bottom:none}
+table.grid td:first-child,table.grid th:first-child{padding-left:16px}
+table.grid td:last-child,table.grid th:last-child{padding-right:16px}
+tr.clickable{cursor:pointer;transition:background var(--t)}
+tr.clickable:hover td{background:var(--sunk)}
+tr.clickable:hover td:first-child{box-shadow:inset 2px 0 0 var(--blue)}
+tr.row--default td{background:var(--sunk);color:var(--text-2)}
+tr.row--default:hover td{background:var(--sunk-2)}
+tr.row--drift td{background:var(--amber-sf)}
+tr.row--drift td:first-child{box-shadow:inset 2px 0 0 var(--amber)}
+tr.row--fresh td{background:var(--green-sf)}
+tr.row--fresh td:first-child{box-shadow:inset 2px 0 0 var(--green)}
+tr.row--fwd td:first-child{box-shadow:inset 2px 0 0 var(--violet)}
+tr.row--drift,tr.row--fresh{animation:rowin 260ms cubic-bezier(.4,0,.2,1)}
+@keyframes rowin{from{opacity:.35}to{opacity:1}}
+.rowname{font-weight:600;letter-spacing:-.006em}
+.num{color:var(--text-3);font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums}
+.muted{color:var(--text-4)}
+.grip{color:var(--text-4);cursor:grab;user-select:none;font-size:10px;letter-spacing:-1.5px;margin-right:7px;display:inline-block;vertical-align:1px;transition:color var(--t)}
+tr:hover .grip{color:var(--text-3)}
+.grip--off{opacity:.3;cursor:not-allowed}
+.emptyrow{height:auto !important;padding:26px 16px !important;text-align:center;color:var(--text-3);font-size:12.5px}
+
+/* ── chips, tags, badges ─────────────────────────────────────────────── */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);
+  background:var(--sunk-2);border-radius:5px;padding:2.5px 7px;font-size:11.5px;
+  color:var(--text-2);white-space:nowrap;font-weight:500;line-height:1.35;
+}
+.chip--mono{font-family:var(--mono);font-size:10.5px;letter-spacing:-.01em;background:var(--surface)}
+.chip--locked{background:var(--sunk-2);color:var(--text-3);border-color:var(--border);font-weight:500}
+.chip--op{background:var(--violet-sf);color:var(--violet);border-color:var(--violet-br);font-weight:650}
+.tag{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--surface);border-radius:5px;padding:1.5px 7px;font-size:10.5px;color:var(--text-2);font-weight:550;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:2px 8px;font-size:9.5px;font-weight:700;letter-spacing:.055em;text-transform:uppercase;white-space:nowrap}
+.badge::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor;flex:none}
+.badge--green{background:var(--green-sf);color:var(--green);border:1px solid var(--green-br)}
+.badge--amber{background:var(--amber-sf);color:var(--amber);border:1px solid var(--amber-br)}
+.badge--red{background:var(--red-sf);color:var(--red);border:1px solid var(--red-br)}
+.badge--blue{background:var(--blue-sf);color:var(--blue);border:1px solid var(--blue-br)}
+.badge--grey{background:var(--sunk-2);color:var(--text-3);border:1px solid var(--border-2)}
+.badge--violet{background:var(--violet-sf);color:var(--violet);border:1px solid var(--violet-br)}
+
+.sw{display:inline-block;width:32px;height:18px;border-radius:99px;background:var(--green);position:relative;vertical-align:middle;cursor:pointer;border:none;padding:0;transition:background var(--t);box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.sw::after{content:"";position:absolute;top:2px;left:16px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(19,23,30,.3);transition:left var(--t)}
+.sw--off{background:var(--border-2)}
+.sw--off::after{left:2px}
+
+/* ── announcements ───────────────────────────────────────────────────── */
+.ann{display:flex;gap:10px;padding:11px 13px;border-radius:var(--r);border:1px solid var(--border);background:var(--sunk);font-size:12.5px;line-height:1.55;margin:0}
+.ann+.ann{margin-top:9px}
+.ann .ic{flex:none;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;margin-top:2px;line-height:1}
+.ann--info{background:var(--blue-sf);border-color:var(--blue-br);color:var(--text-2)}   .ann--info .ic{background:var(--blue)}
+.ann--warn{background:var(--amber-sf);border-color:var(--amber-br);color:var(--text-2)} .ann--warn .ic{background:var(--amber)}
+.ann--bad{background:var(--red-sf);border-color:var(--red-br);color:var(--text-2)}      .ann--bad .ic{background:var(--red)}
+.ann--ok{background:var(--green-sf);border-color:var(--green-br);color:var(--text-2)}   .ann--ok .ic{background:var(--green)}
+.ann b{color:var(--text);font-weight:650}
+
+/* ── drawer ──────────────────────────────────────────────────────────── */
+.backdrop{position:fixed;inset:52px 0 0 0;background:rgba(19,23,30,.4);z-index:50;opacity:0;pointer-events:none;transition:opacity 180ms ease;backdrop-filter:blur(2px)}
+.backdrop.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:52px;right:0;bottom:0;width:min(760px,96vw);background:var(--surface);
+  border-left:1px solid var(--border);box-shadow:var(--sh-4);z-index:51;
+  display:flex;flex-direction:column;transform:translateX(100%);transition:transform 220ms cubic-bezier(.32,.72,0,1);
+}
+.drawer.open{transform:none}
+.drawer__hd{display:flex;align-items:center;gap:11px;padding:15px 20px;border-bottom:1px solid var(--border);background:var(--sunk);flex:none;flex-wrap:wrap}
+.drawer__title{font-weight:650;font-size:15px;letter-spacing:-.015em}
+.drawer__body{flex:1;overflow-y:auto;padding:0 20px 22px;overscroll-behavior:contain}
+.drawer__ft{flex:none;display:flex;align-items:center;gap:9px;padding:13px 20px;border-top:1px solid var(--border);background:var(--sunk)}
+.x{background:none;border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text-3);cursor:pointer;font-size:15px;line-height:1;padding:3px 9px;font-family:inherit;transition:all var(--t)}
+.x:hover{color:var(--text);border-color:var(--text-4);background:var(--sunk-2)}
+
+.dsec{padding:18px 0;border-bottom:1px solid var(--border)}
+.dsec:last-child{border-bottom:none;padding-bottom:4px}
+.dsec__hd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px}
+.dsec__title{font-size:13.5px;font-weight:650;letter-spacing:-.012em;display:flex;align-items:center;gap:9px}
+.dsec__n{flex:none;width:19px;height:19px;border-radius:50%;background:var(--sunk-2);border:1px solid var(--border);color:var(--text-3);font-size:10.5px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.dsec__desc{color:var(--text-3);font-size:12.5px;margin:0 0 13px;max-width:76ch}
+.f{margin-bottom:13px}
+.f:last-child{margin-bottom:0}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:700px){.f2{grid-template-columns:1fr}}
+label.fl{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text-2);margin:0 0 6px;letter-spacing:-.003em}
+.req{color:var(--red);font-weight:700}
+.opt{color:var(--text-4);font-weight:450}
+.inp,.sel{width:100%;border:1px solid var(--border-2);background:var(--surface);color:var(--text);border-radius:var(--r-sm);padding:8px 11px;font-family:var(--sans);font-size:12.5px;transition:border-color var(--t),box-shadow var(--t)}
+.sel{
+  appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:30px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 11px) 52%;background-size:4px 4px,4px 4px;background-repeat:no-repeat;
+}
+.inp.mono{font-family:var(--mono);font-size:12px;letter-spacing:-.01em}
+.inp:hover:not([readonly]):not(:disabled),.sel:hover:not(:disabled){border-color:var(--text-4)}
+.inp:focus,.sel:focus{outline:none;border-color:var(--blue);box-shadow:var(--ring)}
+.inp[readonly],.inp:disabled,.sel:disabled{
+  background:var(--sunk-2);color:var(--text-2);cursor:not-allowed;border-color:var(--border);
+  background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--border) 55%,transparent) 6px 7px);
+}
+.sel:disabled{background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--border) 55%,transparent) 6px 7px)}
+.inp--err{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(180,35,24,.14) !important}
+.tipwrap{position:relative;display:inline-flex;align-items:center}
+.tipic{width:14px;height:14px;border-radius:50%;border:1px solid var(--text-4);color:var(--text-3);font-size:9.5px;font-weight:700;display:grid;place-items:center;cursor:help;font-style:normal;flex:none}
+.tipwrap:hover .tipic,.tipwrap:focus-within .tipic{border-color:var(--blue);color:var(--blue)}
+.tipbox{display:none;position:absolute;top:calc(100% + 7px);left:-10px;z-index:60;width:min(400px,70vw);padding:11px 13px;border-radius:var(--r);border:1px solid var(--border-2);background:var(--surface);box-shadow:var(--sh-2);font-size:11.5px;font-weight:450;line-height:1.55;color:var(--text-2);text-transform:none;letter-spacing:normal;white-space:normal;pointer-events:none}
+.tipbox b{color:var(--text);font-weight:650}
+.tipwrap:hover .tipbox,.tipwrap:focus-within .tipbox{display:block}
+.pnames{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ttabs{display:flex;align-items:stretch;gap:2px;border-bottom:1px solid var(--border);margin:0 0 15px;overflow-x:auto}
+.ttab{display:inline-flex;align-items:center;gap:7px;flex:none;background:none;border:none;border-bottom:2px solid transparent;padding:8px 11px;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;white-space:nowrap;border-radius:var(--r-sm) var(--r-sm) 0 0;transition:color var(--t),background var(--t)}
+.ttab:hover{color:var(--text-2);background:var(--sunk-2)}
+.ttab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.ttab__l{font-family:var(--mono);font-size:11.5px;letter-spacing:-.01em}
+.ttab__x{display:grid;place-items:center;width:15px;height:15px;border-radius:4px;color:var(--text-4);font-size:13px;line-height:1}
+.ttab__x:hover{background:var(--red-sf);color:var(--red)}
+.ttab--add{font-size:15px;color:var(--text-4);padding:8px 12px}
+.hint{display:block;font-size:11.5px;color:var(--text-3);margin-top:7px;line-height:1.5;max-width:74ch}
+.hint b{color:var(--text-2);font-weight:650}
+.err{display:block;font-size:11.5px;color:var(--red);font-weight:600;margin-top:6px}
+
+/* settings grid */
+.setgrid{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.setrow{display:grid;grid-template-columns:170px 1fr 118px;gap:14px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);position:relative}
+.setrow:last-child{border-bottom:none}
+.setrow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent}
+.setrow--mut::before{background:var(--green-br)}
+.setrow--imm::before{background:var(--violet-br)}
+.setrow--off{opacity:.55}
+.setrow:nth-child(even){background:var(--sunk)}
+.setrow__k{font-size:12.5px;font-weight:600;letter-spacing:-.006em;line-height:1.35}
+.setrow__k .mono{font-size:10px;color:var(--text-4);display:block;font-weight:450;margin-top:2px;text-transform:none;letter-spacing:0}
+.setrow__w{min-width:0}
+.setrow__w .hint{margin-top:6px}
+@media (max-width:700px){.setrow{grid-template-columns:1fr;gap:7px}}
+
+/* matcher builder */
+.cb{border:1px solid var(--border-2);border-radius:var(--r);padding:12px;background:var(--sunk);background-image:radial-gradient(color-mix(in srgb,var(--border-2) 90%,transparent) .8px,transparent .8px);background-size:11px 11px}
+.cbrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cbrow .inp{flex:1 1 180px;min-width:150px;background:var(--surface)}
+.cbrow .sel{background-color:var(--surface);width:auto;min-width:150px}
+.cbrow .sel:disabled{color:var(--text);font-weight:600;background-color:var(--sunk-2)}
+
+/* preview */
+.preview{border:1px solid var(--border);border-radius:var(--r-md);background:var(--sunk);padding:13px}
+.pvhd{font-size:11px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;letter-spacing:.045em;text-transform:uppercase;color:var(--text-4)}
+.pvlist{display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto}
+.pvitem{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;padding:6px 9px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);letter-spacing:-.01em}
+.pvitem--no{background:var(--red-sf);border-color:var(--red-br);color:var(--red)}
+.pvitem--yes{background:var(--green-sf);border-color:var(--green-br);color:var(--green)}
+.pvitem--hold{background:var(--amber-sf);border-color:var(--amber-br);color:var(--amber)}
+.pvitem .arrow{color:var(--text-4);flex:none}
+.pvempty{color:var(--text-3);font-size:12px;padding:7px 2px;font-family:var(--sans);line-height:1.5}
+
+/* resolution walk */
+.walk{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;position:relative}
+.step+.step{border-top:1px dashed var(--border)}
+.step__n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--sunk-2);border:1px solid var(--border-2);color:var(--text-3);font-size:11px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.step--hit .step__n{background:var(--green-sf);border-color:var(--green-br);color:var(--green)}
+.step--miss .step__n{background:var(--sunk-2);color:var(--text-4)}
+.step--stop .step__n{background:var(--red-sf);border-color:var(--red-br);color:var(--red)}
+.step__b{min-width:0;font-size:12.5px;line-height:1.55;color:var(--text-2)}
+.step__b b{color:var(--text);font-weight:650}
+.step__t{font-size:12.5px;font-weight:650;color:var(--text);margin-bottom:2px}
+
+/* history */
+.hist{list-style:none;margin:0;padding:0;border-left:2px solid var(--border-2);margin-left:5px}
+.hist li{position:relative;padding:0 0 13px 16px;font-size:12.5px;color:var(--text-2);line-height:1.5}
+.hist li:last-child{padding-bottom:0}
+.hist li::before{content:"";position:absolute;left:-5px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--surface);border:2px solid var(--border-2)}
+.hist li:first-child::before{border-color:var(--blue);background:var(--blue-sf)}
+.hist .when{display:block;font-size:10.5px;color:var(--text-4);font-family:var(--mono);letter-spacing:-.01em}
+
+/* ── modal ───────────────────────────────────────────────────────────── */
+.modal{position:fixed;inset:52px 0 0 0;z-index:70;display:grid;place-items:center;padding:26px;background:rgba(19,23,30,.5);backdrop-filter:blur(3px);animation:fade 160ms ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal__box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-4);max-width:980px;width:100%;max-height:88vh;overflow-y:auto;animation:pop 200ms cubic-bezier(.32,.72,0,1)}
+.modal__box--sm{max-width:640px}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.modal__hd{display:flex;align-items:center;gap:11px;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.modal__hd h3{margin:0;font-size:15px;font-weight:660;letter-spacing:-.015em}
+.modal__bd{padding:18px 20px 22px}
+.modal__ft{display:flex;gap:9px;align-items:center;padding:13px 20px;border-top:1px solid var(--border);background:var(--sunk);position:sticky;bottom:0}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.sect{border:1px solid var(--border);border-radius:var(--r-md);padding:14px;background:var(--sunk)}
+/* a record table inside a .sect card needs its own ground, or the cells share
+   the card's colour and the rows stop reading as rows */
+.sect table.m{
+  width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;
+  border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+  background:var(--surface);margin:11px 0 0;table-layout:fixed;
+}
+.sect table.m th{
+  text-align:left;background:var(--sunk-2);padding:8px 11px;
+  border-bottom:1px solid var(--border);font-size:10px;letter-spacing:.075em;
+  text-transform:uppercase;color:var(--text-4);font-weight:600;
+}
+.sect table.m td{
+  padding:11px;border-bottom:1px solid var(--border);background:var(--surface);
+  vertical-align:top;line-height:1.55;color:var(--text-2);word-break:break-word;
+}
+.sect table.m tbody tr:last-child td{border-bottom:none}
+.sect table.m td b{color:var(--text);font-weight:650}
+.sect table.m .attr{margin:2px 4px 2px 0}
+.sect--wide{grid-column:1/-1}
+.sect h4{margin:0 0 6px;font-size:12.5px;font-weight:650;letter-spacing:-.008em}
+.sect p{margin:0 0 8px;color:var(--text-3);font-size:12.5px;line-height:1.55}
+.sect p b{color:var(--text-2);font-weight:650}
+.sect p:last-child{margin-bottom:0}
+ul.r{margin:7px 0 0;padding-left:16px;color:var(--text-2);font-size:12.5px;line-height:1.6}
+ul.r li{margin:4px 0;padding-left:2px}
+ul.r li::marker{color:var(--text-4)}
+.attr{font-family:var(--mono);font-size:10.5px;background:var(--sunk-2);border:1px solid var(--border-2);border-radius:5px;padding:2px 7px;color:var(--text-2);display:inline-block;margin:2px 3px 2px 0}
+.attr--imm{background:var(--violet-sf);color:var(--violet);border-color:var(--violet-br)}
+
+/* ── toast ───────────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(6px);
+  background:var(--n10);color:var(--n0);border-radius:var(--r);padding:10px 16px;
+  font-size:12.5px;font-weight:600;z-index:80;box-shadow:var(--sh-4);
+  opacity:0;pointer-events:none;transition:opacity 180ms ease,transform 180ms cubic-bezier(.32,.72,0,1);letter-spacing:-.005em;
+}
+[data-theme="dark"] .toast{background:var(--n0);color:var(--n10)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .toast{background:#e9edf3;color:#13171e}}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+.case{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);margin-bottom:11px;overflow:hidden}
+.case:last-child{margin-bottom:0}
+.case__hd{display:flex;align-items:flex-start;gap:12px;padding:13px 15px}
+.case__n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--sunk-2);border:1px solid var(--border-2);color:var(--text-3);font-size:11px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums;margin-top:1px}
+.case__b{min-width:0;flex:1}
+.case__t{font-size:13.5px;font-weight:650;letter-spacing:-.01em;margin-bottom:3px}
+.case__p{font-size:12.5px;color:var(--text-3);line-height:1.55;margin:0}
+.case__p b{color:var(--text-2);font-weight:600}
+.case__exp{font-size:12.5px;color:var(--text-2);line-height:1.55;margin:6px 0 0;padding-left:11px;border-left:2px solid var(--border-2)}
+.case__act{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.case__res{border-top:1px solid var(--border);background:var(--sunk);padding:13px 15px}
+.case__note{font-size:12.5px;line-height:1.55;color:var(--text-2);margin:11px 0 0;padding:10px 12px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border)}
+.case__note b{color:var(--text)}
+.case--ran{box-shadow:inset 3px 0 0 var(--blue)}
+.simbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.prov{color:var(--text-4);font-size:11.5px;line-height:1.8;border-top:1px solid var(--border);padding-top:15px;margin-top:26px;max-width:112ch}
+.prov .mono{font-size:10.5px}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <span class="brandmark">Data Flow</span><span class="sep"></span>
+  <div class="navtabs" id="nav">
+    <button data-s="def" class="on">Dataset Definitions</button>
+    <button data-s="tpl">Config Templates</button>
+    <button data-s="tm">TCO</button>
+    <span class="sep"></span>
+    <button data-s="sim">Simulation</button>
+  </div>
+  <span class="grow"></span>
+  <span class="notreal">simulation, not shipped</span>
+  <button class="tbtn" id="th">Dark</button>
+</div>
+
+<div class="shell">
+
+  <!-- ══ screen 1 · dataset definitions ══ -->
+  <div id="s-def">
+    <h1 class="page">Dataset Definitions</h1>
+    <p class="pagesub">The dataset <b>name is the key</b>. There is no matcher on this screen. A definition holds description, optional bucket name, dataset type, physical location, ingestion mode, entityType, partitioning, retention, quota and access. Creating a name that already exists is an error.</p>
+
+    <div class="card">
+      <div class="card__hd">
+        <h3 class="card__title">Definitions</h3>
+        <span class="counter" id="defcount">0</span>
+        <span class="card__sub">Click a row for its own drawer. <b>Off template</b>: config no longer matches its template. <b>No data yet</b>: created, nothing written.</span>
+        <span class="grow"></span>
+        <button class="btn btn--ghost" id="bulkbtn">Bulk update a field</button>
+        <button class="btn btn--solid" id="createdef">+ Create definition</button>
+      </div>
+      <div class="tablewrap">
+        <table class="grid">
+          <thead><tr>
+            <th>Name</th><th>Type</th><th>Entity type</th><th>Physical location</th>
+            <th>Retention</th><th>Quota</th><th>Access</th><th>From template</th><th>Data</th>
+          </tr></thead>
+          <tbody id="defbody"></tbody>
+        </table>
+      </div>
+      <div class="cardpad" id="defann"></div>
+    </div>
+
+  </div>
+
+  <!-- ══ screen 2 · config templates ══ -->
+  <div id="s-tpl" class="hide">
+    <h1 class="page">Config Templates</h1>
+    <p class="pagesub">A separate feature with its own API and its own permission. A template is a <b>blueprint</b>: a matcher plus a default configuration. It is read only when a name arrives that no definition covers.</p>
+
+    <div class="card">
+      <div class="card__hd">
+        <h3 class="card__title">Templates</h3>
+        <span class="counter" id="tplcount">0</span>
+        <span class="card__sub">First match wins, top down. The dataspace catch-all is pinned last.</span>
+        <span class="grow"></span>
+        <button class="btn btn--solid" id="createtpl">+ Create template</button>
+      </div>
+      <div class="tablewrap">
+        <table class="grid">
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Matcher</th><th>Type</th><th>Entity type</th>
+            <th>Retention</th><th>Quota</th><th>Access</th><th>Created</th><th>On</th>
+          </tr></thead>
+          <tbody id="tplbody"></tbody>
+        </table>
+      </div>
+      <div class="cardpad" id="tplann"></div>
+    </div>
+  </div>
+
+  <!-- ══ screen 3 · TCO ══ -->
+  <div id="s-tm" class="hide">
+    <h1 class="page">TCO</h1>
+    <p class="pagesub">A rule routes matched data to <b>one or more destinations</b>, each a dataspace and a dataset. Each destination picks its dataset one of two ways: a <b>static dataset</b> from a closed dropdown of datasets that exist, or a <b>dynamic template</b> that is validated, not free text. More than one destination means more than one stored copy.</p>
+
+    <div class="card">
+      <div class="card__hd">
+        <h3 class="card__title">Rules</h3>
+        <span class="counter" id="tmcount">0</span>
+        <span class="grow"></span>
+        <button class="btn btn--solid" id="createtm">+ Create rule</button>
+      </div>
+      <div class="tablewrap">
+        <table class="grid">
+          <thead><tr><th>#</th><th>Name</th><th>Filter</th><th>Target mode</th><th>Target</th><th>Lands in</th><th>On</th></tr></thead>
+          <tbody id="tmbody"></tbody>
+        </table>
+      </div>
+      <div class="cardpad" id="tmann"></div>
+    </div>
+  </div>
+
+  <!-- ══ screen 4 · simulation ══ -->
+  <div id="s-sim" class="hide">
+    <h1 class="page">Simulation</h1>
+    <p class="pagesub">Not a product screen. Three cases, one for each way an arriving dataset name can resolve. Each case resets the data, applies its setup, and shows what Citadel would do. Run one, then look at the other tabs to see the state it left behind.</p>
+
+    <div class="simbar">
+      <button class="btn btn--solid" id="runall">Run all cases</button>
+      <button class="btn btn--ghost" id="resetall">Reset the data</button>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <h3 class="card__title">Test cases</h3>
+        <span class="counter" id="casecount">0</span>
+        <span class="card__sub">Citadel checks Dataset Definitions first and only falls through to Config Templates on a miss. Each case resets the data first, so order does not matter.</span>
+      </div>
+      <div class="cardpad" id="caselist"></div>
+    </div>
+  </div>
+  </div>
+
+  <p class="prov">
+  Working simulation, 2026-09-06. Model taken from the Harel and Redlus session of 06-09, which retired dataset rules with matchers and split the concept into Dataset Definitions and Config Templates.<br>
+  <b>Not signed off.</b> The session was read from a fragmented auto-translation, Harel has not confirmed the write-up, and no RFC owner was named. Use this to explain the shape, not to brief a build team.<br>
+  Screen shapes still come from <span class="mono">internal-cx-web-workspace-design @ master@9b5f9da</span>, routes <span class="mono">data-flow/dataspace-management</span> and <span class="mono">data-flow/tco-optimizer</span>. The repo has not been rebuilt on this model, so every screen here is a proposal.<br>
+  Supersedes <span class="mono">simulation-2026-08-31-dataset-rule-static-dynamic.html</span>, now in <span class="mono">Archive/</span><br>
+  <button class="whybtn" id="whybtn" style="margin-top:6px">What changed on 06-09, and what is still open</button>
+  </p>
+</div>
+
+<div class="backdrop" id="bd"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer__hd">
+    <span class="drawer__title" id="drtitle">Definition</span>
+    <span id="drbadge"></span>
+    <span class="grow"></span>
+    <button class="x" id="drclose" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer__body" id="drbody"></div>
+  <div class="drawer__ft">
+    <button class="btn btn--solid" id="drsave">Save</button>
+    <button class="btn btn--ghost" id="drcancel">Cancel</button>
+    <span class="grow"></span>
+    <button class="btn btn--danger hide" id="drdelete">Delete</button>
+  </div>
+</div>
+
+<!-- bulk update -->
+<div class="modal hide" id="bulk">
+  <div class="modal__box modal__box--sm">
+    <div class="modal__hd">
+      <h3>Bulk update a field</h3>
+      <span class="grow"></span>
+      <button class="x" id="bulkclose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__bd">
+      <p class="sect p" style="border:none;background:none;padding:0;margin:0 0 14px;color:var(--text-3);font-size:12.5px">
+        The complement to templates. It is a batch action on datasets that already exist, not a live binding. The affected list is shown before anything is written.
+      </p>
+      <div class="f2">
+        <div class="f"><label class="fl">Scope</label><select class="sel" id="b-scope"></select></div>
+        <div class="f"><label class="fl">Field</label><select class="sel" id="b-field">
+          <option value="retention">Retention</option>
+          <option value="quota">Quota limit</option>
+          <option value="access">Access policy</option>
+        </select></div>
+      </div>
+      <div class="f"><label class="fl">New value</label><span id="b-valwrap"></span></div>
+      <div class="preview"><div class="pvhd">Datasets this will change <span class="counter" id="b-count">0</span></div>
+        <div class="pvlist" id="b-list"></div></div>
+    </div>
+    <div class="modal__ft">
+      <button class="btn btn--solid" id="b-apply">Apply to the listed datasets</button>
+      <button class="btn btn--ghost" id="b-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- why -->
+<div class="modal hide" id="why">
+  <div class="modal__box">
+    <div class="modal__hd">
+      <h3>What changed on 06-09</h3>
+      <span class="grow"></span>
+      <button class="x" id="whyclose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__bd">
+      <div class="two">
+
+        <div class="sect sect--wide">
+          <h4>Not signed off yet</h4>
+          <p>This page is built from the 06-09 session read through a fragmented auto-translation. Harel has not confirmed the write-up and nobody was named to write the RFC. Ilya was not in the room and this reverses his position. Treat every claim here as the shape the room converged on, not as a committed contract.</p>
+          <p><b>Two things the room said are deliberately out of this page.</b> The room named a third target mode on a TCO rule, a pipeline that creates no loop; only the two dataset modes are shown here, so the page stays on the dataset question. The room also called the layer "traffic management"; the screen is labelled TCO because that is what the product calls it today.</p>
+          <p><b>One thing on the TCO screen does not come from 06-09 at all.</b> A rule holds several destinations, each a dataspace and a dataset. That is the shape the TCO policy screen already ships, read off the design repo, and it is here so the dataset question is asked against the real screen. The 06-09 session discussed a single target. Each destination starts with the dataset type: it filters the dataset list to archive or forwarder datasets, and on a dynamic destination it is the type the rule creates the dataset with. What fan-out adds to this page is the cost line: every destination stores a full copy, so a rule with three destinations bills at about three times the matched volume out of one quota.</p>
+        </div>
+
+        <div class="sect sect--wide">
+          <h4>The room retired "dataset rules with matchers" and split it into two features with two APIs</h4>
+          <p>The old model had one object: a rule with a matcher that both selected datasets and carried their configuration. Editing a rule reached every dataset it governed. That object is gone.</p>
+        </div>
+
+        <div class="sect">
+          <h4>Dataset Definitions</h4>
+          <p>The dataset <b>name is the key</b>. No matcher field at all.</p>
+          <ul class="r">
+            <li>Fields: description, optional bucket name, ingestion mode, entityType, physical location, retention, partitioning, PBAC.</li>
+            <li>A duplicate name returns an error.</li>
+            <li>It is a list of configured datasets and nothing more.</li>
+          </ul>
+        </div>
+
+        <div class="sect">
+          <h4>Config Templates</h4>
+          <p>A second, separate feature: name, matcher, default configuration.</p>
+          <ul class="r">
+            <li>Citadel checks definitions first and only falls through to templates on a miss.</li>
+            <li>A matching template <b>creates</b> the definition.</li>
+            <li>Editing a template never changes an existing dataset. It shapes the next one created.</li>
+          </ul>
+        </div>
+
+        <div class="sect">
+          <h4>Why weaker on purpose</h4>
+          <p>Harel's reason for preferring it: a bug in a template cannot corrupt live customer data, and the risk drops by about a factor of ten. He compared it to a Notion page template.</p>
+          <p>Two APIs means two screens or tabs, not one merged list. Redlus argued for one list with exact matches on top; Harel refused, because the concepts and the permission level differ. Editing a template is a weaker role than creating a dataset.</p>
+        </div>
+
+        <div class="sect">
+          <h4>The argument that did not win, kept on the record</h4>
+          <p>Redlus: one expression rule spawning <span class="mono">logs-1</span> to <span class="mono">logs-50</span> lets one config change reach all fifty. Promote them to concrete datasets and a retention change becomes fifty edits. He compared it to a PBAC group override and said "dataset group" may be a clearer name than "dataset rule".</p>
+          <p>Bulk update per field is the answer the room gave, and it is weaker: a batch action, not a live binding. Case 2 on the Simulation tab shows why one edit can no longer reach many datasets.</p>
+        </div>
+
+        <div class="sect">
+          <h4>Dataset type is a property of the dataset</h4>
+          <p><b>Archive</b> covers S3, GCS and COS: queryable, access policy applies. <b>Forwarder</b> covers MSK, Custom Kafka and IBM Event Streams: not queryable, no access policy, no retention tag, PBAC muted, and excluded from DLI query suggestions.</p>
+          <p>The enum sits on the dataset record, not only on the physical location, so consumers can filter on it. You pick the type first and the location dropdown then shows only the matching locations. Harel will not settle the name until Citadel says whether they already hold such a property.</p>
+        </div>
+
+        <div class="sect sect--wide">
+          <h4>The three declared properties, and why empty is not one of them</h4>
+          <p>The 20-08 constraints concept put three properties on the create form and offered two paths for each: declare it now, or leave it empty and let the first write settle it. The second path is gone by agreement. <b>Ingestion mode, entityType and partitioning are declared at creation and cannot be left empty</b>, so a new definition starts with all three unset and the save is refused until each one is picked. The page keeps a fourth field from that concept, the optional bucket name, which the platform may name itself.</p>
+          <p><b>Ingestion mode</b> decides who writes the dataset: streaming, written continuously as it arrives at the pipeline, or summary, written by a background query execution. It also decides the pillar in practice, because a summary lands as <span class="mono">jsonData</span> rather than as logs. It locks at creation, since the two write paths cannot be mixed on one dataset.</p>
+        </div>
+
+        <div class="sect">
+          <h4>The drawer belongs to the dataset</h4>
+          <p>Today, clicking a dataset opens the rule that created it, which lets an admin change other datasets by accident. The drawer must show that dataset's own config, its physical-location history, and which template it came from.</p>
+        </div>
+
+        <div class="sect">
+          <h4>Deferred, named, not rejected</h4>
+          <ul class="r">
+            <li>Per-parameter inheritance and pass-through to the default, ordered per parameter rather than per rule. Harel raised it from the compliance case, a two-year retention on everything European crossing three rules, and compared it to Elasticsearch index templates.</li>
+            <li>Rule-ordering risk. Reordering can silently redirect traffic to a different physical location with no signal. Not a first-stage blocker.</li>
+          </ul>
+        </div>
+
+        <div class="sect sect--wide">
+          <h4>The dynamic name template, and the two syntaxes on the record</h4>
+          <p>A dynamic target <b>produces</b> the dataset name from the data, so no dropdown is possible. Both entries below are Harel's. They do not agree, and nobody has picked one.</p>
+          <table class="m">
+            <thead><tr><th style="width:15%">Source</th><th style="width:44%">Example</th><th>Shape</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Harel, 27-08</td>
+                <td><span class="attr">k8s-prod-$d.region</span><span class="attr">default/AWS-$1</span><span class="attr">$d.region-AWS</span></td>
+                <td>Free text, no validation beyond a legal dataset name. In his words: "you can write a template in free text", and "there is no validation, it just needs to be a legal string of a dataset".</td>
+              </tr>
+              <tr>
+                <td>06-09 session</td>
+                <td><span class="attr">logs-{region}</span></td>
+                <td>A <b>validated</b> template, resolving from <span class="mono">$l</span> application name.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Two things differ, not one. The placeholder syntax, <span class="mono">$d.field</span> and <span class="mono">$1</span> against <span class="mono">{name}</span>. And the keypath root, <span class="mono">$d</span> for data against <span class="mono">$l</span> for label, which resolve from different places. Free text against validated is a third difference and it decides whether the field can be checked before save.</p>
+          <p><b>What no syntax fixes: the preview can only look backwards.</b> The name is built per event at write time, from the template plus the value on that event. So a list of the names a template will produce is not a prediction, it is a report of placeholder values already received. Until matching data has been sent there is nothing to show, no dataset exists, and the admin cannot see what the rule will do. This is why the room called a simulation tool the answer, and it is the part the UI has to make obvious rather than hide behind a preview that looks complete.</p>
+        </div>
+
+        <div class="sect">
+          <h4>Still open</h4>
+          <ul class="r">
+            <li>Nobody was named to write the RFC.</li>
+            <li>Ilya was not in the room and this reverses his position. Noam carries it to him.</li>
+            <li>A TCO admin still cannot see the physical location or retention of a dataset a template created, even as an admin. Raised in the room, not answered.</li>
+            <li>Today, traffic that matches no rule writes nothing at all. The dataspace catch-all is the proposed fix and it is on the templates screen here.</li>
+            <li>The dynamic-template syntax. Two syntaxes are on the record and neither was picked. See the table above.</li>
+            <li>Whether the entityType lock reaches a forwarder was not ruled on. This page reads the 06-09 wording as scoped to a dataset that holds data, so a forwarder stays editable. That is a reading, not a decision.</li>
+          </ul>
+        </div>
+
+        <div class="sect sect--wide">
+          <h4>Immutability, stated for the first time on 06-09</h4>
+          <p>On a dataset that already holds data, <b>entityType cannot be changed and validation must refuse it</b>. Retention and quota limit can change. That constrains re-ingestion: a re-import cannot repair a wrong entityType.</p>
+          <p>Partitioning behaves the same way: an admin sets it at creation and cannot change it afterwards. The platform may still change its own internal granularity later, daily to hourly, and 06-09 required that this never make the caller write the data twice. That is a Citadel decision, not an editable field.</p>
+          <p>Both locks bind at creation and apply to a forwarder as well as an archive. Retention, access and partitioning do not apply to a forwarder at all.</p>
+          <p>
+            <span class="attr">retention</span><span class="attr">quota</span><span class="attr">access</span><span class="attr">physical location</span>
+            mutable ·
+            <span class="attr attr--imm">entityType</span><span class="attr attr--imm">partitioning</span>
+            set at creation, locked afterwards ·
+            <span class="attr">dataset type</span>
+            not ruled on
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var root = document.documentElement, tb = document.getElementById('th');
+  tb.onclick = function(){
+    var d = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', d ? 'light' : 'dark');
+    tb.textContent = d ? 'Dark' : 'Light';
+  };
+
+  // ─────────────────────────────────────────────────────────────────────
+  // STATE
+  // propagate: 'next' is the 06-09 decision. 'all' is the retired rules
+  // behaviour, kept as a switch so the cost of the decision is visible.
+  // ─────────────────────────────────────────────────────────────────────
+  // propagate is fixed at 'next', the 06-09 decision. The lever that showed the
+  // retired live-binding behaviour was removed on 07-09, so nothing sets it now.
+  var S = { screen:'def', propagate:'next' };
+
+  var RETENTION = ['Default','Short','Intermediate','Long'];
+  var ACCESS    = ['Default Policy','Restricted Access','Team Only','Public Read','Admin Only'];
+  var ENTITY    = ['logs','logEvents','jsonData','spans','metrics','browserLogs','sessionRecordings'];
+  var PARTS     = [{v:'Partitioned',   l:'Partitioned · time based'},
+                   {v:'Unpartitioned', l:'Unpartitioned · one set, no time dimension'}];
+  // From the 20-08 constraints concept. Its third option, "leave empty and infer on the
+  // first write", is deliberately absent: the declared properties cannot be left empty.
+  var INGEST    = [{v:'streaming', l:'Streaming · written continuously as it arrives at the pipeline'},
+                   {v:'summary',   l:'Summary · written by a background query execution'}];
+  // No exact-match operator. An exact name is a Dataset Definition, not a template.
+  var OPS       = ['Starts with','Contains','Regex'];
+
+  var LOCATIONS = [
+    { id:'s3-eu-west-1',  label:'S3 · eu-west-1',              kind:'archive'   },
+    { id:'s3-eu-central-1',label:'S3 · eu-central-1',          kind:'archive'   },
+    { id:'s3-us-east-1',  label:'S3 · us-east-1',              kind:'archive'   },
+    { id:'gcs-eu-west-4', label:'GCS · eu-west-4',             kind:'archive'   },
+    { id:'cos-eu-de',     label:'IBM COS · eu-de',             kind:'archive'   },
+    { id:'s3-il-central-1',label:'S3 · il-central-1',          kind:'archive'   },
+    { id:'msk-prod',      label:'MSK · prod-events',           kind:'forwarder' },
+    { id:'kafka-siem',    label:'Custom Kafka · siem-export',  kind:'forwarder' },
+    { id:'ibm-es-eu-de',  label:'IBM Event Streams · eu-de',   kind:'forwarder' }
+  ];
+  function locsFor(kind){ return LOCATIONS.filter(function(l){ return l.kind === kind; }); }
+  function locLabel(id){
+    for (var i=0;i<LOCATIONS.length;i++) if (LOCATIONS[i].id === id) return LOCATIONS[i].label;
+    return id || '—';
+  }
+
+  // ── templates ────────────────────────────────────────────────────────
+  var tplSeq = 0;
+  function tpl(o){
+    return {
+      id:o.id || ('t'+(++tplSeq)), name:o.name, desc:o.desc||'',
+      op:o.op||'Starts with', value:o.value||'',
+      type:o.type||'archive', entityType:o.entityType||'logs',
+      ingestion:o.ingestion||'streaming',
+      location:o.location||'s3-eu-west-1',
+      retention:o.retention||'Default', quota:(o.quota===undefined?'':o.quota),
+      access:o.access||'Default Policy', partitioning:o.partitioning||'Partitioned',
+      enabled:(o.enabled===undefined?true:o.enabled), isDefault:!!o.isDefault
+    };
+  }
+  var templates = [
+    tpl({id:'t-logs', name:'Regional application logs', op:'Starts with', value:'logs-',
+         entityType:'logs', location:'s3-eu-west-1', retention:'Short', quota:'8', access:'Team Only',
+         desc:'One line covers every region. This is the case rules were built for.'}),
+    tpl({id:'t-spans',name:'Enterprise spans', op:'Starts with', value:'spans-',
+         entityType:'spans', location:'s3-us-east-1', retention:'Intermediate', quota:'', access:'Restricted Access',
+         desc:'Trace data for the enterprise tier.'}),
+    tpl({id:'t-fwd',  name:'IBM forwarding', op:'Starts with', value:'ibm-forward-',
+         type:'forwarder', entityType:'logs', location:'ibm-es-eu-de', retention:'Default', quota:'', access:'Default Policy',
+         desc:'Streams out to IBM Event Streams. Nothing is stored on our side.'})
+  ];
+  var CATCHALL = tpl({
+    id:'t-catchall', name:'Dataspace default', op:'Is', value:'*', isDefault:true,
+    entityType:'logs', location:'s3-eu-west-1', retention:'Default', quota:'', access:'Default Policy',
+    desc:'Matcher always true, carrying full configuration. Proposed on 06-09. Today, traffic that matches nothing writes nothing at all.'
+  });
+  function tplList(){ return templates.concat([CATCHALL]); }
+  function tplById(id){
+    var l = tplList();
+    for (var i=0;i<l.length;i++) if (l[i].id === id) return l[i];
+    return null;
+  }
+
+  // ── definitions ──────────────────────────────────────────────────────
+  var defSeq = 0;
+  function def(o){
+    return {
+      id:o.id || ('d'+(++defSeq)), name:o.name, desc:o.desc||'',
+      type:o.type||'archive', entityType:o.entityType||'logs',
+      ingestion:o.ingestion||'streaming', bucket:o.bucket||'',
+      location:o.location||'s3-eu-west-1',
+      retention:o.retention||'Default', quota:(o.quota===undefined?'':o.quota),
+      access:o.access||'Default Policy', partitioning:o.partitioning||'Partitioned',
+      from:o.from||null, createdBy:o.createdBy||'template',
+      hasData:(o.hasData===undefined?true:o.hasData),
+      history:o.history||[],
+      fresh:!!o.fresh
+    };
+  }
+  // Eight came from the regional template while it was on Short/8%/Team Only.
+  function fromLogsTpl(region, extra){
+    var o = { name:'logs-'+region, from:'t-logs', entityType:'logs', location:'s3-eu-west-1',
+              retention:'Short', quota:'8', access:'Team Only', partitioning:'Partitioned',
+              desc:'Created by the regional template.',
+              history:[{when:'2026-06-02', what:'Created at S3 · eu-west-1 by the regional template'}] };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    return def(o);
+  }
+  var definitions = [
+    fromLogsTpl('eu-west-1'),
+    fromLogsTpl('eu-central-1'),
+    fromLogsTpl('us-east-1'),
+    fromLogsTpl('us-west-2'),
+    fromLogsTpl('ap-south-1'),
+    fromLogsTpl('ap-northeast-1'),
+    fromLogsTpl('sa-east-1'),
+    fromLogsTpl('il-central-1', {
+      location:'s3-il-central-1', retention:'Long',
+      desc:'Split out by hand for the Israeli bucket. Its own config now, and the template no longer reaches it.',
+      history:[
+        {when:'2026-08-19', what:'Physical location moved to S3 · il-central-1, retention set to Long'},
+        {when:'2026-06-02', what:'Created at S3 · eu-west-1 by the regional template'}
+      ]
+    }),
+    def({ name:'spans-enterprise-payment', from:'t-spans', entityType:'spans', location:'s3-us-east-1',
+          retention:'Intermediate', quota:'', access:'Restricted Access',
+          desc:'Enterprise payment traces.',
+          history:[{when:'2026-06-11', what:'Created at S3 · us-east-1 by the enterprise spans template'}] }),
+    def({ name:'payments-audit', from:null, createdBy:'sarah.chen@company.com', entityType:'logEvents',
+          location:'gcs-eu-west-4', retention:'Long', quota:'15', access:'Admin Only',
+          desc:'Defined by hand. No template was involved.',
+          history:[{when:'2026-07-04', what:'Created at GCS · eu-west-4 by sarah.chen@company.com'}] }),
+    def({ name:'security-audit-2027', from:null, createdBy:'sarah.chen@company.com', entityType:'logEvents',
+          location:'s3-il-central-1', retention:'Long', quota:'5', access:'Admin Only', hasData:false,
+          desc:'Defined by hand ahead of next year\'s audit. Nothing has been written to it yet.',
+          history:[{when:'2026-09-04', what:'Created at S3 · il-central-1 by sarah.chen@company.com'}] }),
+    def({ name:'ml-feature-export', from:null, createdBy:'olivier.combe@company.com', entityType:'jsonData',
+          ingestion:'summary', bucket:'cx-ml-features-eu',
+          location:'gcs-eu-west-4', retention:'Short', quota:'', access:'Team Only', hasData:false,
+          desc:'Written by a background query, not by the pipeline. Defined by hand so a TCO rule could target it before any data arrived.',
+          history:[{when:'2026-09-05', what:'Created at GCS · eu-west-4 by olivier.combe@company.com'}] }),
+    def({ name:'k8s-cluster-metrics', from:null, createdBy:'maria.garcia@company.com', entityType:'metrics',
+          location:'s3-eu-central-1', retention:'Intermediate', quota:'10', access:'Team Only',
+          desc:'Defined by hand.',
+          history:[{when:'2026-05-28', what:'Created at S3 · eu-central-1 by maria.garcia@company.com'}] }),
+    def({ name:'ibm-forward-eu-logs', from:'t-fwd', type:'forwarder', entityType:'logs',
+          location:'ibm-es-eu-de', retention:'Default', quota:'', access:'Default Policy',
+          desc:'Forwarded out. Not queryable, no access policy, no retention.',
+          history:[{when:'2026-08-25', what:'Created at IBM Event Streams · eu-de by the IBM forwarding template'}] }),
+    def({ name:'default/logs', from:null, createdBy:'system', entityType:'logs', location:'s3-eu-west-1',
+          retention:'Default', quota:'', access:'Default Policy',
+          desc:'The pre-existing default dataset.',
+          history:[{when:'2025-01-01', what:'Created by the platform'}] })
+  ];
+  function defByName(n){
+    for (var i=0;i<definitions.length;i++) if (definitions[i].name === n) return definitions[i];
+    return null;
+  }
+
+  /**
+   * The whole argument in one function. Under the 06-09 decision a definition
+   * carries its own configuration and a template edit cannot reach it. Under
+   * the retired rules behaviour the mutable fields are read live off the
+   * template, so one edit moves every dataset it created.
+   */
+  function eff(d){
+    if (S.propagate !== 'all' || !d.from) return d;
+    var t = tplById(d.from);
+    if (!t) return d;
+    var o = {};
+    for (var k in d) o[k] = d[k];
+    o.retention = t.retention; o.quota = t.quota; o.access = t.access;
+    return o;
+  }
+  /** A definition drifts when its own mutable config no longer equals its source template's. */
+  function drifted(d){
+    if (!d.from) return false;
+    var t = tplById(d.from);
+    if (!t) return false;
+    return d.retention !== t.retention || String(d.quota) !== String(t.quota) || d.access !== t.access;
+  }
+  function childrenOf(id){ return definitions.filter(function(d){ return d.from === id; }); }
+
+  // ── TCO rules (the traffic-management layer, named TCO on screen) ────
+  var tmSeq = 0, dstSeq = 0;
+  /** One destination = one dataspace plus one dataset, carrying the dataset type.
+      Shape taken from the TCO policy screen the product ships today: routes fan out,
+      each route is a dataspace/dataset pair, and the dataspace is read-only on default. */
+  function dst(o){
+    o = o || {};
+    return {
+      id:o.id || ('t'+(++dstSeq)),
+      dataspace:o.dataspace || 'Default',
+      mode:o.mode || 'static', dataset:o.dataset || '',
+      template:o.template || '', values:o.values || ['eu-west-1','us-west-2','ap-south-1'],
+      dstype:o.dstype || 'archive'
+    };
+  }
+  function dstType(t){ return t.dstype; }
+  /** The dataset list a destination can choose from: only datasets of the type it is set to. */
+  function defsOfType(kind){ return definitions.filter(function(d){ return d.type === kind; }); }
+  function dstLabel(t){
+    var n = t.mode === 'static' ? (t.dataset || 'no dataset') : (t.template || 'no template');
+    return String(t.dataspace).toLowerCase() + '/' + n;
+  }
+  function tm(o){
+    return {
+      id:o.id || ('m'+(++tmSeq)), name:o.name, filter:o.filter||'—',
+      targets: (o.targets && o.targets.length)
+        ? o.targets.map(dst)
+        : [dst({ mode:o.mode, dataset:o.dataset, template:o.template, values:o.values, dstype:o.dstype })],
+      enabled:(o.enabled===undefined?true:o.enabled)
+    };
+  }
+  var tmrules = [
+    tm({id:'m1', name:'Payments audit trail', filter:'Application Is payment-gateway',
+        targets:[ dst({mode:'static', dataset:'payments-audit'}),
+                  dst({mode:'static', dataset:'security-audit-2027'}) ]}),
+    tm({id:'m2', name:'Regional application logs', filter:'Subsystem Is app', mode:'dynamic',
+        template:'logs-{region}', values:['eu-west-1','us-east-1','me-south-1']}),
+    tm({id:'m4', name:'IBM stream out', filter:'Subsystem Is ibm-tenant', mode:'static',
+        dataset:'ibm-forward-eu-logs', dstype:'forwarder', enabled:false})
+  ];
+  /** Every placeholder shape on the record: {name}, $d.field, $l.field, $1. */
+  var PLACEHOLDER = /\{[^}]*\}|\$[dl]\.[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*|\$\d+/;
+  function hasPlaceholder(tpl){ return PLACEHOLDER.test(tpl || ''); }
+  function producedByOne(t){
+    if (t.mode === 'static') return t.dataset ? [t.dataset] : [];
+    if (!t.template) return [];
+    // No placeholder means the template is already a fixed name, so it produces exactly one.
+    if (!hasPlaceholder(t.template)) return [t.template];
+    var out = [];
+    t.values.forEach(function(v){
+      var n = t.template.replace(PLACEHOLDER, v);
+      if (out.indexOf(n) === -1) out.push(n);
+    });
+    return out;
+  }
+  /** What a DataPrime query over history would return for a placeholder. Simulated. */
+  var VALUE_HISTORY = ['eu-west-1','eu-central-1','us-east-1','us-west-2','ap-south-1','ap-northeast-1','sa-east-1','il-central-1','me-south-1'];
+  function producedBy(r){
+    if (!r.enabled) return [];
+    var out = [];
+    r.targets.forEach(function(t){ producedByOne(t).forEach(function(n){ if (out.indexOf(n) === -1) out.push(n); }); });
+    return out;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // RESOLUTION. Definitions first, templates only on a miss.
+  // ─────────────────────────────────────────────────────────────────────
+  function matches(t, name){
+    if (!t.enabled) return false;
+    if (t.isDefault) return true;
+    var v = t.value;
+    if (!v) return false;
+    if (t.op === 'Is')          return name === v;
+    if (t.op === 'Starts with') return name.indexOf(v) === 0;
+    if (t.op === 'Contains')    return name.indexOf(v) !== -1;
+    if (t.op === 'Regex')       { try { return new RegExp(v).test(name); } catch(e){ return false; } }
+    return false;
+  }
+  function resolve(name){
+    var d = defByName(name);
+    if (d) return { hit:'definition', def:d, tpl:null };
+    var l = tplList();
+    for (var i=0;i<l.length;i++) if (matches(l[i], name)) return { hit:'template', def:null, tpl:l[i] };
+    return { hit:'none', def:null, tpl:null };
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function q(v){ return v ? v + '%' : '—'; }
+  function typeBadge(t){
+    return t === 'forwarder'
+      ? '<span class="badge badge--violet">forwarder</span>'
+      : '<span class="badge badge--grey">archive</span>';
+  }
+
+  function renderDefs(){
+    var body = document.getElementById('defbody');
+    body.innerHTML = definitions.map(function(d){
+      var e = eff(d), dr = S.propagate === 'next' && drifted(d), fwd = d.type === 'forwarder';
+      var cls = d.fresh ? 'row--fresh' : (dr ? 'row--drift' : (fwd ? 'row--fwd' : ''));
+      var src = d.from
+        ? '<span class="chip chip--mono">' + esc((tplById(d.from)||{name:d.from}).name) + '</span>'
+        : '<span class="muted">' + esc(d.createdBy) + '</span>';
+      return '<tr class="clickable ' + cls + '" data-def="' + d.id + '">'
+        + '<td><span class="mono rowname">' + esc(d.name) + '</span>'
+          + (d.fresh ? ' <span class="badge badge--green">new</span>' : '')
+          + (dr ? ' <span class="badge badge--amber">off template</span>' : '') + '</td>'
+        + '<td>' + typeBadge(d.type) + '</td>'
+        + '<td><span class="tag">' + esc(d.entityType) + '</span>'
+          + (d.ingestion === 'summary' ? ' <span class="badge badge--blue">summary</span>' : '') + '</td>'
+        + '<td class="num">' + esc(locLabel(d.location)) + '</td>'
+        + '<td>' + (fwd ? '<span class="muted">n/a</span>' : '<span class="tag">' + esc(e.retention) + '</span>') + '</td>'
+        + '<td class="num">' + q(e.quota) + '</td>'
+        + '<td class="num">' + (fwd ? '<span class="muted">n/a</span>' : esc(e.access)) + '</td>'
+        + '<td>' + src + '</td>'
+        + '<td>' + (d.hasData
+            ? '<span class="num">yes</span>'
+            : '<span class="badge badge--grey">no data yet</span>') + '</td></tr>';
+    }).join('') || '<tr><td colspan="9" class="emptyrow">No definitions yet.</td></tr>';
+
+    document.getElementById('defcount').textContent = definitions.length;
+
+    // The argument for this screen lives on the Simulation tab and in the Why panel.
+    // The screen itself stays a product screen: state is carried by the row badge.
+    setAnn('defann', '');
+  }
+
+  function renderTpls(){
+    var body = document.getElementById('tplbody');
+    var l = tplList();
+    body.innerHTML = l.map(function(t, i){
+      var n = childrenOf(t.id).length, fwd = t.type === 'forwarder';
+      return '<tr class="clickable' + (t.isDefault?' row--default':'') + '" data-tpl="' + t.id + '">'
+        + '<td class="num">' + (i+1) + '</td>'
+        + '<td><span class="grip' + (t.isDefault?' grip--off':'') + '">&#8942;&#8942;</span>'
+          + '<span class="rowname">' + esc(t.name) + '</span>'
+          + (t.isDefault?' <span class="badge badge--grey">catch-all</span>':'') + '</td>'
+        + '<td>' + (t.isDefault
+            ? '<span class="chip chip--locked">always true</span>'
+            : '<span class="chip chip--locked">Name</span> <span class="chip chip--op">' + esc(t.op) + '</span> <span class="chip chip--mono">' + esc(t.value) + '</span>') + '</td>'
+        + '<td>' + typeBadge(t.type) + '</td>'
+        + '<td><span class="tag">' + esc(t.entityType) + '</span></td>'
+        + '<td>' + (fwd ? '<span class="muted">n/a</span>' : '<span class="tag">' + esc(t.retention) + '</span>') + '</td>'
+        + '<td class="num">' + q(t.quota) + '</td>'
+        + '<td class="num">' + (fwd ? '<span class="muted">n/a</span>' : esc(t.access)) + '</td>'
+        + '<td><span class="counter">' + n + '</span></td>'
+        + '<td><span class="sw' + (t.enabled?'':' sw--off') + '"></span></td></tr>';
+    }).join('');
+    document.getElementById('tplcount').textContent = l.length;
+
+    setAnn('tplann',
+      '<div class="ann ann--warn"><span class="ic">!</span><div>'
+      + '<b>The catch-all is a proposal, not the product.</b> Today, traffic that matches no rule writes nothing at all.</div></div>');
+  }
+
+  function renderTm(){
+    var body = document.getElementById('tmbody');
+    body.innerHTML = tmrules.map(function(r, i){
+      var modes = [];
+      r.targets.forEach(function(t){
+        var m = t.mode === 'static' ? 'Static dataset' : 'Dynamic template';
+        if (modes.indexOf(m) === -1) modes.push(m);
+      });
+      var mode = modes.length > 1 ? 'Mixed' : (modes[0] || '—');
+      var target = r.targets.map(function(t){
+        return '<span class="chip chip--mono">' + esc(dstLabel(t)) + '</span>';
+      }).join(' ') + (r.targets.length > 1
+        ? ' <span class="badge badge--amber">' + r.targets.length + '× copy</span>' : '');
+      var names = producedBy(r), lands;
+      if (!names.length) lands = '<span class="muted">—</span>';
+      else {
+        var miss = names.filter(function(n){ return resolve(n).hit !== 'definition'; }).length;
+        lands = miss
+          ? '<span class="badge badge--amber">' + miss + ' created on arrival</span>'
+          : '<span class="badge badge--green">existing datasets</span>';
+      }
+      return '<tr class="clickable" data-tm="' + r.id + '">'
+        + '<td class="num">' + (i+1) + '</td>'
+        + '<td><span class="rowname">' + esc(r.name) + '</span></td>'
+        + '<td class="num">' + esc(r.filter) + '</td>'
+        + '<td><span class="tag">' + mode + '</span></td>'
+        + '<td>' + target + '</td>'
+        + '<td>' + lands + '</td>'
+        + '<td><span class="sw' + (r.enabled?'':' sw--off') + '"></span></td></tr>';
+    }).join('') || '<tr><td colspan="7" class="emptyrow">No rules yet.</td></tr>';
+    document.getElementById('tmcount').textContent = tmrules.length;
+
+    setAnn('tmann',
+      '<div class="ann ann--warn"><span class="ic">!</span><div>'
+      + '<b>Unresolved, raised in the room.</b> This screen does not show the physical location or retention of the dataset it writes to, '
+      + 'even to an admin. Fan-out makes it worse: a rule can hold several destinations and this screen names the location of none of them.</div></div>');
+  }
+
+  function setAnn(id, html){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = html;
+    el.classList.toggle('hide', !html);
+  }
+
+  function render(){ renderDefs(); renderTpls(); renderTm(); }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // THE ARRIVING-NAME WALK
+  // ─────────────────────────────────────────────────────────────────────
+  function step(n, kind, title, body){
+    return '<div class="step step--' + kind + '"><span class="step__n">' + n + '</span>'
+      + '<div class="step__b"><div class="step__t">' + title + '</div>' + body + '</div></div>';
+  }
+  function cfgLine(o){
+    if (o.type === 'forwarder')
+      return 'type <b>forwarder</b> · ' + esc(locLabel(o.location)) + ' · entityType <b>' + esc(o.entityType)
+           + '</b> · not queryable, no retention, no access policy';
+    return 'type <b>archive</b> · ' + esc(locLabel(o.location)) + ' · entityType <b>' + esc(o.entityType)
+         + '</b> · retention <b>' + esc(o.retention) + '</b> · quota ' + q(o.quota) + ' · access <b>' + esc(o.access) + '</b>';
+  }
+  function walkHTML(name){
+    var r = resolve(name), h = '';
+
+    if (r.hit === 'definition') {
+      var e = eff(r.def);
+      h += step(1, 'hit', 'Dataset Definitions &mdash; found',
+        'The name is the key, so the lookup ends here. <span class="mono">' + esc(name) + '</span> already exists: ' + cfgLine(e) + '.');
+      h += step(2, 'miss', 'Config Templates &mdash; not read',
+        'Templates are read only when no definition covers the name. Nothing here can change this dataset.');
+    } else if (r.hit === 'template') {
+      h += step(1, 'miss', 'Dataset Definitions &mdash; miss',
+        'No definition is keyed on <span class="mono">' + esc(name) + '</span>, so Citadel falls through.');
+      h += step(2, 'hit', 'Config Templates &mdash; ' + esc(r.tpl.name) + (r.tpl.isDefault ? ' (catch-all)' : ''),
+        'Matched top down on <span class="chip chip--op">' + esc(r.tpl.op) + '</span> <span class="chip chip--mono">' + esc(r.tpl.value) + '</span>.');
+      h += step(3, 'hit', 'A definition is created',
+        'It gets the template\'s configuration <b>as it stands right now</b>: ' + cfgLine(r.tpl) + '.<br>'
+        + 'From that moment the definition owns those values. A later edit to the template will not reach it.');
+    } else {
+      h += step(1, 'miss', 'Dataset Definitions &mdash; miss', 'No definition is keyed on that name.');
+      h += step(2, 'stop', 'No template matches', 'Nothing is written. This is the gap the dataspace catch-all is meant to close.');
+    }
+    return h;
+  }
+  // ─────────────────────────────────────────────────────────────────────
+  // DRAWER
+  // ─────────────────────────────────────────────────────────────────────
+  var D = null;
+  var drawer = document.getElementById('drawer'), bd = document.getElementById('bd');
+  function clone(o){ var c={}; for (var k in o) c[k] = o[k]; return c; }
+  function toast(m){
+    var t = document.getElementById('toast');
+    t.textContent = m; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+  function openDrawer(){ drawer.classList.add('open'); bd.classList.add('open'); }
+  function closeDrawer(){ D = null; drawer.classList.remove('open'); bd.classList.remove('open'); }
+
+  /**
+   * One row of a settings grid: label plus field name, the control, and a badge.
+   * Shared by the definition drawer and the template drawer, so a template reads
+   * like the create-definition form. Pass `badge` to override the default, which
+   * a template needs: nothing on a blueprint is immutable, the lock lands later.
+   */
+  function setRow(k, field, control, cls, note, badge){
+    return '<div class="setrow ' + cls + '"><div class="setrow__k">' + k + '<span class="mono">' + field + '</span></div>'
+      + '<div class="setrow__w">' + control + (note ? '<span class="hint">' + note + '</span>' : '') + '</div>'
+      + '<div>' + (badge ? badge
+                  : cls.indexOf('off') > -1 ? '<span class="badge badge--grey">not applicable</span>'
+                  : cls.indexOf('imm') > -1 ? '<span class="badge badge--violet">immutable</span>'
+                  : '<span class="badge badge--green">mutable</span>') + '</div></div>';
+  }
+
+  function selHTML(id, list, value, disabled){
+    return '<select class="sel" id="' + id + '"' + (disabled?' disabled':'') + '>'
+      + list.map(function(o){
+          var v = typeof o === 'string' ? o : o.v, l = typeof o === 'string' ? o : o.l;
+          return '<option value="' + esc(v) + '"' + (v === value ? ' selected' : '') + '>' + esc(l) + '</option>';
+        }).join('')
+      + '</select>';
+  }
+  function locOptions(kind){ return locsFor(kind).map(function(l){ return { v:l.id, l:l.label }; }); }
+
+  // ── definition drawer ──
+  function openDef(id){
+    var src = id ? definitions.filter(function(d){ return d.id === id; })[0] : null;
+    D = { kind:'def', mode: src ? 'edit' : 'create', id:id,
+          draft: src ? clone(src) : def({ name:'', from:null, createdBy:'you', hasData:false, history:[] }) };
+    if (!src) {
+      // Declared at creation, and empty is not a choice: start them unset so the admin picks.
+      D.draft.entityType = ''; D.draft.ingestion = ''; D.draft.partitioning = '';
+    }
+    document.getElementById('drtitle').textContent = src ? src.name : 'New dataset definition';
+    document.getElementById('drbadge').innerHTML =
+      src
+        ? (src.from ? '<span class="badge badge--blue">from a template</span>' : '<span class="badge badge--grey">defined by hand</span>')
+        : '<span class="badge badge--green">new</span>';
+    document.getElementById('drdelete').classList.toggle('hide', !src);
+    document.getElementById('drdelete').textContent = 'Delete definition';
+    drawDefBody();
+    openDrawer();
+  }
+  function drawDefBody(){
+    var d = D.draft, isNew = D.mode === 'create', fwd = d.type === 'forwarder';
+    var locked = !isNew && d.hasData;   // the dataset type itself
+    // entityType and partitioning are set at creation and locked afterwards,
+    // on an archive and on a forwarder alike (Noam, 07-09).
+    var etLocked = !isNew;
+    var h = '';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">1</span>Details</span></div>'
+      + '<p class="dsec__desc">The name is the key of this record. It cannot be edited after creation, and creating a name that already exists returns an error.</p>'
+      + '<div class="f"><label class="fl">Dataset name <span class="req">*</span></label>'
+      + '<input class="inp mono" id="f-name" value="' + esc(d.name) + '"' + (isNew?'':' readonly') + ' placeholder="e.g. logs-me-south-1">'
+      + '<span class="err hide" id="f-name-err"></span></div>'
+      + '<div class="f2"><div class="f"><label class="fl">Description <span class="opt">(optional)</span></label>'
+      + '<input class="inp" id="f-desc" value="' + esc(d.desc) + '"></div>'
+      + '<div class="f"><label class="fl">Bucket name <span class="opt">(optional)</span></label>'
+      + '<input class="inp mono" id="f-bucket" value="' + esc(d.bucket) + '" placeholder="platform picks one">'
+      + '<span class="hint">From the 20-08 constraints concept. Empty is allowed here, because the platform can name the bucket itself. '
+      + 'That is not true of the three declared properties below.</span></div></div></div>';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">2</span>Type, then location</span>'
+      + '<span class="grow"></span>' + typeBadge(d.type) + '</div>'
+      + '<p class="dsec__desc">The type is a property of the dataset, not only of the location. Pick it first and the location list narrows to the ones that can serve it.</p>'
+      + '<div class="f2"><div class="f"><label class="fl">Dataset type</label>'
+      + selHTML('f-type', [{v:'archive',l:'Archive · stored and queryable'},{v:'forwarder',l:'Forwarder · streamed out, not stored'}], d.type, locked)
+      + '<span class="hint">' + (locked ? 'Locked here because this dataset already holds data. The room did not rule on whether the type can change, so treat the lock as a proposal.' : 'Archive covers S3, GCS and COS. Forwarder covers MSK, Custom Kafka and IBM Event Streams.') + '</span></div>'
+      + '<div class="f"><label class="fl">Physical location</label>'
+      + selHTML('f-loc', locOptions(d.type), d.location)
+      + '<span class="hint">' + locsFor(d.type).length + ' of ' + LOCATIONS.length + ' locations can serve ' + (d.type === 'archive' ? 'an archive' : 'a forwarder') + ' dataset. '
+      + 'Location can move after creation, which is why the drawer keeps a history of it.</span></div></div></div>';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">3</span>Configuration</span>'
+      + '<span class="grow"></span>'
+      + (fwd ? '<span class="badge badge--violet">stores nothing</span>'
+             : locked ? '<span class="badge badge--violet">holds data</span>' : '<span class="badge badge--grey">empty</span>') + '</div>'
+      + '<p class="dsec__desc">Retention, quota and access stay mutable for the life of the dataset. Ingestion mode, entityType and partitioning are set at creation and locked afterwards, and validation must refuse a change. '
+      + '<b>None of the three can be left empty.</b> The 20-08 constraints concept offered declaring them or leaving them empty and letting the first write settle them; that second path is gone by agreement, so a dataset cannot be created without them.'
+      + (fwd ? ' A forwarder holds nothing, so retention, access and partitioning do not apply to it at all.' : '') + '</p>'
+      + '<div class="setgrid">';
+
+    h += setRow('Retention', 'retention_tag',
+      fwd ? '<input class="inp" value="not applicable" readonly>' : selHTML('f-ret', RETENTION, d.retention),
+      'setrow--mut' + (fwd?' setrow--off':''), fwd ? 'A forwarder holds nothing, so there is nothing to expire.' : '');
+    h += setRow('Quota limit', 'quota_limit', '<input class="inp mono" id="f-quota" value="' + esc(d.quota) + '" placeholder="% of plan">', 'setrow--mut', '');
+    h += setRow('Access policy', 'pbac_properties',
+      fwd ? '<input class="inp" value="not applicable" readonly>' : selHTML('f-acc', ACCESS, d.access),
+      'setrow--mut' + (fwd?' setrow--off':''), fwd ? 'PBAC is muted on a forwarder. Access is granted at the dataspace, not here.' : '');
+    h += setRow('Ingestion mode', 'ingestion_mode',
+      selHTML('f-ing', isNew ? [{v:'',l:'Select an ingestion mode'}].concat(INGEST) : INGEST, d.ingestion, etLocked),
+      'setrow--imm',
+      !etLocked
+        ? 'Set once, at creation, and it cannot be left empty. Streaming is written continuously as it arrives. '
+          + 'Summary is written by a background query execution, and a summary dataset lands as <span class="mono">jsonData</span>.'
+        : 'Locked. It decides whether the pipeline writes to this dataset or a background query does, and the two cannot be mixed on one dataset.');
+    h += setRow('Entity type', 'entityType',
+      selHTML('f-ent', isNew ? [{v:'',l:'Select an entity type'}].concat(ENTITY) : ENTITY, d.entityType, etLocked), 'setrow--imm',
+      !etLocked ? 'Set once, at creation, and it cannot be left empty. It cannot be changed afterwards and validation must refuse it.'
+      : fwd ? 'Locked. It still decides what Citadel validates arriving events against, so a wrong value silently discards traffic.'
+      : 'Locked. Stated on 06-09: entityType cannot change and validation must refuse it. A re-import cannot repair a wrong value.');
+    h += setRow('Partitioning', 'partitioning',
+      fwd ? '<input class="inp" value="not applicable" readonly>'
+          : selHTML('f-part', isNew ? [{v:'',l:'Select a partitioning scheme'}].concat(PARTS) : PARTS, d.partitioning, !isNew),
+      (fwd ? 'setrow--mut setrow--off' : 'setrow--imm'),
+      fwd ? 'A forwarder writes to a stream and stores nothing on our side, so there is nothing to partition.'
+      : isNew ? 'Set once, at creation, and it cannot be left empty. It cannot be changed afterwards.'
+      : 'Locked. Partitioning is set when the dataset is created and an admin cannot change it afterwards. '
+        + 'Separately, the platform may change its own internal granularity later, daily to hourly, and that must not make the caller write the data twice. '
+        + 'That is a Citadel decision, not this field.');
+    h += '</div></div>';
+
+    if (!D.draft.from && D.mode === 'edit') {
+      h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">4</span>Origin</span></div>'
+        + '<p class="dsec__desc">Defined by hand by <b>' + esc(d.createdBy) + '</b>. No template is attached, so no template edit can reach it.</p></div>';
+    } else if (D.mode === 'edit') {
+      var t = tplById(d.from);
+      h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">4</span>Source template</span>'
+        + '<span class="grow"></span><span class="chip chip--mono">' + esc(t ? t.name : d.from) + '</span></div>'
+        + '<p class="dsec__desc">Which template created it, recorded on the dataset. This is the provenance the old screen did not keep.</p>'
+        + (S.propagate === 'next'
+            ? '<div class="ann ann--ok"><span class="ic">&#10003;</span><div><b>A change to that template will not reach this dataset.</b> '
+              + 'The configuration above belongs to this record. To move it with others, use bulk update.</div></div>'
+            : '<div class="ann ann--bad"><span class="ic">!</span><div><b>Retired behaviour is switched on.</b> '
+              + 'Retention, quota and access above are being read live off the template, so an edit there rewrites them here.</div></div>')
+        + '</div>';
+    }
+
+    if (D.mode === 'edit' && d.history.length) {
+      h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">5</span>Physical location history</span></div>'
+        + '<p class="dsec__desc">Asked for by name on 06-09: the drawer shows where this dataset\'s data has been written, not just where it is written now.</p>'
+        + '<ul class="hist">' + d.history.map(function(x){
+            return '<li><span class="when">' + esc(x.when) + '</span>' + esc(x.what) + '</li>';
+          }).join('') + '</ul></div>';
+    }
+
+    document.getElementById('drbody').innerHTML = h;
+    wireDefFields();
+  }
+  function wireDefFields(){
+    function on(id, prop, ev, redraw){
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener(ev || 'input', function(){
+        D.draft[prop] = el.value;
+        if (el.value) el.classList.remove('inp--err');
+        if (redraw) drawDefBody();
+      });
+    }
+    on('f-name','name'); on('f-desc','desc'); on('f-quota','quota'); on('f-bucket','bucket');
+    on('f-ret','retention','change'); on('f-acc','access','change');
+    on('f-ent','entityType','change'); on('f-part','partitioning','change');
+    on('f-ing','ingestion','change'); on('f-loc','location','change');
+    var ty = document.getElementById('f-type');
+    if (ty) ty.addEventListener('change', function(){
+      D.draft.type = ty.value;
+      var l = locsFor(D.draft.type);
+      D.draft.location = l.length ? l[0].id : '';
+      drawDefBody();
+    });
+  }
+
+  // ── template drawer ──
+  function openTpl(id){
+    var src = id ? tplById(id) : null;
+    D = { kind:'tpl', mode: src ? 'edit' : 'create', id:id,
+          draft: src ? clone(src) : tpl({ name:'', op:'Starts with', value:'' }) };
+    document.getElementById('drtitle').textContent = src ? src.name : 'New config template';
+    document.getElementById('drbadge').innerHTML = src && src.isDefault
+      ? '<span class="badge badge--grey">catch-all</span>'
+      : '<span class="badge badge--blue">blueprint</span>';
+    document.getElementById('drdelete').classList.toggle('hide', !src || !!src.isDefault);
+    document.getElementById('drdelete').textContent = 'Delete template';
+    drawTplBody();
+    openDrawer();
+  }
+  function drawTplBody(){
+    var t = D.draft, isDef = !!t.isDefault, fwd = t.type === 'forwarder';
+    var kids = D.mode === 'edit' ? childrenOf(t.id) : [];
+    var h = '';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">1</span>Details</span></div>'
+      + '<div class="f"><label class="fl">Template name <span class="req">*</span></label>'
+      + '<input class="inp" id="g-name" value="' + esc(t.name) + '"' + (isDef?' readonly':'') + ' placeholder="e.g. Regional application logs">'
+      + '<span class="err hide" id="g-name-err"></span></div>'
+      + '<div class="f"><label class="fl">Description <span class="opt">(optional)</span></label>'
+      + '<input class="inp" id="g-desc" value="' + esc(t.desc) + '"' + (isDef?' readonly':'') + '></div></div>';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">2</span>Matcher</span></div>'
+      + '<p class="dsec__desc">The condition runs on the dataset <b>name</b>. It never produces a name, and it is read only when no definition already covers that name.</p>';
+    if (isDef) {
+      h += '<div class="cb"><div class="cbrow"><span class="chip chip--locked">Any name no template above matched</span></div></div>'
+        + '<span class="hint">The catch-all condition is fixed. It is the tail of the list, so nothing arrives with nowhere to land.</span>';
+    } else {
+      h += '<div class="cb"><div class="cbrow"><span class="chip chip--locked">Name</span>'
+        + selHTML('g-op', OPS, t.op) + '<input class="inp mono" id="g-value" value="' + esc(t.value) + '" placeholder="logs-"></div></div>';
+    }
+    h += '</div>';
+
+    // Same shape as the create-definition drawer: type and location first, then a
+    // settings grid with the same field names. A template is the form for a dataset
+    // that does not exist yet, so it should read like the form for one that does.
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">3</span>Type, then location</span>'
+      + '<span class="grow"></span>' + typeBadge(t.type) + '</div>'
+      + '<p class="dsec__desc">Pick the type first and the location list narrows to the ones that can serve it. Every dataset this template creates gets both.</p>'
+      + '<div class="f2"><div class="f"><label class="fl">Dataset type</label>'
+      + selHTML('g-type', [{v:'archive',l:'Archive · stored and queryable'},{v:'forwarder',l:'Forwarder · streamed out, not stored'}], t.type)
+      + '<span class="hint">Archive covers S3, GCS and COS. Forwarder covers MSK, Custom Kafka and IBM Event Streams.</span></div>'
+      + '<div class="f"><label class="fl">Physical location</label>' + selHTML('g-loc', locOptions(t.type), t.location)
+      + '<span class="hint">' + locsFor(t.type).length + ' of ' + LOCATIONS.length + ' locations can serve '
+      + (t.type === 'archive' ? 'an archive' : 'a forwarder') + ' dataset.</span></div></div></div>';
+
+    var AT_CREATION = '<span class="badge badge--violet">set at creation</span>';
+    var LATER       = '<span class="badge badge--green">editable later</span>';
+    var NA          = '<span class="badge badge--grey">not applicable</span>';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">4</span>Default configuration</span>'
+      + '<span class="grow"></span><span class="badge badge--blue">blueprint</span></div>'
+      + '<p class="dsec__desc">Every field here is copied onto the definition at the moment it is created, and belongs to that definition afterwards. '
+      + 'Nothing here is locked, because no dataset exists yet. The badge says what happens to each field <b>on the dataset</b> once it does.</p>'
+      + '<div class="setgrid">';
+    h += setRow('Retention', 'retention_tag',
+      fwd ? '<input class="inp" value="not applicable" readonly>' : selHTML('g-ret', RETENTION, t.retention),
+      'setrow--mut' + (fwd?' setrow--off':''),
+      fwd ? 'A forwarder holds nothing, so there is nothing to expire.' : '',
+      fwd ? NA : LATER);
+    h += setRow('Quota limit', 'quota_limit',
+      '<input class="inp mono" id="g-quota" value="' + esc(t.quota) + '" placeholder="% of plan">',
+      'setrow--mut', '', LATER);
+    h += setRow('Access policy', 'pbac_properties',
+      fwd ? '<input class="inp" value="not applicable" readonly>' : selHTML('g-acc', ACCESS, t.access),
+      'setrow--mut' + (fwd?' setrow--off':''),
+      fwd ? 'PBAC is muted on a forwarder. Access is granted at the dataspace, not here.' : '',
+      fwd ? NA : LATER);
+    h += setRow('Ingestion mode', 'ingestion_mode', selHTML('g-ing', INGEST, t.ingestion), 'setrow--imm',
+      'Locks on the dataset the moment it is created. Streaming is written by the pipeline, summary by a background query. '
+      + 'A template cannot leave it empty either, because the dataset it creates would have nothing to bind.',
+      AT_CREATION);
+    h += setRow('Entity type', 'entityType', selHTML('g-ent', ENTITY, t.entityType), 'setrow--imm',
+      'Locks on the dataset the moment it is created. A wrong value here cannot be repaired by a re-import, and every dataset this template makes inherits it.',
+      AT_CREATION);
+    h += setRow('Partitioning', 'partitioning',
+      fwd ? '<input class="inp" value="not applicable" readonly>' : selHTML('g-part', PARTS, t.partitioning),
+      fwd ? 'setrow--mut setrow--off' : 'setrow--imm',
+      fwd ? 'A forwarder stores nothing on our side, so there is nothing to partition.'
+          : 'Locks on the dataset once it is created. An admin cannot change it afterwards.',
+      fwd ? NA : AT_CREATION);
+    h += '</div></div>';
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">5</span>What saving this does</span>'
+      + '<span class="grow"></span><span class="counter">' + kids.length + ' existing</span></div>';
+    if (S.propagate === 'next') {
+      h += '<div class="ann ann--ok"><span class="ic">&#10003;</span><div><b>Nothing that exists changes.</b> '
+        + (kids.length ? kids.length + ' datasets were created by this template and none of them will move. ' : 'No dataset has been created by this template yet. ')
+        + 'The configuration above shapes the next dataset whose name matches and that no definition already covers.</div></div>';
+    } else {
+      h += '<div class="ann ann--bad"><span class="ic">!</span><div><b>Retired behaviour is switched on.</b> '
+        + 'Saving rewrites retention, quota and access on all ' + kids.length + ' datasets below at once. '
+        + 'That is the reach Redlus wanted and the blast radius the room refused.</div></div>';
+    }
+    if (kids.length) {
+      h += '<div class="preview" style="margin-top:12px"><div class="pvhd">Datasets created by this template</div><div class="pvlist">'
+        + kids.map(function(k){
+            var e = eff(k), off = S.propagate === 'next' && drifted(k);
+            return '<div class="pvitem ' + (S.propagate === 'all' ? 'pvitem--no' : (off ? 'pvitem--hold' : 'pvitem--yes')) + '">'
+              + '<span>' + esc(k.name) + '</span><span class="arrow">&rarr;</span>'
+              + '<span>' + esc(e.retention) + ' · ' + q(e.quota) + ' · ' + esc(e.access)
+              + (off ? ' · off template' : '') + '</span></div>';
+          }).join('')
+        + '</div><div class="pvempty">'
+        + (S.propagate === 'next'
+            ? 'Amber means the dataset already carries different values from the template. Under the 06-09 model that is expected, and only a bulk update closes it.'
+            : 'Every row here is rewritten the moment you save.')
+        + '</div></div>';
+    }
+    h += '</div>';
+
+    document.getElementById('drbody').innerHTML = h;
+    wireTplFields();
+  }
+  function wireTplFields(){
+    function on(id, prop, ev, redraw){
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener(ev || 'input', function(){
+        D.draft[prop] = el.value;
+        if (redraw) drawTplBody();
+      });
+    }
+    on('g-name','name'); on('g-desc','desc'); on('g-value','value'); on('g-quota','quota');
+    on('g-op','op','change');
+    on('g-ent','entityType','change'); on('g-part','partitioning','change');
+    on('g-ing','ingestion','change');
+    on('g-ret','retention','change'); on('g-acc','access','change'); on('g-loc','location','change');
+    var ty = document.getElementById('g-type');
+    if (ty) ty.addEventListener('change', function(){
+      D.draft.type = ty.value;
+      var l = locsFor(D.draft.type);
+      D.draft.location = l.length ? l[0].id : '';
+      drawTplBody();
+    });
+  }
+
+  // ── TCO drawer ──
+  function openTm(id){
+    var src = id ? tmrules.filter(function(r){ return r.id === id; })[0] : null;
+    D = { kind:'tm', mode: src ? 'edit' : 'create', id:id,
+          draft: src ? clone(src) : tm({ name:'', filter:'—', mode:'static' }) };
+    D.active = D.draft.targets[0].id;
+    document.getElementById('drtitle').textContent = src ? src.name : 'New TCO rule';
+    document.getElementById('drbadge').innerHTML = '<span class="badge badge--grey">TCO</span>';
+    document.getElementById('drdelete').classList.toggle('hide', !src);
+    document.getElementById('drdelete').textContent = 'Delete rule';
+    drawTmBody();
+    openDrawer();
+  }
+  /** The names a dynamic destination produces, built live from its template and its values. */
+  function madeHTML(t){
+    var made = producedByOne(t);
+    if (!made.length) {
+      return '<span class="hint">Nothing yet. Type a template with a placeholder, '
+        + '<span class="mono">{region}</span>, <span class="mono">$d.region</span> or <span class="mono">$1</span>, '
+        + 'then Refresh to read the values that have already arrived.</span>';
+    }
+    var ph = (t.template.match(PLACEHOLDER) || [])[0];
+    return '<div class="pnames">' + made.map(function(n){
+        return '<span class="chip chip--mono">' + esc(n) + (defByName(n) ? '' : ' · new') + '</span>';
+      }).join('') + '</div>'
+      + '<span class="hint">'
+      + (ph
+          ? made.length + ' name' + (made.length === 1 ? '' : 's') + ', built by putting each value we have received in place of '
+            + '<span class="mono">' + esc(ph) + '</span>. The list follows the template as you type it.'
+          : 'This template has no placeholder, so it is one fixed name rather than a family of them. '
+            + 'A fixed name belongs in a static destination, where the dataset can be picked from a list.')
+      + ' A name marked <b>new</b> has no definition yet, so the first matching event creates it.</span>';
+  }
+  function drawTmBody(){
+    var r = D.draft, h = '';
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">1</span>Details</span></div>'
+      + '<div class="f"><label class="fl">Rule name <span class="req">*</span></label>'
+      + '<input class="inp" id="h-name" value="' + esc(r.name) + '" placeholder="e.g. Regional application logs">'
+      + '<span class="err hide" id="h-name-err"></span></div>'
+      + '<div class="f"><label class="fl">Filter</label><input class="inp" id="h-filter" value="' + esc(r.filter) + '"></div></div>';
+
+    var ti = 0;
+    for (var q=0;q<r.targets.length;q++) if (r.targets[q].id === D.active) ti = q;
+    D.active = r.targets[ti].id;
+    var t = r.targets[ti];
+
+    h += '<div class="dsec"><div class="dsec__hd"><span class="dsec__title"><span class="dsec__n">2</span>Destination</span></div>'
+      + '<p class="dsec__desc">A rule routes matched data to one or more destinations. Each destination is one dataspace and one dataset, '
+      + 'The dataspace is read-only while it is the default one. The dataset type comes first, because it decides which datasets this destination can reach.</p>';
+
+    h += '<div class="ttabs" id="h-tabs">'
+      + r.targets.map(function(x, i){
+          return '<button class="ttab' + (x.id === D.active ? ' on' : '') + '" data-tgt="' + x.id + '">'
+            + '<span class="ttab__l">' + esc(dstLabel(x)) + '</span>'
+            + '<span class="chip chip--locked">' + esc(dstType(x) || 'no type') + '</span>'
+            + (r.targets.length > 1 ? '<span class="ttab__x" data-rm="' + x.id + '" title="Remove this destination">&times;</span>' : '')
+            + '</button>';
+        }).join('')
+      + '<button class="ttab ttab--add" id="h-addtgt" title="Add a destination">+</button></div>';
+
+    if (r.targets.length > 1) {
+      h += '<div class="ann ann--warn" style="margin-bottom:15px"><span class="ic">!</span><div>'
+        + '<b>Matched data is copied to ' + r.targets.length + ' destinations.</b> Each destination stores a full copy, '
+        + 'so this rule bills at about ' + r.targets.length + '× the matched volume, all drawn from the same quota. '
+        + 'Fan-out is a cost decision, not a routing convenience.</div></div>';
+    }
+
+    h += '<div class="f"><label class="fl">Dataset type</label>'
+      + selHTML('h-dstype', [
+          {v:'archive',   l:'Archive · stored and queryable'},
+          {v:'forwarder', l:'Forwarder · streamed out, not stored'}
+        ], t.dstype)
+      + '<span class="hint">Archive covers S3, GCS and COS. Forwarder covers MSK, Custom Kafka and IBM Event Streams. '
+      + 'Pick the type first: it filters the dataset list below to datasets of that type, and on a dynamic destination it is '
+      + 'the type the dataset is created with.</span></div>';
+
+    h += '<div class="f"><label class="fl">Target mode</label>' + selHTML('h-mode', [
+          {v:'static',  l:'Static dataset · pick from datasets that exist'},
+          {v:'dynamic', l:'Dynamic dataset · a validated name template'}
+        ], t.mode)
+      + '<span class="hint">Set per destination. Which one you pick decides whether this destination can be enumerated '
+      + 'before any data arrives.</span></div>';
+
+    var dsSel = '<div class="f"><label class="fl">Dataspace</label>'
+      + '<select class="sel" id="h-dataspace" disabled><option>Default</option></select>'
+      + '<span class="hint">Read-only. The default dataspace is the only one this page models.</span></div>';
+
+    if (t.mode === 'static') {
+      var used = r.targets.filter(function(x){ return x.id !== t.id; }).map(function(x){ return x.dataset; });
+      var names = defsOfType(t.dstype).map(function(d){ return d.name; });
+      h += '<div class="f2">' + dsSel
+        + '<div class="f"><label class="fl">Dataset</label>'
+        + '<select class="sel" id="h-dataset"><option value="">Select a dataset</option>'
+        + names.map(function(n){
+            var taken = used.indexOf(n) !== -1;
+            return '<option' + (n === t.dataset ? ' selected' : '') + (taken ? ' disabled' : '') + '>'
+              + esc(n) + (taken ? ' · already a destination on this rule' : '') + '</option>';
+          }).join('')
+        + '</select>'
+        + '<span class="hint">' + names.length + ' of ' + definitions.length + ' definitions are '
+        + (t.dstype === 'archive' ? 'archive' : 'forwarder') + ' datasets, and only those are listed. '
+        + 'You cannot select a dataset that does not exist, and there is a create path next to it. '
+        + 'A dataset already used by another destination on this rule is greyed out, because a name is unique inside a dataspace.'
+        + '</span></div></div>';
+    } else {
+      var tplTip = '<span class="tipwrap" tabindex="0"><span class="tipic">i</span><span class="tipbox">'
+        + 'The template <b>produces</b> the name from the data, so no dropdown is possible. '
+        + 'Examples on the record, all Harel\'s: '
+        + '<span class="chip chip--mono">logs-{region}</span> '
+        + '<span class="chip chip--mono">k8s-prod-$d.region</span> '
+        + '<span class="chip chip--mono">default/AWS-$1</span> '
+        + '<span class="chip chip--mono">$d.region-AWS</span><br>'
+        + '<b>The syntax is not settled.</b> On 27-08 he wrote it as free text with <span class="mono">$d.field</span> and '
+        + '<span class="mono">$1</span>, with no validation beyond a legal dataset name. On 06-09 it became a <b>validated</b> '
+        + 'template shaped like <span class="mono">logs-{region}</span>, resolving from <span class="mono">$l</span>. '
+        + 'Those are different placeholder syntaxes and different keypath roots, <span class="mono">$d</span> against '
+        + '<span class="mono">$l</span>. Nobody has picked one.'
+        + '</span></span>';
+
+      h += '<div class="f2">' + dsSel
+        + '<div class="f"><label class="fl">Name template ' + tplTip
+        + ' <span class="opt">validated, not free text</span></label>'
+        + '<input class="inp mono" id="h-template" value="' + esc(t.template) + '" placeholder="logs-{region}">'
+        + '</div></div>';
+
+      var refTip = '<span class="tipwrap" tabindex="0"><span class="tipic">i</span><span class="tipbox">'
+        + 'Refresh runs a <b>DataPrime query over historical data</b> to read the placeholder values already received, '
+        + 'and rebuilds this list from them. It reports what has arrived. It cannot report a value that has never arrived.'
+        + '</span></span>';
+
+      h += '<div class="f"><label class="fl">Names this template produces '
+        + '<span class="opt">read from data already sent</span>'
+        + '<span class="grow"></span>'
+        + '<button class="tbtn" type="button" id="h-refresh">Refresh</button>' + refTip + '</label>'
+        + '<div id="h-madewrap">' + madeHTML(t) + '</div>'
+        + (t.queried ? '<span class="hint">DataPrime query run ' + esc(t.queried) + '.</span>' : '')
+        + '<span class="hint">The name is built <b>per event, at write time</b>, from the template and the value on that event, '
+        + 'so this list is not a prediction. It can only show names built from placeholder values we have <b>already received</b>.<br>'
+        + '<b>This is the part to make clear to the user.</b> Until data that matches the template has been sent there is nothing '
+        + 'to list here, no dataset exists, and the admin cannot see what this rule will produce. A value that has never arrived '
+        + 'will not appear, and the dataset for it is created the first time it does.</span></div>';
+    }
+
+    h += '</div>';
+
+    document.getElementById('drbody').innerHTML = h;
+    var onTab = document.querySelector('#h-tabs .ttab.on');
+    if (onTab && onTab.scrollIntoView) onTab.scrollIntoView({ block:'nearest', inline:'nearest' });
+    wireTmFields();
+  }
+  function wireTmFields(){
+    function on(id, prop, ev, fn){
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener(ev || 'input', function(){
+        D.draft[prop] = fn ? fn(el.value) : el.value;
+      });
+    }
+    on('h-name','name'); on('h-filter','filter');
+
+    function active(){
+      if (!D || D.kind !== 'tm') return {};
+      var r = D.draft;
+      for (var i=0;i<r.targets.length;i++) if (r.targets[i].id === D.active) return r.targets[i];
+      return r.targets[0];
+    }
+    function onT(id, prop, ev, redraw, fn){
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener(ev || 'input', function(){
+        active()[prop] = fn ? fn(el.value) : el.value;
+        if (redraw) drawTmBody();
+      });
+    }
+    onT('h-dataset','dataset','change', true);
+
+    onT('h-mode','mode','change', true);
+    function paintMade(){
+      var w = document.getElementById('h-madewrap');
+      if (w) w.innerHTML = madeHTML(active());
+    }
+    onT('h-template','template','input', false, function(v){ setTimeout(paintMade, 0); return v; });
+    onT('h-template','template','change', true);
+    var ty = document.getElementById('h-dstype');
+    if (ty) ty.addEventListener('change', function(){
+      var t = active();
+      t.dstype = ty.value;
+      var d = t.dataset ? defByName(t.dataset) : null;
+      if (d && d.type !== t.dstype) t.dataset = '';   // the pick no longer matches the type
+      drawTmBody();
+    });
+
+    var rf = document.getElementById('h-refresh');
+    if (rf) rf.addEventListener('click', function(){
+      var t = active();
+      t.values = VALUE_HISTORY.slice();
+      t.queried = 'just now, over the last 30 days';
+      drawTmBody();
+      toast('DataPrime query over history returned ' + t.values.length + ' values');
+    });
+
+    var tabs = document.getElementById('h-tabs');
+    if (tabs) tabs.addEventListener('click', function(e){
+      if (!D || D.kind !== 'tm') return;
+      var rm = e.target.closest('[data-rm]');
+      if (rm) {
+        e.stopPropagation();
+        var gone = rm.getAttribute('data-rm');
+        D.draft.targets = D.draft.targets.filter(function(x){ return x.id !== gone; });
+        if (D.active === gone) D.active = D.draft.targets[0].id;
+        drawTmBody();
+        return;
+      }
+      var add = e.target.closest('#h-addtgt');
+      if (add) {
+        var n = dst({});
+        D.draft.targets.push(n);
+        D.active = n.id;
+        drawTmBody();
+        return;
+      }
+      var tab = e.target.closest('[data-tgt]');
+      if (tab) { D.active = tab.getAttribute('data-tgt'); drawTmBody(); }
+    });
+  }
+  // ── save / delete ──
+  document.getElementById('drsave').onclick = function(){
+    if (!D) return;
+    var d = D.draft;
+    if (!String(d.name).trim()) {
+      var idm = { def:'f-name', tpl:'g-name', tm:'h-name' }[D.kind];
+      var f = document.getElementById(idm);
+      if (f) { f.classList.add('inp--err'); f.focus(); }
+      toast('Name is required');
+      return;
+    }
+    if (D.kind === 'def') {
+      if (D.mode === 'create') {
+        var need = [{ id:'f-ing', v:d.ingestion, l:'an ingestion mode' },
+                    { id:'f-ent', v:d.entityType, l:'an entity type' }];
+        if (d.type !== 'forwarder') need.push({ id:'f-part', v:d.partitioning, l:'a partitioning scheme' });
+        for (var q=0;q<need.length;q++) {
+          if (!need[q].v) {
+            var badf = document.getElementById(need[q].id);
+            if (badf) { badf.classList.add('inp--err'); badf.focus(); }
+            toast('Pick ' + need[q].l + '. It is set at creation and cannot be left empty.');
+            return;
+          }
+        }
+        if (defByName(d.name.trim())) {
+          var fn = document.getElementById('f-name');
+          fn.classList.add('inp--err'); fn.focus();
+          var er = document.getElementById('f-name-err');
+          er.textContent = 'A dataset with this name already exists. The name is the key, so this is an error, not a merge.';
+          er.classList.remove('hide');
+          toast('Duplicate dataset name');
+          return;
+        }
+        d.name = d.name.trim();
+        d.history = [{ when:'today', what:'Created at ' + locLabel(d.location) + ' by you' }];
+        d.fresh = true; d.hasData = false; d.createdBy = 'you';
+        definitions.unshift(clone(d));
+        toast('Definition created');
+      } else {
+        for (var i=0;i<definitions.length;i++) if (definitions[i].id === d.id) definitions[i] = clone(d);
+        toast('Definition saved');
+      }
+    } else if (D.kind === 'tpl') {
+      if (d.isDefault) {
+        for (var k in d) CATCHALL[k] = d[k];
+      } else if (D.mode === 'edit') {
+        for (var j=0;j<templates.length;j++) if (templates[j].id === d.id) templates[j] = clone(d);
+      } else {
+        templates.unshift(clone(d));
+      }
+      toast(S.propagate === 'next'
+        ? 'Template saved. No existing dataset changed.'
+        : 'Template saved. ' + childrenOf(d.id).length + ' datasets rewritten.');
+    } else {
+      if (D.mode === 'edit') {
+        for (var m=0;m<tmrules.length;m++) if (tmrules[m].id === d.id) tmrules[m] = clone(d);
+      } else {
+        tmrules.unshift(clone(d));
+      }
+      toast(D.mode === 'create' ? 'Rule created' : 'Rule saved');
+    }
+    closeDrawer(); render();
+  };
+
+  document.getElementById('drdelete').onclick = function(){
+    if (!D) return;
+    if (D.kind === 'def') {
+      definitions = definitions.filter(function(x){ return x.id !== D.draft.id; });
+      toast('Definition deleted. A name that arrives again falls through to the templates.');
+    } else if (D.kind === 'tpl') {
+      var n = childrenOf(D.draft.id).length;
+      templates = templates.filter(function(x){ return x.id !== D.draft.id; });
+      toast('Template deleted. The ' + n + ' datasets it created keep their configuration and stay live.');
+    } else {
+      tmrules = tmrules.filter(function(x){ return x.id !== D.draft.id; });
+      toast('Rule deleted');
+    }
+    closeDrawer(); render();
+  };
+
+  document.getElementById('drclose').onclick = closeDrawer;
+  document.getElementById('drcancel').onclick = closeDrawer;
+  bd.onclick = closeDrawer;
+
+  // ─────────────────────────────────────────────────────────────────────
+  // BULK UPDATE
+  // ─────────────────────────────────────────────────────────────────────
+  var bulk = document.getElementById('bulk');
+  var B = { scope:'all', field:'retention', value:'Default' };
+  function openBulk(){
+    var sc = document.getElementById('b-scope');
+    sc.innerHTML = '<option value="all">Every dataset (' + definitions.length + ')</option>'
+      + templates.map(function(t){
+          return '<option value="' + esc(t.id) + '">From template · ' + esc(t.name) + ' (' + childrenOf(t.id).length + ')</option>';
+        }).join('');
+    sc.value = B.scope;
+    document.getElementById('b-field').value = B.field;
+    drawBulkValue();
+    bulk.classList.remove('hide');
+  }
+  function bulkTargets(){
+    var list = B.scope === 'all' ? definitions : childrenOf(B.scope);
+    return list.filter(function(d){
+      if (d.type === 'forwarder' && (B.field === 'retention' || B.field === 'access')) return false;
+      return String(d[B.field]) !== String(B.value);
+    });
+  }
+  function drawBulkValue(){
+    var w = document.getElementById('b-valwrap');
+    if (B.field === 'retention')  { B.value = RETENTION.indexOf(B.value) > -1 ? B.value : 'Default'; w.innerHTML = selHTML('b-val', RETENTION, B.value); }
+    else if (B.field === 'access'){ B.value = ACCESS.indexOf(B.value) > -1 ? B.value : 'Default Policy'; w.innerHTML = selHTML('b-val', ACCESS, B.value); }
+    else                          { if (RETENTION.indexOf(B.value) > -1 || ACCESS.indexOf(B.value) > -1) B.value = '10'; w.innerHTML = '<input class="inp mono" id="b-val" value="' + esc(B.value) + '" placeholder="% of plan">'; }
+    var el = document.getElementById('b-val');
+    el.addEventListener(B.field === 'quota' ? 'input' : 'change', function(){ B.value = el.value; drawBulkList(); });
+    drawBulkList();
+  }
+  function drawBulkList(){
+    var t = bulkTargets();
+    document.getElementById('b-count').textContent = t.length;
+    document.getElementById('b-list').innerHTML = t.length
+      ? t.map(function(d){
+          return '<div class="pvitem"><span>' + esc(d.name) + '</span><span class="arrow">&rarr;</span>'
+            + '<span>' + esc(String(d[B.field] || '—')) + ' becomes ' + esc(String(B.value || '—')) + '</span></div>';
+        }).join('')
+      : '<div class="pvempty">Nothing to change. Every dataset in scope already carries this value, or is a forwarder the field does not apply to.</div>';
+  }
+  document.getElementById('bulkbtn').onclick = openBulk;
+  document.getElementById('b-scope').addEventListener('change', function(){ B.scope = this.value; drawBulkList(); });
+  document.getElementById('b-field').addEventListener('change', function(){ B.field = this.value; drawBulkValue(); });
+  document.getElementById('b-apply').onclick = function(){
+    var t = bulkTargets();
+    t.forEach(function(d){ d[B.field] = B.value; });
+    bulk.classList.add('hide');
+    render();
+    toast(t.length + ' datasets updated in one batch. This is an action, not a binding.');
+  };
+  function closeBulk(){ bulk.classList.add('hide'); }
+  document.getElementById('bulkclose').onclick = closeBulk;
+  document.getElementById('b-cancel').onclick = closeBulk;
+  bulk.addEventListener('click', function(e){ if (e.target === bulk) closeBulk(); });
+
+  // ─────────────────────────────────────────────────────────────────────
+  // SIMULATION CASES
+  // Every case resets the seed data first, so a result never depends on
+  // what you ran before it.
+  // ─────────────────────────────────────────────────────────────────────
+  var SNAPSHOT = JSON.stringify({
+    d:definitions, t:templates, c:CATCHALL, m:tmrules,
+    seq:{ d:defSeq, t:tplSeq, m:tmSeq }
+  });
+  function resetAll(){
+    var o = JSON.parse(SNAPSHOT);
+    definitions = o.d; templates = o.t; tmrules = o.m;
+    for (var k in o.c) CATCHALL[k] = o.c[k];
+    defSeq = o.seq.d; tplSeq = o.seq.t; tmSeq = o.seq.m;
+  }
+
+  /** Create the definition an arriving name would produce, and return it. */
+  function createFromTemplate(name, t){
+    var d = def({
+      name:name, from:t.id, createdBy:'template', type:t.type, entityType:t.entityType,
+      location:t.location, retention:t.retention, quota:t.quota, access:t.access,
+      partitioning:t.partitioning, hasData:true, fresh:true,
+      desc:'Created on arrival by ' + t.name + '.',
+      history:[{ when:'today', what:'Created at ' + locLabel(t.location) + ' by the template ' + t.name }]
+    });
+    definitions.unshift(d);
+    return d;
+  }
+
+  var VERDICT = {
+    model:    { c:'badge--green', t:'matches the model' },
+    open:     { c:'badge--amber', t:'open question' },
+    today:    { c:'badge--red',   t:"today's behaviour" },
+    deferred: { c:'badge--grey',  t:'deferred' }
+  };
+
+  var CASES = [
+    {
+      title:'An event for a dataset someone created by hand',
+      premise:'An event arrives for <span class="mono">payments-audit</span>. A person defined that dataset, no template was involved.',
+      expect:'The definition is found on its name and used. No template is read.',
+      run:function(){
+        resetAll();
+        var d = defByName('payments-audit');
+        return {
+          name:'payments-audit', verdict:'model',
+          note:'This is the case the old model could not express: <b>a dataset with no rule behind it</b>. '
+            + 'Under 06-09 the name is the key, so a definition made by hand is a first-class row. '
+            + 'Its origin reads <span class="mono">' + esc(d ? d.createdBy : 'a person') + '</span> instead of a template, '
+            + 'and no template edit anywhere can reach it.'
+        };
+      }
+    },
+    {
+      title:'An event for a dataset a template created',
+      premise:'An event arrives for <span class="mono">logs-eu-west-1</span>. The regional template created it, and that template still matches this name.',
+      expect:'The definition is found and used. The template is still not read, even though it matches.',
+      run:function(){
+        resetAll();
+        var t = tplById('t-logs');
+        return {
+          name:'logs-eu-west-1', verdict:'model',
+          note:'<b>This is the case worth slowing down on.</b> The template <span class="mono">' + esc(t.name) + '</span> '
+            + 'matches <span class="mono">logs-eu-west-1</span> on <span class="mono">' + esc(t.op) + ' ' + esc(t.value) + '</span>, '
+            + 'and it is the template that created this dataset. It is still never consulted, because a definition exists for the name and step 1 ends the lookup.<br>'
+            + 'That is exactly why editing the template does not move this dataset. The dataset owns its configuration from the moment it was created. '
+            + 'The template is recorded on it as provenance, not as governance.'
+        };
+      }
+    },
+    {
+      title:'An event for a name no dataset covers',
+      premise:'An event arrives for <span class="mono">logs-me-south-1</span>. No definition is keyed on it, and the regional template matches it.',
+      expect:'Citadel falls through to the templates, and the matching template creates the definition.',
+      run:function(){
+        resetAll();
+        var t = tplById('t-logs');
+        var before = definitions.length;
+        var made = createFromTemplate('logs-me-south-1', t);
+        return {
+          verdict:'model',
+          steps:[
+            ['miss','Dataset Definitions, miss','No definition is keyed on <span class="mono">logs-me-south-1</span>, so Citadel falls through.'],
+            ['hit','Config Templates, ' + esc(t.name),'Matched top down on <span class="chip chip--op">' + esc(t.op) + '</span> <span class="chip chip--mono">' + esc(t.value) + '</span>.'],
+            ['hit','A definition is created','It takes the template configuration <b>as it stands right now</b>: ' + cfgLine(t) + '.'],
+            ['hit','From now on it is independent','The definitions list went from ' + before + ' to ' + definitions.length + '. '
+              + 'The new row owns those values, and a later edit to the template will not reach it. It is now case 2.']
+          ],
+          note:'Go to the <b>Dataset Definitions</b> tab and the new row is at the top. Open it and section 4 names the template that made it. '
+            + 'This is the only one of the three cases that writes anything.'
+        };
+      }
+    }
+  ];
+
+  function renderCases(){
+    var el = document.getElementById('caselist');
+    if (!el) return;
+    document.getElementById('casecount').textContent = CASES.length;
+    el.innerHTML = CASES.map(function(c, i){
+      return '<div class="case" id="case-' + i + '">'
+        + '<div class="case__hd"><span class="case__n">' + (i+1) + '</span>'
+        + '<div class="case__b"><div class="case__t">' + c.title + '</div>'
+        + '<p class="case__p">' + c.premise + '</p>'
+        + '<p class="case__exp"><b>Expected.</b> ' + c.expect + '</p></div>'
+        + '<div class="case__act"><button class="btn btn--ghost" data-case="' + i + '">Run</button></div></div>'
+        + '<div class="case__res hide" id="caseres-' + i + '"></div></div>';
+    }).join('');
+  }
+
+  function runCase(i){
+    var c = CASES[i];
+    if (!c) return;
+    var out = c.run();
+    var v = VERDICT[out.verdict] || VERDICT.model;
+    var walk = out.steps
+      ? out.steps.map(function(x, n){ return step(n+1, x[0], x[1], x[2]); }).join('')
+      : walkHTML(out.name);
+    var res = document.getElementById('caseres-' + i);
+    res.innerHTML = '<div class="pvhd">Result <span class="badge ' + v.c + '">' + v.t + '</span>'
+      + (out.name ? '<span class="grow"></span><span class="chip chip--mono">' + esc(out.name) + '</span>' : '') + '</div>'
+      + '<div class="walk">' + walk + '</div>'
+      + (out.note ? '<p class="case__note">' + out.note + '</p>' : '');
+    res.classList.remove('hide');
+    document.getElementById('case-' + i).classList.add('case--ran');
+    render();
+    return out;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // WIRING
+  // ─────────────────────────────────────────────────────────────────────
+  document.getElementById('createdef').onclick = function(){ openDef(null); };
+  document.getElementById('createtpl').onclick = function(){ openTpl(null); };
+  document.getElementById('createtm').onclick  = function(){ openTm(null); };
+
+  document.getElementById('defbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-def]'); if (tr) openDef(tr.getAttribute('data-def'));
+  });
+  document.getElementById('tplbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-tpl]'); if (tr) openTpl(tr.getAttribute('data-tpl'));
+  });
+  document.getElementById('tmbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-tm]'); if (tr) openTm(tr.getAttribute('data-tm'));
+  });
+
+  document.getElementById('caselist').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-case]');
+    if (b) runCase(parseInt(b.getAttribute('data-case'), 10));
+  });
+  document.getElementById('runall').onclick = function(){
+    for (var i=0;i<CASES.length;i++) runCase(i);
+    toast('All ' + CASES.length + ' cases ran. The data is left in the state case ' + CASES.length + ' created.');
+  };
+  document.getElementById('resetall').onclick = function(){
+    resetAll(); render();
+    var res = document.querySelectorAll('.case__res');
+    for (var i=0;i<res.length;i++) res[i].classList.add('hide');
+    var cs = document.querySelectorAll('.case');
+    for (var j=0;j<cs.length;j++) cs[j].classList.remove('case--ran');
+    toast('Seed data restored');
+  };
+
+  document.getElementById('nav').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    S.screen = b.getAttribute('data-s');
+    var btns = this.querySelectorAll('button');
+    for (var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i] === b);
+    document.getElementById('s-def').classList.toggle('hide', S.screen !== 'def');
+    document.getElementById('s-tpl').classList.toggle('hide', S.screen !== 'tpl');
+    document.getElementById('s-tm').classList.toggle('hide',  S.screen !== 'tm');
+    document.getElementById('s-sim').classList.toggle('hide', S.screen !== 'sim');
+  });
+
+  var why = document.getElementById('why');
+  function closeWhy(){ why.classList.add('hide'); }
+  document.getElementById('whybtn').onclick = function(){ why.classList.remove('hide'); };
+  document.getElementById('whyclose').onclick = closeWhy;
+  why.addEventListener('click', function(e){ if (e.target === why) closeWhy(); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    if (!why.classList.contains('hide')) { closeWhy(); return; }
+    if (!bulk.classList.contains('hide')) { closeBulk(); return; }
+    if (D) closeDrawer();
+  });
+
+  renderCases();
+  render();
+})();
+</script>
+</body>
+</html>
