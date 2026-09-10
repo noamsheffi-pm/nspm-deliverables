@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Named scope in the dataset access policy — mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── Brainy tokens (src/generated-tokens.scss, CX theme, captured ff95390 · 2026-09-02) ── */
+:root{
+  --c-text-primary:#1c1c1c;--c-text-secondary:#68686d;--c-text-placeholder:#d0d0d3;--c-text-disabled:#ababb1;
+  --c-text-interactive:#029449;--c-text-error:#eb6166;--c-text-success:#3cc67e;--c-text-warning:#e4b83c;--c-text-on-color:#fff;
+  --c-button-primary:#02763a;--c-button-primary-hover:#029449;--c-button-secondary-disable:#ababb133;
+  --c-icon-primary:#68686d;--c-icon-secondary:#ababb1;--c-icon-interactive:#029449;--c-icon-warning:#e4b83c;--c-icon-info:#3cbcd3;
+  --c-border-subtle:#ececee;--c-border-strong:#dedee0;--c-border-interactive:#029449;--c-border-warning:#e4b83c;--c-border-info:#3cbcd3;
+  --c-background-surface-primary:#f8fafc;--c-background-surface-secondary:#fff;--c-background-card:#fff;
+  --c-background-hover:#0000000d;--c-background-focus:#e6fff2;--c-background-warning:#fefce9;--c-background-info:#eef6fe;
+  --c-background-button-group:#f8f9fc;--c-background-label:#dbe9fd;--c-chip-label:#dbe9fd;
+  --c-background-grey-reg:#f8f9fc;--c-background-green-reg:#dcfce7;--c-background-blue-reg:#dbe9fd;--c-background-purple-reg:#f3e7fe;--c-background-orange-reg:#ffecd7;
+  --c-tag-green-text:#02763a;--c-tag-blue-text:#1d4ed8;--c-tag-purple-text:#7e22ce;--c-tag-orange-text:#c2410c;--c-tag-grey-text:#68686d;
+  --f-page-title:normal normal 600 20px/1.5 'Nunito Sans';--f-section-title:normal normal 600 16px/1.5 'Nunito Sans';
+  --f-caption:normal normal 600 11px/16px 'Nunito Sans';--f-subheading-bold:normal normal 600 14px/1.5 'Nunito Sans';
+  --f-paragraph-reg:normal normal 400 12px/1.5 'Nunito Sans';--f-paragraph-bold:normal normal 600 12px/1.5 'Nunito Sans';
+  --f-code-reg:normal normal 400 14px/1.5 'Inconsolata';--f-code-sm-reg:normal normal 400 12px/1.5 'Inconsolata';
+  --f-button:normal normal 600 12px/1.5 'Nunito Sans';
+  --border-radius-sm:4px;--border-radius-md:6px;--border-radius-lg:8px;--shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:#eef1f5;color:var(--c-text-primary);font:var(--f-paragraph-reg);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+code,.mono{font-family:'Inconsolata',monospace}
+svg{display:block;flex-shrink:0}
+
+/* ── Page frame (mockup chrome, not product) ── */
+.page{max-width:1280px;margin:0 auto;padding:24px 24px 64px}
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:18px}
+.hd h1{font:var(--f-page-title);margin:0 0 4px}
+.hd p{margin:0;color:var(--c-text-secondary);max-width:720px}
+.stamp{font:var(--f-caption);color:var(--c-text-secondary);text-align:right;white-space:nowrap;line-height:1.6}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:20px;padding:10px 14px;background:#fff;border:1px solid var(--c-border-subtle);border-radius:8px;margin-bottom:18px}
+.ctl .lbl{font:var(--f-caption);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-right:6px}
+.ctl .grp{display:flex;align-items:center}
+.stage{display:grid;grid-template-columns:640px minmax(0,1fr);gap:22px;align-items:start}
+@media(max-width:1000px){.stage{grid-template-columns:1fr}}
+
+/* ── Brainy primitives, ported ── */
+.cx-ui-btn-group{display:inline-flex;align-items:center;gap:2px;padding:2px;background:var(--c-background-button-group);border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);box-sizing:content-box;height:18px}
+.cx-ui-btn-group--sm{height:26px}
+.cx-ui-btn-group__item{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:100%;padding:2px 8px;font:var(--f-button);color:var(--c-text-secondary);background:transparent;border:1px solid transparent;border-radius:var(--border-radius-sm);cursor:pointer;white-space:nowrap}
+.cx-ui-btn-group__item:hover:not(:disabled):not(.cx-ui-btn-group__item--selected){color:var(--c-text-interactive)}
+.cx-ui-btn-group__item--selected{background:#fff;color:var(--c-text-primary);border-color:var(--c-border-subtle);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.cx-ui-btn-group__item:disabled{color:var(--c-text-disabled);cursor:not-allowed}
+.cxl-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;border:1px solid transparent;cursor:pointer;white-space:nowrap;font:var(--f-button);border-radius:var(--border-radius-md);background:transparent;color:var(--c-text-primary)}
+.cxl-btn--lg{height:32px;padding:0 12px}
+.cxl-btn--sm{height:18px;padding:0 6px;font-size:11px}
+.cxl-btn--icon.cxl-btn--sm{width:18px;padding:0;border-radius:4px}
+.cxl-btn--solid{background:var(--c-button-primary);color:var(--c-text-on-color)}
+.cxl-btn--solid:hover{background:var(--c-button-primary-hover)}
+.cxl-btn--outline{border-color:var(--c-border-strong);background:#fff}
+.cxl-btn--outline:hover{border-color:var(--c-border-interactive);color:var(--c-text-interactive)}
+.cxl-btn--outline:disabled{color:var(--c-text-disabled);cursor:not-allowed}
+.cxl-btn--ghost{color:var(--c-icon-primary)}
+.cxl-btn--ghost:hover{background:var(--c-background-hover);color:var(--c-text-primary)}
+.cxl-btn--link{color:var(--c-text-interactive);padding:0;height:auto}
+.cxl-toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.cxl-toggle__track{position:relative;width:22px;height:13px;border-radius:100px;background:var(--c-background-hover);border:1px solid var(--c-border-subtle)}
+.cxl-toggle__thumb{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;top:50%;transform:translateY(-50%);left:1px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.cxl-toggle--on .cxl-toggle__track{background:var(--c-button-primary);border-color:var(--c-button-primary)}
+.cxl-toggle--on .cxl-toggle__thumb{left:10px}
+.cxl-toggle__label{font:var(--f-paragraph-reg);color:var(--c-text-primary)}
+.cxl-badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;font:var(--f-caption);white-space:nowrap;height:20px;padding:0 6px}
+.cxl-badge--grey{background:var(--c-background-grey-reg);color:var(--c-tag-grey-text);border:1px solid var(--c-border-subtle)}
+.cxl-badge--green{background:var(--c-background-green-reg);color:var(--c-tag-green-text)}
+.cxl-badge--blue{background:var(--c-background-blue-reg);color:var(--c-tag-blue-text)}
+.cxl-badge--purple{background:var(--c-background-purple-reg);color:var(--c-tag-purple-text)}
+.cxl-badge--orange{background:var(--c-background-orange-reg);color:var(--c-tag-orange-text)}
+.cx-ui-chip{display:inline-flex;align-items:center;gap:4px;height:16px;padding:4px 8px;box-sizing:content-box;border-radius:var(--border-radius-sm);background:var(--c-chip-label);color:var(--c-text-primary);font:var(--f-paragraph-reg);white-space:nowrap}
+.cx-ui-chip__remove{display:inline-flex;border:none;background:none;padding:0;color:var(--c-icon-primary);cursor:pointer}
+.cx-ui-select{display:inline-block;position:relative}
+.cx-ui-select__trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;height:32px;padding:0 8px 0 10px;background:#fff;border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);font:var(--f-paragraph-reg);color:var(--c-text-primary);cursor:pointer;width:100%}
+.cx-ui-select__trigger:hover,.cx-ui-select--open .cx-ui-select__trigger{border-color:var(--c-border-interactive)}
+.cx-ui-select__trigger--inline{border-color:transparent;background:transparent;padding:0 4px}
+.cx-ui-select__trigger--inline:hover{border-color:var(--c-border-subtle);background:#fff}
+.cx-ui-select__value{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cx-ui-select__chevron{color:var(--c-icon-secondary)}
+.cx-ui-select__panel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:10;max-height:320px;overflow-y:auto;padding:4px;background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);box-shadow:var(--shadow-md)}
+.cx-ui-select__option{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:6px 8px;border-radius:var(--border-radius-sm);color:var(--c-text-primary);cursor:pointer;background:none;border:none;font:var(--f-paragraph-reg)}
+.cx-ui-select__option:hover{background:var(--c-background-hover)}
+.cx-ui-select__option--selected{background:var(--c-background-focus)}
+.cx-ui-select__option--disabled{color:var(--c-text-disabled);cursor:default}
+.cx-ui-select__group{padding:8px 8px 4px;font:var(--f-caption);color:var(--c-text-secondary);text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:6px}
+.cx-ui-select__group + .cx-ui-select__group{border-top:1px solid var(--c-border-subtle);margin-top:4px}
+.cxl-input{height:32px;padding:0 10px;border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);background:#fff;font:var(--f-paragraph-reg);color:var(--c-text-primary);width:100%}
+.cxl-input[readonly]{background:var(--c-background-surface-primary);color:var(--c-text-secondary)}
+.cxl-input.ta{height:56px;padding:8px 10px;resize:none}
+
+/* ── Drawer (cxl-drawer, system mode 640px) ── */
+.drawer{width:640px;max-width:100%;border:1px solid var(--c-border-subtle);border-radius:10px;overflow:hidden;background:var(--c-background-surface-primary);box-shadow:-8px 0 24px rgba(0,0,0,.08)}
+.dr-toolbar{height:36px;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 8px;border-bottom:1px solid var(--c-border-subtle)}
+.dr-toolbar .div{width:1px;height:16px;background:var(--c-border-subtle);margin:0 4px}
+.dr-titlebar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--c-background-surface-secondary);border-bottom:1px solid var(--c-border-subtle)}
+.dr-title{font:var(--f-section-title)}
+.dr-actions{display:flex;align-items:center;gap:16px}
+.dr-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.cxl-drawer-section{display:flex;flex-direction:column;gap:16px;padding:16px;background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:8px}
+.sec-hd{display:flex;align-items:center;gap:8px}
+.sec-title{font:var(--f-subheading-bold)}
+.sec-desc{margin:-12px 0 0;color:var(--c-text-secondary)}
+.cxl-drawer-field{display:flex;flex-direction:column;gap:6px}
+.cxl-drawer-field__label{display:flex;align-items:center;gap:4px;font:var(--f-paragraph-bold)}
+.opt{font:var(--f-paragraph-reg);color:var(--c-text-secondary)}
+.ro-field{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--c-border-subtle);border-radius:var(--border-radius-md);background:var(--c-background-surface-primary);color:var(--c-text-secondary)}
+.note{font:var(--f-caption);font-weight:400;color:var(--c-text-secondary)}
+
+/* ── Access policy (cxui-ap, ported from Brainy src/cx-ui-local/access-policy) ── */
+.cxui-ap{display:flex;flex-direction:column;gap:12px}
+.cxui-ap__header{display:flex;align-items:center;gap:8px}
+.cxui-ap__info{color:var(--c-icon-primary)}
+.cxui-ap__headactions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.cxui-ap__field{display:flex;flex-direction:column;gap:8px}
+.cxui-ap__composerow{display:flex;align-items:flex-start;gap:8px}
+.cxui-ap__composer{flex:1;min-height:32px;padding:3px 4px;border:1px solid var(--c-border-subtle);border-radius:6px;background:#fff;display:flex;align-items:center}
+.cxui-ap__placeholder{padding-left:4px;color:var(--c-text-placeholder)}
+.cxui-ap__rule{display:flex;flex-direction:column}
+.cxui-ap__rulerow{display:flex;align-items:center;gap:8px;min-height:32px}
+.cxui-ap__rulegroups{flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:32px;padding:0 8px 0 4px;border:1px solid var(--c-border-subtle);border-radius:6px;background:#fff;cursor:pointer}
+.cxui-ap__rulechips{flex:1;display:flex;gap:4px;align-items:center;overflow:hidden}
+.cxui-ap__perm{flex:0 0 auto}
+.cxui-ap__perm .cx-ui-select__trigger{height:32px}
+.cxui-ap__remove{display:inline-flex;border:none;background:none;padding:0;color:var(--c-icon-primary);cursor:pointer}
+.cxui-ap__remove:hover{color:var(--c-text-error)}
+.cxui-ap__everyone{flex:1;display:flex;align-items:center;gap:8px;color:var(--c-text-primary)}
+.cxui-ap__globe{color:var(--c-icon-secondary)}
+.cxui-ap__filter{position:relative;display:flex;flex-direction:column;gap:8px;margin-left:9px;padding:12px 0 0 16px}
+.cxui-ap__filter::before{content:'';position:absolute;top:4px;left:0;width:12px;height:22px;border-left:1px solid var(--c-border-subtle);border-bottom:1px solid var(--c-border-subtle);border-bottom-left-radius:6px}
+.cxui-ap__moderow{display:flex;align-items:center;gap:10px;min-height:26px}
+.cxui-ap__mode{font:var(--f-caption);color:var(--c-text-secondary)}
+.cxui-ap__code{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--c-border-subtle);border-radius:8px;background:#fff}
+.cxui-ap__code--ro{background:var(--c-background-surface-primary)}
+.cxui-ap__gutter{min-width:10px;font:var(--f-code-sm-reg);color:var(--c-text-secondary)}
+.cxui-ap__ver{font:var(--f-code-sm-reg);color:var(--c-text-disabled)}
+.cxui-ap__expr{flex:1;min-width:0;border:none;background:transparent;outline:none;font:var(--f-code-sm-reg);color:var(--c-text-interactive)}
+.cxui-ap__expr[readonly]{color:var(--c-text-secondary)}
+.cxui-ap__lock{margin-left:auto;color:var(--c-icon-secondary)}
+
+/* Named scope block (new) */
+.ns{display:flex;flex-direction:column;gap:8px}
+.ns__pick{display:flex;align-items:center;gap:8px}
+.ns__pick .cx-ui-select{flex:1;min-width:0}
+.ns__meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:var(--f-caption);font-weight:400;color:var(--c-text-secondary)}
+.ns__meta code{font:var(--f-code-sm-reg);color:var(--c-text-primary);background:var(--c-background-surface-primary);border:1px solid var(--c-border-subtle);border-radius:4px;padding:0 5px}
+.ns__actions{display:flex;align-items:center;gap:14px}
+.ns__opt{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.ns__opt-name{display:flex;align-items:center;gap:8px}
+.ns__opt-id{font:var(--f-code-sm-reg);color:var(--c-text-secondary)}
+.ns__opt-expr{font:var(--f-code-sm-reg);color:var(--c-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.ns__empty{padding:6px 8px 8px;color:var(--c-text-disabled);font:var(--f-paragraph-reg)}
+
+/* ── Notes column (mockup, not product) ── */
+.notes{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:#fff;border:1px solid var(--c-border-subtle);border-radius:8px;padding:14px 16px}
+.card h2{font:var(--f-subheading-bold);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.card ol,.card ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.card li{display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.card li p{margin:0}
+.card li b{font-weight:600}
+.k{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:var(--f-caption);color:#fff;background:var(--c-button-primary)}
+.k--open{background:var(--c-icon-warning);color:#1c1c1c}
+.k--none{background:var(--c-border-strong);color:var(--c-text-secondary)}
+.pin{position:absolute;right:-8px;top:-8px;z-index:5}
+.pin .k{box-shadow:0 0 0 2px #fff}
+.rel{position:relative}
+.ns--open .ns__meta ~ .cxui-ap__code .pin,.ns--open .ns__actions .pin{visibility:hidden}
+.src{font:var(--f-caption);font-weight:400;color:var(--c-text-secondary);line-height:1.7}
+.src code{font-size:11px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hd">
+    <div>
+      <h1>Named scope in the dataset access policy</h1>
+      <p>Mockup of the <b>Edit system dataset</b> drawer for <code>default/logs</code> after the 08-09 session with Harel and Marco. Built on Brainy's drawer and <code>cxui-access-policy</code> markup. Green markers are decided. Yellow markers are open.</p>
+    </div>
+    <div class="stamp">Brainy <code>ff95390</code> · 2026-09-02<br>Meeting 2026-09-08 · mockup 2026-09-10</div>
+  </div>
+
+  <div class="ctl" id="ctl">
+    <div class="grp"><span class="lbl">Dataset</span>
+      <div class="cx-ui-btn-group cx-ui-btn-group--sm">
+        <button class="cx-ui-btn-group__item" data-ds="default/logs">default/logs</button>
+        <button class="cx-ui-btn-group__item" data-ds="default/spans">default/spans</button>
+        <button class="cx-ui-btn-group__item" data-ds="payments/logs">payments/logs (any other)</button>
+      </div>
+    </div>
+    <div class="grp"><span class="lbl">Rule 1 mode</span>
+      <div class="cx-ui-btn-group cx-ui-btn-group--sm">
+        <button class="cx-ui-btn-group__item" data-mode="expr">Filter expression</button>
+        <button class="cx-ui-btn-group__item" data-mode="scope">Named scope</button>
+        <button class="cx-ui-btn-group__item" data-mode="scope-open">Named scope, list open</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage">
+  <!-- ═══════════════ DRAWER ═══════════════ -->
+  <div class="drawer" id="drawer">
+    <div class="dr-toolbar">
+      <button class="cxl-btn cxl-btn--ghost cxl-btn--sm cxl-btn--icon" title="Full screen"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M7 1h4v4M5 11H1V7M11 1L7 5M1 11l4-4"/></svg></button>
+      <span class="div"></span>
+      <button class="cxl-btn cxl-btn--ghost cxl-btn--sm cxl-btn--icon" title="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+    </div>
+    <div class="dr-titlebar">
+      <span class="dr-title" id="drTitle">Edit system dataset</span>
+      <div class="dr-actions">
+        <span class="cxl-toggle cxl-toggle--on"><span class="cxl-toggle__track"><span class="cxl-toggle__thumb"></span></span><span class="cxl-toggle__label">Enable dataset</span></span>
+        <button class="cxl-btn cxl-btn--solid cxl-btn--lg">Save</button>
+      </div>
+    </div>
+    <div class="dr-body">
+      <!-- Details -->
+      <div class="cxl-drawer-section">
+        <div class="sec-hd"><span class="sec-title">Details</span></div>
+        <div class="cxl-drawer-field">
+          <label class="cxl-drawer-field__label">Dataset name</label>
+          <input class="cxl-input mono" readonly id="dsName" value="default/logs">
+        </div>
+        <div class="cxl-drawer-field">
+          <label class="cxl-drawer-field__label">Description <span class="opt">(optional)</span></label>
+          <input class="cxl-input" readonly id="dsDesc" value="System dataset. Ingested through the legacy logs pipeline.">
+        </div>
+      </div>
+
+      <!-- Entity type -->
+      <div class="cxl-drawer-section">
+        <div class="sec-hd"><span class="sec-title">Entity type</span></div>
+        <p class="sec-desc">Which telemetry this dataset holds.</p>
+        <div class="cxl-drawer-field">
+          <div class="ro-field mono" id="dsEt">logs</div>
+          <span class="note" id="dsEtNote">Fixed for a system dataset.</span>
+        </div>
+      </div>
+
+      <!-- Access policy -->
+      <div class="cxl-drawer-section rel">
+        <div class="cxui-ap">
+          <div class="cxui-ap__header">
+            <span class="sec-title">Access policy</span>
+            <svg class="cxui-ap__info" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="6" cy="6" r="5"/><path d="M6 5.5V9M6 3.5v.2"/></svg>
+            <div class="cxui-ap__headactions">
+              <span class="cxl-toggle cxl-toggle--on"><span class="cxl-toggle__label">Policy permissions</span><span class="cxl-toggle__track"><span class="cxl-toggle__thumb"></span></span></span>
+              <button class="cxl-btn cxl-btn--ghost cxl-btn--lg"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 6a4 4 0 1 1 1.2 2.9M2 9V6h3"/></svg> Reset</button>
+            </div>
+          </div>
+
+          <!-- Composer -->
+          <div class="cxui-ap__field">
+            <label class="cxl-drawer-field__label">Apply to target groups</label>
+            <div class="cxui-ap__composerow">
+              <div class="cxui-ap__composer"><span class="cxui-ap__placeholder">Add groups to define a rule</span></div>
+              <button class="cxl-btn cxl-btn--outline cxl-btn--lg" disabled>Apply</button>
+            </div>
+          </div>
+
+          <!-- Rule 1 : the one that carries the new control -->
+          <div class="cxui-ap__rule rel" id="rule1">
+            <div class="cxui-ap__rulerow">
+              <div class="cxui-ap__rulegroups">
+                <div class="cxui-ap__rulechips">
+                  <span class="cx-ui-chip">Analysts <button class="cx-ui-chip__remove"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l8 8M10 2l-8 8"/></svg></button></span>
+                  <span class="cx-ui-chip">SRE <button class="cx-ui-chip__remove"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l8 8M10 2l-8 8"/></svg></button></span>
+                </div>
+                <span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span>
+              </div>
+              <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Dataset: Read</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+              <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Policy: View</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+              <button class="cxui-ap__remove" title="Remove rule"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/></svg></button>
+            </div>
+
+            <div class="cxui-ap__filter">
+              <!-- Mode control: today a static "Filter expression" label in Brainy, a 2-item button group in prod. Here: 3 items. -->
+              <div class="cxui-ap__moderow rel">
+                <span class="pin"><span class="k">1</span></span>
+                <div class="cx-ui-btn-group" id="modeCtl">
+                  <button class="cx-ui-btn-group__item" disabled title="Coming soon">Builder</button>
+                  <button class="cx-ui-btn-group__item" data-m="expr">Filter expression</button>
+                  <button class="cx-ui-btn-group__item" data-m="scope" id="modeScopeBtn">Named scope</button>
+                </div>
+                <span class="note" id="modeNote" hidden>Named scope is not offered on this dataset in phase 1.</span>
+              </div>
+
+              <!-- expr state -->
+              <div class="cxui-ap__code" id="exprBlock">
+                <span class="cxui-ap__gutter">1</span><span class="cxui-ap__ver">&lt;v1&gt;</span>
+                <input class="cxui-ap__expr" value="$d.subsystem == 'payments'">
+              </div>
+
+              <!-- scope state -->
+              <div class="ns" id="scopeBlock" hidden>
+                <div class="ns__pick rel">
+                  <span class="pin"><span class="k">2</span></span>
+                  <div class="cx-ui-select" id="scopeSel">
+                    <button class="cx-ui-select__trigger" id="scopeTrig">
+                      <span class="cx-ui-select__value" id="scopeVal">payments-team · logs</span>
+                      <span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span>
+                    </button>
+                    <div class="cx-ui-select__panel" id="scopePanel" hidden>
+                      <div class="cx-ui-select__group"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg> Legacy scopes · read only <span class="cxl-badge cxl-badge--grey" id="legacyCount">3</span></div>
+                      <div id="legacyOpts"></div>
+                      <div class="cx-ui-select__group">Named scopes</div>
+                      <div class="ns__empty">None yet. Legacy scopes appear here first.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ns__meta">
+                  <span class="cxl-badge cxl-badge--grey"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg> Read only</span>
+                  <span>ID <code id="scopeId">scope1_logs</code></span>
+                  <span>·</span>
+                  <span>Split from legacy scope <code>scope1</code></span>
+                  <span>·</span>
+                  <span>Managed in Settings › Scopes</span>
+                </div>
+                <div class="cxui-ap__code cxui-ap__code--ro rel">
+                  <span class="pin"><span class="k">3</span></span>
+                  <span class="cxui-ap__gutter">1</span><span class="cxui-ap__ver">&lt;v1&gt;</span>
+                  <input class="cxui-ap__expr" readonly id="scopeExpr" value="$d.subsystem == 'payments'">
+                  <svg class="cxui-ap__lock" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>
+                </div>
+                <div class="ns__actions rel">
+                  <span class="pin" style="right:auto;left:-26px;top:2px"><span class="k">4</span></span>
+                  <button class="cxl-btn cxl-btn--link">Open in Scopes <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 2H2v8h8V7M7 2h3v3M10 2L5.5 6.5"/></svg></button>
+                  <button class="cxl-btn cxl-btn--link" id="detachBtn">Detach and edit as expression</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rule 2 : unchanged expression rule -->
+          <div class="cxui-ap__rule">
+            <div class="cxui-ap__rulerow">
+              <div class="cxui-ap__rulegroups">
+                <div class="cxui-ap__rulechips">
+                  <span class="cx-ui-chip">Admins <button class="cx-ui-chip__remove"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l8 8M10 2l-8 8"/></svg></button></span>
+                </div>
+                <span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span>
+              </div>
+              <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Dataset: Read, Append, Override</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+              <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Policy: Edit</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+              <button class="cxui-ap__remove" title="Remove rule"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/></svg></button>
+            </div>
+            <div class="cxui-ap__filter">
+              <div class="cxui-ap__moderow">
+                <div class="cx-ui-btn-group">
+                  <button class="cx-ui-btn-group__item" disabled title="Coming soon">Builder</button>
+                  <button class="cx-ui-btn-group__item cx-ui-btn-group__item--selected">Filter expression</button>
+                  <button class="cx-ui-btn-group__item r2scope">Named scope</button>
+                </div>
+              </div>
+              <div class="cxui-ap__code"><span class="cxui-ap__gutter">1</span><span class="cxui-ap__ver">&lt;v1&gt;</span><input class="cxui-ap__expr" value="true"></div>
+            </div>
+          </div>
+
+          <!-- General access -->
+          <div class="cxui-ap__field">
+            <label class="cxl-drawer-field__label">General access</label>
+            <div class="cxui-ap__rule">
+              <div class="cxui-ap__rulerow">
+                <span class="cxui-ap__everyone"><svg class="cxui-ap__globe" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7" cy="7" r="5.5"/><path d="M1.5 7h11M7 1.5c2 2 2 9 0 11M7 1.5c-2 2-2 9 0 11"/></svg> Everyone in onlineboutique</span>
+                <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Dataset: Read</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+                <div class="cx-ui-select cxui-ap__perm"><button class="cx-ui-select__trigger cx-ui-select__trigger--inline"><span class="cx-ui-select__value">Policy: View</span><span class="cx-ui-select__chevron"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5l3 3 3-3"/></svg></span></button></div>
+              </div>
+              <div class="cxui-ap__filter">
+                <div class="cxui-ap__moderow">
+                  <div class="cx-ui-btn-group">
+                    <button class="cx-ui-btn-group__item" disabled title="Coming soon">Builder</button>
+                    <button class="cx-ui-btn-group__item cx-ui-btn-group__item--selected">Filter expression</button>
+                    <button class="cx-ui-btn-group__item r2scope">Named scope</button>
+                  </div>
+                </div>
+                <div class="cxui-ap__code"><span class="cxui-ap__gutter">1</span><span class="cxui-ap__ver">&lt;v1&gt;</span><input class="cxui-ap__expr" value="$d.severity != 'DEBUG'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ NOTES ═══════════════ -->
+  <div class="notes">
+    <div class="card">
+      <h2>Decided 2026-09-08</h2>
+      <ol>
+        <li><span class="k">1</span><p><b>A third mode on the control that already ships.</b> The rule's filter row gets <b>Named scope</b> next to Filter expression. Builder stays disabled, as in production today. In the data model this is <code>readScopeType: expr | scopeId</code> beside today's <code>readScope</code>.</p></li>
+        <li><span class="k">2</span><p><b>The dropdown holds legacy scopes, reflected read only.</b> AAA splits each legacy scope into a logs half and a spans half with their own IDs. On <code>default/logs</code> only the logs halves are offered. The "All other entities" default clones to both sides. No other named scopes exist yet.</p></li>
+        <li><span class="k">3</span><p><b>The ID is a reference, not a copy.</b> Citadel stores <code>readScopeId</code>. The expression is shown but cannot be edited here. An edit through the old scopes API shows up here on its own.</p></li>
+        <li><span class="k">4</span><p><b>Detach cuts the link on purpose.</b> "Detach and edit as expression" copies the text into Filter expression and drops the reference. Harel: a copy or a move would break the old API's view, a shared ID does not.</p></li>
+        <li><span class="k">5</span><p><b>Only <code>default/logs</code> and <code>default/spans</code> in phase 1.</b> Switch to <i>payments/logs</i> above: the Named scope item is absent and nothing else changes. Phase 1 needs no scope API extension. AAA and Citadel agree a fixed access policy ID per team for the two datasets instead.</p></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>Open, shown here as one possible shape</h2>
+      <ul>
+        <li><span class="k k--open">A</span><p><b>Schema context and autocomplete</b> on a scope written outside the dataset. Harel flagged it, Ievgen and DLI still have to validate. The code read narrows it: the dataset editor already looks up schema by tier, not per dataset.</p></li>
+        <li><span class="k k--open">B</span><p><b>A named scopes page in Citadel</b> where an admin writes a reusable expression. Harel proposes it, Marco wants it as a separate project, Noam pushed back on the indirection. Not decided. The empty "Named scopes" group in the dropdown is the only trace of it here.</p></li>
+        <li><span class="k k--open">C</span><p><b>Where the legacy scope is edited.</b> "Open in Scopes" points at Settings › Scopes because that is where the old API is exposed today. Whether the page moves to Citadel ownership is phase 2.</p></li>
+        <li><span class="k k--none">–</span><p><b>Not shown.</b> The fixed per-team policy ID is a backend agreement. Whether it appears anywhere on screen was not discussed.</p></li>
+      </ul>
+    </div>
+    <div class="card src">
+      <b>Sources.</b> Drawer, sections and access-policy markup: Brainy <code>src/data-flow/dataspace-management/dataset-rule-drawer.component.html</code> and <code>src/cx-ui-local/access-policy/</code> at <code>ff95390</code>. Shipped two-item control (Builder disabled, Filter Expression): <code>libs/policy-based-access-control/.../access-policy-additional-infos-dataset</code> in cx-web-workspace. Decisions: <code>Meetings/Scope API compatibility ... 08-09-2026.md</code>. Group names and expressions are placeholders.
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LEGACY = {
+    logs:  [ {name:'payments-team', id:'scope1_logs',  expr:"$d.subsystem == 'payments'"},
+             {name:'eu-only',       id:'scope2_logs',  expr:"$d.region == 'eu-west-1'"},
+             {name:'All other entities', id:'scope_default_logs', expr:'<allow everything>', def:true} ],
+    spans: [ {name:'payments-team', id:'scope1_spans', expr:"$d.subsystem == 'payments'"},
+             {name:'eu-only',       id:'scope2_spans', expr:"$d.region == 'eu-west-1'"},
+             {name:'All other entities', id:'scope_default_spans', expr:'<allow everything>', def:true} ]
+  };
+  var state = { ds:'default/logs', mode:'scope', open:false, pick:0 };
+  var q = new URLSearchParams(location.search);
+  if (q.get('ds')) state.ds = q.get('ds');
+  if (q.get('mode')) { state.mode = q.get('mode')==='scope-open' ? 'scope' : q.get('mode'); state.open = q.get('mode')==='scope-open'; }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var isDefault = function(){ return state.ds==='default/logs' || state.ds==='default/spans'; };
+  var et = function(){ return state.ds.indexOf('spans')>=0 ? 'spans' : 'logs'; };
+
+  function render(){
+    // page controls
+    document.querySelectorAll('#ctl [data-ds]').forEach(function(b){ b.classList.toggle('cx-ui-btn-group__item--selected', b.dataset.ds===state.ds); });
+    var ctlMode = state.mode==='scope' ? (state.open ? 'scope-open' : 'scope') : 'expr';
+    document.querySelectorAll('#ctl [data-mode]').forEach(function(b){ b.classList.toggle('cx-ui-btn-group__item--selected', b.dataset.mode===ctlMode); b.disabled = !isDefault() && b.dataset.mode!=='expr'; });
+
+    // drawer header + details
+    $('drTitle').textContent = isDefault() ? 'Edit system dataset' : 'Edit dataset';
+    $('dsName').value = state.ds;
+    $('dsDesc').value = isDefault() ? 'System dataset. Ingested through the legacy '+et()+' pipeline.' : 'Team dataset created by a dataset rule.';
+    $('dsEt').textContent = et();
+    $('dsEtNote').textContent = isDefault() ? 'Fixed for a system dataset.' : 'Declared on the rule that created this dataset.';
+
+    // phase-1 gate: Named scope only on default/*
+    if (!isDefault()) state.mode = 'expr';
+    $('modeScopeBtn').hidden = !isDefault();
+    document.querySelectorAll('.r2scope').forEach(function(b){ b.hidden = !isDefault(); });
+    $('modeNote').hidden = isDefault();
+
+    // rule 1 mode
+    document.querySelectorAll('#modeCtl [data-m]').forEach(function(b){ b.classList.toggle('cx-ui-btn-group__item--selected', b.dataset.m===state.mode); });
+    $('exprBlock').hidden = state.mode!=='expr';
+    $('scopeBlock').hidden = state.mode!=='scope';
+
+    // scope list for this entity type
+    var list = LEGACY[et()];
+    var sel = list[state.pick] || list[0];
+    $('scopeVal').textContent = sel.name + ' · ' + et();
+    $('scopeId').textContent = sel.id;
+    $('scopeExpr').value = sel.expr;
+    $('legacyCount').textContent = list.length;
+    var html = '';
+    list.forEach(function(s,i){
+      html += '<button class="cx-ui-select__option'+(i===state.pick?' cx-ui-select__option--selected':'')+'" data-i="'+i+'">'
+        + '<span class="ns__opt"><span class="ns__opt-name"><span>'+s.name+'</span>'
+        + (s.def ? '<span class="cxl-badge cxl-badge--orange">default</span>' : '')
+        + '<span class="cxl-badge cxl-badge--grey">'+et()+'</span></span>'
+        + '<span class="ns__opt-id">'+s.id+' · <span class="ns__opt-expr">'+s.expr.replace(/</g,'&lt;')+'</span></span></span></button>';
+    });
+    $('legacyOpts').innerHTML = html;
+    $('scopePanel').hidden = !state.open;
+    $('scopeSel').classList.toggle('cx-ui-select--open', state.open);
+    $('scopeBlock').classList.toggle('ns--open', state.open);
+  }
+
+  // wiring
+  document.querySelectorAll('#ctl [data-ds]').forEach(function(b){ b.onclick = function(){ state.ds=b.dataset.ds; state.open=false; state.pick=0; render(); }; });
+  document.querySelectorAll('#ctl [data-mode]').forEach(function(b){ b.onclick = function(){ var m=b.dataset.mode; state.mode = m==='expr'?'expr':'scope'; state.open = m==='scope-open'; render(); }; });
+  document.querySelectorAll('#modeCtl [data-m]').forEach(function(b){ b.onclick = function(){ state.mode=b.dataset.m; state.open=false; render(); }; });
+  $('scopeTrig').onclick = function(e){ e.stopPropagation(); state.open=!state.open; render(); };
+  $('legacyOpts').onclick = function(e){ var o=e.target.closest('[data-i]'); if(!o) return; state.pick=+o.dataset.i; state.open=false; render(); };
+  $('detachBtn').onclick = function(){ var list=LEGACY[et()]; var s=list[state.pick]||list[0]; document.querySelector('#exprBlock .cxui-ap__expr').value = s.def ? 'true' : s.expr; state.mode='expr'; state.open=false; render(); };
+  document.addEventListener('click', function(){ if(state.open){ state.open=false; render(); } });
+
+  render();
+  window.__mock = { state: state, render: render };
+})();
+</script>
+</body>
+</html>
