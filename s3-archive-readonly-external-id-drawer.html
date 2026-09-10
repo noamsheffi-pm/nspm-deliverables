@@ -1,0 +1,483 @@
+<title>Setup Archive — read-only External ID (CX-58116)</title>
+<style>
+  :root {
+    --ground: #eef0f4;
+    --surface: #ffffff;
+    --surface-2: #f7f8fa;
+    --text: #1a2230;
+    --text-2: #5b6675;
+    --text-3: #8a94a3;
+    --accent: #10a86e;
+    --accent-ink: #0b7a50;
+    --border: #e3e7ec;
+    --amber: #b7791f;
+    --amber-bg: #fdf6e6;
+    --amber-bd: #f0daa6;
+    --blue: #2f6fb0;
+    --blue-bg: #eef4fb;
+    --blue-bd: #cfe0f2;
+    --red: #d64545;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--text); font-family: var(--sans);
+    -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.45;
+  }
+  .wrap { position: relative; min-height: 100vh; overflow-x: hidden; }
+  .toolbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .toolbar h1 { font-size: 15px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  .toolbar .sub { color: var(--text-3); font-size: 12.5px; }
+  .seg { display: inline-flex; margin-left: auto; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+  .seg button { font: inherit; font-size: 12.5px; font-weight: 550; border: 0; background: transparent; color: var(--text-2); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(16,24,40,.08); }
+
+  .backdrop { position: fixed; inset: 0; top: 49px; background: rgba(26,34,48,.28); backdrop-filter: blur(1px); z-index: 1; }
+  .ghost-list { position: fixed; top: 70px; left: 24px; right: 620px; z-index: 0; opacity: .5; filter: grayscale(.3); pointer-events: none; }
+  .ghost-row { height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+  .ghost-hd { height: 28px; width: 220px; background: #dfe3ea; border-radius: 6px; margin-bottom: 14px; }
+
+  .drawer { position: fixed; top: 49px; right: 0; bottom: 0; width: 600px; max-width: 100vw; z-index: 2; background: var(--surface); border-left: 1px solid var(--border); box-shadow: -12px 0 40px rgba(16,24,40,.14); display: flex; flex-direction: column; }
+  .drawer__bar { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border-bottom: 1px solid var(--border); justify-content: flex-end; }
+  .icobtn { width: 24px; height: 24px; border: 0; background: transparent; color: var(--text-3); border-radius: 5px; cursor: pointer; font-size: 14px; }
+  .icobtn:hover { background: var(--surface-2); color: var(--text); }
+  .drawer__title { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  .drawer__title h2 { font-size: 15.5px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  .title-actions { display: flex; align-items: center; gap: 12px; }
+  .toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-2); }
+  .toggle .tk { width: 30px; height: 17px; border-radius: 999px; background: var(--accent); position: relative; }
+  .toggle .tk::after { content: ""; position: absolute; top: 2px; left: 15px; width: 13px; height: 13px; border-radius: 50%; background: #fff; }
+  .btn { font: inherit; font-weight: 600; font-size: 13px; border-radius: 7px; padding: 8px 15px; cursor: pointer; border: 1px solid transparent; }
+  .btn--primary { background: var(--accent); color: #fff; } .btn--primary:hover { background: var(--accent-ink); }
+  .btn--outline { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .drawer__body { overflow-y: auto; padding: 4px 0 40px; }
+
+  section.sec { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+  .sec__hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 3px; }
+  .sec__t { font-size: 13.5px; font-weight: 650; letter-spacing: -0.005em; }
+  .sec__d { color: var(--text-2); font-size: 12.5px; margin: 0 0 14px; }
+
+  .field { margin-bottom: 16px; position: relative; }
+  .field:last-child { margin-bottom: 0; }
+  .lbl { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 550; margin-bottom: 6px; }
+  .lbl .req { color: var(--red); }
+  .lbl .spacer { flex: 1; }
+  .hint { font-size: 11.5px; color: var(--text-3); margin-top: 5px; }
+  input.in, select.in { width: 100%; font: inherit; font-size: 13px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); }
+  input.in.mono { font-family: var(--mono); font-size: 12px; }
+  input.in::placeholder { color: var(--text-3); }
+  input.in:focus, select.in:focus { outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 0; border-color: var(--accent); }
+  .in--ro { background: var(--surface-2); color: var(--text-2); }
+  .copyrow { position: relative; }
+  .copyrow .copy { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); }
+
+  .cards { display: flex; gap: 10px; }
+  .card { flex: 1; text-align: left; border: 1.5px solid var(--border); border-radius: 9px; padding: 12px; background: var(--surface); }
+  .card--on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, #fff); }
+  .card__t { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .card__b { color: var(--text-2); font-size: 11.5px; margin-top: 4px; }
+  .dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+  .card--on .dot { border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--accent), inset 0 0 0 5px #fff; }
+
+  .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .badge--green { background: color-mix(in srgb, var(--accent) 14%, #fff); color: var(--accent-ink); }
+  .badge--amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+
+  /* motivation callout — the "why switch" */
+  .why { border: 1px solid var(--blue-bd); background: var(--blue-bg); border-radius: 10px; padding: 13px 15px; margin-bottom: 16px; }
+  .why__t { font-size: 12.5px; font-weight: 700; color: #234; display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .why__t .ic { font-size: 14px; }
+  .cmp { display: grid; grid-template-columns: 1fr 22px 1fr; gap: 8px; align-items: stretch; }
+  .cmp__col { border-radius: 8px; padding: 9px 11px; font-size: 11.5px; }
+  .cmp__old { background: #fff; border: 1px solid var(--border); }
+  .cmp__new { background: color-mix(in srgb, var(--accent) 8%, #fff); border: 1px solid color-mix(in srgb, var(--accent) 30%, #fff); }
+  .cmp__lbl { font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); margin-bottom: 4px; }
+  .cmp__new .cmp__lbl { color: var(--accent-ink); }
+  .cmp__col ul { margin: 0; padding-left: 14px; color: var(--text-2); } .cmp__col li { margin: 2px 0; }
+  .cmp__arrow { align-self: center; text-align: center; color: var(--text-3); font-size: 15px; }
+
+  .callout { display: flex; gap: 10px; padding: 11px 13px; border-radius: 9px; font-size: 12.5px; border: 1px solid var(--border); background: var(--surface-2); margin-bottom: 14px; }
+  .callout code { font-family: var(--mono); font-size: 11.5px; background: #eceff3; padding: 1px 5px; border-radius: 4px; }
+  .callout--amber { background: var(--amber-bg); border-color: var(--amber-bd); color: #6b5417; }
+  .callout .ic { flex-shrink: 0; font-size: 14px; line-height: 1.3; }
+
+  /* snippet button + popover */
+  .snipbtn { font: inherit; font-size: 11.5px; font-weight: 600; color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 9%, #fff); border: 1px solid color-mix(in srgb, var(--accent) 28%, #fff); border-radius: 6px; padding: 3px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .snipbtn:hover { background: color-mix(in srgb, var(--accent) 15%, #fff); }
+  .snipbtn .glyph { font-family: var(--mono); font-weight: 700; }
+  .pop { display: none; position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 6px); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 34px rgba(16,24,40,.18); overflow: hidden; }
+  .pop.open { display: block; }
+  .pop__hd { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 650; }
+  .pop pre { margin: 0; padding: 12px 13px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--text); overflow-x: auto; background: #fbfcfd; }
+  .pop__ft { padding: 8px 12px; font-size: 11px; color: var(--text-3); border-top: 1px solid var(--border); background: var(--surface); }
+  .k { color: #9a3b8c; } .s { color: var(--accent-ink); } .fix { background: #dcf7ea; border-radius: 3px; padding: 0 2px; }
+  .copy { font-size: 11px; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+  .copy:hover { color: var(--text); }
+
+  .ready { display: flex; align-items: center; gap: 12px; padding: 12px 13px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
+  .ready__m { flex: 1; }
+  .ready__lbl { font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .bar { height: 7px; border-radius: 999px; background: #e9edf2; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  .ack { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 13px; border: 1px dashed var(--amber-bd); border-radius: 9px; background: var(--amber-bg); }
+  .ack input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--accent); }
+  .ack label { font-size: 12.5px; color: #5c4a1c; }
+
+  .pin { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; margin-left: 7px; vertical-align: middle; }
+  .legend { position: fixed; left: 20px; bottom: 20px; z-index: 3; width: min(520px, calc(100vw - 660px)); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(16,24,40,.12); padding: 15px 17px; }
+  .legend h3 { margin: 0 0 3px; font-size: 13px; }
+  .legend p.mut { margin: 0 0 11px; font-size: 11.5px; color: var(--text-3); }
+  .legend ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+  .legend li { display: flex; gap: 9px; font-size: 12px; align-items: flex-start; }
+  .legend .n { flex-shrink: 0; min-width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+  .tag--fix { background: #fde7e7; color: var(--red); } .tag--new { background: color-mix(in srgb, var(--accent) 15%, #fff); color: var(--accent-ink); }
+  @media (max-width: 1180px) { .legend { display: none; } }
+  @media (max-width: 640px) { .drawer { width: 100vw; } .cmp { grid-template-columns: 1fr; } .cmp__arrow { transform: rotate(90deg); } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style><style>
+  /* additions for this pass: read-only External ID + team-wide banner + diff legend */
+  .in--locked { background: var(--surface-2); color: var(--text); font-family: var(--mono); font-size: 12px; padding-right: 112px; }
+  .lockrow { position: relative; }
+  .lockrow .icons { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: flex; gap: 2px; }
+  .lockrow .icons button { min-width: 46px; height: 24px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); border-radius: 6px; cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; padding: 0 7px; }
+  .lockrow .icons button:hover { background: var(--surface-2); color: var(--text); }
+  .lockrow .icons { gap: 5px; }
+  .derived { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 8%, #fff); border: 1px solid color-mix(in srgb, var(--accent) 26%, #fff); border-radius: 6px; padding: 4px 9px; margin-top: 7px; }
+  .derived code { font-family: var(--mono); font-size: 11px; }
+  .gone { text-decoration: line-through; color: var(--text-3); }
+  .removed { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--red); background: #fdeaea; border: 1px dashed #f2bcbc; border-radius: 6px; padding: 3px 9px; }
+  .teamscope { border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); padding: 11px 13px; margin-top: 14px; }
+  .teamscope__t { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); margin-bottom: 8px; }
+  .teamscope table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .teamscope th { text-align: left; font-weight: 600; color: var(--text-3); font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; padding: 0 0 5px; }
+  .teamscope td { padding: 5px 0; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--text-2); }
+  .teamscope td.same { color: var(--accent-ink); font-weight: 600; }
+  .open-q { border: 1px dashed var(--amber-bd); background: var(--amber-bg); border-radius: 9px; padding: 11px 13px; margin-top: 14px; font-size: 12px; color: #6b5417; }
+  .open-q b { color: #5c4a1c; }
+  .diff { position: fixed; left: 20px; bottom: 20px; z-index: 3; width: min(560px, calc(100vw - 660px)); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(16,24,40,.12); padding: 15px 17px; max-height: calc(100vh - 130px); overflow-y: auto; }
+  .diff h3 { margin: 0 0 3px; font-size: 13px; }
+  .diff p.mut { margin: 0 0 11px; font-size: 11.5px; color: var(--text-3); }
+  .diff table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .diff th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); font-weight: 700; padding: 0 6px 5px 0; }
+  .diff td { padding: 6px 6px 6px 0; border-top: 1px solid var(--border); vertical-align: top; color: var(--text-2); }
+  .diff td.now { color: var(--text); }
+  .diff td.p { font-weight: 700; color: var(--accent-ink); white-space: nowrap; font-size: 10.5px; }
+  .diff code { font-family: var(--mono); font-size: 10.5px; background: #eceff3; padding: 1px 4px; border-radius: 3px; }
+  @media (max-width: 1180px) { .diff { display: none; } }
+</style>
+<div class="wrap">
+  <div class="toolbar">
+    <h1>Physical Locations</h1>
+    <span class="sub">Data Flow · Setup Archive · read-only External ID</span>
+    <div class="seg" role="group" aria-label="Scenario">
+      <button id="btnNew" aria-pressed="true">New customer</button>
+      <button id="btnBefore" aria-pressed="false">Migrating — before setup</button>
+      <button id="btnNotReady" aria-pressed="false">Migrating — role added</button>
+    </div>
+  </div>
+
+  <div class="ghost-list" aria-hidden="true">
+    <div class="ghost-hd"></div>
+    <div class="ghost-row"></div><div class="ghost-row"></div><div class="ghost-row"></div>
+    <div class="ghost-row"></div><div class="ghost-row"></div>
+  </div>
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <aside class="drawer" aria-label="Add location drawer">
+    <div class="drawer__bar">
+      <button class="icobtn" title="Full screen">⛶</button>
+      <span style="width:1px;height:16px;background:var(--border)"></span>
+      <button class="icobtn" title="Close">✕</button>
+    </div>
+    <div class="drawer__title">
+      <h2 id="dTitle">Add location</h2>
+      <div class="title-actions">
+        <span class="toggle"><span class="tk"></span> Enable location</span>
+        <button class="btn btn--primary" id="saveBtn">Save location</button>
+      </div>
+    </div>
+
+    <div class="drawer__body">
+
+      <section class="sec">
+        <div class="sec__hd"><span class="sec__t">Connection</span></div>
+        <p class="sec__d">Select the AWS region and specify the target S3 bucket.</p>
+        <div class="field">
+          <div class="lbl">Region <span class="req">*</span></div>
+          <select class="in" id="regionSel">
+            <option value="eu1" data-acct="625240141681" data-role="coralogix-archive-eu1">EU West (Ireland)</option>
+            <option value="us1" data-acct="625240141681" data-role="coralogix-archive-us1" selected>US East (N. Virginia)</option>
+            <option value="us2" data-acct="739076534691" data-role="coralogix-archive-us2">US West (Oregon)</option>
+            <option value="ap3" data-acct="025066248247" data-role="coralogix-archive-ap3">AP (Jakarta)</option>
+          </select>
+          <div class="hint">Changes the Coralogix principal your role must trust. It does not change your External ID.</div>
+        </div>
+        <div class="field">
+          <div class="lbl">Bucket name <span class="req">*</span></div>
+          <input class="in" id="bucketIn" placeholder="my-s3-bucket" />
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec__hd">
+          <span class="sec__t">Archive access</span>
+          <span class="badge badge--green" id="accessBadge">New</span>
+        </div>
+        <p class="sec__d">Coralogix writes to your bucket by assuming a dedicated IAM role you create. The role trusts Coralogix only for your team's External ID, which Coralogix sets and never changes.</p>
+
+        <div class="callout callout--amber" id="migBanner" style="display:none">
+          <span class="ic">⚠</span>
+          <div>Your bucket is set up with the <b>basic access method</b> (shared role <code id="sharedRole">coralogix-archive-us1</code>). A <b>new, more secure setup</b> is now available, a dedicated role that trusts Coralogix only for your team's External ID. Add it <b>alongside</b> your current setup (no forced cutover), then remove the old access once migration completes below.</div>
+        </div>
+
+        <div class="why" id="whyMig" style="display:none">
+          <div class="why__t"><span class="ic">🔒</span> Why switch from the basic access method?</div>
+          <div class="cmp">
+            <div class="cmp__col cmp__old">
+              <div class="cmp__lbl">Basic method, today</div>
+              One shared Coralogix role writes for every customer, and its name isn't secret. There's no per-customer isolation or revocation.
+            </div>
+            <div class="cmp__arrow">→</div>
+            <div class="cmp__col cmp__new">
+              <div class="cmp__lbl">Your role + External ID</div>
+              Only Coralogix acting for <b>your</b> team can assume the role. The trust policy accepts one fixed External ID that Coralogix sends only for you.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" id="whyNew">
+          <span class="ic">🔒</span>
+          <div><b>How Coralogix accesses your bucket.</b> You create a dedicated IAM role that only <b>your</b> Coralogix team can assume. Its trust policy carries the External ID shown below, set by Coralogix, one per team, never changing. Revoke access anytime by editing the role, and every change is audited.</div>
+        </div>
+
+        <div class="field">
+          <div class="lbl">Coralogix principal ARN <span title="Auto-filled from your region. This is the identity your role must trust." style="color:var(--text-3);cursor:help">ⓘ</span></div>
+          <div class="copyrow">
+            <input class="in mono in--ro" id="principalIn" readonly tabindex="-1" />
+            <button class="copy" data-copy="principalIn">Copy</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="lbl">Role ARN <span class="req" id="roleReq">*</span></div>
+          <div class="copyrow">
+            <input class="in mono" id="roleArnIn" placeholder="arn:aws:iam::123456789012:role/CoralogixArchiveRole" />
+          </div>
+          <button class="snipbtn" data-pop="popPerm" style="margin-top:7px"><span class="glyph">{ }</span> Bucket permission policy</button>
+          <div class="pop" id="popPerm">
+            <div class="pop__hd"><span>Bucket permission policy</span><button class="copy">Copy</button></div>
+            <pre>{
+  <span class="k">"Version"</span>: <span class="s">"2012-10-17"</span>,
+  <span class="k">"Statement"</span>: [{
+    <span class="k">"Effect"</span>: <span class="s">"Allow"</span>,
+    <span class="k">"Action"</span>: [<span class="s">"s3:PutObject"</span>, <span class="s">"s3:GetObject"</span>, <span class="s">"s3:ListBucket"</span>, <span class="s">"s3:GetBucketLocation"</span>],
+    <span class="k">"Resource"</span>: [<span class="s" id="snipRes">"arn:aws:s3:::&lt;bucket name&gt;"</span>, <span class="s" id="snipRes2">"arn:aws:s3:::&lt;bucket name&gt;/*"</span>]
+  }]
+}</pre>
+            <div class="pop__ft">Attach to the role you create. Updates with your bucket name.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="lbl">
+            External ID
+            <span title="Set by Coralogix, one value for your whole team. Put it in your role's trust policy. It never changes." style="color:var(--text-3);cursor:help">ⓘ</span>
+            <span class="spacer"></span>
+            <span class="removed" id="goneTag">✕ <span class="gone">Generate</span> removed</span>
+          </div>
+          <div class="lockrow">
+            <input class="in in--locked" id="extIdIn" type="password" value="us1-555585" readonly tabindex="-1" />
+            <div class="icons">
+              <button id="revealBtn" title="Show the value">Show</button>
+              <button id="extCopyBtn" data-copy="extIdIn" title="Copy">Copy</button>
+            </div>
+          </div>
+          <div class="hint">Same for every bucket and physical location on this team.</div>
+          <div class="derived">Derived by Coralogix as <code>{CX_ID}-{company_id}</code>. Not stored, not editable, never rotated.</div>
+          <button class="snipbtn" data-pop="popTrust" style="margin-top:9px"><span class="glyph">{ }</span> Role trust policy</button>
+          <div class="pop" id="popTrust">
+            <div class="pop__hd"><span>Role trust policy</span><button class="copy">Copy</button></div>
+            <pre>{
+  <span class="k">"Version"</span>: <span class="s">"2012-10-17"</span>,
+  <span class="k">"Statement"</span>: [{
+    <span class="k">"Sid"</span>: <span class="s">"CoralogixAssumeRoleWithExternalId"</span>,
+    <span class="k">"Effect"</span>: <span class="s">"Allow"</span>,
+    <span class="k">"Principal"</span>: { <span class="k">"AWS"</span>: <span class="s" id="snipPrincipal">""</span> },
+    <span class="k">"Action"</span>: <span class="s">"sts:AssumeRole"</span>,
+    <span class="k">"Condition"</span>: { <span class="k">"StringEquals"</span>: { <span class="k">"sts:ExternalId"</span>: <span class="s fix" id="snipExtId">"us1-555585"</span> } }
+  }]
+}</pre>
+            <div class="pop__ft">Set as the trust relationship on your role. Principal follows your region; the External ID is fixed for your team.</div>
+          </div>
+
+          <div class="teamscope">
+            <div class="teamscope__t">One value, every location on this team</div>
+            <table>
+              <thead><tr><th>Physical location</th><th>Region</th><th>External ID</th></tr></thead>
+              <tbody>
+                <tr><td>Production Logs Archive</td><td>us-east-1</td><td class="same">us1-555585</td></tr>
+                <tr><td>Dev Logs Archive</td><td>eu-west-1</td><td class="same">us1-555585</td></tr>
+                <tr><td>Metrics Archive</td><td>us-west-2</td><td class="same">us1-555585</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="open-q">
+            <b>Open question, not designed here.</b> One bucket serving several teams. Asaf says the bucket's role carries one External ID condition per team, so five Role ARNs map to five External IDs on the same bucket. Asked in channel 2026-09-08, no reply from Asaf or Nikita yet.
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="migSec" style="display:none">
+        <div class="sec__hd">
+          <span class="sec__t">Migration</span>
+          <span class="badge badge--amber" id="migBadge">Not started</span>
+        </div>
+        <p class="sec__d">Keep the shared role active for 24 hours so in-transit writes aren't lost. We track which identity your writes use and tell you when it's safe to remove the old one.</p>
+        <div class="callout" id="migState">
+          <span class="ic">ⓘ</span>
+          <div><b>Migration hasn't started.</b><br>Set up your dedicated role above to begin. You can remove the shared Coralogix role only once setup is complete and migration finishes.</div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec__hd"><span class="sec__t">Validation</span></div>
+        <p class="sec__d">Verify that the destination is reachable before saving.</p>
+        <button class="btn btn--outline">Run full validation</button>
+        <div class="hint">Nikita asked for four setup checks here: trust policy binds the External ID, trust policy is not over-broad, bucket owned by the role's account, an existing object is readable. Product question 2, undecided, so not drawn.</div>
+      </section>
+
+    </div>
+  </aside>
+
+  <div class="diff" aria-label="What changed">
+    <h3>Read-only External ID — CX-58116</h3>
+    <p class="mut">Nikita's 2026-09-07 review + Asaf 2026-09-08. Backend CX-58038 merged 2026-09-10. Brainy branch <code>feat/arn-external-id-readonly@08e12b44</code>.</p>
+    <table>
+      <thead><tr><th></th><th>Before</th><th>Now</th></tr></thead>
+      <tbody>
+        <tr><td class="p">P1</td><td>Required input, placeholder <code>acme-cx-a1b2c3d4</code></td><td class="now">Read-only display, cannot type, paste or clear</td></tr>
+        <tr><td class="p">P2</td><td>Generate button beside the field</td><td class="now">Removed. The value never changes</td></tr>
+        <tr><td class="p">P3</td><td>Masked, eye toggle, copy</td><td class="now">Unchanged</td></tr>
+        <tr><td class="p">P4</td><td>Empty until the customer typed it</td><td class="now">Shown before any role is saved, so it can go in the trust policy first</td></tr>
+        <tr><td class="p">P5</td><td>One value per binding</td><td class="now">One value per team, every bucket and location</td></tr>
+        <tr><td class="p">P6</td><td>Snippet carried what was typed, else a placeholder</td><td class="now">Snippet carries the derived value</td></tr>
+        <tr><td class="p">Copy</td><td>"an External ID only you know"</td><td class="now">Binding, not secrecy. The value is guessable; protection is that Coralogix only sends the value derived from the requesting team</td></tr>
+        <tr><td class="p">State</td><td>External ID presence marked migration progress</td><td class="now">Role ARN presence marks it. The External ID is always there now</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const region = $('regionSel');
+  const COMPANY_ID = '555585';
+  const CX_ENV = 'us1';
+
+  function extId() { return CX_ENV + '-' + COMPANY_ID; }
+
+  function syncRegion() {
+    const o = region.options[region.selectedIndex];
+    const arn = 'arn:aws:iam::' + o.dataset.acct + ':role/' + o.dataset.role;
+    $('principalIn').value = arn;
+    $('snipPrincipal').textContent = '"' + arn + '"';
+    $('sharedRole').textContent = o.dataset.role;
+  }
+  function syncBucket() {
+    const b = $('bucketIn').value || '<bucket name>';
+    $('snipRes').textContent = '"arn:aws:s3:::' + b + '"';
+    $('snipRes2').textContent = '"arn:aws:s3:::' + b + '/*"';
+  }
+  function syncExtId() {
+    $('extIdIn').value = extId();
+    $('snipExtId').textContent = '"' + extId() + '"';
+    document.querySelectorAll('.teamscope td.same').forEach(td => td.textContent = extId());
+  }
+  region.addEventListener('change', syncRegion);
+  $('bucketIn').addEventListener('input', syncBucket);
+
+  let revealed = false;
+  $('revealBtn').addEventListener('click', () => {
+    revealed = !revealed;
+    $('extIdIn').type = revealed ? 'text' : 'password';
+    $('revealBtn').textContent = revealed ? 'Hide' : 'Show';
+    $('revealBtn').title = revealed ? 'Hide the value' : 'Show the value';
+  });
+
+  document.querySelectorAll('button.copy, #extCopyBtn').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const src = b.dataset.copy ? $(b.dataset.copy).value : (b.closest('.pop') ? b.closest('.pop').querySelector('pre').innerText : '');
+    if (navigator.clipboard && src) navigator.clipboard.writeText(src).catch(() => {});
+    const t = b.textContent, w = b.style.width;
+    b.textContent = 'Copied';
+    setTimeout(() => { b.textContent = t; b.style.width = w; }, 1200);
+  }));
+
+  const pops = ['popTrust', 'popPerm'];
+  function closeAll(except) { pops.forEach(p => { if (p !== except) $(p).classList.remove('open'); }); }
+  document.querySelectorAll('.snipbtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const t = $(btn.dataset.pop);
+      const willOpen = !t.classList.contains('open');
+      closeAll(willOpen ? btn.dataset.pop : null);
+      t.classList.toggle('open', willOpen);
+    });
+  });
+  document.querySelectorAll('.pop').forEach(p => p.addEventListener('click', e => e.stopPropagation()));
+  document.addEventListener('click', () => closeAll(null));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(null); });
+
+  const SC = {
+    new: {
+      title: 'Add location', save: 'Save location', badge: ['New', 'badge badge--green'],
+      mig: false, migSec: false, role: '', bucket: '', roleReq: true,
+      migBadge: null, migState: null,
+    },
+    before: {
+      title: 'Edit location', save: 'Save changes', badge: ['Migration', 'badge badge--amber'],
+      mig: true, migSec: true, role: '', bucket: 'coralogix-archive-prod', roleReq: false,
+      migBadge: ['Not started', 'badge badge--amber'],
+      migState: ['ⓘ', '<b>Migration hasn\'t started.</b><br>Set up your dedicated role above to begin. You can remove the shared Coralogix role only once setup is complete and migration finishes.', 'callout'],
+    },
+    notready: {
+      title: 'Edit location', save: 'Save changes', badge: ['Migration', 'badge badge--amber'],
+      mig: true, migSec: true, role: 'arn:aws:iam::123456789012:role/CoralogixArchiveRole', bucket: 'coralogix-archive-prod', roleReq: false,
+      migBadge: ['Not ready', 'badge badge--amber'],
+      migState: ['⚠', '<b>Don\'t remove the shared role yet.</b><br>Some of your writes still use the shared Coralogix role. Removing it now could drop in-transit data. We\'ll tell you here as soon as it\'s safe.', 'callout callout--amber'],
+    },
+  };
+  const BTN = { new: 'btnNew', before: 'btnBefore', notready: 'btnNotReady' };
+
+  function setScenario(key) {
+    const c = SC[key];
+    Object.keys(BTN).forEach(k => $(BTN[k]).setAttribute('aria-pressed', String(k === key)));
+    $('dTitle').textContent = c.title;
+    $('saveBtn').textContent = c.save;
+    $('accessBadge').textContent = c.badge[0];
+    $('accessBadge').className = c.badge[1];
+    $('migBanner').style.display = c.mig ? 'flex' : 'none';
+    $('whyMig').style.display = c.mig ? 'block' : 'none';
+    $('whyNew').style.display = c.mig ? 'none' : 'flex';
+    $('migSec').style.display = c.migSec ? 'block' : 'none';
+    $('roleReq').style.display = c.roleReq ? 'inline' : 'none';
+    $('roleArnIn').value = c.role;
+    $('bucketIn').value = c.bucket;
+    if (c.migBadge) { $('migBadge').textContent = c.migBadge[0]; $('migBadge').className = c.migBadge[1]; }
+    if (c.migState) { $('migState').className = c.migState[2]; $('migState').innerHTML = '<span class="ic">' + c.migState[0] + '</span><div>' + c.migState[1] + '</div>'; }
+    // Mirrors resetForm() in the Brainy component: the reveal toggle resets per drawer open.
+    revealed = false; $('extIdIn').type = 'password'; $('revealBtn').textContent = 'Show'; $('revealBtn').title = 'Show the value';
+    closeAll(null); syncBucket(); syncExtId();
+  }
+  Object.keys(BTN).forEach(k => $(BTN[k]).addEventListener('click', () => setScenario(k)));
+
+  // Deep link one scenario: ?state=new | before | notready (so a Jira ticket can point at one screen).
+  const want = new URLSearchParams(location.search).get('state');
+  syncRegion(); syncExtId(); setScenario(SC[want] ? want : 'new');
+</script>
