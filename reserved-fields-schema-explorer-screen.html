@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reserved Fields — dataspace-aware table</title>
+<style>
+:root{
+  --teal:#0e8a9b; --bg:#f4f6f8; --card:#fff; --line:#e3e8ee; --line2:#eef2f6;
+  --txt:#1b2733; --txt2:#5b6b7c; --txt3:#8496a8;
+  --blue-bg:#eef6ff; --blue-line:#bcdcff; --blue-tx:#1b64c4;
+  --amber-bg:#fff6e6; --amber-line:#ffd899; --amber-tx:#9a6200;
+  --green-bg:#e8f6ee; --green-line:#a8dcc0; --green-tx:#1e7b4c;
+  --grey-bg:#f0f3f6; --grey-line:#d9e1e9; --grey-tx:#5b6b7c;
+  --red-bg:#fdecec; --red-line:#f7bebe; --red-tx:#b02a37;
+  --r:8px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding-block:24px;padding-left:16px;padding-right:16px}
+.wrap{max-width:1180px;margin:0 auto}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:18px}
+.note h1{margin:0 0 6px;font-size:16px}
+.note p{margin:0 0 6px;color:var(--txt2);font-size:13px}
+.note p:last-child{margin-bottom:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.controls span{font-size:12px;color:var(--txt3);margin-right:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 14px;margin-bottom:14px;flex-wrap:wrap}
+.selectors{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%235b6b7c' stroke-width='1.5'/></svg>") no-repeat right 10px center;
+  border:1px solid var(--line);border-radius:6px;padding:7px 30px 7px 10px;font:inherit;color:var(--txt);min-width:170px;cursor:pointer}
+select:focus,input:focus{outline:2px solid var(--teal);outline-offset:1px}
+.topactions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.counter{display:flex;flex-direction:column;gap:2px;padding:0 12px;border-left:1px solid var(--line2)}
+.counter b{font-size:15px}
+.counter span{font-size:11px;color:var(--txt3)}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 12px;
+  font:inherit;color:var(--txt);cursor:pointer;white-space:nowrap}
+.btn:hover:not([disabled]){background:#f7f9fb}
+.btn--primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn--primary:hover:not([disabled]){background:#0b7686}
+.btn--ghost{border-color:transparent;background:transparent;color:var(--txt2)}
+.btn--sm{padding:4px 9px;font-size:12.5px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.main{padding:16px}
+.hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hd h2{margin:0;font-size:16px}
+.tag{background:var(--grey-bg);border:1px solid var(--grey-line);border-radius:20px;
+  padding:1px 9px;font-size:12px;font-weight:600}
+.tag--full{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
+.lim{font-size:12px;color:var(--txt3)}
+.desc{margin:6px 0 14px;color:var(--txt2);font-size:13px;max-width:78ch}
+.desc a{color:var(--blue-tx)}
+.ctx{display:flex;align-items:flex-start;gap:10px;border-radius:6px;padding:9px 12px;
+  font-size:12.5px;margin-bottom:14px;border:1px solid}
+.ctx--os{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue-tx)}
+.ctx--ar{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
+.ctx .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 8px;background:currentColor}
+
+/* announcement bar */
+.ann{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:6px;
+  padding:9px 12px;margin-bottom:14px;font-size:13px;color:var(--blue-tx)}
+.ann .l{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ann b{font-weight:600}
+.ann .lnk{color:var(--blue-tx);text-decoration:underline;cursor:pointer;background:none;border:0;font:inherit;padding:0}
+.ann .r{display:flex;gap:8px}
+
+.tb{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.search{flex:1;min-width:180px;max-width:320px;position:relative}
+.search input{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px 10px 7px 30px;font:inherit}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
+.tb .sp{margin-left:auto;display:flex;gap:8px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);font-size:13px;vertical-align:middle}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);font-weight:600;background:#fbfcfd}
+th .q{display:inline-block;width:13px;height:13px;line-height:13px;text-align:center;border-radius:50%;
+  background:var(--grey-line);color:#fff;font-size:9px;margin-left:5px;cursor:help;vertical-align:middle}
+tbody tr:hover{background:#fafcfd}
+tr.editing{background:#f2fbfc!important;box-shadow:inset 2px 0 0 var(--teal)}
+tr.removed td.path{text-decoration:line-through;color:var(--txt3)}
+tr.removed{background:#fdf7f7}
+tr.hl{animation:hl 1.4s ease-out}
+@keyframes hl{from{background:#e6f7f9}to{background:transparent}}
+td.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+td.path input{width:100%;font-family:inherit;font-size:12.5px;border:1px solid var(--line);
+  border-radius:5px;padding:5px 8px}
+td.path input.bad{border-color:var(--red-line);background:var(--red-bg)}
+.err{color:var(--red-tx);font-size:11.5px;margin-top:3px;display:block}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:2px 8px;
+  font-size:11.5px;font-weight:600;border:1px solid}
+.chip .g{font-family:ui-monospace,monospace;opacity:.65;font-weight:400}
+.c-String{background:var(--grey-bg);border-color:var(--grey-line);color:var(--grey-tx)}
+.c-Number{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue-tx)}
+.c-Boolean{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
+.c-Object{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
+.st-ok{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
+.st-warn{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
+.st-bad{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
+.st-idle{background:var(--grey-bg);border-color:var(--grey-line);color:var(--grey-tx)}
+.badge{font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 6px;margin-left:6px;
+  background:var(--blue-bg);color:var(--blue-tx);border:1px solid var(--blue-line)}
+.badge--e{background:var(--amber-bg);color:var(--amber-tx);border-color:var(--amber-line)}
+.badge--r{background:var(--red-bg);color:var(--red-tx);border-color:var(--red-line)}
+td.tsel select{min-width:120px;padding:5px 26px 5px 8px;font-size:12.5px}
+.rowacts{text-align:right;white-space:nowrap;color:var(--txt3)}
+.rowacts button{border:0;background:transparent;cursor:pointer;color:var(--txt3);padding:3px 6px;border-radius:4px;font-size:13px}
+.rowacts button:hover{background:var(--grey-bg);color:var(--txt)}
+.rowacts .ok{color:var(--green-tx)}
+.pending{color:var(--txt3);font-size:11.5px;font-style:italic}
+@keyframes shimmer{0%{background-position:-420px 0}100%{background-position:420px 0}}
+.sk{display:block;height:12px;border-radius:4px;
+  background:linear-gradient(90deg,#eceff3 25%,#f6f8fa 50%,#eceff3 75%);
+  background-size:420px 100%;animation:shimmer 1.15s linear infinite}
+.sk--pill{height:18px;border-radius:5px}
+.sk--num{height:15px;width:38px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){.sk,.hl{animation:none}}
+.fade{animation:fadein .22s ease-out}
+@keyframes fadein{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
+.legend{margin-top:18px;font-size:12.5px;color:var(--txt2)}
+.legend h3{font-size:13px;margin:14px 0 6px;color:var(--txt)}
+.legend li{margin-bottom:5px}
+kbd{background:var(--grey-bg);border:1px solid var(--grey-line);border-bottom-width:2px;
+  border-radius:4px;padding:0 5px;font-size:11px;font-family:inherit}
+dialog{border:1px solid var(--line);border-radius:var(--r);padding:0;max-width:540px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(27,39,51,.35)}
+.dlg-h{padding:14px 16px;border-bottom:1px solid var(--line2);font-weight:600}
+.dlg-b{padding:14px 16px;max-height:52vh;overflow:auto}
+.dlg-f{padding:12px 16px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
+.dlg-b ul{margin:0;padding-left:18px}
+.dlg-b li{margin-bottom:6px;font-size:13px}
+.op{font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 6px;margin-right:6px}
+.op--add{background:var(--green-bg);color:var(--green-tx)}
+.op--upd{background:var(--amber-bg);color:var(--amber-tx)}
+.op--rem{background:var(--red-bg);color:var(--red-tx)}
+/* tabs */
+.tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line);padding:0 2px}
+.tab{border:0;background:transparent;font:inherit;color:var(--txt2);cursor:pointer;
+  padding:9px 14px;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.tab .n{background:var(--grey-bg);border-radius:20px;padding:0 7px;font-size:11px;font-weight:600;color:var(--txt2)}
+.tab.on .n{background:#d9f1f4;color:var(--teal)}
+[hidden]{display:none!important}
+/* explorer */
+.pop{display:flex;align-items:center;gap:7px}
+.bar{height:5px;border-radius:3px;background:var(--grey-bg);width:56px;overflow:hidden;flex:0 0 56px}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:3px}
+.num{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--txt2)}
+.types{display:flex;gap:4px;flex-wrap:wrap}
+.resv{display:flex;align-items:center;gap:6px}
+.dash{color:var(--txt3)}
+.btn--xs{padding:3px 8px;font-size:12px}
+.warnrow{box-shadow:inset 2px 0 0 var(--amber-line)}
+.badrow{box-shadow:inset 2px 0 0 var(--red-line)}
+.srcnote{font-size:11px;color:var(--txt3);margin-top:8px}
+#etbody tr{cursor:pointer}
+#etbody tr:hover{background:#f2fbfc}
+#etbody tr:hover td.path{color:var(--teal)}
+.kp{display:inline-flex;align-items:center;gap:7px}
+.kp .go{opacity:0;font-size:11px;font-weight:600;color:var(--teal);white-space:nowrap;
+  border:1px solid var(--teal);border-radius:4px;padding:1px 6px;transition:opacity .12s}
+#etbody tr:hover .kp .go{opacity:1}
+/* reserve drawer */
+.scrim{position:fixed;inset:0;background:rgba(27,39,51,.35);z-index:70}
+.drw{position:fixed;top:0;right:0;bottom:0;width:430px;max-width:100%;background:#fff;z-index:71;
+  display:flex;flex-direction:column;box-shadow:-8px 0 28px rgba(27,39,51,.16);animation:slidein .18s ease-out}
+@keyframes slidein{from{transform:translateX(18px);opacity:.6}to{transform:none;opacity:1}}
+.drw-h{padding:15px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.drw-h h3{margin:0 0 3px;font-size:15px}
+.drw-h p{margin:0;font-size:12px;color:var(--txt3)}
+.drw-x{border:0;background:transparent;font-size:16px;color:var(--txt3);cursor:pointer;padding:2px 6px;border-radius:4px}
+.drw-x:hover{background:var(--grey-bg);color:var(--txt)}
+.drw-b{padding:18px;overflow:auto;flex:1}
+.drw-f{padding:13px 18px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
+.drw-l{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);margin:0 0 6px;font-weight:600}
+.drw-kp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;word-break:break-all;
+  background:var(--grey-bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.obs{display:flex;flex-direction:column;gap:7px}
+.obs-r{display:flex;align-items:center;gap:9px}
+.obs-r .bar{flex:1;width:auto}
+.obs-pc{font-variant-numeric:tabular-nums;font-size:12px;color:var(--txt2);width:38px;text-align:right}
+.tpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tp{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);
+  border-radius:6px;padding:9px 11px;cursor:pointer;background:#fff;font:inherit;text-align:left}
+.tp:hover{background:#f7f9fb}
+.tp.on{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal);background:#f2fbfc}
+.tp .obsd{font-size:10px;color:var(--teal);font-weight:600}
+.drw-sec{margin-bottom:20px}
+.cons{border-radius:6px;padding:10px 12px;font-size:12.5px;border:1px solid}
+.cons--ok{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
+.cons--warn{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
+.cons--bad{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
+.cons b{font-weight:600}
+.vocab{margin-top:18px}
+.vocab h3{color:var(--txt)}
+.vtab th{background:#fbfcfd}
+.vtab td{vertical-align:top;color:var(--txt2);font-size:12.5px}
+.vtab td:first-child{vertical-align:middle}
+.vtab code{background:var(--grey-bg);border-radius:3px;padding:1px 4px;font-size:11.5px}
+
+/* keypath suggestions - portalled to body, per the design-repo note that an
+   absolutely positioned panel inside a table cell is clamped to the row box */
+#sg{position:fixed;z-index:60;background:#fff;border:1px solid var(--line);
+  border-radius:6px;box-shadow:0 6px 20px rgba(27,39,51,.14);overflow:auto;max-height:246px;padding:4px}
+#sg[hidden]{display:none}
+.sg-o{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:6px 9px;border-radius:5px;cursor:pointer}
+.sg-o:hover,.sg-o.on{background:#f0fafb}
+.sg-o.on{box-shadow:inset 2px 0 0 var(--teal)}
+.sg-n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-n b{background:#ffe9a8;font-weight:600;border-radius:2px}
+.sg-r{flex:0 0 auto}
+.sg-empty{padding:9px;color:var(--txt3);font-size:12.5px;text-align:center}
+.sg-hd{padding:5px 9px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--txt3);border-bottom:1px solid var(--line2);margin-bottom:3px;
+  display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="note">
+    <h1>Reserved Fields — dataspace-aware table</h1>
+    <p>Mockup only. Built from <code>cx-web-workspace@dbd08c4db</code> and <code>internal-cx-web-workspace-design@c9346d52</code>. Three proposals on top of what ships: <b>skeleton loading on dataset change</b>, a <b>status column in Schema explorer that follows the storage engine</b>, and <b>add and edit a keypath inline</b>.</p>
+    <p>The edit flow implements the three known defects as fixed: Cancel restores name <i>and</i> type (CX-57950), a no-op Save is not counted as a change (CX-57951), and a suggested type is adopted only when you have not set one yourself (CX-57952).</p>
+  </div>
+
+  <div class="controls">
+    <span>Demo:</span>
+    <button class="btn" id="replay">Replay loading</button>
+    <button class="btn" id="slow">Slow network (2.5s)</button>
+    <button class="btn" id="reseed">Reset data</button>
+  </div>
+
+  <div class="card topbar">
+    <div class="selectors">
+      <div class="fld"><label for="ds">Dataspace</label><select id="ds"></select></div>
+      <div class="fld"><label for="dt">Dataset</label><select id="dt"></select></div>
+    </div>
+    <div class="topactions" id="topactions"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" id="tabExp"><span>Schema explorer</span><span class="n" id="nExp">0</span></button>
+    <button class="tab on" id="tabRes"><span>Reserved fields</span><span class="n" id="nRes">0</span></button>
+  </div>
+
+  <div class="card main" id="paneExp" hidden>
+    <div class="hd"><h2>Schema explorer</h2></div>
+    <p class="desc" id="expDesc">—</p>
+    <div class="ctx" id="expCtx"></div>
+    <div class="card" style="overflow:hidden">
+      <div class="tb">
+        <div class="search">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#8496a8" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#8496a8" stroke-width="1.6"/></svg>
+          <input placeholder="Search keypath" id="eq">
+        </div>
+        <div class="sp">
+          <button class="btn btn--sm" id="fOnlyIssues">Only fields with an issue</button>
+          <button class="btn btn--sm" id="fOnlyUnres">Only unreserved</button>
+        </div>
+      </div>
+      <div class="tablewrap"><table><thead id="ethead"></thead><tbody id="etbody"></tbody></table></div>
+    </div>
+    <p class="srcnote" id="expSrc"></p>
+  </div>
+
+  <div class="card main" id="paneRes">
+    <div class="hd">
+      <h2>Reserved Fields</h2>
+      <span class="tag" id="count">—</span>
+      <span class="lim">/ <span id="limit">12</span></span>
+    </div>
+    <p class="desc" id="desc">—</p>
+    <div class="ctx" id="ctx"></div>
+    <div id="annwrap"></div>
+
+    <div class="card" style="overflow:hidden">
+      <div class="tb">
+        <div class="search">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#8496a8" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#8496a8" stroke-width="1.6"/></svg>
+          <input placeholder="Search field" id="q">
+        </div>
+        <div class="sp">
+          <button class="btn btn--ghost" id="del" disabled>Delete</button>
+          <button class="btn" id="bulk">Add in bulk</button>
+          <button class="btn btn--primary" id="add">Add</button>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="legend">
+      <h3>Add and edit</h3>
+      <ul>
+        <li><kbd>Add</kbd> puts a new row at the top in edit mode. Type a keypath, pick a type, confirm with <kbd>Enter</kbd> or the tick.</li>
+        <li>The keypath box opens a list under it: the observed field on the left, the type it was seen as on the right. Arrow keys move, <kbd>Enter</kbd> picks, <kbd>Esc</kbd> closes.</li>
+        <li>Picking a suggestion fills the type <b>only if you have not chosen a type yourself</b>.</li>
+        <li><kbd>Esc</kbd> or the cross cancels and restores the row exactly as it was, type included.</li>
+        <li>Remove marks the row <b>Removed</b> and keeps it, so Revert can bring it back. Nothing leaves until you Save.</li>
+        <li>A row you edit back to its original values is not counted as a change.</li>
+      </ul>
+      <h3>What changes with the dataspace</h3>
+      <ul>
+        <li><b>On this tab, nothing but the header.</b> <kbd>Reset index</kbd> and the ingest counters appear for <b>frequentsearch</b> only. The table itself is the same everywhere, because a declaration does not depend on where the data is stored.</li>
+        <li><b>In Schema explorer</b>, the status column follows the engine: <b>Mapping status</b> for frequentsearch, <b>Column status</b> for default and system. Values are explained below.</li>
+        <li>Switch dataspace on the explorer tab and watch <code>message</code>. The same field is a <b>Union type</b> in the archive and a <b>Mapping exception</b> in OpenSearch. The archive reads it slowly, OpenSearch rejects it.</li>
+      </ul>
+      <h3>Two tabs, two jobs</h3>
+      <ul>
+        <li><b>Reserved fields</b> is configuration. It is static: a keypath and the type you declare for it. It is what you intend.</li>
+        <li><b>Schema explorer</b> is observation. It is dynamic: what the data actually did, per dataset, over a time range. It is where status belongs, and where the problem is visible.</li>
+        <li>So <b>Reserve this field</b> lives in the explorer, next to the problem, and writes into the configuration tab. That is CX-56997 in one screen.</li>
+        <li>And there is <b>no status column on the Reserved fields tab</b>. It holds a keypath and a type, which is all a declaration is.</li>
+      </ul>
+      <h3>Reserve from the explorer</h3>
+      <ul>
+        <li><b>Click any row in Schema explorer</b> to reserve that field. The row is the target; the <kbd>Reserve</kbd> button in the Reserved column does the same thing for anyone who scans by column.</li>
+        <li>It opens a drawer. It is a confirm step, not a one-click write.</li>
+        <li>It shows every type the keypath was observed as, with the <b>share of events</b> for each, and lets you <b>set or override</b> the declared type.</li>
+        <li>The drawer states the cost of the choice before you commit it. Declaring <code>message</code> as String says <b>13% of values will be read as null</b>, because reserving forces a cast and Object cannot cast to String.</li>
+        <li>An already reserved row offers <kbd>Change</kbd>, which opens the same drawer to override the type.</li>
+        <li>Confirming writes an unsaved change into the Reserved fields tab. Nothing reaches the server until you Save there.</li>
+      </ul>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card main vocab">
+  <h2 style="margin:0 0 4px;font-size:16px">Status vocabulary — Schema explorer only</h2>
+  <p class="desc">These values live on the <b>Schema explorer</b> tab. The Reserved fields tab has no status column: it is configuration, and a declaration is the same wherever the data is stored. One keypath can be healthy in one dataspace and broken in the other, because Frequent Search is OpenSearch and the rest is the S3 archive, so the column says what <i>this</i> engine did with it.</p>
+
+  <h3 style="font-size:13px;margin:16px 0 6px">What <code>$d</code> is</h3>
+  <p class="desc"><code>$d</code> is the DataPrime data root: the whole raw event stored as one object. Any field without its own column still lives inside it. Reading one field out of <code>$d</code> means reading the whole event and digging the field out, for every row. That is the cost CX-44928 is about.</p>
+
+  <h3 style="font-size:13px;margin:18px 0 6px">Archive — <code>default</code> and <code>system</code></h3>
+  <div class="tablewrap"><table class="vtab">
+    <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip st-ok">Materialized</span></td>
+        <td>The field has its own parquet column. The engine reads only that column.</td>
+        <td>Already fixed. This is the state reserving aims at.</td><td>none</td></tr>
+      <tr><td><span class="chip st-warn">Unmaterialized</span></td>
+        <td>The field has no parquet column, so it is read out of <code>$d</code>. It could have had one: the budget of roughly 5,000 columns ran out and it was dropped.</td>
+        <td><b>Yes.</b> A reserved field is guaranteed a column in new data.</td>
+        <td>🔴 <b>No.</b> Only reachable as the query-time warning <code>fieldsExceedingColumnLimit</code>, per query, not per field.</td></tr>
+      <tr><td><span class="chip st-warn">Union type</span></td>
+        <td>The field arrives as an object in some events and a scalar in others. A parquet column needs one type, so it cannot have one.</td>
+        <td><b>Only partly.</b> No column appears. Reserving forces a cast at read time, and values that cannot cast return <code>null</code>.</td>
+        <td>🟢 <b>Yes.</b> <code>ObservationGroup.observations</code> is a repeated field, so one keypath returning several types is a union we can detect on the client.</td></tr>
+      <tr><td><span class="chip st-bad">mismatch</span><div style="font-size:11px;color:var(--txt3);margin-top:3px">in the Reserved column</div></td>
+        <td>The data arrives as one type and you declared another. The field is read as you declared it.</td>
+        <td>Not a fix. It means your declaration and the data disagree, so check which one is wrong.</td>
+        <td>🟢 <b>Yes.</b> Compare the declared type on the reserved record against <code>Observation.data_type</code>. The RFC also commits to exposing this difference.</td></tr>
+
+    </tbody>
+  </table></div>
+
+  <h3 style="font-size:13px;margin:18px 0 6px">OpenSearch — <code>frequentsearch</code></h3>
+  <div class="tablewrap"><table class="vtab">
+    <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip st-ok">Mapped</span></td>
+        <td>OpenSearch holds a mapping for the field and indexes it normally.</td>
+        <td>Already fixed.</td><td>🔴 <b>No</b> per field. The header counts mapping exceptions for the dataset, not per keypath.</td></tr>
+      <tr><td><span class="chip st-warn">Partially mapped</span></td>
+        <td>Some of the keypath is mapped and some is not, usually a branch where only certain children were accepted.</td>
+        <td><b>Yes</b> for the keypath you reserve.</td>
+        <td>🟢 <b>Yes.</b> Schema Explorer already models <code>partially-mapped</code>.</td></tr>
+      <tr><td><span class="chip st-idle">Unmapped</span></td>
+        <td>No mapping exists for the keypath.</td>
+        <td><b>Yes.</b> Reserving writes the field into the index mapping.</td>
+        <td>🟢 <b>Yes.</b> Already modelled as <code>unmapped</code>.</td></tr>
+      <tr><td><span class="chip st-bad">Mapping exception</span></td>
+        <td>A value arrived that does not fit the mapped type, and OpenSearch rejected it.</td>
+        <td>Not on its own. Fix the declared type, or fix the data.</td>
+        <td>🟡 <b>Dataset level only.</b> The header counter exists. Attributing it to a keypath does not.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ctx" style="margin-top:16px;background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)">
+    <span class="dot"></span>
+    <span><b>Most of this column has no data source today. Verified 15-09 against the schema-store protos.</b>
+    The reserved record (<code>SchemaTemplateField</code>) holds a path and a type, nothing else. <code>Observation</code> holds type, cardinality, occurrences and values, and no column or mapping status. So only <b>Union type</b> and <b>Type mismatch</b> are derivable on the client right now. Materialized, Unmaterialized and both Pending states all need backend work that nobody has scoped.</span>
+  </div>
+
+  <div class="ctx ctx--ar" style="margin-top:12px">
+    <span class="dot"></span>
+    <span><b>Why the Reserved fields tab has no status column.</b> Reserving a field is a declaration: a keypath and a type. It is the same statement whatever the engine does with it afterwards. What the data actually did is an observation over a time range, which is the explorer's job and the observations API's data. Putting it on the configuration page also makes a static page look live, and it cannot be, because a fresh reservation has nothing to report until the next compaction or index reset.</span>
+  </div>
+
+  <div class="ctx ctx--os" style="margin-top:12px">
+    <span class="dot"></span>
+    <span><b>The asymmetry worth remembering.</b> A union field is rejected outright by OpenSearch as a mapping exception, and read correctly but slowly by the archive. Same field, same data, two different failures. That is why one column name cannot serve both dataspaces.</span>
+  </div>
+
+  <p class="desc" style="margin-top:14px"><b>Unmaterialized is the state Amnon wants to remove.</b> A reserved field can still lose its column today when the budget runs out. His ask in the 14-09 meeting was that reserved fields go in first, before the popularity ranking. If that ships, this chip should never appear on a reserved field again, which makes it a good way to check whether the change worked.</p>
+
+  <p class="desc"><b>Reserving still has no confirmation.</b> After you reserve a field, nothing tells you it took effect until the next compaction or index reset changes what the explorer shows. Moving the status to the explorer makes that honest rather than solving it. Whether the user needs a clearer signal is an open question.</p>
+</div>
+
+<div id="drwWrap" hidden>
+  <div class="scrim" id="drwScrim"></div>
+  <aside class="drw" role="dialog" aria-modal="true" aria-labelledby="drwTitle">
+    <div class="drw-h">
+      <div><h3 id="drwTitle">Reserve field</h3><p id="drwSub"></p></div>
+      <button class="drw-x" id="drwX" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="drw-b">
+      <div class="drw-sec">
+        <p class="drw-l">Keypath</p>
+        <div class="drw-kp" id="drwKp"></div>
+      </div>
+      <div class="drw-sec">
+        <p class="drw-l">Observed in the data, last 7 days</p>
+        <div class="obs" id="drwObs"></div>
+      </div>
+      <div class="drw-sec">
+        <p class="drw-l">Declare as</p>
+        <div class="tpick" id="drwTypes"></div>
+      </div>
+      <div id="drwCons"></div>
+    </div>
+    <div class="drw-f">
+      <button class="btn" id="drwCancel">Cancel</button>
+      <button class="btn btn--primary" id="drwOk">Add to reserved fields</button>
+    </div>
+  </aside>
+</div>
+
+<div id="sg" hidden></div>
+
+<dialog id="changes">
+  <div class="dlg-h">Pending changes</div>
+  <div class="dlg-b"><ul id="changelist"></ul></div>
+  <div class="dlg-f"><button class="btn" id="closeChanges">Close</button></div>
+</dialog>
+
+<script>
+const DATASPACES = [
+  {id:'default',        name:'Default dataspace', engine:'archive'},
+  {id:'frequentsearch', name:'Frequent Search',   engine:'opensearch'},
+  {id:'system',         name:'System dataspace',  engine:'archive'},
+];
+const DATASETS = {
+  default:       ['logs','spans','aws-prod-payment-logs','web-frontend-logs'],
+  frequentsearch:['logs','spans'],
+  system:        ['engine.queries','alerts.history','aaa.audit_events'],
+};
+const ENGINE = {
+  opensearch:{label:'OpenSearch', ctxClass:'ctx--os',
+    ctxText:'<b>Frequent Search is OpenSearch.</b> A reserved field here is written into the index mapping. A value that does not fit the declared type is rejected as a mapping exception.',
+    counters:true},
+  archive:{label:'S3 archive', ctxClass:'ctx--ar',
+    ctxText:'<b>This dataspace reads from the S3 archive.</b> A reserved field here is guaranteed a parquet column. A field without one is read out of <code>$d</code>, which is what makes the query slow.',
+    counters:false}
+};
+const TYPES = {String:'Aa', Number:'#', Boolean:'T|F', Object:'{}'};
+
+// Schema Explorer status. Same split as the reserved tab, but computed from
+// observations rather than from configuration.
+const EXP_STATES = {
+  opensearch:{
+    col:'Mapping status',
+    hint:'What OpenSearch did with this keypath. Already shipping in Schema Explorer today.',
+    map:{ok:['Mapped','st-ok'], partial:['Partially mapped','st-warn'],
+          none:['Unmapped','st-idle'], conflict:['Mapping exception','st-bad']},
+    src:'Derivable today. Schema Explorer already models mappingStatus as mapped, partially-mapped or unmapped, and carries a type-conflict issue.'
+  },
+  archive:{
+    col:'Column status',
+    hint:'Whether the keypath has its own parquet column in the archive.',
+    map:{ok:['Materialized','st-ok'], partial:['Union type','st-warn'],
+         none:['Unmaterialized','st-warn'], conflict:['Union type','st-warn']},
+    src:'Partly derivable. A union is visible today, because ObservationGroup.observations is repeated. Materialized versus Unmaterialized is not: no field in the schema-store API reports it.'
+  }
+};
+
+// observed schema, per keypath: types actually seen, condition, popularity, cardinality
+// `shares` is the share of events in which the keypath arrived as that type.
+// It is what makes the cost of a type override concrete rather than abstract.
+const SCHEMA = [
+  {kp:'kubernetes.pod.ip',         cond:'ok',       pop:98, card:4210,    shares:{String:100}},
+  {kp:'kubernetes.namespace_name', cond:'ok',       pop:96, card:38,      shares:{String:100}},
+  {kp:'kubernetes.labels.app',     cond:'ok',       pop:74, card:212,     shares:{String:100}},
+  {kp:'http.status_code',          cond:'none',     pop:88, card:31,      shares:{Number:100}},
+  {kp:'http.request.method',       cond:'ok',       pop:71, card:8,       shares:{String:100}},
+  {kp:'message',                   cond:'conflict', pop:100,card:null,    shares:{String:87, Object:13}},
+  {kp:'user.authenticated',        cond:'ok',       pop:52, card:2,       shares:{Boolean:100}},
+  {kp:'user.id',                   cond:'ok',       pop:63, card:91400,   shares:{String:100}},
+  {kp:'trace.duration_ms',         cond:'conflict', pop:44, card:null,    shares:{Number:61, String:39}},
+  {kp:'trace.span_id',             cond:'none',     pop:41, card:1240000, shares:{String:100}},
+  {kp:'request.headers',           cond:'partial',  pop:29, card:null,    shares:{Object:100}},
+  {kp:'service.version',           cond:'ok',       pop:58, card:17,      shares:{String:100}},
+  {kp:'error.stack',               cond:'none',     pop:12, card:880,     shares:{String:100}},
+  {kp:'db.rows_affected',          cond:'none',     pop:9,  card:640,     shares:{Number:100}},
+];
+SCHEMA.forEach(f=>{ f.types = Object.keys(f.shares).sort((a,b)=>f.shares[b]-f.shares[a]); });
+let drw=null;
+let expFilters={issues:false, unres:false};
+let activeTab='res';
+let loading=false;   // shared by both tabs: one dataset change, one load
+const LIMIT = 12;
+
+// observed keypaths offered as suggestions, with the type actually seen in the data
+const OBSERVED = [
+  ['kubernetes.pod.ip','String'],['kubernetes.namespace_name','String'],['kubernetes.labels.app','String'],
+  ['http.status_code','Number'],['http.request.method','String'],['message','String'],
+  ['user.authenticated','Boolean'],['user.id','String'],['trace.duration_ms','Number'],
+  ['trace.span_id','String'],['request.headers','Object'],['service.version','String'],
+  ['error.stack','String'],['db.rows_affected','Number'],
+];
+const SEED = [
+  ['kubernetes.pod.ip','String','ok'],
+  ['kubernetes.namespace_name','String','ok'],
+  ['http.status_code','Number','limit'],
+  ['message','String','union'],
+  ['user.authenticated','Boolean','ok'],
+  ['trace.duration_ms','Number','mismatch'],
+  ['request.headers','Object','ok'],
+  ['service.version','String','ok'],
+];
+
+let rows=[], delay=700, token=0, uid=0, editingId=null, draft=null;
+const $ = s=>document.querySelector(s);
+const engineOf = id => ENGINE[DATASPACES.find(d=>d.id===id).engine];
+
+function seed(){
+  uid=0;
+  rows = SEED.map(([fieldName,type])=>({
+    id:'r'+(++uid), fieldName, type,
+    original:{fieldName,type}, isNew:false, isRemoved:false, hl:false
+  }));
+  editingId=null; draft=null;
+}
+const live = () => rows.filter(r=>!r.isRemoved);
+
+function modifications(){
+  const out=[];
+  for(const r of rows){
+    if(r.isNew && !r.isRemoved) out.push({op:'add', r});
+    else if(r.isRemoved && !r.isNew) out.push({op:'remove', r});
+    else if(!r.isNew && r.original &&
+            (r.fieldName!==r.original.fieldName || r.type!==r.original.type)) out.push({op:'update', r});
+  }
+  return out;
+}
+
+function fillDataspaces(){ $('#ds').innerHTML = DATASPACES.map(d=>`<option value="${d.id}">${d.name}</option>`).join(''); }
+function fillDatasets(id){ $('#dt').innerHTML = DATASETS[id].map(n=>`<option value="${n}">${n}</option>`).join(''); }
+
+function renderTopActions(eng, loading){
+  const el=$('#topactions');
+  if(!eng.counters){ el.innerHTML=''; return; }
+  el.innerHTML = loading
+    ? `<div class="counter"><span class="sk sk--num"></span><span>Ingested today</span></div>
+       <div class="counter"><span class="sk sk--num"></span><span>Mapping exceptions</span></div>
+       <button class="btn" disabled>Reset index</button>`
+    : `<div class="counter"><b>1.2B</b><span>Ingested today</span></div>
+       <div class="counter"><b>14</b><span>Mapping exceptions</span></div>
+       <button class="btn">Reset index</button>`;
+}
+function renderHead(eng){
+  // Configuration only. What the data did with the field lives in Schema explorer.
+  $('#thead').innerHTML = `<tr>
+    <th style="width:36px"><input type="checkbox" disabled></th>
+    <th>Field name</th><th style="width:160px">Type</th>
+    <th style="width:96px"></th></tr>`;
+}
+function skeletonRows(n){
+  let out='';
+  for(let i=0;i<n;i++){
+    const w=[92,68,84,74,88][i%5];
+    out+=`<tr><td><span class="sk" style="width:14px;height:14px;border-radius:3px"></span></td>
+      <td><span class="sk" style="width:${w}%"></span></td>
+      <td><span class="sk sk--pill" style="width:72px"></span></td><td></td></tr>`;
+  }
+  return out;
+}
+const typeChip = t => `<span class="chip c-${t}">${t} <i class="g">${TYPES[t]}</i></span>`;
+
+function renderAnn(){
+  const mods=modifications(), w=$('#annwrap');
+  if(!mods.length){ w.innerHTML=''; return; }
+  const n={add:0,update:0,remove:0}; mods.forEach(m=>n[m.op]++);
+  w.innerHTML=`<div class="ann"><div class="l">
+      <b>Changed fields: ${mods.length}</b>
+      <span>${n.add} added, ${n.update} updated, ${n.remove} removed</span>
+      <button class="lnk" id="viewChanges">View changes</button>
+    </div><div class="r">
+      <button class="btn btn--sm" id="revert">Revert</button>
+      <button class="btn btn--sm btn--primary" id="save">Save</button>
+    </div></div>`;
+  $('#viewChanges').onclick=()=>{
+    $('#changelist').innerHTML = mods.map(m=>{
+      const lbl={add:['op--add','Added'],update:['op--upd','Updated'],remove:['op--rem','Removed']}[m.op];
+      let detail = `<code>${m.r.fieldName}</code> as ${m.r.type}`;
+      if(m.op==='update'){
+        const o=m.r.original, bits=[];
+        if(o.fieldName!==m.r.fieldName) bits.push(`name <code>${o.fieldName}</code> to <code>${m.r.fieldName}</code>`);
+        if(o.type!==m.r.type) bits.push(`type ${o.type} to ${m.r.type}`);
+        detail = bits.join(', ');
+      }
+      return `<li><span class="op ${lbl[0]}">${lbl[1]}</span>${detail}</li>`;
+    }).join('');
+    $('#changes').showModal();
+  };
+  $('#revert').onclick=()=>{ seed(); renderBody(engineOf($('#ds').value)); };
+  $('#save').onclick=()=>{
+    rows = rows.filter(r=>!r.isRemoved).map(r=>({...r, isNew:false, hl:true,
+      original:{fieldName:r.fieldName, type:r.type}}));
+    editingId=null; draft=null;
+    renderBody(engineOf($('#ds').value));
+    setTimeout(()=>{ rows.forEach(r=>r.hl=false); renderBody(engineOf($('#ds').value)); }, 1500);
+  };
+}
+
+function nameError(value, id){
+  const v=(value||'').trim();
+  if(!v) return 'A keypath is required.';
+  if(!/^[A-Za-z_][\w.-]*$/.test(v)) return 'Use letters, numbers, dots, dashes and underscores.';
+  if(rows.some(r=>r.id!==id && !r.isRemoved && r.fieldName===v)) return 'This keypath is already reserved.';
+  return null;
+}
+
+function renderBody(eng){
+  const q=($('#q').value||'').trim().toLowerCase();
+  const body=$('#tbody');
+  body.className='fade';
+  const visible = rows.filter(r => r.id===editingId || !q || r.fieldName.toLowerCase().includes(q));
+
+  body.innerHTML = visible.map(r=>{
+    if(r.id===editingId){
+      const err = nameError(draft.fieldName, r.id);
+      return `<tr class="editing"><td></td>
+        <td class="path">
+          <input id="nameInput" value="${draft.fieldName.replace(/"/g,'&quot;')}"
+                 placeholder="e.g. kubernetes.pod.ip" class="${err&&draft.touched?'bad':''}" autocomplete="off">
+          ${err&&draft.touched?`<span class="err">${err}</span>`:''}
+        </td>
+        <td class="tsel"><select id="typeInput">
+          ${Object.keys(TYPES).map(t=>`<option value="${t}"${t===draft.type?' selected':''}>${t}</option>`).join('')}
+        </select></td>
+        <td class="rowacts">
+          <button class="ok" id="confirmEdit" title="Confirm">&#10003;</button>
+          <button id="cancelEdit" title="Cancel">&#10005;</button>
+        </td></tr>`;
+    }
+    let badge='';
+    if(r.isRemoved) badge='<span class="badge badge--r">Removed</span>';
+    else if(r.isNew) badge='<span class="badge">New</span>';
+    else if(r.original && (r.fieldName!==r.original.fieldName || r.type!==r.original.type))
+      badge='<span class="badge badge--e">Edited</span>';
+    return `<tr data-id="${r.id}" class="${r.isRemoved?'removed':''} ${r.hl?'hl':''}">
+      <td><input type="checkbox" ${r.isRemoved?'disabled':''}></td>
+      <td class="path">${r.fieldName}${badge}</td>
+      <td>${typeChip(r.type)}</td>
+      <td class="rowacts">${ r.isRemoved
+        ? `<button data-act="restore" data-id="${r.id}" title="Restore">&#8630;</button>`
+        : `<button data-act="edit" data-id="${r.id}" title="Edit">&#9998;</button>
+           <button data-act="remove" data-id="${r.id}" title="Remove">&#10005;</button>`}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="4" style="padding:26px;text-align:center;color:#8496a8">No reserved field matches this search.</td></tr>`;
+
+  const n = live().length;
+  $('#count').textContent = n;
+  $('#count').className = 'tag' + (n>=LIMIT ? ' tag--full' : '');
+  $('#add').disabled = editingId!==null || n>=LIMIT;
+  $('#bulk').disabled = editingId!==null || n>=LIMIT;
+  $('#add').title = n>=LIMIT ? `Limit of ${LIMIT} reserved fields reached.` : '';
+  if(!loading){ setCounts(false); if(activeTab==='exp') renderExplorer(); }
+  renderAnn();
+  if(editingId!==null) wireEditor();
+}
+
+const sg = () => document.getElementById('sg');
+
+function sgMatches(v){
+  const q=(v||'').trim().toLowerCase();
+  const taken=new Set(rows.filter(r=>!r.isRemoved && r.id!==editingId).map(r=>r.fieldName));
+  return OBSERVED.filter(([n])=>!taken.has(n) && (!q || n.toLowerCase().includes(q))).slice(0,8);
+}
+function sgHide(){ const p=sg(); p.hidden=true; p.innerHTML=''; draft && (draft.sgIndex=-1); }
+function sgPlace(input){
+  const p=sg(), r=input.getBoundingClientRect();
+  p.style.left = r.left+'px';
+  p.style.width = r.width+'px';
+  const below = window.innerHeight - r.bottom;
+  if(below < 170 && r.top > below){ p.style.top='auto'; p.style.bottom=(window.innerHeight-r.top+4)+'px'; }
+  else { p.style.bottom='auto'; p.style.top=(r.bottom+4)+'px'; }
+}
+function sgRender(input){
+  const p=sg(), list=sgMatches(draft.fieldName);
+  draft.sgList=list;
+  if(!list.length){
+    p.innerHTML='<div class="sg-empty">No observed field matches. You can still reserve it.</div>';
+    p.hidden=false; sgPlace(input); return;
+  }
+  if(draft.sgIndex>=list.length) draft.sgIndex=-1;
+  const q=(draft.fieldName||'').trim();
+  p.innerHTML = '<div class="sg-hd"><span>Observed field</span><span>Type</span></div>' +
+    list.map(([n,t],i)=>{
+      let label=n;
+      if(q){
+        const at=n.toLowerCase().indexOf(q.toLowerCase());
+        if(at>-1) label = n.slice(0,at)+'<b>'+n.slice(at,at+q.length)+'</b>'+n.slice(at+q.length);
+      }
+      return `<div class="sg-o ${i===draft.sgIndex?'on':''}" data-i="${i}">
+        <span class="sg-n">${label}</span>
+        <span class="sg-r"><span class="chip c-${t}">${t} <i class="g">${TYPES[t]}</i></span></span>
+      </div>`;
+    }).join('');
+  p.hidden=false;
+  sgPlace(input);
+}
+function sgPick(i){
+  const hit=draft.sgList && draft.sgList[i];
+  if(!hit) return;
+  draft.fieldName=hit[0]; draft.touched=true;
+  // CX-57952: adopt the observed type only when the user has not set one
+  if(!draft.typeTouched) draft.type=hit[1];
+  sgHide();
+  const n=document.getElementById('nameInput'), t=document.getElementById('typeInput');
+  n.value=draft.fieldName; t.value=draft.type;
+  validateName(n);
+  n.focus();
+}
+function validateName(name){
+  const err=nameError(draft.fieldName,editingId);
+  name.classList.toggle('bad',!!err && draft.touched);
+  let e=name.parentElement.querySelector('.err');
+  if(err && draft.touched){
+    if(!e){e=document.createElement('span');e.className='err';name.parentElement.appendChild(e);}
+    e.textContent=err;
+  } else if(e) e.remove();
+  document.getElementById('confirmEdit').disabled=!!err;
+  return err;
+}
+
+function wireEditor(){
+  const name=document.getElementById('nameInput'), type=document.getElementById('typeInput');
+  name.focus();
+  if(draft.caretEnd!==false) name.setSelectionRange(name.value.length,name.value.length);
+  draft.sgIndex=-1;
+  sgRender(name);
+
+  name.oninput=()=>{
+    draft.fieldName=name.value; draft.touched=true; draft.caretEnd=false; draft.sgIndex=-1;
+    if(!draft.typeTouched){
+      const hit=OBSERVED.find(o=>o[0]===name.value.trim());
+      if(hit && hit[1]!==draft.type){ draft.type=hit[1]; type.value=hit[1]; }
+    }
+    validateName(name);
+    sgRender(name);
+  };
+  name.onfocus=()=>sgRender(name);
+  name.onkeydown=e=>{
+    const n=(draft.sgList||[]).length;
+    if(e.key==='ArrowDown'&&n){e.preventDefault();draft.sgIndex=(draft.sgIndex+1)%n;sgRender(name);}
+    else if(e.key==='ArrowUp'&&n){e.preventDefault();draft.sgIndex=(draft.sgIndex-1+n)%n;sgRender(name);}
+    else if(e.key==='Enter'){
+      e.preventDefault();
+      if(draft.sgIndex>-1){ sgPick(draft.sgIndex); } else { sgHide(); commitEdit(); }
+    }
+    else if(e.key==='Escape'){
+      e.preventDefault();
+      if(!sg().hidden){ sgHide(); } else { cancelEdit(); }
+    }
+    else if(e.key==='Tab'){ sgHide(); }
+  };
+  type.onchange=()=>{ draft.type=type.value; draft.typeTouched=true; };
+  type.onfocus=sgHide;
+  type.onkeydown=e=>{ if(e.key==='Escape'){e.preventDefault();cancelEdit();} };
+  document.getElementById('confirmEdit').onclick=()=>{sgHide();commitEdit();};
+  document.getElementById('cancelEdit').onclick=()=>{sgHide();cancelEdit();};
+  document.getElementById('confirmEdit').disabled=!!nameError(draft.fieldName,editingId);
+}
+
+sg().addEventListener('mousedown', e=>{
+  const o=e.target.closest('.sg-o'); if(!o) return;
+  e.preventDefault();            // keep focus in the input
+  sgPick(Number(o.dataset.i));
+});
+document.addEventListener('mousedown', e=>{
+  if(editingId===null || sg().hidden) return;
+  if(e.target.closest('#sg') || e.target.closest('tr.editing')) return;
+  sgHide();
+});
+window.addEventListener('scroll', ()=>{
+  const n=document.getElementById('nameInput');
+  if(n && !sg().hidden) sgPlace(n);
+}, true);
+window.addEventListener('resize', ()=>{
+  const n=document.getElementById('nameInput');
+  if(n && !sg().hidden) sgPlace(n);
+});
+
+function startEdit(id){
+  const r=rows.find(x=>x.id===id);
+  editingId=id;
+  draft={fieldName:r.fieldName, type:r.type, touched:false, typeTouched:false, caretEnd:true};
+  renderBody(engineOf($('#ds').value));
+}
+function commitEdit(){
+  if(nameError(draft.fieldName,editingId)) return;
+  sgHide();
+  const r=rows.find(x=>x.id===editingId);
+  r.fieldName=draft.fieldName.trim();
+  r.type=draft.type;
+  // CX-57951: an edit back to the original values is not a change
+  editingId=null; draft=null;
+  renderBody(engineOf($('#ds').value));
+}
+function cancelEdit(){
+  sgHide();
+  // CX-57950: restore name AND type from the row, never leave the draft type behind
+  const r=rows.find(x=>x.id===editingId);
+  if(r && r.isNew && !r.original){ rows=rows.filter(x=>x.id!==editingId); }
+  editingId=null; draft=null;
+  renderBody(engineOf($('#ds').value));
+}
+
+$('#tbody').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const id=b.dataset.id, r=rows.find(x=>x.id===id);
+  if(b.dataset.act==='edit'){ if(editingId===null) startEdit(id); }
+  else if(b.dataset.act==='remove'){
+    if(r.isNew){ rows=rows.filter(x=>x.id!==id); } else { r.isRemoved=true; }
+    renderBody(engineOf($('#ds').value));
+  }
+  else if(b.dataset.act==='restore'){ r.isRemoved=false; renderBody(engineOf($('#ds').value)); }
+});
+
+$('#add').onclick=()=>{
+  if(editingId!==null || live().length>=LIMIT) return;
+  const r={id:'r'+(++uid), fieldName:'', type:'String', state:'pending',
+           original:null, isNew:true, isRemoved:false, hl:false};
+  rows.unshift(r);
+  editingId=r.id;
+  draft={fieldName:'', type:'String', touched:false, typeTouched:false, caretEnd:true};
+  renderBody(engineOf($('#ds').value));
+};
+$('#bulk').onclick=()=>alert('Bulk add opens the dialog from Omer design c9346d52. Not mocked here.');
+$('#q').oninput=()=>renderBody(engineOf($('#ds').value));
+$('#closeChanges').onclick=()=>$('#changes').close();
+
+function expSkeletonRows(n){
+  let out='';
+  for(let i=0;i<n;i++){
+    const w=[88,64,92,72,80,58][i%6];
+    out+=`<tr>
+      <td><span class="sk" style="width:${w}%"></span></td>
+      <td><span class="sk sk--pill" style="width:74px"></span></td>
+      <td><span class="sk sk--pill" style="width:104px"></span></td>
+      <td><span class="sk sk--pill" style="width:88px"></span></td>
+      <td><span class="pop"><span class="sk" style="width:56px;height:5px"></span><span class="sk sk--num" style="width:20px"></span></span></td>
+      <td><span class="sk sk--num" style="width:46px"></span></td></tr>`;
+  }
+  return out;
+}
+
+function renderExplorer(){
+  const dsId=$('#ds').value, engKey=DATASPACES.find(d=>d.id===dsId).engine, E=EXP_STATES[engKey];
+  const declared = new Map(rows.filter(r=>!r.isRemoved && r.fieldName).map(r=>[r.fieldName,r.type]));
+
+  $('#expDesc').innerHTML=`What the data actually did in <b>${dsId}/${$('#dt').value}</b> over the last 7 days. This table is observed, not configured. <a href="#">Learn more</a>`;
+  $('#expCtx').className='ctx '+ENGINE[engKey].ctxClass;
+  $('#expCtx').innerHTML=`<span class="dot"></span><span>${ENGINE[engKey].ctxText}</span>`;
+  $('#expSrc').textContent=E.src;
+
+  $('#ethead').innerHTML=`<tr>
+    <th>Keypath</th>
+    <th style="width:170px">Observed type</th>
+    <th style="width:180px">${E.col}<span class="q" title="${E.hint}">?</span></th>
+    <th style="width:190px">Reserved</th>
+    <th style="width:110px">Popularity</th>
+    <th style="width:104px">Cardinality</th></tr>`;
+
+  if(loading){
+    $('#etbody').className='loading';
+    $('#etbody').innerHTML=expSkeletonRows(7);
+    $('#expSrc').textContent='';
+    return;
+  }
+  $('#etbody').className='fade';
+
+  const q=($('#eq').value||'').trim().toLowerCase();
+  const list=SCHEMA.filter(f=>{
+    if(q && !f.kp.toLowerCase().includes(q)) return false;
+    if(expFilters.issues && f.cond==='ok') return false;
+    if(expFilters.unres && declared.has(f.kp)) return false;
+    return true;
+  });
+
+  $('#etbody').innerHTML = list.map(f=>{
+    const [txt,cls]=E.map[f.cond];
+    const dec=declared.get(f.kp);
+    const mismatch = dec && !f.types.includes(dec);
+    const rowcls = f.cond==='conflict' ? 'badrow' : (f.cond==='ok' ? '' : 'warnrow');
+    const resv = dec
+      ? `<span class="resv">${typeChip(dec)}${mismatch?'<span class="chip st-bad" title="Declared type is not among the observed types">mismatch</span>':''}
+           <button class="btn btn--xs" data-reserve="${f.kp}">Change</button></span>`
+      : `<span class="resv"><span class="dash">not reserved</span>
+           <button class="btn btn--xs" data-reserve="${f.kp}">Reserve</button></span>`;
+    return `<tr class="${rowcls}" data-kp="${f.kp}" title="${dec?'Change the declared type':'Reserve this field'}">
+      <td class="path"><span class="kp">${f.kp}<span class="go">${dec?'Change type':'+ Reserve'}</span></span></td>
+      <td><span class="types">${f.types.map(t=>typeChip(t)).join('')}</span></td>
+      <td><span class="chip ${cls}">${txt}</span></td>
+      <td>${resv}</td>
+      <td><span class="pop"><span class="bar"><i style="width:${f.pop}%"></i></span><span class="num">${f.pop}</span></span></td>
+      <td class="num">${f.card===null?'<span class="dash">n/a</span>':f.card.toLocaleString()}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" style="padding:26px;text-align:center;color:#8496a8">No keypath matches.</td></tr>`;
+
+  $('#nExp').textContent=SCHEMA.length;
+  $('#nRes').textContent=live().length;
+}
+
+function setCounts(isLoading){
+  const dots='<span class="sk sk--num" style="width:14px;display:inline-block;vertical-align:-2px"></span>';
+  $('#nExp').innerHTML = isLoading ? dots : SCHEMA.length;
+  $('#nRes').innerHTML = isLoading ? dots : live().length;
+}
+
+function openReserve(kp){
+  const f=SCHEMA.find(x=>x.kp===kp);
+  const existing=rows.find(r=>!r.isRemoved && r.fieldName===kp);
+  drw={kp, f, editing:!!existing, id:existing?existing.id:null,
+       type: existing ? existing.type : f.types.find(t=>TYPES[t]) || 'String'};
+  $('#drwTitle').textContent = drw.editing ? 'Change declared type' : 'Reserve field';
+  $('#drwSub').textContent = `${$('#ds').value}/${$('#dt').value}`;
+  $('#drwKp').textContent = kp;
+  $('#drwOk').textContent = drw.editing ? 'Update type' : 'Add to reserved fields';
+  renderDrawer();
+  $('#drwWrap').hidden=false;
+  document.body.style.overflow='hidden';
+}
+function renderDrawer(){
+  const {f,type}=drw;
+  $('#drwObs').innerHTML = f.types.map(t=>`<div class="obs-r">
+      ${typeChip(t)}
+      <span class="bar"><i style="width:${f.shares[t]}%"></i></span>
+      <span class="obs-pc">${f.shares[t]}%</span></div>`).join('');
+
+  $('#drwTypes').innerHTML = Object.keys(TYPES).map(t=>`
+    <button class="tp ${t===type?'on':''}" data-t="${t}">
+      ${typeChip(t)}${f.shares[t]?`<span class="obsd">${f.shares[t]}% observed</span>`:''}
+    </button>`).join('');
+
+  // the consequence of this exact choice, stated before the write
+  const covered=f.shares[type]||0, lost=100-covered;
+  const others=f.types.filter(t=>t!==type);
+  let cls,html;
+  if(covered===100){
+    cls='cons--ok';
+    html=`<b>Every value fits.</b> All observed values are ${type}, so nothing is lost by declaring it.`;
+  } else if(covered===0){
+    cls='cons--bad';
+    html=`<b>No value fits.</b> This keypath was never seen as ${type}. Every value would be read as <code>null</code>.
+      It arrives as ${others.map(t=>`${t} (${f.shares[t]}%)`).join(' and ')}.`;
+  } else {
+    cls='cons--warn';
+    html=`<b>${lost}% of values will be read as <code>null</code>.</b>
+      ${covered}% of events carry ${type}. The rest arrive as ${others.map(t=>`${t} (${f.shares[t]}%)`).join(' and ')},
+      and reserving forces a cast at read time, so anything that cannot cast returns <code>null</code>.`;
+  }
+  $('#drwCons').innerHTML=`<div class="cons ${cls}">${html}</div>`;
+}
+function closeReserve(){ drw=null; $('#drwWrap').hidden=true; document.body.style.overflow=''; }
+
+$('#drwTypes').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-t]'); if(!b||!drw) return;
+  drw.type=b.dataset.t; renderDrawer();
+});
+$('#drwOk').onclick=()=>{
+  if(!drw) return;
+  if(drw.editing){
+    const r=rows.find(x=>x.id===drw.id); r.type=drw.type; r.hl=true;
+  } else {
+    if(live().length>=LIMIT){ alert(`Limit of ${LIMIT} reserved fields reached.`); return; }
+    rows.unshift({id:'r'+(++uid), fieldName:drw.kp, type:drw.type,
+      original:null, isNew:true, isRemoved:false, hl:true});
+  }
+  closeReserve();
+  renderBody(engineOf($('#ds').value));
+  renderExplorer();
+};
+$('#drwCancel').onclick=closeReserve;
+$('#drwX').onclick=closeReserve;
+$('#drwScrim').onclick=closeReserve;
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drw) closeReserve(); });
+
+function setTab(t){
+  activeTab=t;
+  $('#paneExp').hidden = t!=='exp';
+  $('#paneRes').hidden = t!=='res';
+  $('#tabExp').classList.toggle('on', t==='exp');
+  $('#tabRes').classList.toggle('on', t==='res');
+  if(t==='exp') renderExplorer();
+  setCounts(loading);
+}
+
+function load(){
+  const dsId=$('#ds').value, eng=engineOf(dsId), mine=++token;
+  editingId=null; draft=null; sgHide();
+  $('#ctx').className='ctx '+eng.ctxClass;
+  $('#ctx').innerHTML=`<span class="dot"></span><span>${eng.ctxText}</span>`;
+  $('#desc').innerHTML=`Reserved fields keep a keypath and its declared type stable in <b>${dsId}/${$('#dt').value}</b>, stored in ${eng.label}. <a href="#">Learn more</a>`;
+  renderHead(eng);
+  renderTopActions(eng,true);
+  $('#annwrap').innerHTML='';
+  loading=true;
+  $('#tbody').className='loading';
+  $('#tbody').innerHTML=skeletonRows(6);
+  $('#count').innerHTML='<span class="sk sk--num" style="width:22px;display:inline-block;vertical-align:-3px"></span>';
+  setCounts(true);
+  renderExplorer();              // paints the explorer skeleton and its context strip
+  setTimeout(()=>{
+    if(mine!==token) return;     // a newer dataset change won; drop this result
+    loading=false;
+    renderTopActions(eng,false);
+    renderBody(eng);
+    renderExplorer();
+    setCounts(false);
+  }, delay);
+}
+
+// production confirms before discarding uncommitted edits on a dataset switch
+let lastDs=null, lastDt=null;
+function guarded(fn){
+  if(modifications().length &&
+     !confirm('You have unsaved changes on this dataset. Switching will discard them. Continue?')){
+    $('#ds').value=lastDs; fillDatasets(lastDs); $('#dt').value=lastDt; return;
+  }
+  seed(); fn();
+  lastDs=$('#ds').value; lastDt=$('#dt').value;
+}
+$('#ds').addEventListener('change', ()=>guarded(()=>{ fillDatasets($('#ds').value); load(); }));
+$('#dt').addEventListener('change', ()=>guarded(load));
+$('#replay').onclick=load;
+$('#reseed').onclick=()=>{ seed(); load(); };
+$('#slow').onclick=e=>{ delay = delay===700?2500:700;
+  e.target.textContent = delay===700?'Slow network (2.5s)':'Normal speed'; load(); };
+
+$('#tabExp').onclick=()=>setTab('exp');
+$('#tabRes').onclick=()=>setTab('res');
+$('#eq').oninput=()=>{ if(!loading) renderExplorer(); };
+$('#fOnlyIssues').onclick=e=>{ if(loading) return; expFilters.issues=!expFilters.issues;
+  e.target.classList.toggle('btn--primary',expFilters.issues); renderExplorer(); };
+$('#fOnlyUnres').onclick=e=>{ if(loading) return; expFilters.unres=!expFilters.unres;
+  e.target.classList.toggle('btn--primary',expFilters.unres); renderExplorer(); };
+
+// Reserve from the explorer - this is CX-56997 in miniature.
+// It writes into the configuration tab and leaves it unsaved, so the user still confirms.
+$('#etbody').addEventListener('click', e=>{
+  if(loading) return;
+  const b=e.target.closest('button[data-reserve]');
+  if(b){ openReserve(b.dataset.reserve); return; }
+  const tr=e.target.closest('tr[data-kp]');
+  if(tr) openReserve(tr.dataset.kp);
+});
+
+$('#limit').textContent=LIMIT;
+fillDataspaces(); fillDatasets('default'); seed();
+lastDs=$('#ds').value; lastDt=$('#dt').value;
+load();
+setTab('exp');
+</script>
+</body>
+</html>
