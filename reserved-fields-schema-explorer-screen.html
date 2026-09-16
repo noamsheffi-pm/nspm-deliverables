@@ -3,1080 +3,1901 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reserved Fields — dataspace-aware table</title>
+<title>Schema Manager — production parity mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* ── Design tokens, lifted verbatim from internal-cx-web-workspace-design@2381a6f5
+   src/generated-tokens.scss, light theme :root block. Do not hand-pick colours here. */
 :root{
-  --teal:#0e8a9b; --bg:#f4f6f8; --card:#fff; --line:#e3e8ee; --line2:#eef2f6;
-  --txt:#1b2733; --txt2:#5b6b7c; --txt3:#8496a8;
-  --blue-bg:#eef6ff; --blue-line:#bcdcff; --blue-tx:#1b64c4;
-  --amber-bg:#fff6e6; --amber-line:#ffd899; --amber-tx:#9a6200;
-  --green-bg:#e8f6ee; --green-line:#a8dcc0; --green-tx:#1e7b4c;
-  --grey-bg:#f0f3f6; --grey-line:#d9e1e9; --grey-tx:#5b6b7c;
-  --red-bg:#fdecec; --red-line:#f7bebe; --red-tx:#b02a37;
-  --r:8px;
+  --c-text-primary:#1c1c1c; --c-text-secondary:#68686d; --c-text-label:#202020;
+  --c-text-placeholder:#d0d0d3; --c-text-on-color:#ffffff; --c-text-disabled:#ababb1;
+  --c-text-interactive:#029449; --c-text-error:#eb6166; --c-text-success:#3cc67e;
+  --c-text-warning:#e4b83c; --c-text-ai:#b273ee; --c-text-on-color-secondary:#ababb1;
+  --c-button-primary:#02763a; --c-button-primary-hover:#029449; --c-button-disabled:#dedee0;
+  --c-icon-primary:#68686d; --c-icon-secondary:#ababb1; --c-icon-interactive:#029449;
+  --c-icon-error:#eb6166; --c-icon-warning:#e4b83c; --c-icon-info:#3cbcd3; --c-icon-ai:#b273ee;
+  --c-border-subtle:#ececee; --c-border-strong:#dedee0; --c-border-interactive:#029449;
+  --c-border-error:#eb6166; --c-border-warning:#e4b83c; --c-border-info:#3cbcd3;
+  --c-background-surface-primary:#f8fafc; --c-background-card:#ffffff;
+  --c-background-table-header:#f8fafc; --c-background-hover:#0000000d;
+  --c-background-button-group:#f8f9fc; --c-background-button-group-asset-focus:#ffffff;
+  --c-background-info:#eef6fe; --c-background-warning:#fefce9; --c-background-error:#fef3f3;
+  --c-background-success:#f0fdf5; --c-background-skeleton:#f8f9fc;
+  --c-background-grey-reg:#f8f9fc; --c-background-grey-hover:#ececee;
+  --c-background-blue-reg:#dbe9fd; --c-background-green-reg:#dcfce7;
+  --c-background-overlay:#09090b80;
+  --c-tag-green-bg:#3cc67e33; --c-tag-green-text:#24734b;
+  --c-tag-yellow-bg:#e4b83c33; --c-tag-yellow-text:#8e581f;
+  --c-tag-grey-bg:#ababb133; --c-tag-grey-text:#272728;
+  --c-tag-light-grey-bg:#c9d1d933; --c-tag-light-grey-text:#323d4e;
+  --c-tag-red-bg:#eb616633; --c-tag-red-text:#a52c32;
+  --c-tag-blue-bg:#5095ed33; --c-tag-blue-text:#1e6f81;
+  --f-page-title:normal normal 600 20px/1.5 'Nunito Sans';
+  --f-section-title:normal normal 600 16px/1.5 'Nunito Sans';
+  --f-subheading-reg:normal normal 400 14px/1.5 'Nunito Sans';
+  --f-subheading-bold:normal normal 600 14px/1.5 'Nunito Sans';
+  --f-paragraph-reg:normal normal 400 12px/1.5 'Nunito Sans';
+  --f-paragraph-bold:normal normal 600 12px/1.5 'Nunito Sans';
+  --f-caption:normal normal 600 11px/16px 'Nunito Sans';
+  --f-code-reg:normal normal 400 14px/1.5 'Inconsolata';
+  --f-code-sm-reg:normal normal 400 12px/1.5 'Inconsolata';
+  --f-button:normal normal 600 12px/1.5 'Nunito Sans';
+  --f-link:normal normal 400 12px/1.5 'Nunito Sans';
+  /* mockup-only accent, used ONLY on annotations that are not production */
+  --mock:#0e8a9b;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);
-  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  padding-block:24px;padding-left:16px;padding-right:16px}
-.wrap{max-width:1180px;margin:0 auto}
-.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);
-  border-radius:var(--r);padding:14px 16px;margin-bottom:18px}
-.note h1{margin:0 0 6px;font-size:16px}
-.note p{margin:0 0 6px;color:var(--txt2);font-size:13px}
-.note p:last-child{margin-bottom:0}
-.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
-.controls span{font-size:12px;color:var(--txt3);margin-right:4px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:12px 14px;margin-bottom:14px;flex-wrap:wrap}
-.selectors{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
-select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%235b6b7c' stroke-width='1.5'/></svg>") no-repeat right 10px center;
-  border:1px solid var(--line);border-radius:6px;padding:7px 30px 7px 10px;font:inherit;color:var(--txt);min-width:170px;cursor:pointer}
-select:focus,input:focus{outline:2px solid var(--teal);outline-offset:1px}
-.topactions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.counter{display:flex;flex-direction:column;gap:2px;padding:0 12px;border-left:1px solid var(--line2)}
-.counter b{font-size:15px}
-.counter span{font-size:11px;color:var(--txt3)}
-.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 12px;
-  font:inherit;color:var(--txt);cursor:pointer;white-space:nowrap}
-.btn:hover:not([disabled]){background:#f7f9fb}
-.btn--primary{background:var(--teal);border-color:var(--teal);color:#fff}
-.btn--primary:hover:not([disabled]){background:#0b7686}
-.btn--ghost{border-color:transparent;background:transparent;color:var(--txt2)}
-.btn--sm{padding:4px 9px;font-size:12.5px}
-.btn[disabled]{opacity:.45;cursor:not-allowed}
-.main{padding:16px}
-.hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.hd h2{margin:0;font-size:16px}
-.tag{background:var(--grey-bg);border:1px solid var(--grey-line);border-radius:20px;
-  padding:1px 9px;font-size:12px;font-weight:600}
-.tag--full{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
-.lim{font-size:12px;color:var(--txt3)}
-.desc{margin:6px 0 14px;color:var(--txt2);font-size:13px;max-width:78ch}
-.desc a{color:var(--blue-tx)}
-.ctx{display:flex;align-items:flex-start;gap:10px;border-radius:6px;padding:9px 12px;
-  font-size:12.5px;margin-bottom:14px;border:1px solid}
-.ctx--os{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue-tx)}
-.ctx--ar{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
-.ctx .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 8px;background:currentColor}
-
-/* announcement bar */
-.ann{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:6px;
-  padding:9px 12px;margin-bottom:14px;font-size:13px;color:var(--blue-tx)}
-.ann .l{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ann b{font-weight:600}
-.ann .lnk{color:var(--blue-tx);text-decoration:underline;cursor:pointer;background:none;border:0;font:inherit;padding:0}
-.ann .r{display:flex;gap:8px}
-
-.tb{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
-.search{flex:1;min-width:180px;max-width:320px;position:relative}
-.search input{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px 10px 7px 30px;font:inherit}
-.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
-.tb .sp{margin-left:auto;display:flex;gap:8px}
-.tablewrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:760px}
-th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);font-size:13px;vertical-align:middle}
-th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);font-weight:600;background:#fbfcfd}
-th .q{display:inline-block;width:13px;height:13px;line-height:13px;text-align:center;border-radius:50%;
-  background:var(--grey-line);color:#fff;font-size:9px;margin-left:5px;cursor:help;vertical-align:middle}
-tbody tr:hover{background:#fafcfd}
-tr.editing{background:#f2fbfc!important;box-shadow:inset 2px 0 0 var(--teal)}
-tr.removed td.path{text-decoration:line-through;color:var(--txt3)}
-tr.removed{background:#fdf7f7}
-tr.hl{animation:hl 1.4s ease-out}
-@keyframes hl{from{background:#e6f7f9}to{background:transparent}}
-td.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
-td.path input{width:100%;font-family:inherit;font-size:12.5px;border:1px solid var(--line);
-  border-radius:5px;padding:5px 8px}
-td.path input.bad{border-color:var(--red-line);background:var(--red-bg)}
-.err{color:var(--red-tx);font-size:11.5px;margin-top:3px;display:block}
-.chip{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:2px 8px;
-  font-size:11.5px;font-weight:600;border:1px solid}
-.chip .g{font-family:ui-monospace,monospace;opacity:.65;font-weight:400}
-.c-String{background:var(--grey-bg);border-color:var(--grey-line);color:var(--grey-tx)}
-.c-Number{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue-tx)}
-.c-Boolean{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
-.c-Object{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
-.st-ok{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
-.st-warn{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
-.st-bad{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
-.st-idle{background:var(--grey-bg);border-color:var(--grey-line);color:var(--grey-tx)}
-.badge{font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 6px;margin-left:6px;
-  background:var(--blue-bg);color:var(--blue-tx);border:1px solid var(--blue-line)}
-.badge--e{background:var(--amber-bg);color:var(--amber-tx);border-color:var(--amber-line)}
-.badge--r{background:var(--red-bg);color:var(--red-tx);border-color:var(--red-line)}
-td.tsel select{min-width:120px;padding:5px 26px 5px 8px;font-size:12.5px}
-.rowacts{text-align:right;white-space:nowrap;color:var(--txt3)}
-.rowacts button{border:0;background:transparent;cursor:pointer;color:var(--txt3);padding:3px 6px;border-radius:4px;font-size:13px}
-.rowacts button:hover{background:var(--grey-bg);color:var(--txt)}
-.rowacts .ok{color:var(--green-tx)}
-.pending{color:var(--txt3);font-size:11.5px;font-style:italic}
-@keyframes shimmer{0%{background-position:-420px 0}100%{background-position:420px 0}}
-.sk{display:block;height:12px;border-radius:4px;
-  background:linear-gradient(90deg,#eceff3 25%,#f6f8fa 50%,#eceff3 75%);
-  background-size:420px 100%;animation:shimmer 1.15s linear infinite}
-.sk--pill{height:18px;border-radius:5px}
-.sk--num{height:15px;width:38px;border-radius:4px}
-@media (prefers-reduced-motion:reduce){.sk,.hl{animation:none}}
-.fade{animation:fadein .22s ease-out}
-@keyframes fadein{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
-.legend{margin-top:18px;font-size:12.5px;color:var(--txt2)}
-.legend h3{font-size:13px;margin:14px 0 6px;color:var(--txt)}
-.legend li{margin-bottom:5px}
-kbd{background:var(--grey-bg);border:1px solid var(--grey-line);border-bottom-width:2px;
-  border-radius:4px;padding:0 5px;font-size:11px;font-family:inherit}
-dialog{border:1px solid var(--line);border-radius:var(--r);padding:0;max-width:540px;width:calc(100% - 32px)}
-dialog::backdrop{background:rgba(27,39,51,.35)}
-.dlg-h{padding:14px 16px;border-bottom:1px solid var(--line2);font-weight:600}
-.dlg-b{padding:14px 16px;max-height:52vh;overflow:auto}
-.dlg-f{padding:12px 16px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
-.dlg-b ul{margin:0;padding-left:18px}
-.dlg-b li{margin-bottom:6px;font-size:13px}
-.op{font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 6px;margin-right:6px}
-.op--add{background:var(--green-bg);color:var(--green-tx)}
-.op--upd{background:var(--amber-bg);color:var(--amber-tx)}
-.op--rem{background:var(--red-bg);color:var(--red-tx)}
-/* tabs */
-.tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line);padding:0 2px}
-.tab{border:0;background:transparent;font:inherit;color:var(--txt2);cursor:pointer;
-  padding:9px 14px;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px}
-.tab:hover{color:var(--txt)}
-.tab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
-.tab .n{background:var(--grey-bg);border-radius:20px;padding:0 7px;font-size:11px;font-weight:600;color:var(--txt2)}
-.tab.on .n{background:#d9f1f4;color:var(--teal)}
 [hidden]{display:none!important}
-/* explorer */
-.pop{display:flex;align-items:center;gap:7px}
-.bar{height:5px;border-radius:3px;background:var(--grey-bg);width:56px;overflow:hidden;flex:0 0 56px}
-.bar i{display:block;height:100%;background:var(--teal);border-radius:3px}
-.num{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--txt2)}
-.types{display:flex;gap:4px;flex-wrap:wrap}
-.resv{display:flex;align-items:center;gap:6px}
-.dash{color:var(--txt3)}
-.btn--xs{padding:3px 8px;font-size:12px}
-.warnrow{box-shadow:inset 2px 0 0 var(--amber-line)}
-.badrow{box-shadow:inset 2px 0 0 var(--red-line)}
-.srcnote{font-size:11px;color:var(--txt3);margin-top:8px}
-#etbody tr{cursor:pointer}
-#etbody tr:hover{background:#f2fbfc}
-#etbody tr:hover td.path{color:var(--teal)}
-.kp{display:inline-flex;align-items:center;gap:7px}
-.kp .go{opacity:0;font-size:11px;font-weight:600;color:var(--teal);white-space:nowrap;
-  border:1px solid var(--teal);border-radius:4px;padding:1px 6px;transition:opacity .12s}
-#etbody tr:hover .kp .go{opacity:1}
-/* reserve drawer */
-.scrim{position:fixed;inset:0;background:rgba(27,39,51,.35);z-index:70}
-.drw{position:fixed;top:0;right:0;bottom:0;width:430px;max-width:100%;background:#fff;z-index:71;
-  display:flex;flex-direction:column;box-shadow:-8px 0 28px rgba(27,39,51,.16);animation:slidein .18s ease-out}
-@keyframes slidein{from{transform:translateX(18px);opacity:.6}to{transform:none;opacity:1}}
-.drw-h{padding:15px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.drw-h h3{margin:0 0 3px;font-size:15px}
-.drw-h p{margin:0;font-size:12px;color:var(--txt3)}
-.drw-x{border:0;background:transparent;font-size:16px;color:var(--txt3);cursor:pointer;padding:2px 6px;border-radius:4px}
-.drw-x:hover{background:var(--grey-bg);color:var(--txt)}
-.drw-b{padding:18px;overflow:auto;flex:1}
-.drw-f{padding:13px 18px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
-.drw-l{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);margin:0 0 6px;font-weight:600}
-.drw-kp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;word-break:break-all;
-  background:var(--grey-bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
-.obs{display:flex;flex-direction:column;gap:7px}
-.obs-r{display:flex;align-items:center;gap:9px}
-.obs-r .bar{flex:1;width:auto}
-.obs-pc{font-variant-numeric:tabular-nums;font-size:12px;color:var(--txt2);width:38px;text-align:right}
-.tpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tp{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);
-  border-radius:6px;padding:9px 11px;cursor:pointer;background:#fff;font:inherit;text-align:left}
-.tp:hover{background:#f7f9fb}
-.tp.on{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal);background:#f2fbfc}
-.tp .obsd{font-size:10px;color:var(--teal);font-weight:600}
-.drw-sec{margin-bottom:20px}
-.cons{border-radius:6px;padding:10px 12px;font-size:12.5px;border:1px solid}
-.cons--ok{background:var(--green-bg);border-color:var(--green-line);color:var(--green-tx)}
-.cons--warn{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-tx)}
-.cons--bad{background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)}
-.cons b{font-weight:600}
-.vocab{margin-top:18px}
-.vocab h3{color:var(--txt)}
-.vtab th{background:#fbfcfd}
-.vtab td{vertical-align:top;color:var(--txt2);font-size:12.5px}
-.vtab td:first-child{vertical-align:middle}
-.vtab code{background:var(--grey-bg);border-radius:3px;padding:1px 4px;font-size:11.5px}
+body{margin:0;background:var(--c-background-surface-primary);color:var(--c-text-primary);
+  font:var(--f-subheading-reg);-webkit-font-smoothing:antialiased}
+.mono{font-family:'Inconsolata',ui-monospace,monospace}
 
-/* keypath suggestions - portalled to body, per the design-repo note that an
-   absolutely positioned panel inside a table cell is clamped to the row box */
-#sg{position:fixed;z-index:60;background:#fff;border:1px solid var(--line);
-  border-radius:6px;box-shadow:0 6px 20px rgba(27,39,51,.14);overflow:auto;max-height:246px;padding:4px}
-#sg[hidden]{display:none}
-.sg-o{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:6px 9px;border-radius:5px;cursor:pointer}
-.sg-o:hover,.sg-o.on{background:#f0fafb}
-.sg-o.on{box-shadow:inset 2px 0 0 var(--teal)}
-.sg-n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--txt);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sg-n b{background:#ffe9a8;font-weight:600;border-radius:2px}
-.sg-r{flex:0 0 auto}
-.sg-empty{padding:9px;color:var(--txt3);font-size:12.5px;text-align:center}
-.sg-hd{padding:5px 9px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
-  color:var(--txt3);border-bottom:1px solid var(--line2);margin-bottom:3px;
-  display:flex;justify-content:space-between}
+/* ── mockup chrome (not production) ───────────────────────────── */
+.mockbar{background:#0d3b44;color:#cfeef3;padding:8px 16px;font:var(--f-paragraph-reg);
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.mockbar b{color:#fff}
+.mockbar code{background:#14525e;color:#cfeef3}
+.mockbar .sp{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.mockbar button{background:#14525e;border:1px solid #1d6b79;color:#eaffff;border-radius:6px;
+  padding:3px 9px;font:var(--f-button);cursor:pointer}
+.mockbar button:hover{background:#1a6675}
+.newflag{display:inline-block;background:var(--mock);color:#fff;border-radius:4px;
+  padding:0 5px;font:var(--f-caption);margin-left:6px;vertical-align:middle}
+
+/* ── app shell ────────────────────────────────────────────────── */
+.app{max-width:1600px;margin:0 auto}
+.header{background:var(--c-background-card);padding:12px 16px 0;border-bottom:1px solid var(--c-border-subtle)}
+.header .row1{display:flex;align-items:center;margin-bottom:16px}
+h1{font:var(--f-page-title);margin:0}
+.olly{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c-border-subtle);
+  background:var(--c-background-card);border-radius:6px;padding:6px 10px;font:var(--f-button);cursor:pointer}
+.olly .ai{color:var(--c-text-ai)}
+.olly kbd{font:var(--f-caption);color:var(--c-text-secondary);border:1px solid var(--c-border-subtle);
+  border-radius:3px;padding:0 4px}
+nav.tabs{display:flex;align-items:center;gap:22px}
+nav.tabs a{display:inline-flex;align-items:center;gap:6px;padding:8px 2px 10px;font:var(--f-subheading-bold);
+  color:var(--c-text-secondary);text-decoration:none;cursor:pointer;border-bottom:2px solid transparent}
+nav.tabs a:hover{color:var(--c-text-primary)}
+nav.tabs a.active-link{color:var(--c-text-interactive);border-bottom-color:var(--c-border-interactive)}
+nav.tabs .learn{margin-left:auto;border:0;color:var(--c-text-interactive);font:var(--f-link);font-weight:600}
+.page{display:flex;flex-direction:column;gap:16px;padding:16px}
+.card{background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:8px}
+.filterbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;flex-wrap:wrap}
+.selectors{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.selectors .f{display:flex;align-items:center;gap:8px}
+.selectors label{font:var(--f-paragraph-bold)}
+select{appearance:none;background:var(--c-background-card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%2368686d' stroke-width='1.5'/></svg>") no-repeat right 10px center;
+  border:1px solid var(--c-border-strong);border-radius:6px;padding:6px 28px 6px 10px;
+  font:var(--f-paragraph-reg);color:var(--c-text-primary);min-width:135px;cursor:pointer;height:32px}
+select:focus,input:focus{outline:2px solid var(--c-border-interactive);outline-offset:-1px}
+.rightfilters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btngroup{display:inline-flex;background:var(--c-background-button-group);border:1px solid var(--c-border-subtle);
+  border-radius:6px;padding:2px}
+.btngroup button{border:0;background:transparent;border-radius:4px;padding:5px 12px;font:var(--f-button);
+  color:var(--c-text-secondary);cursor:pointer}
+.btngroup button.on{background:var(--c-background-button-group-asset-focus);color:var(--c-text-primary);
+  box-shadow:0 1px 2px #0e172a1a}
+
+.main-section{padding:16px;display:flex;flex-direction:column;gap:12px}
+h2.title{font:var(--f-section-title);margin:0}
+p.description{font:var(--f-paragraph-reg);color:var(--c-text-secondary);margin:6px 0 0;max-width:120ch}
+a.link{color:var(--c-text-interactive);font:var(--f-link);font-weight:600;text-decoration:none;cursor:pointer}
+a.link:hover{text-decoration:underline}
+.titlerow{display:flex;align-items:center;gap:8px}
+.cxui-tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:4px;
+  background:var(--c-tag-light-grey-bg);color:var(--c-tag-light-grey-text);font:var(--f-caption)}
+.caption{font:var(--f-caption);color:var(--c-text-secondary)}
+.i{display:inline-flex;width:14px;height:14px;border-radius:50%;border:1.3px solid var(--c-icon-primary);
+  color:var(--c-icon-primary);font:600 9px/12px 'Nunito Sans';align-items:center;justify-content:center;cursor:help;
+  flex:0 0 14px}
+.i.err{border-color:var(--c-icon-error);color:var(--c-icon-error)}
+
+/* ── buttons ──────────────────────────────────────────────────── */
+button.b{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;
+  font:var(--f-button);cursor:pointer;border:1px solid transparent;
+  background:var(--c-button-primary);color:var(--c-text-on-color)}
+button.b:hover:not(:disabled){background:var(--c-button-primary-hover)}
+button.b.outline{background:var(--c-background-card);color:var(--c-text-primary);border-color:var(--c-border-strong)}
+button.b.outline:hover:not(:disabled){background:var(--c-background-hover)}
+button.b.ghost{background:transparent;color:var(--c-text-primary)}
+button.b.ghost:hover:not(:disabled){background:var(--c-background-hover)}
+button.b:disabled{background:var(--c-button-disabled);color:var(--c-text-disabled);border-color:transparent;cursor:not-allowed}
+button.b.outline:disabled{background:var(--c-background-card);color:var(--c-text-disabled)}
+button.icon{border:0;background:transparent;cursor:pointer;color:var(--c-icon-primary);padding:4px;border-radius:4px;line-height:1}
+button.icon:hover{background:var(--c-background-hover);color:var(--c-text-primary)}
+
+/* ── grid ─────────────────────────────────────────────────────── */
+.grid{border:1px solid var(--c-border-subtle);border-radius:8px;overflow:hidden;background:var(--c-background-card)}
+.toolbar{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--c-border-subtle);flex-wrap:wrap}
+.search{position:relative;width:260px}
+.search input{width:100%;height:32px;border:1px solid var(--c-border-strong);border-radius:6px;
+  padding:0 10px 0 30px;font:var(--f-paragraph-reg)}
+.search input::placeholder{color:var(--c-text-placeholder)}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
+.filterby{position:relative}
+.filterby>button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:6px;
+  border:1px solid var(--c-border-subtle);background:var(--c-background-card);font:var(--f-button);cursor:pointer}
+.fbmenu{position:absolute;top:36px;left:0;z-index:40;background:var(--c-background-card);
+  border:1px solid var(--c-border-subtle);border-radius:8px;box-shadow:0 8px 24px #0e172a1f;padding:10px;width:260px}
+.fbmenu h4{margin:0 0 6px;font:var(--f-paragraph-bold)}
+.fbmenu label{display:flex;align-items:center;gap:6px;padding:3px 0;font:var(--f-paragraph-reg);cursor:pointer}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap}
+.fchip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:4px;
+  background:var(--c-tag-blue-bg);color:var(--c-tag-blue-text);font:var(--f-caption)}
+.fchip button{border:0;background:transparent;color:inherit;cursor:pointer;font-size:12px;line-height:1;padding:0}
+.toggle{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font:var(--f-paragraph-reg);cursor:pointer}
+.sw{width:32px;height:18px;border-radius:9px;background:var(--c-border-strong);position:relative;transition:.15s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s}
+.sw.on{background:var(--c-button-primary)}
+.sw.on::after{left:16px}
+.tablewrap{overflow:auto;max-height:560px}
+table{width:100%;border-collapse:collapse;min-width:1240px}
+th,td{text-align:left;padding:0 12px;height:40px;border-bottom:1px solid var(--c-border-subtle);
+  font:var(--f-paragraph-reg);vertical-align:middle;white-space:nowrap}
+th{position:sticky;top:0;z-index:2;background:var(--c-background-table-header);font:var(--f-paragraph-bold);
+  color:var(--c-text-secondary);height:36px}
+th .hh{display:inline-flex;align-items:center;gap:5px}
+th.sortable{cursor:pointer}
+th .arrow{color:var(--c-icon-interactive);font-size:10px}
+td.num,th.num{text-align:right;font:var(--f-code-sm-reg)}
+tbody tr:hover{background:var(--c-background-hover)}
+tbody tr.clickable{cursor:pointer}
+td.kp{font:var(--f-code-sm-reg)}
+td.kp .copy{visibility:hidden;margin-left:6px}
+tr:hover td.kp .copy{visibility:visible}
+.twisty{display:inline-flex;width:14px;justify-content:center;color:var(--c-icon-primary);cursor:pointer;margin-right:4px}
+.badge{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:4px;font:var(--f-caption)}
+.badge.green{background:var(--c-tag-green-bg);color:var(--c-tag-green-text)}
+.badge.yellow{background:var(--c-tag-yellow-bg);color:var(--c-tag-yellow-text)}
+.badge.grey{background:var(--c-tag-grey-bg);color:var(--c-tag-grey-text)}
+.badge.red{background:var(--c-tag-red-bg);color:var(--c-tag-red-text)}
+.badge.blue{background:var(--c-tag-blue-bg);color:var(--c-tag-blue-text)}
+.tchip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px;border-radius:4px;
+  background:var(--c-tag-light-grey-bg);color:var(--c-tag-light-grey-text);font:var(--f-caption);margin-right:4px}
+.tchip .g{opacity:.6;font-family:'Inconsolata',monospace;font-weight:400}
+.overflow{color:var(--c-text-secondary);font:var(--f-caption)}
+.spark{display:block}
+.issuecell{display:inline-flex;align-items:center;gap:4px;color:var(--c-text-primary)}
+.empty{padding:48px 16px;text-align:center;color:var(--c-text-secondary)}
+.empty h3{font:var(--f-subheading-bold);color:var(--c-text-primary);margin:0 0 4px}
+.empty p{font:var(--f-paragraph-reg);margin:0 auto;max-width:52ch}
+.skel{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,#f1f3f7 25%,#f8fafc 50%,#f1f3f7 75%);
+  background-size:420px 100%;animation:sh 1.1s linear infinite}
+@keyframes sh{0%{background-position:-420px 0}100%{background-position:420px 0}}
+
+/* counters + banner */
+.counter{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--c-border-subtle);
+  border-radius:6px;font:var(--f-paragraph-reg);background:var(--c-background-card)}
+.counter b{font:var(--f-paragraph-bold)}
+.unsaved{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:6px;
+  background:var(--c-background-info);border:1px solid #cfe3fb;padding:8px 10px}
+.unsaved .l{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:var(--f-paragraph-reg)}
+.unsaved .r{display:flex;gap:8px}
+
+/* tooltip */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;z-index:60;left:0;top:calc(100% + 6px);
+  background:var(--c-background-card);color:var(--c-text-primary);border:1px solid var(--c-border-subtle);
+  box-shadow:0 8px 24px #0e172a1f;border-radius:6px;padding:8px 10px;font:var(--f-paragraph-reg);
+  width:280px;white-space:normal}
+
+/* drawer + dialog */
+.scrim{position:fixed;inset:0;background:var(--c-background-overlay);z-index:80}
+.drw{position:fixed;top:0;right:0;bottom:0;width:min(720px,94vw);background:var(--c-background-card);z-index:81;
+  display:flex;flex-direction:column;box-shadow:-8px 0 30px #0e172a26}
+.drw-h{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--c-border-subtle)}
+.drw-h h3{margin:0;font:var(--f-section-title)}
+.drw-h p{margin:2px 0 0;font:var(--f-code-sm-reg);color:var(--c-text-secondary)}
+.drw-tabs{display:flex;gap:18px;padding:0 16px;border-bottom:1px solid var(--c-border-subtle)}
+.drw-tabs button{border:0;background:transparent;padding:10px 2px;font:var(--f-subheading-bold);
+  color:var(--c-text-secondary);cursor:pointer;border-bottom:2px solid transparent}
+.drw-tabs button.on{color:var(--c-text-interactive);border-bottom-color:var(--c-border-interactive)}
+.drw-b{padding:16px;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.meta div{border:1px solid var(--c-border-subtle);border-radius:6px;padding:8px 10px}
+.meta span{display:block;font:var(--f-caption);color:var(--c-text-secondary)}
+.meta b{font:var(--f-subheading-bold)}
+.aibox{border:1px solid var(--c-border-subtle);border-radius:6px;padding:10px}
+.aibox .hd{display:flex;align-items:center;gap:6px;font:var(--f-paragraph-bold);color:var(--c-text-ai)}
+.dlg{position:fixed;z-index:81;top:50%;left:50%;transform:translate(-50%,-50%);width:min(680px,94vw);
+  background:var(--c-background-card);border-radius:10px;box-shadow:0 20px 60px #0e172a40;display:flex;flex-direction:column}
+.dlg-h{padding:14px 16px;border-bottom:1px solid var(--c-border-subtle);font:var(--f-section-title)}
+.dlg-b{padding:16px;max-height:60vh;overflow:auto}
+.dlg-f{padding:12px 16px;border-top:1px solid var(--c-border-subtle);display:flex;justify-content:flex-end;gap:8px}
+
+/* inline edit */
+tr.editing{background:#f3fbf6}
+td .inp{width:100%;height:28px;border:1px solid var(--c-border-strong);border-radius:5px;padding:0 8px;
+  font:var(--f-code-sm-reg)}
+td .inp.bad{border-color:var(--c-border-error);background:var(--c-background-error)}
+.sugg{position:absolute;z-index:50;background:var(--c-background-card);border:1px solid var(--c-border-subtle);
+  border-radius:6px;box-shadow:0 8px 24px #0e172a1f;min-width:320px;max-height:220px;overflow:auto}
+.sugg div{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;font:var(--f-code-sm-reg);cursor:pointer}
+.sugg div.on,.sugg div:hover{background:var(--c-background-grey-reg)}
+.rowacts{text-align:right}
+.err{color:var(--c-text-error);font:var(--f-caption)}
+
+/* proposal UI inside the parity screens — dotted teal marks what is NOT production */
+.prop{box-shadow:inset 2px 0 0 var(--mock)}
+th.prop .hh{color:var(--mock)}
+.newflag.sm{font:600 9px/14px 'Nunito Sans';padding:0 4px}
+.freshchip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:4px;
+  background:#e8f6f8;color:#0b5a66;font:var(--f-caption);border:1px solid #bfe4ea}
+.stale{color:var(--mock);font:var(--f-caption);display:inline-flex;align-items:center;gap:4px}
+.bulkbar{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#eef8fa;
+  border-bottom:1px solid #bfe4ea;font:var(--f-paragraph-reg)}
+.bulkbar b{font:var(--f-paragraph-bold)}
+.bulkbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
+.drw-note{border:1px dashed var(--mock);border-radius:6px;padding:10px;background:#f4fbfc;font:var(--f-paragraph-reg)}
+.pctbar{height:6px;border-radius:3px;background:var(--c-background-grey-hover);overflow:hidden;margin-top:4px}
+.pctbar i{display:block;height:100%;background:#5095ed}
+
+/* export / import dialog bits */
+.legendrow{font:var(--f-paragraph-bold);margin:14px 0 6px}
+.radgroup{display:flex;gap:10px;flex-wrap:wrap}
+.radcard{flex:1;min-width:170px;display:flex;gap:8px;align-items:flex-start;border:1px solid var(--c-border-strong);
+  border-radius:8px;padding:10px;cursor:pointer;font:var(--f-paragraph-reg)}
+.radcard.on{border-color:var(--c-border-interactive);background:var(--c-background-success)}
+.radcard.off{opacity:.5;cursor:not-allowed}
+.radcard .dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--c-border-strong);flex:0 0 14px;margin-top:2px}
+.radcard.on .dot{border:4px solid var(--c-border-interactive)}
+.codewrap{display:flex;border:1px solid var(--c-border-strong);border-radius:6px;overflow:hidden;height:230px}
+.gutter{background:var(--c-background-grey-reg);color:var(--c-text-placeholder);font:var(--f-code-sm-reg);
+  padding:8px 6px;text-align:right;user-select:none;overflow:hidden;min-width:34px}
+.codewrap textarea{flex:1;border:0;resize:none;padding:8px;font:var(--f-code-sm-reg);outline:none;white-space:pre;overflow:auto}
+.sbs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dupe{color:var(--c-tag-yellow-text)}
+
+/* proposal section */
+.proposal{border-top:3px solid var(--mock);margin-top:8px}
+.proposal .flagline{background:#e8f6f8;color:#0b5a66;padding:10px 16px;font:var(--f-paragraph-bold)}
+.vtab td,.vtab th{white-space:normal;height:auto;padding:8px 12px;vertical-align:top}
+.note{border:1px solid var(--c-border-subtle);border-left:3px solid var(--mock);border-radius:6px;
+  padding:10px 12px;font:var(--f-paragraph-reg);color:var(--c-text-secondary);background:var(--c-background-card)}
+.note b{color:var(--c-text-primary)}
+.legend h3{font:var(--f-subheading-bold);margin:16px 0 6px}
+.legend ul{margin:0;padding-left:18px}
+.legend li{font:var(--f-paragraph-reg);color:var(--c-text-secondary);margin-bottom:4px}
+.legend li b{color:var(--c-text-primary)}
+kbd{border:1px solid var(--c-border-strong);border-radius:4px;padding:0 4px;font:var(--f-caption);background:var(--c-background-grey-reg)}
+code{font-family:'Inconsolata',monospace;background:var(--c-background-grey-reg);border-radius:3px;padding:0 3px}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="note">
-    <h1>Reserved Fields — dataspace-aware table</h1>
-    <p>Mockup only. Built from <code>cx-web-workspace@dbd08c4db</code> and <code>internal-cx-web-workspace-design@c9346d52</code>. Three proposals on top of what ships: <b>skeleton loading on dataset change</b>, a <b>status column in Schema explorer that follows the storage engine</b>, and <b>add and edit a keypath inline</b>.</p>
-    <p>The edit flow implements the three known defects as fixed: Cancel restores name <i>and</i> type (CX-57950), a no-op Save is not counted as a change (CX-57951), and a suggested type is adopted only when you have not set one yourself (CX-57952).</p>
-  </div>
+<div class="mockbar">
+  <b>Mockup — Schema Manager production parity.</b>
+  <span>Parity built from <code>cx-web-workspace@c3528d2d6</code> (16-09), tokens from <code>internal-cx-web-workspace-design@2381a6f5</code>. Labels, columns and tooltips are the shipped i18n strings. Anything marked <span class="newflag sm">new</span> is a 16-09 proposal, not production.</span>
+  <span class="sp">
+    <button id="mReplay">Replay loading</button>
+    <button id="mSlow">Slow network</button>
+    <button id="mEmpty">Empty state</button>
+    <button id="mReset">Reset data</button>
+  </span>
+</div>
 
-  <div class="controls">
-    <span>Demo:</span>
-    <button class="btn" id="replay">Replay loading</button>
-    <button class="btn" id="slow">Slow network (2.5s)</button>
-    <button class="btn" id="reseed">Reset data</button>
-  </div>
-
-  <div class="card topbar">
-    <div class="selectors">
-      <div class="fld"><label for="ds">Dataspace</label><select id="ds"></select></div>
-      <div class="fld"><label for="dt">Dataset</label><select id="dt"></select></div>
+<div class="app">
+  <div class="header">
+    <div class="row1">
+      <h1>Schema Manager</h1>
+      <button class="olly"><span class="ai">✦</span> Olly AI <kbd>⌘I</kbd></button>
     </div>
-    <div class="topactions" id="topactions"></div>
+    <nav class="tabs">
+      <a id="tabExp" class="active-link"><span>▦</span> Schema explorer</a>
+      <a id="tabRes"><span>⭳</span> Reserved fields</a>
+      <a class="link learn" href="https://coralogix.com/docs/user-guides/data-layer/schema-management/" target="_blank">Learn more ↗</a>
+    </nav>
   </div>
 
-  <div class="tabs">
-    <button class="tab" id="tabExp"><span>Schema explorer</span><span class="n" id="nExp">0</span></button>
-    <button class="tab on" id="tabRes"><span>Reserved fields</span><span class="n" id="nRes">0</span></button>
-  </div>
-
-  <div class="card main" id="paneExp" hidden>
-    <div class="hd"><h2>Schema explorer</h2></div>
-    <p class="desc" id="expDesc">—</p>
-    <div class="ctx" id="expCtx"></div>
-    <div class="card" style="overflow:hidden">
-      <div class="tb">
-        <div class="search">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#8496a8" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#8496a8" stroke-width="1.6"/></svg>
-          <input placeholder="Search keypath" id="eq">
-        </div>
-        <div class="sp">
-          <button class="btn btn--sm" id="fOnlyIssues">Only fields with an issue</button>
-          <button class="btn btn--sm" id="fOnlyUnres">Only unreserved</button>
-        </div>
+  <!-- ══════════ SCHEMA EXPLORER ══════════ -->
+  <div class="page" id="paneExp">
+    <div class="card filterbar">
+      <div class="selectors">
+        <div class="f"><label for="eDs">Dataspace</label><select id="eDs"></select></div>
+        <div class="f"><label for="eDt">Dataset</label><select id="eDt"></select></div>
       </div>
-      <div class="tablewrap"><table><thead id="ethead"></thead><tbody id="etbody"></tbody></table></div>
-    </div>
-    <p class="srcnote" id="expSrc"></p>
-  </div>
-
-  <div class="card main" id="paneRes">
-    <div class="hd">
-      <h2>Reserved Fields</h2>
-      <span class="tag" id="count">—</span>
-      <span class="lim">/ <span id="limit">12</span></span>
-    </div>
-    <p class="desc" id="desc">—</p>
-    <div class="ctx" id="ctx"></div>
-    <div id="annwrap"></div>
-
-    <div class="card" style="overflow:hidden">
-      <div class="tb">
-        <div class="search">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#8496a8" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#8496a8" stroke-width="1.6"/></svg>
-          <input placeholder="Search field" id="q">
+      <div class="rightfilters">
+        <div class="btngroup" id="gran">
+          <button data-g="daily" class="on">Daily</button>
+          <button data-g="weekly">Weekly</button>
+          <button data-g="monthly">Monthly</button>
         </div>
-        <div class="sp">
-          <button class="btn btn--ghost" id="del" disabled>Delete</button>
-          <button class="btn" id="bulk">Add in bulk</button>
-          <button class="btn btn--primary" id="add">Add</button>
-        </div>
-      </div>
-      <div class="tablewrap">
-        <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+        <select id="startDate" style="min-width:210px"></select>
       </div>
     </div>
 
-    <div class="legend">
-      <h3>Add and edit</h3>
+    <div class="card main-section">
+      <div>
+        <div class="titlerow">
+          <h2 class="title" id="expTitle">default/logs</h2>
+          <span class="freshchip" id="freshChip">snapshot</span>
+          <span class="newflag sm">new</span>
+        </div>
+        <p class="description">
+          The data shown is calculated and summarized daily at 00:00 UTC. Report generation can take several hours and may not be available until later.
+          <a class="link" href="https://coralogix.com/docs/user-guides/data-layer/schema-management/schema-explorer/" target="_blank">Learn more ↗</a>
+        </p>
+        <p class="description" id="engineNote"></p>
+      </div>
+
+      <div class="grid">
+        <div class="toolbar">
+          <div class="search">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#68686d" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#68686d" stroke-width="1.6"/></svg>
+            <input id="eq" placeholder="Search table">
+          </div>
+          <div class="filterby">
+            <button id="fbBtn"><span style="color:var(--c-icon-primary)">⌄⌃</span> Filtered by <span style="color:var(--c-text-interactive);font-size:14px">+</span></button>
+            <div class="fbmenu" id="fbMenu" hidden>
+              <h4 id="fbStatusTitle">Mapping status</h4>
+              <div id="fbStatus"></div>
+              <h4 style="margin-top:10px">Type</h4>
+              <div id="fbTypes"></div>
+              <h4 style="margin-top:10px">Reserved <span class="newflag sm">new</span></h4>
+              <label><input type="checkbox" class="fre" value="yes"> Reserved</label>
+              <label><input type="checkbox" class="fre" value="no"> Not reserved</label>
+            </div>
+          </div>
+          <div class="chiprow" id="fbChips"></div>
+          <label class="toggle"><span>Flat view</span><span class="sw" id="flatSw"></span></label>
+        </div>
+        <div class="tablewrap">
+          <table id="eTable">
+            <thead id="ethead"></thead>
+            <tbody id="etbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ RESERVED FIELDS ══════════ -->
+  <div class="page" id="paneRes" hidden>
+    <div class="card filterbar">
+      <div class="selectors">
+        <div class="f"><label for="rDs">Dataspace</label><select id="rDs"></select></div>
+        <div class="f"><label for="rDt">Dataset</label><select id="rDt"></select></div>
+      </div>
+      <div class="rightfilters" id="rfActions"></div>
+    </div>
+
+    <div class="card main-section">
+      <div>
+        <div class="titlerow">
+          <h2 class="title">Reserved fields</h2>
+          <span class="cxui-tag" id="rfCount">0</span>
+          <span class="caption">/ <span id="rfLimit">100</span></span>
+          <span class="i" data-tip="Refers to the number of explicitly reserved fields. Newly added fields are applied at 00:00 UTC.">i</span>
+        </div>
+        <p class="description">
+          Reserved fields allow you to prioritize specific fields in your ingested data for querying and monitoring, ensuring they are available for investigative purposes.
+          <a class="link" href="https://coralogix.com/docs/user-guides/data-layer/schemas/reserved-fields/" target="_blank">Learn more ↗</a>
+        </p>
+      </div>
+
+      <div id="unsavedWrap"></div>
+
+      <div class="grid">
+        <div class="toolbar">
+          <div class="search">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#68686d" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#68686d" stroke-width="1.6"/></svg>
+            <input id="rq" placeholder="Search Table">
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center" id="rfToolbar">
+            <button class="b ghost" id="rfDelete" disabled>🗑 Delete</button>
+            <button class="b ghost" id="rfImport">⭱ Import fields <span class="newflag sm">new</span></button>
+            <button class="b ghost" id="rfExport">⭳ Export list <span class="newflag sm">new</span></button>
+            <button class="b ghost" id="rfBulk">Add in bulk</button>
+            <button class="b" id="rfAdd">＋ Add field</button>
+          </div>
+        </div>
+        <div id="bulkBar"></div>
+        <div class="tablewrap">
+          <table id="rTable" style="min-width:820px">
+            <thead id="rthead"></thead>
+            <tbody id="rtbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROPOSALS — NOT IN PRODUCTION ══════════ -->
+<div class="app proposal">
+  <div class="flagline">Below this line: proposals and open questions. Nothing here ships today.</div>
+  <div class="page">
+
+    <div class="card main-section">
+      <h2 class="title">Amnon, 16-09 — the asks <span class="newflag">drawn above</span></h2>
+      <p class="description">Everything marked <span class="newflag sm">new</span> in the screens above is one of these. Nothing here ships today, and nothing here has a ticket unless the row says so.</p>
+      <div class="tablewrap"><table class="vtab" style="min-width:0">
+        <thead><tr><th style="width:210px">Ask</th><th>What it changes</th><th style="width:130px">Drawn above</th><th style="width:170px">Where it lands</th></tr></thead>
+        <tbody>
+          <tr><td><b>Bulk change type</b></td>
+            <td>Reserved fields already has bulk add with a type and bulk delete. Changing the type of rows that exist is one row at a time. The room called this UX work, not backend work. A customer converting a union to text had to walk the list.</td>
+            <td>✅ Selection bulk bar + a preview dialog listing from-type and to-type per row.</td>
+            <td>Reserved fields grid. No ticket names it.</td></tr>
+          <tr><td><b>Reserved status in Schema explorer</b></td>
+            <td>Show whether a keypath is reserved from the explorer, so a user who hits a type error is routed to the Reserved fields screen instead of guessing. Carries the declared type, and flags it when the declaration disagrees with what the data did.</td>
+            <td>✅ Reserved column, a Reserved / Not reserved filter, and a reserve action in the row menu.</td>
+            <td>Explorer grid. The Reserved fields half of the status column is CX-58841.</td></tr>
+          <tr><td><b>Status column follows the storage engine</b><div class="caption" style="margin-top:3px">carried over from the 15-09 mockup</div></td>
+            <td>default and system are the S3 archive, frequentsearch is OpenSearch. In the archive the question is whether the field has its own parquet column, so the column reads <b>Column status</b> with Materialized / Unmaterialized / Union type. Mapping exceptions do not exist there, so that column is removed rather than left empty: an empty column reads as "none today", which is not what it means.</td>
+            <td>✅ Column, filter vocabulary and the Mapping Exceptions column all switch with the dataspace.</td>
+            <td>Explorer grid. Needs backend: only Union type is derivable on the client today.</td></tr>
+          <tr><td><b>Snapshot freshness marker</b></td>
+            <td>The grid is yesterday's aggregation. Reserve a field or change a type now and nothing on this screen moves until the next run. A "currently mapped" marker was the suggestion in the room.</td>
+            <td>✅ Snapshot chip in the header, counting what was declared after it, plus a per-row "not in this snapshot" line.</td>
+            <td>Explorer header + Reserved column.</td></tr>
+          <tr><td><b>Materialized / unmaterialized is visible</b><div class="caption" style="margin-top:3px">"the transition mode between un-materialized and materialized"</div></td>
+            <td>The state a user moves a field into by reserving it. Today nothing on the screen names it.</td>
+            <td>✅ Column status in the archive dataspaces, and the reserve drawer states what the declaration will do.</td>
+            <td>Explorer grid. Needs backend for the real value.</td></tr>
+          <tr><td><b>Route union-type errors to this screen</b><div class="caption" style="margin-top:3px">"following the errors, you send them to this screen"</div></td>
+            <td>The union-type parsing fix shipped last month, so customers now see the error. The ask is that the error itself carries them to Reserved fields instead of leaving them to find it.</td>
+            <td>❌ <b>Not drawn, and the biggest gap.</b> The explorer now shows reserved state and offers the reserve action, but that only helps a user already on this screen. The entry point from the error is CX-56997, and it is blocked on which surface hosts it: Explore, Dashboards, RUM or the query builder.</td>
+            <td>Not this screen. CX-56997, decision owed by Yoni and Ievgen.</td></tr>
+          <tr><td><b>"Why do I need two tabs?"</b></td>
+            <td>The explorer is observation over a time range, Reserved fields is a declaration with no time. The separation is real, but nothing on screen explains it.</td>
+            <td>◐ Partly. The Reserved column removes most of the tab-switching, and the drawer says what a declaration does. The wording that explains the split is not written.</td>
+            <td>Explorer + Reserved fields copy. Docs question for Maya too.</td></tr>
+          <tr><td><b>Reserved status inside the snapshot</b></td>
+            <td>Enrich the Context Structure report with reserved status so the explorer does not need a second source. Answered as a good point that needs checking.</td>
+            <td>❌ Backend. The Reserved column above reads the Reserved fields tab, which is the second source this would remove.</td>
+            <td>schema-store report, Cont Structure.</td></tr>
+          <tr><td><b>Object as a declarable type</b></td>
+            <td>Production lets you declare String, Number and Boolean only. Object is drawn in the design repo and is the type that touches the union-type problem.</td>
+            <td>❌ Kept out on purpose, so the type lists above match production.</td>
+            <td>Reserved fields type cell. No ticket names it.</td></tr>
+          <tr><td><b>Export list</b></td>
+            <td>A dialog, not a straight download, because what gets exported is otherwise invisible: someone who searched the table cannot tell whether they got the filtered list or all of it without opening the file. Format CSV or JSON, an editable name with a fixed extension, and a row scope that states its own count. JSON round-trips into Import.</td>
+            <td>✅ Built to the design-repo spec, including the unsaved-changes choice and the committed-baseline export.</td>
+            <td>Reserved fields toolbar. CX-53272 / CX-53270 under CX-58841.</td></tr>
+          <tr><td><b>Import fields</b></td>
+            <td>Paste JSON, extract, review side by side, pick rows, set types, add as unsaved. Defaults from the 2025 user story: everything selected, String when the type is missing or unknown, Next off until the JSON parses, Add to list off until something is picked, counter against the team quota.</td>
+            <td>✅ Two-step dialog. Nested objects are walked into keypaths, so a pasted sample event works. Duplicates are shown disabled instead of dropped, and file upload feeds the same parser.</td>
+            <td>Reserved fields toolbar. Old tickets CX-105 / CX-114 are Cancelled, CTDL-779 carries the story. No live ticket.</td></tr>
+          <tr><td><b>Cardinality column on Reserved fields</b></td>
+            <td>Production lists Field Name, Type and Cardinality. Cardinality is an observation over a time range, and this screen is a declaration, so it does not belong next to a keypath and a type.</td>
+            <td>✅ Removed, 16-09 call.</td>
+            <td>Reserved fields grid.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card main-section legend">
+      <h2 class="title">Status vocabulary — Schema explorer only</h2>
+      <p class="description">These values live on the <b>Schema explorer</b> tab. The Reserved fields tab has no status column: it is configuration, and a declaration is the same wherever the data is stored. One keypath can be healthy in one dataspace and broken in the other, because Frequent Search is OpenSearch and the rest is the S3 archive, so the column says what <i>this</i> engine did with it.</p>
+
+      <h3>What <code>$d</code> is</h3>
+      <p class="description"><code>$d</code> is the DataPrime data root: the whole raw event stored as one object. Any field without its own column still lives inside it. Reading one field out of <code>$d</code> means reading the whole event and digging the field out, for every row. That is the cost CX-44928 is about.</p>
+
+      <h3>Archive — <code>default</code> and <code>system</code></h3>
+      <div class="tablewrap"><table class="vtab" style="min-width:0">
+        <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge green">Materialized</span></td>
+            <td>The field has its own parquet column. The engine reads only that column.</td>
+            <td>Already fixed. This is the state reserving aims at.</td><td>none</td></tr>
+          <tr><td><span class="badge yellow">Unmaterialized</span></td>
+            <td>The field has no parquet column, so it is read out of <code>$d</code>. It could have had one: the budget of roughly 5,000 columns ran out and it was dropped.</td>
+            <td><b>Yes.</b> A reserved field is guaranteed a column in new data.</td>
+            <td>🔴 <b>No.</b> Only reachable as the query-time warning <code>fieldsExceedingColumnLimit</code>, per query, not per field.</td></tr>
+          <tr><td><span class="badge yellow">Union type</span></td>
+            <td>The field arrives as an object in some events and a scalar in others. A parquet column needs one type, so it cannot have one.</td>
+            <td><b>Only partly.</b> No column appears. Reserving forces a cast at read time, and values that cannot cast return <code>null</code>.</td>
+            <td>🟢 <b>Yes.</b> <code>ObservationGroup.observations</code> is a repeated field, so one keypath returning several types is a union we can detect on the client.</td></tr>
+          <tr><td><span class="badge red">Type mismatch</span></td>
+            <td>The data arrives as one type and you declared another. The field is read as you declared it.</td>
+            <td>Not a fix. It means your declaration and the data disagree, so check which one is wrong.</td>
+            <td>🟢 <b>Yes.</b> Compare the declared type on the reserved record against <code>Observation.data_type</code>.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>OpenSearch — <code>frequentsearch</code> (this vocabulary is the one that ships)</h3>
+      <div class="tablewrap"><table class="vtab" style="min-width:0">
+        <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge green">Mapped</span></td>
+            <td>OpenSearch holds a mapping for the field and indexes it normally.</td>
+            <td>Already fixed.</td><td>🟢 Ships today as <b>Mapping status</b>.</td></tr>
+          <tr><td><span class="badge yellow">Partially mapped</span></td>
+            <td>Indexed for part of the time range.</td>
+            <td><b>Yes</b> for the keypath you reserve.</td><td>🟢 Ships today.</td></tr>
+          <tr><td><span class="badge grey">Unmapped</span></td>
+            <td>No mapping exists for the keypath in the selected range.</td>
+            <td><b>Yes.</b> Reserving writes the field into the index mapping.</td><td>🟢 Ships today.</td></tr>
+          <tr><td><span class="badge red">Mapping exception</span></td>
+            <td>Multiple applications sent the same field with different data types.</td>
+            <td>Not on its own. Fix the declared type, or fix the data.</td>
+            <td>🟡 Ships as a <b>count</b> per keypath (Mapping Exceptions column), plus a dataset-level counter on the Reserved fields tab.</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="note" style="margin-top:14px"><b>Most of the archive column has no data source today. Verified 15-09 against the schema-store protos.</b>
+        The reserved record (<code>SchemaTemplateField</code>) holds a path and a type, nothing else. <code>Observation</code> holds type, cardinality, occurrences and values, and no column or mapping status. So only <b>Union type</b> and <b>Type mismatch</b> are derivable on the client right now. Materialized and Unmaterialized need backend work that nobody has scoped.</div>
+
+      <div class="note" style="margin-top:10px"><b>Why the Reserved fields tab has no status column.</b> Reserving a field is a declaration: a keypath and a type. It is the same statement whatever the engine does with it afterwards. What the data actually did is an observation over a time range, which is the explorer's job. It is also the reason a reserved field cannot be merged into the snapshot as it stands: the snapshot is dated, the declaration is not.</div>
+
+      <div class="note" style="margin-top:10px"><b>The asymmetry worth remembering.</b> A union field is rejected outright by OpenSearch as a mapping exception, and read correctly but slowly by the archive. Same field, same data, two different failures. That is why one column name cannot serve both dataspaces.</div>
+
+      <p class="description" style="margin-top:12px"><b>Unmaterialized is the state Amnon wants to remove.</b> A reserved field can still lose its column today when the column budget runs out. His ask on 14-09 was that reserved fields go in first, before the popularity ranking. If that ships, this chip should never appear on a reserved field again, which makes it a way to check whether the change worked.</p>
+
+      <h3>Add and edit — the fixes in CX-57950 / CX-57951 / CX-57952</h3>
       <ul>
-        <li><kbd>Add</kbd> puts a new row at the top in edit mode. Type a keypath, pick a type, confirm with <kbd>Enter</kbd> or the tick.</li>
+        <li><kbd>Add field</kbd> puts a new row at the top in edit mode. Type a keypath, pick a type, confirm with <kbd>Enter</kbd> or the tick.</li>
         <li>The keypath box opens a list under it: the observed field on the left, the type it was seen as on the right. Arrow keys move, <kbd>Enter</kbd> picks, <kbd>Esc</kbd> closes.</li>
-        <li>Picking a suggestion fills the type <b>only if you have not chosen a type yourself</b>.</li>
-        <li><kbd>Esc</kbd> or the cross cancels and restores the row exactly as it was, type included.</li>
-        <li>Remove marks the row <b>Removed</b> and keeps it, so Revert can bring it back. Nothing leaves until you Save.</li>
-        <li>A row you edit back to its original values is not counted as a change.</li>
-      </ul>
-      <h3>What changes with the dataspace</h3>
-      <ul>
-        <li><b>On this tab, nothing but the header.</b> <kbd>Reset index</kbd> and the ingest counters appear for <b>frequentsearch</b> only. The table itself is the same everywhere, because a declaration does not depend on where the data is stored.</li>
-        <li><b>In Schema explorer</b>, the status column follows the engine: <b>Mapping status</b> for frequentsearch, <b>Column status</b> for default and system. Values are explained below.</li>
-        <li>Switch dataspace on the explorer tab and watch <code>message</code>. The same field is a <b>Union type</b> in the archive and a <b>Mapping exception</b> in OpenSearch. The archive reads it slowly, OpenSearch rejects it.</li>
-      </ul>
-      <h3>Two tabs, two jobs</h3>
-      <ul>
-        <li><b>Reserved fields</b> is configuration. It is static: a keypath and the type you declare for it. It is what you intend.</li>
-        <li><b>Schema explorer</b> is observation. It is dynamic: what the data actually did, per dataset, over a time range. It is where status belongs, and where the problem is visible.</li>
-        <li>So <b>Reserve this field</b> lives in the explorer, next to the problem, and writes into the configuration tab. That is CX-56997 in one screen.</li>
-        <li>And there is <b>no status column on the Reserved fields tab</b>. It holds a keypath and a type, which is all a declaration is.</li>
-      </ul>
-      <h3>Reserve from the explorer</h3>
-      <ul>
-        <li><b>Click any row in Schema explorer</b> to reserve that field. The row is the target; the <kbd>Reserve</kbd> button in the Reserved column does the same thing for anyone who scans by column.</li>
-        <li>It opens a drawer. It is a confirm step, not a one-click write.</li>
-        <li>It shows every type the keypath was observed as, with the <b>share of events</b> for each, and lets you <b>set or override</b> the declared type.</li>
-        <li>The drawer states the cost of the choice before you commit it. Declaring <code>message</code> as String says <b>13% of values will be read as null</b>, because reserving forces a cast and Object cannot cast to String.</li>
-        <li>An already reserved row offers <kbd>Change</kbd>, which opens the same drawer to override the type.</li>
-        <li>Confirming writes an unsaved change into the Reserved fields tab. Nothing reaches the server until you Save there.</li>
-      </ul>
+        <li>Picking a suggestion fills the type <b>only if you have not chosen a type yourself</b> (CX-57952).</li>
+        <li><kbd>Esc</kbd> or the cross cancels and restores the row exactly as it was, type included (CX-57950).</li>
+        <li>A row you edit back to its original values is not counted as a change (CX-57951).</li>
+        <li>Remove marks the row and keeps it, so Revert can bring it back. Nothing leaves until you Save.</li>
       </ul>
     </div>
   </div>
 </div>
 
-<div class="card main vocab">
-  <h2 style="margin:0 0 4px;font-size:16px">Status vocabulary — Schema explorer only</h2>
-  <p class="desc">These values live on the <b>Schema explorer</b> tab. The Reserved fields tab has no status column: it is configuration, and a declaration is the same wherever the data is stored. One keypath can be healthy in one dataspace and broken in the other, because Frequent Search is OpenSearch and the rest is the S3 archive, so the column says what <i>this</i> engine did with it.</p>
-
-  <h3 style="font-size:13px;margin:16px 0 6px">What <code>$d</code> is</h3>
-  <p class="desc"><code>$d</code> is the DataPrime data root: the whole raw event stored as one object. Any field without its own column still lives inside it. Reading one field out of <code>$d</code> means reading the whole event and digging the field out, for every row. That is the cost CX-44928 is about.</p>
-
-  <h3 style="font-size:13px;margin:18px 0 6px">Archive — <code>default</code> and <code>system</code></h3>
-  <div class="tablewrap"><table class="vtab">
-    <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
-    <tbody>
-      <tr><td><span class="chip st-ok">Materialized</span></td>
-        <td>The field has its own parquet column. The engine reads only that column.</td>
-        <td>Already fixed. This is the state reserving aims at.</td><td>none</td></tr>
-      <tr><td><span class="chip st-warn">Unmaterialized</span></td>
-        <td>The field has no parquet column, so it is read out of <code>$d</code>. It could have had one: the budget of roughly 5,000 columns ran out and it was dropped.</td>
-        <td><b>Yes.</b> A reserved field is guaranteed a column in new data.</td>
-        <td>🔴 <b>No.</b> Only reachable as the query-time warning <code>fieldsExceedingColumnLimit</code>, per query, not per field.</td></tr>
-      <tr><td><span class="chip st-warn">Union type</span></td>
-        <td>The field arrives as an object in some events and a scalar in others. A parquet column needs one type, so it cannot have one.</td>
-        <td><b>Only partly.</b> No column appears. Reserving forces a cast at read time, and values that cannot cast return <code>null</code>.</td>
-        <td>🟢 <b>Yes.</b> <code>ObservationGroup.observations</code> is a repeated field, so one keypath returning several types is a union we can detect on the client.</td></tr>
-      <tr><td><span class="chip st-bad">mismatch</span><div style="font-size:11px;color:var(--txt3);margin-top:3px">in the Reserved column</div></td>
-        <td>The data arrives as one type and you declared another. The field is read as you declared it.</td>
-        <td>Not a fix. It means your declaration and the data disagree, so check which one is wrong.</td>
-        <td>🟢 <b>Yes.</b> Compare the declared type on the reserved record against <code>Observation.data_type</code>. The RFC also commits to exposing this difference.</td></tr>
-
-    </tbody>
-  </table></div>
-
-  <h3 style="font-size:13px;margin:18px 0 6px">OpenSearch — <code>frequentsearch</code></h3>
-  <div class="tablewrap"><table class="vtab">
-    <thead><tr><th style="width:158px">Value</th><th>What happened</th><th style="width:196px">Does reserving fix it</th><th style="width:210px">Can we show it today</th></tr></thead>
-    <tbody>
-      <tr><td><span class="chip st-ok">Mapped</span></td>
-        <td>OpenSearch holds a mapping for the field and indexes it normally.</td>
-        <td>Already fixed.</td><td>🔴 <b>No</b> per field. The header counts mapping exceptions for the dataset, not per keypath.</td></tr>
-      <tr><td><span class="chip st-warn">Partially mapped</span></td>
-        <td>Some of the keypath is mapped and some is not, usually a branch where only certain children were accepted.</td>
-        <td><b>Yes</b> for the keypath you reserve.</td>
-        <td>🟢 <b>Yes.</b> Schema Explorer already models <code>partially-mapped</code>.</td></tr>
-      <tr><td><span class="chip st-idle">Unmapped</span></td>
-        <td>No mapping exists for the keypath.</td>
-        <td><b>Yes.</b> Reserving writes the field into the index mapping.</td>
-        <td>🟢 <b>Yes.</b> Already modelled as <code>unmapped</code>.</td></tr>
-      <tr><td><span class="chip st-bad">Mapping exception</span></td>
-        <td>A value arrived that does not fit the mapped type, and OpenSearch rejected it.</td>
-        <td>Not on its own. Fix the declared type, or fix the data.</td>
-        <td>🟡 <b>Dataset level only.</b> The header counter exists. Attributing it to a keypath does not.</td></tr>
-    </tbody>
-  </table></div>
-
-  <div class="ctx" style="margin-top:16px;background:var(--red-bg);border-color:var(--red-line);color:var(--red-tx)">
-    <span class="dot"></span>
-    <span><b>Most of this column has no data source today. Verified 15-09 against the schema-store protos.</b>
-    The reserved record (<code>SchemaTemplateField</code>) holds a path and a type, nothing else. <code>Observation</code> holds type, cardinality, occurrences and values, and no column or mapping status. So only <b>Union type</b> and <b>Type mismatch</b> are derivable on the client right now. Materialized, Unmaterialized and both Pending states all need backend work that nobody has scoped.</span>
-  </div>
-
-  <div class="ctx ctx--ar" style="margin-top:12px">
-    <span class="dot"></span>
-    <span><b>Why the Reserved fields tab has no status column.</b> Reserving a field is a declaration: a keypath and a type. It is the same statement whatever the engine does with it afterwards. What the data actually did is an observation over a time range, which is the explorer's job and the observations API's data. Putting it on the configuration page also makes a static page look live, and it cannot be, because a fresh reservation has nothing to report until the next compaction or index reset.</span>
-  </div>
-
-  <div class="ctx ctx--os" style="margin-top:12px">
-    <span class="dot"></span>
-    <span><b>The asymmetry worth remembering.</b> A union field is rejected outright by OpenSearch as a mapping exception, and read correctly but slowly by the archive. Same field, same data, two different failures. That is why one column name cannot serve both dataspaces.</span>
-  </div>
-
-  <p class="desc" style="margin-top:14px"><b>Unmaterialized is the state Amnon wants to remove.</b> A reserved field can still lose its column today when the budget runs out. His ask in the 14-09 meeting was that reserved fields go in first, before the popularity ranking. If that ships, this chip should never appear on a reserved field again, which makes it a good way to check whether the change worked.</p>
-
-  <p class="desc"><b>Reserving still has no confirmation.</b> After you reserve a field, nothing tells you it took effect until the next compaction or index reset changes what the explorer shows. Moving the status to the explorer makes that honest rather than solving it. Whether the user needs a clearer signal is an open question.</p>
-</div>
-
-<div id="drwWrap" hidden>
-  <div class="scrim" id="drwScrim"></div>
-  <aside class="drw" role="dialog" aria-modal="true" aria-labelledby="drwTitle">
-    <div class="drw-h">
-      <div><h3 id="drwTitle">Reserve field</h3><p id="drwSub"></p></div>
-      <button class="drw-x" id="drwX" aria-label="Close">&#10005;</button>
-    </div>
-    <div class="drw-b">
-      <div class="drw-sec">
-        <p class="drw-l">Keypath</p>
-        <div class="drw-kp" id="drwKp"></div>
-      </div>
-      <div class="drw-sec">
-        <p class="drw-l">Observed in the data, last 7 days</p>
-        <div class="obs" id="drwObs"></div>
-      </div>
-      <div class="drw-sec">
-        <p class="drw-l">Declare as</p>
-        <div class="tpick" id="drwTypes"></div>
-      </div>
-      <div id="drwCons"></div>
-    </div>
-    <div class="drw-f">
-      <button class="btn" id="drwCancel">Cancel</button>
-      <button class="btn btn--primary" id="drwOk">Add to reserved fields</button>
-    </div>
-  </aside>
-</div>
-
-<div id="sg" hidden></div>
-
-<dialog id="changes">
-  <div class="dlg-h">Pending changes</div>
-  <div class="dlg-b"><ul id="changelist"></ul></div>
-  <div class="dlg-f"><button class="btn" id="closeChanges">Close</button></div>
-</dialog>
+<div id="overlays"></div>
 
 <script>
-const DATASPACES = [
-  {id:'default',        name:'Default dataspace', engine:'archive'},
-  {id:'frequentsearch', name:'Frequent Search',   engine:'opensearch'},
-  {id:'system',         name:'System dataspace',  engine:'archive'},
-];
-const DATASETS = {
-  default:       ['logs','spans','aws-prod-payment-logs','web-frontend-logs'],
-  frequentsearch:['logs','spans'],
-  system:        ['engine.queries','alerts.history','aaa.audit_events'],
+/* ────────────────────────────────────────────────────────────────
+   Data model. Field names mirror the schema-store report proto:
+   path[] · mappingStatus · issues[] · mappingViolationCount · types[]
+   countOverTime[] · count · cardinalityOverTime[] · cardinality
+   firstSeen · lastSeen
+   ──────────────────────────────────────────────────────────────── */
+const DATASPACES = {
+  default: ['logs', 'spans'],
+  system: ['logs'],
+  frequentsearch: ['logs'],
 };
-const ENGINE = {
-  opensearch:{label:'OpenSearch', ctxClass:'ctx--os',
-    ctxText:'<b>Frequent Search is OpenSearch.</b> A reserved field here is written into the index mapping. A value that does not fit the declared type is rejected as a mapping exception.',
-    counters:true},
-  archive:{label:'S3 archive', ctxClass:'ctx--ar',
-    ctxText:'<b>This dataspace reads from the S3 archive.</b> A reserved field here is guaranteed a parquet column. A field without one is read out of <code>$d</code>, which is what makes the query slow.',
-    counters:false}
+const TYPES = {
+  string: {label: 'string', glyph: 'Aa'},
+  number: {label: 'number', glyph: '#'},
+  bool: {label: 'bool', glyph: '01'},
+  object: {label: 'object', glyph: '{}'},
+  array: {label: 'array', glyph: '[]'},
+  'array<string>': {label: 'array<string>', glyph: '[]'},
 };
-const TYPES = {String:'Aa', Number:'#', Boolean:'T|F', Object:'{}'};
+const STATUS = {
+  mapped: {label: 'Mapped', color: 'green'},
+  unmapped: {label: 'Unmapped', color: 'grey'},
+  partially: {label: 'Partially mapped', color: 'yellow'},
+  unspecified: {label: '-', color: null},
+};
+/* PROPOSAL — the archive vocabulary. default and system are the S3 archive, not
+   OpenSearch, so the column says whether the field has its own parquet column.
+   Mapping exceptions are an OpenSearch concept and do not exist here. */
+const COLUMN_STATUS = {
+  materialized: {label: 'Materialized', color: 'green'},
+  unmaterialized: {label: 'Unmaterialized', color: 'yellow'},
+  union: {label: 'Union type', color: 'yellow'},
+  unspecified: {label: '-', color: null},
+};
+const isArchive = () => S.dataspace !== 'frequentsearch';
+const RESERVED_LIMIT = 100;
 
-// Schema Explorer status. Same split as the reserved tab, but computed from
-// observations rather than from configuration.
-const EXP_STATES = {
-  opensearch:{
-    col:'Mapping status',
-    hint:'What OpenSearch did with this keypath. Already shipping in Schema Explorer today.',
-    map:{ok:['Mapped','st-ok'], partial:['Partially mapped','st-warn'],
-          none:['Unmapped','st-idle'], conflict:['Mapping exception','st-bad']},
-    src:'Derivable today. Schema Explorer already models mappingStatus as mapped, partially-mapped or unmapped, and carries a type-conflict issue.'
-  },
-  archive:{
-    col:'Column status',
-    hint:'Whether the keypath has its own parquet column in the archive.',
-    map:{ok:['Materialized','st-ok'], partial:['Union type','st-warn'],
-         none:['Unmaterialized','st-warn'], conflict:['Union type','st-warn']},
-    src:'Partly derivable. A union is visible today, because ObservationGroup.observations is repeated. Materialized versus Unmaterialized is not: no field in the schema-store API reports it.'
+const RAW = [
+  ['@timestamp', 'mapped', ['string'], 13328430, 9286792, 0, []],
+  ['@version', 'mapped', ['string'], 13328430, 1, 0, []],
+  ['__CURSOR', 'mapped', ['string'], 4519, 4499, 0, []],
+  ['__MONOTONIC_TIMESTAMP', 'mapped', ['string'], 4519, 4466, 0, []],
+  ['_BOOT_ID', 'mapped', ['string'], 4519, 1, 0, []],
+  ['_CAP_EFFECTIVE', 'mapped', ['string'], 4517, 1, 0, []],
+  ['_CMDLINE', 'mapped', ['string'], 4445, 7, 0, []],
+  ['_COMM', 'mapped', ['string'], 4519, 4, 0, []],
+  ['_EXE', 'mapped', ['string'], 4453, 4, 0, []],
+  ['_GID', 'mapped', ['number'], 4519, 2, 0, []],
+  ['kubernetes.pod_name', 'mapped', ['string'], 11204551, 8842, 0, []],
+  ['kubernetes.namespace_name', 'mapped', ['string'], 11204551, 62, 0, []],
+  ['kubernetes.container_name', 'mapped', ['string'], 11204551, 311, 0, []],
+  ['kubernetes.labels.app', 'partially', ['string'], 9120043, 288, 0, []],
+  ['kubernetes.labels.pod-template-hash', 'unmapped', ['string'], 8830012, 7411, 0, []],
+  ['kubernetes.annotations', 'unmapped', ['object'], 640221, 1, 0, ['heavy-branch']],
+  ['message', 'partially', ['string', 'object'], 12880431, 984221, 18442, []],
+  ['log.level', 'mapped', ['string'], 12002334, 6, 0, []],
+  ['log.logger', 'mapped', ['string'], 9004512, 421, 0, []],
+  ['trace_id', 'mapped', ['string'], 6120884, 6118002, 0, []],
+  ['span_id', 'mapped', ['string'], 6120884, 6120112, 0, []],
+  ['http.status_code', 'mapped', ['number', 'string'], 4410233, 24, 3120, []],
+  ['http.method', 'mapped', ['string'], 4410233, 7, 0, []],
+  ['http.url', 'partially', ['string'], 4402119, 2214870, 0, []],
+  ['http.request.headers', 'unmapped', ['object'], 1220445, 1, 0, ['heavy-branch']],
+  ['duration_ms', 'mapped', ['number'], 6120884, 88421, 0, []],
+  ['user.id', 'unmapped', ['string', 'number'], 2240113, 442019, 9021, []],
+  ['user.email', 'unmapped', ['string'], 2240113, 441002, 0, []],
+  ['resource.attributes.service.name', 'mapped', ['string'], 13328430, 74, 0, []],
+  ['resource.attributes.service.version', 'mapped', ['string'], 13100221, 218, 0, []],
+  ['resource.attributes.host.name', 'mapped', ['string'], 13328430, 1204, 0, []],
+  ['cx.error.stack', 'unmapped', ['string', 'array<string>'], 88422, 41220, 1240, []],
+  ['cx.retry.count', 'mapped', ['number'], 120442, 12, 0, []],
+  ['billing.plan', 'mapped', ['string'], 442011, 4, 0, []],
+  ['billing.units', 'mapped', ['number'], 442011, 88201, 0, []],
+];
+
+function seedSeries(base, n) {
+  const out = [];
+  let v = base;
+  for (let i = 0; i < n; i++) {
+    v = Math.max(1, v * (0.82 + ((i * 37) % 55) / 100));
+    out.push(Math.round(v));
   }
-};
-
-// observed schema, per keypath: types actually seen, condition, popularity, cardinality
-// `shares` is the share of events in which the keypath arrived as that type.
-// It is what makes the cost of a type override concrete rather than abstract.
-const SCHEMA = [
-  {kp:'kubernetes.pod.ip',         cond:'ok',       pop:98, card:4210,    shares:{String:100}},
-  {kp:'kubernetes.namespace_name', cond:'ok',       pop:96, card:38,      shares:{String:100}},
-  {kp:'kubernetes.labels.app',     cond:'ok',       pop:74, card:212,     shares:{String:100}},
-  {kp:'http.status_code',          cond:'none',     pop:88, card:31,      shares:{Number:100}},
-  {kp:'http.request.method',       cond:'ok',       pop:71, card:8,       shares:{String:100}},
-  {kp:'message',                   cond:'conflict', pop:100,card:null,    shares:{String:87, Object:13}},
-  {kp:'user.authenticated',        cond:'ok',       pop:52, card:2,       shares:{Boolean:100}},
-  {kp:'user.id',                   cond:'ok',       pop:63, card:91400,   shares:{String:100}},
-  {kp:'trace.duration_ms',         cond:'conflict', pop:44, card:null,    shares:{Number:61, String:39}},
-  {kp:'trace.span_id',             cond:'none',     pop:41, card:1240000, shares:{String:100}},
-  {kp:'request.headers',           cond:'partial',  pop:29, card:null,    shares:{Object:100}},
-  {kp:'service.version',           cond:'ok',       pop:58, card:17,      shares:{String:100}},
-  {kp:'error.stack',               cond:'none',     pop:12, card:880,     shares:{String:100}},
-  {kp:'db.rows_affected',          cond:'none',     pop:9,  card:640,     shares:{Number:100}},
-];
-SCHEMA.forEach(f=>{ f.types = Object.keys(f.shares).sort((a,b)=>f.shares[b]-f.shares[a]); });
-let drw=null;
-let expFilters={issues:false, unres:false};
-let activeTab='res';
-let loading=false;   // shared by both tabs: one dataset change, one load
-const LIMIT = 12;
-
-// observed keypaths offered as suggestions, with the type actually seen in the data
-const OBSERVED = [
-  ['kubernetes.pod.ip','String'],['kubernetes.namespace_name','String'],['kubernetes.labels.app','String'],
-  ['http.status_code','Number'],['http.request.method','String'],['message','String'],
-  ['user.authenticated','Boolean'],['user.id','String'],['trace.duration_ms','Number'],
-  ['trace.span_id','String'],['request.headers','Object'],['service.version','String'],
-  ['error.stack','String'],['db.rows_affected','Number'],
-];
-const SEED = [
-  ['kubernetes.pod.ip','String','ok'],
-  ['kubernetes.namespace_name','String','ok'],
-  ['http.status_code','Number','limit'],
-  ['message','String','union'],
-  ['user.authenticated','Boolean','ok'],
-  ['trace.duration_ms','Number','mismatch'],
-  ['request.headers','Object','ok'],
-  ['service.version','String','ok'],
-];
-
-let rows=[], delay=700, token=0, uid=0, editingId=null, draft=null;
-const $ = s=>document.querySelector(s);
-const engineOf = id => ENGINE[DATASPACES.find(d=>d.id===id).engine];
-
-function seed(){
-  uid=0;
-  rows = SEED.map(([fieldName,type])=>({
-    id:'r'+(++uid), fieldName, type,
-    original:{fieldName,type}, isNew:false, isRemoved:false, hl:false
+  out[n - 1] = base;
+  return out;
+}
+function mkFields() {
+  return RAW.map(([p, st, types, count, card, viol, issues], i) => ({
+    id: 'f' + i,
+    path: p.split('.'),
+    dataprimePath: p,
+    mappingStatus: st,
+    types,
+    count,
+    cardinality: card,
+    mappingViolationCount: viol,
+    issues,
+    countOverTime: seedSeries(count, 14),
+    cardinalityOverTime: seedSeries(card, 14),
+    // Archive equivalent. A union field can never hold a parquet column: the column
+    // needs one type. Everything else follows whether it made the column budget.
+    columnStatus: types.length > 1 ? 'union' : (st === 'mapped' ? 'materialized' : 'unmaterialized'),
+    firstSeen: '2026-09-15T00:00:00.000Z',
+    lastSeen: '2026-09-15T23:59:00.000Z',
   }));
-  editingId=null; draft=null;
-}
-const live = () => rows.filter(r=>!r.isRemoved);
-
-function modifications(){
-  const out=[];
-  for(const r of rows){
-    if(r.isNew && !r.isRemoved) out.push({op:'add', r});
-    else if(r.isRemoved && !r.isNew) out.push({op:'remove', r});
-    else if(!r.isNew && r.original &&
-            (r.fieldName!==r.original.fieldName || r.type!==r.original.type)) out.push({op:'update', r});
-  }
-  return out;
 }
 
-function fillDataspaces(){ $('#ds').innerHTML = DATASPACES.map(d=>`<option value="${d.id}">${d.name}</option>`).join(''); }
-function fillDatasets(id){ $('#dt').innerHTML = DATASETS[id].map(n=>`<option value="${n}">${n}</option>`).join(''); }
+const RESERVED_SEED = [
+  ['@timestamp', 'string', 9286792],
+  ['kubernetes.pod_name', 'string', 8842],
+  ['kubernetes.namespace_name', 'string', 62],
+  ['message', 'string', 984221],
+  ['log.level', 'string', 6],
+  ['trace_id', 'string', 6118002],
+  ['http.status_code', 'number', 24],
+  ['duration_ms', 'number', 88421],
+];
 
-function renderTopActions(eng, loading){
-  const el=$('#topactions');
-  if(!eng.counters){ el.innerHTML=''; return; }
-  el.innerHTML = loading
-    ? `<div class="counter"><span class="sk sk--num"></span><span>Ingested today</span></div>
-       <div class="counter"><span class="sk sk--num"></span><span>Mapping exceptions</span></div>
-       <button class="btn" disabled>Reset index</button>`
-    : `<div class="counter"><b>1.2B</b><span>Ingested today</span></div>
-       <div class="counter"><b>14</b><span>Mapping exceptions</span></div>
-       <button class="btn">Reset index</button>`;
-}
-function renderHead(eng){
-  // Configuration only. What the data did with the field lives in Schema explorer.
-  $('#thead').innerHTML = `<tr>
-    <th style="width:36px"><input type="checkbox" disabled></th>
-    <th>Field name</th><th style="width:160px">Type</th>
-    <th style="width:96px"></th></tr>`;
-}
-function skeletonRows(n){
-  let out='';
-  for(let i=0;i<n;i++){
-    const w=[92,68,84,74,88][i%5];
-    out+=`<tr><td><span class="sk" style="width:14px;height:14px;border-radius:3px"></span></td>
-      <td><span class="sk" style="width:${w}%"></span></td>
-      <td><span class="sk sk--pill" style="width:72px"></span></td><td></td></tr>`;
-  }
-  return out;
-}
-const typeChip = t => `<span class="chip c-${t}">${t} <i class="g">${TYPES[t]}</i></span>`;
-
-function renderAnn(){
-  const mods=modifications(), w=$('#annwrap');
-  if(!mods.length){ w.innerHTML=''; return; }
-  const n={add:0,update:0,remove:0}; mods.forEach(m=>n[m.op]++);
-  w.innerHTML=`<div class="ann"><div class="l">
-      <b>Changed fields: ${mods.length}</b>
-      <span>${n.add} added, ${n.update} updated, ${n.remove} removed</span>
-      <button class="lnk" id="viewChanges">View changes</button>
-    </div><div class="r">
-      <button class="btn btn--sm" id="revert">Revert</button>
-      <button class="btn btn--sm btn--primary" id="save">Save</button>
-    </div></div>`;
-  $('#viewChanges').onclick=()=>{
-    $('#changelist').innerHTML = mods.map(m=>{
-      const lbl={add:['op--add','Added'],update:['op--upd','Updated'],remove:['op--rem','Removed']}[m.op];
-      let detail = `<code>${m.r.fieldName}</code> as ${m.r.type}`;
-      if(m.op==='update'){
-        const o=m.r.original, bits=[];
-        if(o.fieldName!==m.r.fieldName) bits.push(`name <code>${o.fieldName}</code> to <code>${m.r.fieldName}</code>`);
-        if(o.type!==m.r.type) bits.push(`type ${o.type} to ${m.r.type}`);
-        detail = bits.join(', ');
-      }
-      return `<li><span class="op ${lbl[0]}">${lbl[1]}</span>${detail}</li>`;
-    }).join('');
-    $('#changes').showModal();
-  };
-  $('#revert').onclick=()=>{ seed(); renderBody(engineOf($('#ds').value)); };
-  $('#save').onclick=()=>{
-    rows = rows.filter(r=>!r.isRemoved).map(r=>({...r, isNew:false, hl:true,
-      original:{fieldName:r.fieldName, type:r.type}}));
-    editingId=null; draft=null;
-    renderBody(engineOf($('#ds').value));
-    setTimeout(()=>{ rows.forEach(r=>r.hl=false); renderBody(engineOf($('#ds').value)); }, 1500);
-  };
-}
-
-function nameError(value, id){
-  const v=(value||'').trim();
-  if(!v) return 'A keypath is required.';
-  if(!/^[A-Za-z_][\w.-]*$/.test(v)) return 'Use letters, numbers, dots, dashes and underscores.';
-  if(rows.some(r=>r.id!==id && !r.isRemoved && r.fieldName===v)) return 'This keypath is already reserved.';
-  return null;
-}
-
-function renderBody(eng){
-  const q=($('#q').value||'').trim().toLowerCase();
-  const body=$('#tbody');
-  body.className='fade';
-  const visible = rows.filter(r => r.id===editingId || !q || r.fieldName.toLowerCase().includes(q));
-
-  body.innerHTML = visible.map(r=>{
-    if(r.id===editingId){
-      const err = nameError(draft.fieldName, r.id);
-      return `<tr class="editing"><td></td>
-        <td class="path">
-          <input id="nameInput" value="${draft.fieldName.replace(/"/g,'&quot;')}"
-                 placeholder="e.g. kubernetes.pod.ip" class="${err&&draft.touched?'bad':''}" autocomplete="off">
-          ${err&&draft.touched?`<span class="err">${err}</span>`:''}
-        </td>
-        <td class="tsel"><select id="typeInput">
-          ${Object.keys(TYPES).map(t=>`<option value="${t}"${t===draft.type?' selected':''}>${t}</option>`).join('')}
-        </select></td>
-        <td class="rowacts">
-          <button class="ok" id="confirmEdit" title="Confirm">&#10003;</button>
-          <button id="cancelEdit" title="Cancel">&#10005;</button>
-        </td></tr>`;
-    }
-    let badge='';
-    if(r.isRemoved) badge='<span class="badge badge--r">Removed</span>';
-    else if(r.isNew) badge='<span class="badge">New</span>';
-    else if(r.original && (r.fieldName!==r.original.fieldName || r.type!==r.original.type))
-      badge='<span class="badge badge--e">Edited</span>';
-    return `<tr data-id="${r.id}" class="${r.isRemoved?'removed':''} ${r.hl?'hl':''}">
-      <td><input type="checkbox" ${r.isRemoved?'disabled':''}></td>
-      <td class="path">${r.fieldName}${badge}</td>
-      <td>${typeChip(r.type)}</td>
-      <td class="rowacts">${ r.isRemoved
-        ? `<button data-act="restore" data-id="${r.id}" title="Restore">&#8630;</button>`
-        : `<button data-act="edit" data-id="${r.id}" title="Edit">&#9998;</button>
-           <button data-act="remove" data-id="${r.id}" title="Remove">&#10005;</button>`}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="4" style="padding:26px;text-align:center;color:#8496a8">No reserved field matches this search.</td></tr>`;
-
-  const n = live().length;
-  $('#count').textContent = n;
-  $('#count').className = 'tag' + (n>=LIMIT ? ' tag--full' : '');
-  $('#add').disabled = editingId!==null || n>=LIMIT;
-  $('#bulk').disabled = editingId!==null || n>=LIMIT;
-  $('#add').title = n>=LIMIT ? `Limit of ${LIMIT} reserved fields reached.` : '';
-  if(!loading){ setCounts(false); if(activeTab==='exp') renderExplorer(); }
-  renderAnn();
-  if(editingId!==null) wireEditor();
-}
-
-const sg = () => document.getElementById('sg');
-
-function sgMatches(v){
-  const q=(v||'').trim().toLowerCase();
-  const taken=new Set(rows.filter(r=>!r.isRemoved && r.id!==editingId).map(r=>r.fieldName));
-  return OBSERVED.filter(([n])=>!taken.has(n) && (!q || n.toLowerCase().includes(q))).slice(0,8);
-}
-function sgHide(){ const p=sg(); p.hidden=true; p.innerHTML=''; draft && (draft.sgIndex=-1); }
-function sgPlace(input){
-  const p=sg(), r=input.getBoundingClientRect();
-  p.style.left = r.left+'px';
-  p.style.width = r.width+'px';
-  const below = window.innerHeight - r.bottom;
-  if(below < 170 && r.top > below){ p.style.top='auto'; p.style.bottom=(window.innerHeight-r.top+4)+'px'; }
-  else { p.style.bottom='auto'; p.style.top=(r.bottom+4)+'px'; }
-}
-function sgRender(input){
-  const p=sg(), list=sgMatches(draft.fieldName);
-  draft.sgList=list;
-  if(!list.length){
-    p.innerHTML='<div class="sg-empty">No observed field matches. You can still reserve it.</div>';
-    p.hidden=false; sgPlace(input); return;
-  }
-  if(draft.sgIndex>=list.length) draft.sgIndex=-1;
-  const q=(draft.fieldName||'').trim();
-  p.innerHTML = '<div class="sg-hd"><span>Observed field</span><span>Type</span></div>' +
-    list.map(([n,t],i)=>{
-      let label=n;
-      if(q){
-        const at=n.toLowerCase().indexOf(q.toLowerCase());
-        if(at>-1) label = n.slice(0,at)+'<b>'+n.slice(at,at+q.length)+'</b>'+n.slice(at+q.length);
-      }
-      return `<div class="sg-o ${i===draft.sgIndex?'on':''}" data-i="${i}">
-        <span class="sg-n">${label}</span>
-        <span class="sg-r"><span class="chip c-${t}">${t} <i class="g">${TYPES[t]}</i></span></span>
-      </div>`;
-    }).join('');
-  p.hidden=false;
-  sgPlace(input);
-}
-function sgPick(i){
-  const hit=draft.sgList && draft.sgList[i];
-  if(!hit) return;
-  draft.fieldName=hit[0]; draft.touched=true;
-  // CX-57952: adopt the observed type only when the user has not set one
-  if(!draft.typeTouched) draft.type=hit[1];
-  sgHide();
-  const n=document.getElementById('nameInput'), t=document.getElementById('typeInput');
-  n.value=draft.fieldName; t.value=draft.type;
-  validateName(n);
-  n.focus();
-}
-function validateName(name){
-  const err=nameError(draft.fieldName,editingId);
-  name.classList.toggle('bad',!!err && draft.touched);
-  let e=name.parentElement.querySelector('.err');
-  if(err && draft.touched){
-    if(!e){e=document.createElement('span');e.className='err';name.parentElement.appendChild(e);}
-    e.textContent=err;
-  } else if(e) e.remove();
-  document.getElementById('confirmEdit').disabled=!!err;
-  return err;
-}
-
-function wireEditor(){
-  const name=document.getElementById('nameInput'), type=document.getElementById('typeInput');
-  name.focus();
-  if(draft.caretEnd!==false) name.setSelectionRange(name.value.length,name.value.length);
-  draft.sgIndex=-1;
-  sgRender(name);
-
-  name.oninput=()=>{
-    draft.fieldName=name.value; draft.touched=true; draft.caretEnd=false; draft.sgIndex=-1;
-    if(!draft.typeTouched){
-      const hit=OBSERVED.find(o=>o[0]===name.value.trim());
-      if(hit && hit[1]!==draft.type){ draft.type=hit[1]; type.value=hit[1]; }
-    }
-    validateName(name);
-    sgRender(name);
-  };
-  name.onfocus=()=>sgRender(name);
-  name.onkeydown=e=>{
-    const n=(draft.sgList||[]).length;
-    if(e.key==='ArrowDown'&&n){e.preventDefault();draft.sgIndex=(draft.sgIndex+1)%n;sgRender(name);}
-    else if(e.key==='ArrowUp'&&n){e.preventDefault();draft.sgIndex=(draft.sgIndex-1+n)%n;sgRender(name);}
-    else if(e.key==='Enter'){
-      e.preventDefault();
-      if(draft.sgIndex>-1){ sgPick(draft.sgIndex); } else { sgHide(); commitEdit(); }
-    }
-    else if(e.key==='Escape'){
-      e.preventDefault();
-      if(!sg().hidden){ sgHide(); } else { cancelEdit(); }
-    }
-    else if(e.key==='Tab'){ sgHide(); }
-  };
-  type.onchange=()=>{ draft.type=type.value; draft.typeTouched=true; };
-  type.onfocus=sgHide;
-  type.onkeydown=e=>{ if(e.key==='Escape'){e.preventDefault();cancelEdit();} };
-  document.getElementById('confirmEdit').onclick=()=>{sgHide();commitEdit();};
-  document.getElementById('cancelEdit').onclick=()=>{sgHide();cancelEdit();};
-  document.getElementById('confirmEdit').disabled=!!nameError(draft.fieldName,editingId);
-}
-
-sg().addEventListener('mousedown', e=>{
-  const o=e.target.closest('.sg-o'); if(!o) return;
-  e.preventDefault();            // keep focus in the input
-  sgPick(Number(o.dataset.i));
-});
-document.addEventListener('mousedown', e=>{
-  if(editingId===null || sg().hidden) return;
-  if(e.target.closest('#sg') || e.target.closest('tr.editing')) return;
-  sgHide();
-});
-window.addEventListener('scroll', ()=>{
-  const n=document.getElementById('nameInput');
-  if(n && !sg().hidden) sgPlace(n);
-}, true);
-window.addEventListener('resize', ()=>{
-  const n=document.getElementById('nameInput');
-  if(n && !sg().hidden) sgPlace(n);
-});
-
-function startEdit(id){
-  const r=rows.find(x=>x.id===id);
-  editingId=id;
-  draft={fieldName:r.fieldName, type:r.type, touched:false, typeTouched:false, caretEnd:true};
-  renderBody(engineOf($('#ds').value));
-}
-function commitEdit(){
-  if(nameError(draft.fieldName,editingId)) return;
-  sgHide();
-  const r=rows.find(x=>x.id===editingId);
-  r.fieldName=draft.fieldName.trim();
-  r.type=draft.type;
-  // CX-57951: an edit back to the original values is not a change
-  editingId=null; draft=null;
-  renderBody(engineOf($('#ds').value));
-}
-function cancelEdit(){
-  sgHide();
-  // CX-57950: restore name AND type from the row, never leave the draft type behind
-  const r=rows.find(x=>x.id===editingId);
-  if(r && r.isNew && !r.original){ rows=rows.filter(x=>x.id!==editingId); }
-  editingId=null; draft=null;
-  renderBody(engineOf($('#ds').value));
-}
-
-$('#tbody').addEventListener('click', e=>{
-  const b=e.target.closest('button[data-act]'); if(!b) return;
-  const id=b.dataset.id, r=rows.find(x=>x.id===id);
-  if(b.dataset.act==='edit'){ if(editingId===null) startEdit(id); }
-  else if(b.dataset.act==='remove'){
-    if(r.isNew){ rows=rows.filter(x=>x.id!==id); } else { r.isRemoved=true; }
-    renderBody(engineOf($('#ds').value));
-  }
-  else if(b.dataset.act==='restore'){ r.isRemoved=false; renderBody(engineOf($('#ds').value)); }
-});
-
-$('#add').onclick=()=>{
-  if(editingId!==null || live().length>=LIMIT) return;
-  const r={id:'r'+(++uid), fieldName:'', type:'String', state:'pending',
-           original:null, isNew:true, isRemoved:false, hl:false};
-  rows.unshift(r);
-  editingId=r.id;
-  draft={fieldName:'', type:'String', touched:false, typeTouched:false, caretEnd:true};
-  renderBody(engineOf($('#ds').value));
+/* ── state ─────────────────────────────────────────────────────── */
+const S = {
+  tab: 'explorer',
+  dataspace: 'default',
+  dataset: 'logs',
+  granularity: 'daily',
+  startDate: 0,
+  flat: true,
+  q: '',
+  fStatus: [],
+  fTypes: [],
+  fReserved: [],
+  sort: null,
+  expanded: new Set(),
+  fields: mkFields(),
+  loading: true,
+  rLoading: false,
+  forceEmpty: false,
+  delay: 700,
+  rq: '',
+  rows: [],
+  selected: new Set(),
+  editing: null,
+  resetUsedToday: false,
+  ingestedToday: 812,
+  ingestLimit: 2000,
+  mappingExceptionsToday: 18442,
 };
-$('#bulk').onclick=()=>alert('Bulk add opens the dialog from Omer design c9346d52. Not mocked here.');
-$('#q').oninput=()=>renderBody(engineOf($('#ds').value));
-$('#closeChanges').onclick=()=>$('#changes').close();
+function mkRows() {
+  return RESERVED_SEED.map(([name, type, card], i) => ({
+    id: 'r' + i, name, type, cardinality: card,
+    orig: {name, type}, state: 'clean',
+  }));
+}
+S.rows = mkRows();
 
-function expSkeletonRows(n){
-  let out='';
-  for(let i=0;i<n;i++){
-    const w=[88,64,92,72,80,58][i%6];
-    out+=`<tr>
-      <td><span class="sk" style="width:${w}%"></span></td>
-      <td><span class="sk sk--pill" style="width:74px"></span></td>
-      <td><span class="sk sk--pill" style="width:104px"></span></td>
-      <td><span class="sk sk--pill" style="width:88px"></span></td>
-      <td><span class="pop"><span class="sk" style="width:56px;height:5px"></span><span class="sk sk--num" style="width:20px"></span></span></td>
-      <td><span class="sk sk--num" style="width:46px"></span></td></tr>`;
+/* ── helpers ───────────────────────────────────────────────────── */
+const $ = (s) => document.querySelector(s);
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+const esc = (s) => String(s).replace(/[&<>"]/g, (m) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[m]));
+
+function abbreviateNumber(n) {
+  if (n == null) return '-';
+  return new Intl.NumberFormat('en', {notation: 'standard', maximumFractionDigits: 0}).format(n);
+}
+function seenDate(iso) {
+  const d = new Date(iso);
+  const p = (v, l = 2) => String(v).padStart(l, '0');
+  return `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ` +
+         `${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}.${p(d.getUTCMilliseconds(), 3)}`;
+}
+function startDateOptions() {
+  const count = S.granularity === 'daily' ? 30 : S.granularity === 'weekly' ? 12 : 24;
+  const out = [];
+  const base = new Date('2026-09-15T00:00:00Z');
+  for (let i = 0; i < count; i++) {
+    const d = new Date(base);
+    if (S.granularity === 'daily') d.setUTCDate(d.getUTCDate() - i);
+    if (S.granularity === 'weekly') d.setUTCDate(d.getUTCDate() - i * 7);
+    if (S.granularity === 'monthly') d.setUTCMonth(d.getUTCMonth() - i);
+    const label = `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+    const caption = i === 0 ? 'Yesterday' : S.granularity === 'daily' ? `${i + 1} days ago` :
+      S.granularity === 'weekly' ? `${i + 1} weeks ago` : `${i + 1} months ago`;
+    out.push({label, caption});
   }
   return out;
 }
+function sparkline(series, color) {
+  const w = 150, h = 26, max = Math.max(...series), min = Math.min(...series);
+  const span = Math.max(1, max - min);
+  const pts = series.map((v, i) => [(i / (series.length - 1)) * w, h - 2 - ((v - min) / span) * (h - 6)]);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
+  const area = `${line}L${w},${h}L0,${h}Z`;
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <path d="${area}" fill="${color}22"/><path d="${line}" fill="none" stroke="${color}" stroke-width="1.2"/></svg>`;
+}
+function typeChips(types) {
+  const shown = types.slice(0, 2).map((t) => {
+    const c = TYPES[t] || {label: t, glyph: ''};
+    return `<span class="tchip">${esc(c.label)} <span class="g">${c.glyph}</span></span>`;
+  }).join('');
+  const rest = types.length - 2;
+  return shown + (rest > 0 ? `<span class="overflow">+${rest}</span>` : '');
+}
+/* PROPOSAL — reserved state of a keypath, read from the Reserved fields tab.
+   Declaration is absolute; the grid around it is yesterday's snapshot. That gap
+   is what the freshness marker below makes visible. */
+function reservedIndex() {
+  const m = new Map();
+  S.rows.forEach((r) => {
+    if (!r.name || r.state === 'removed') return;
+    m.set(r.name, {type: r.type, pending: r.state === 'new' || r.state === 'edited'});
+  });
+  return m;
+}
+function reservedCell(f, idx) {
+  const r = idx.get(f.dataprimePath);
+  if (!r) return '<span class="badge grey">Not reserved</span>';
+  const observed = f.types[0];
+  const mismatch = observed && r.type !== observed && !(observed === 'array<string>' && r.type === 'string');
+  const late = r.pending
+    ? '<div class="stale" title="Declared after this snapshot was built">⏱ not in this snapshot</div>' : '';
+  const warn = mismatch
+    ? `<div class="stale" style="color:var(--c-tag-yellow-text)">⚠ declared ${esc(r.type)}, observed ${esc(observed)}</div>` : '';
+  return `<span class="badge green">Reserved</span> <span class="tchip">${esc(r.type)}</span>${late}${warn}`;
+}
 
-function renderExplorer(){
-  const dsId=$('#ds').value, engKey=DATASPACES.find(d=>d.id===dsId).engine, E=EXP_STATES[engKey];
-  const declared = new Map(rows.filter(r=>!r.isRemoved && r.fieldName).map(r=>[r.fieldName,r.type]));
+function statusBadge(st) {
+  const map = isArchive() ? COLUMN_STATUS : STATUS;
+  const s = map[st] || map.unspecified;
+  return s.color ? `<span class="badge ${s.color}">${s.label}</span>` : '<span class="caption">-</span>';
+}
 
-  $('#expDesc').innerHTML=`What the data actually did in <b>${dsId}/${$('#dt').value}</b> over the last 7 days. This table is observed, not configured. <a href="#">Learn more</a>`;
-  $('#expCtx').className='ctx '+ENGINE[engKey].ctxClass;
-  $('#expCtx').innerHTML=`<span class="dot"></span><span>${ENGINE[engKey].ctxText}</span>`;
-  $('#expSrc').textContent=E.src;
+/* ── explorer grid ─────────────────────────────────────────────── */
+/* The status column follows the storage engine, and so does whether Mapping
+   Exceptions exists at all. frequentsearch is OpenSearch; default and system are
+   the S3 archive. One column name cannot serve both. */
+const COL_STATUS_OS = {f: 'mappingStatus', h: 'Mapping status', sortable: true, tip: 'Indexing status for the selected time range:\nIndexed — Mapped\nNot indexed — Unmapped\nIndexed for part of the time range — Partially mapped'};
+const COL_STATUS_ARCHIVE = {f: 'columnStatus', h: 'Column status', sortable: true, prop: true, tip: 'PROPOSAL. default and system are the S3 archive. Materialized — the field has its own parquet column. Unmaterialized — no column, so it is read out of $d. Union type — the field arrives as more than one type, so a column is not possible.'};
+const COL_MAPPING_EXCEPTIONS = {f: 'mappingViolationCount', h: 'Mapping Exceptions', sortable: true, num: true, tip: 'The count of mapping exceptions occurs when multiple applications send the same field with different data types'};
+const COLS_TAIL = [
+  {f: 'issues', h: 'Issues', sortable: false, tip: 'Indicates if the field has any issues (e.g., heavy branch)'},
+  {f: 'types', h: 'Type', sortable: false, tip: 'Fields with multiple types should be avoided as they will lead to a mapping exception.'},
+  {f: 'reserved', h: 'Reserved', sortable: false, prop: true, tip: 'PROPOSAL (Amnon, 16-09). Whether this keypath is declared on the Reserved fields tab, and the type it is declared as. A reserved field is time-independent, so this cell does not come from the daily snapshot.'},
+  {f: 'countOverTime', h: 'Popularity over time', sortable: false, tip: 'The change of frequency over the given timeframe.'},
+  {f: 'count', h: 'Popularity', sortable: true, num: true, tip: 'The total number of times a field appears in ingested logs within the selected timeframe.'},
+  {f: 'cardinalityOverTime', h: 'Cardinality over time', sortable: false, tip: 'The change of cardinality over the given timeframe.'},
+  {f: 'cardinality', h: 'Cardinality', sortable: true, num: true, tip: 'The number of unique values for this field within the selected timeframe.'},
+  {f: 'firstSeen', h: 'First seen', sortable: true, tip: 'The first occurrence of this field within the selected timeframe.'},
+  {f: 'lastSeen', h: 'Last seen', sortable: true, tip: 'The most recent occurrence of this field within the selected timeframe.'},
+];
+function cols() {
+  const head = {f: 'path', h: 'Keypath', sortable: false};
+  const status = isArchive() ? COL_STATUS_ARCHIVE : COL_STATUS_OS;
+  const tail = COLS_TAIL.slice();
+  // Mapping exceptions is an OpenSearch concept. In the archive the column is gone,
+  // not empty: an empty column reads as "none today", which is not what it means.
+  if (!isArchive()) tail.splice(1, 0, COL_MAPPING_EXCEPTIONS);
+  return [head, status, ...tail];
+}
 
-  $('#ethead').innerHTML=`<tr>
-    <th>Keypath</th>
-    <th style="width:170px">Observed type</th>
-    <th style="width:180px">${E.col}<span class="q" title="${E.hint}">?</span></th>
-    <th style="width:190px">Reserved</th>
-    <th style="width:110px">Popularity</th>
-    <th style="width:104px">Cardinality</th></tr>`;
+function renderStatusFilterOptions() {
+  const map = isArchive() ? COLUMN_STATUS : STATUS;
+  $('#fbStatusTitle').innerHTML = (isArchive() ? 'Column status <span class="newflag sm">new</span>' : 'Mapping status');
+  $('#fbStatus').innerHTML = Object.keys(map).filter((k) => k !== 'unspecified')
+    .map((k) => `<label><input type="checkbox" class="fms" value="${k}"> ${map[k].label}</label>`).join('');
+}
 
-  if(loading){
-    $('#etbody').className='loading';
-    $('#etbody').innerHTML=expSkeletonRows(7);
-    $('#expSrc').textContent='';
+function visibleFields() {
+  let list = S.fields.slice();
+  if (S.q) list = list.filter((f) => f.dataprimePath.toLowerCase().includes(S.q.toLowerCase()));
+  if (S.fStatus.length) list = list.filter((f) => S.fStatus.includes(isArchive() ? f.columnStatus : f.mappingStatus));
+  if (S.fTypes.length) list = list.filter((f) => f.types.some((t) => S.fTypes.includes(t)));
+  if (S.fReserved.length) {
+    const idx = reservedIndex();
+    list = list.filter((f) => S.fReserved.includes(idx.has(f.dataprimePath) ? 'yes' : 'no'));
+  }
+  if (S.sort) {
+    const {col, dir} = S.sort;
+    list.sort((a, b) => {
+      const va = col === 'path' ? a.dataprimePath : a[col];
+      const vb = col === 'path' ? b.dataprimePath : b[col];
+      return (va > vb ? 1 : va < vb ? -1 : 0) * (dir === 'asc' ? 1 : -1);
+    });
+  }
+  return list;
+}
+
+function renderExplorerHead() {
+  const tr = cols().map((c) => {
+    const arrow = S.sort && S.sort.col === c.f ? `<span class="arrow">${S.sort.dir === 'asc' ? '▲' : '▼'}</span>` : '';
+    const tip = c.tip ? `<span class="i" data-tip="${esc(c.tip)}">i</span>` : '';
+    const flag = c.prop ? '<span class="newflag sm">new</span>' : '';
+    return `<th class="${c.num ? 'num ' : ''}${c.sortable ? 'sortable' : ''}${c.prop ? ' prop' : ''}" data-col="${c.f}">
+      <span class="hh">${c.h}${flag}${tip}${arrow}</span></th>`;
+  }).join('');
+  $('#ethead').innerHTML = `<tr>${tr}<th style="width:40px"></th></tr>`;
+  $('#ethead').querySelectorAll('th.sortable').forEach((th) => th.onclick = () => {
+    const col = th.dataset.col;
+    S.sort = !S.sort || S.sort.col !== col ? {col, dir: 'asc'} : S.sort.dir === 'asc' ? {col, dir: 'desc'} : null;
+    renderExplorer();
+  });
+}
+
+let RIDX = new Map();
+function rowCells(f, indentLabel) {
+  const issues = f.issues.length
+    ? `<span class="issuecell" data-tip="Too many children keypaths — this parent keypath has too many nested keypaths, so this view only shows a sample of its children."><span class="i err">i</span>${f.issues.length}</span>`
+    : '';
+  return `
+    <td class="kp">${indentLabel}<span class="copy" title="Copy">⧉</span></td>
+    <td${isArchive() ? ' class="prop"' : ''}>${statusBadge(isArchive() ? f.columnStatus : f.mappingStatus)}</td>
+    <td>${issues}</td>
+    ${isArchive() ? '' : `<td class="num">${f.mappingViolationCount ? abbreviateNumber(f.mappingViolationCount) : '-'}</td>`}
+    <td>${typeChips(f.types)}</td>
+    <td class="prop">${reservedCell(f, RIDX)}</td>
+    <td>${sparkline(f.countOverTime, '#5095ed')}</td>
+    <td class="num">${abbreviateNumber(f.count)}</td>
+    <td>${sparkline(f.cardinalityOverTime, '#5095ed')}</td>
+    <td class="num">${abbreviateNumber(f.cardinality)}</td>
+    <td>${seenDate(f.firstSeen)}</td>
+    <td>${seenDate(f.lastSeen)}</td>
+    <td class="rowacts"><button class="icon" data-kebab="${f.id}">⋮</button></td>`;
+}
+
+function renderExplorer() {
+  RIDX = reservedIndex();
+  renderEngineNote();
+  renderFreshness();
+  renderExplorerHead();
+  const tb = $('#etbody');
+  if (S.loading) {
+    tb.innerHTML = Array.from({length: 8}, () =>
+      `<tr>${'<td><span class="skel"></span></td>'.repeat(cols().length + 1)}</tr>`).join('');
     return;
   }
-  $('#etbody').className='fade';
-
-  const q=($('#eq').value||'').trim().toLowerCase();
-  const list=SCHEMA.filter(f=>{
-    if(q && !f.kp.toLowerCase().includes(q)) return false;
-    if(expFilters.issues && f.cond==='ok') return false;
-    if(expFilters.unres && declared.has(f.kp)) return false;
-    return true;
+  const list = S.forceEmpty ? [] : visibleFields();
+  if (!list.length) {
+    tb.innerHTML = `<tr><td colspan="${cols().length + 1}"><div class="empty">
+      <h3>No results found</h3>
+      <p>We couldn't find any results for these search term, filter or timeframe. Try to reset filters or try a different query.</p>
+    </div></td></tr>`;
+    return;
+  }
+  if (S.flat) {
+    tb.innerHTML = list.map((f) =>
+      `<tr class="clickable" data-row="${f.id}">${rowCells(f, esc(f.dataprimePath))}</tr>`).join('');
+  } else {
+    // tree mode: group by first segment
+    const groups = new Map();
+    list.forEach((f) => {
+      const head = f.path.length > 1 ? f.path[0] : null;
+      const key = head || '__leaf__';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(f);
+    });
+    let html = '';
+    for (const [key, members] of groups) {
+      if (key === '__leaf__') {
+        html += members.map((f) => `<tr class="clickable" data-row="${f.id}">${rowCells(f, esc(f.dataprimePath))}</tr>`).join('');
+        continue;
+      }
+      const open = S.expanded.has(key);
+      const agg = {
+        id: 'g_' + key, dataprimePath: key, path: [key],
+        mappingStatus: 'unspecified', columnStatus: 'unspecified', types: ['object'], issues: [],
+        mappingViolationCount: members.reduce((s, m) => s + m.mappingViolationCount, 0),
+        count: members.reduce((s, m) => s + m.count, 0),
+        cardinality: Math.max(...members.map((m) => m.cardinality)),
+        countOverTime: members[0].countOverTime, cardinalityOverTime: members[0].cardinalityOverTime,
+        firstSeen: members[0].firstSeen, lastSeen: members[0].lastSeen,
+      };
+      html += `<tr data-group="${esc(key)}">${rowCells(agg,
+        `<span class="twisty">${open ? '▾' : '▸'}</span>${esc(key)}`)}</tr>`;
+      if (open) {
+        html += members.map((f) => `<tr class="clickable" data-row="${f.id}">${rowCells(f,
+          `<span style="display:inline-block;width:22px"></span>${esc(f.path.slice(1).join('.'))}`)}</tr>`).join('');
+      }
+    }
+    tb.innerHTML = html;
+    tb.querySelectorAll('[data-group]').forEach((tr) => tr.onclick = () => {
+      const k = tr.dataset.group;
+      S.expanded.has(k) ? S.expanded.delete(k) : S.expanded.add(k);
+      renderExplorer();
+    });
+  }
+  tb.querySelectorAll('[data-row]').forEach((tr) => tr.onclick = (e) => {
+    if (e.target.closest('[data-kebab]')) return;
+    openDrilldown(S.fields.find((f) => f.id === tr.dataset.row));
   });
-
-  $('#etbody').innerHTML = list.map(f=>{
-    const [txt,cls]=E.map[f.cond];
-    const dec=declared.get(f.kp);
-    const mismatch = dec && !f.types.includes(dec);
-    const rowcls = f.cond==='conflict' ? 'badrow' : (f.cond==='ok' ? '' : 'warnrow');
-    const resv = dec
-      ? `<span class="resv">${typeChip(dec)}${mismatch?'<span class="chip st-bad" title="Declared type is not among the observed types">mismatch</span>':''}
-           <button class="btn btn--xs" data-reserve="${f.kp}">Change</button></span>`
-      : `<span class="resv"><span class="dash">not reserved</span>
-           <button class="btn btn--xs" data-reserve="${f.kp}">Reserve</button></span>`;
-    return `<tr class="${rowcls}" data-kp="${f.kp}" title="${dec?'Change the declared type':'Reserve this field'}">
-      <td class="path"><span class="kp">${f.kp}<span class="go">${dec?'Change type':'+ Reserve'}</span></span></td>
-      <td><span class="types">${f.types.map(t=>typeChip(t)).join('')}</span></td>
-      <td><span class="chip ${cls}">${txt}</span></td>
-      <td>${resv}</td>
-      <td><span class="pop"><span class="bar"><i style="width:${f.pop}%"></i></span><span class="num">${f.pop}</span></span></td>
-      <td class="num">${f.card===null?'<span class="dash">n/a</span>':f.card.toLocaleString()}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="6" style="padding:26px;text-align:center;color:#8496a8">No keypath matches.</td></tr>`;
-
-  $('#nExp').textContent=SCHEMA.length;
-  $('#nRes').textContent=live().length;
+  tb.querySelectorAll('[data-kebab]').forEach((b) => b.onclick = (e) => {
+    e.stopPropagation();
+    openKebab(b, S.fields.find((f) => f.id === b.dataset.kebab));
+  });
 }
 
-function setCounts(isLoading){
-  const dots='<span class="sk sk--num" style="width:14px;display:inline-block;vertical-align:-2px"></span>';
-  $('#nExp').innerHTML = isLoading ? dots : SCHEMA.length;
-  $('#nRes').innerHTML = isLoading ? dots : live().length;
+function openKebab(anchor, field) {
+  document.querySelectorAll('.kebabmenu').forEach((n) => n.remove());
+  const r = anchor.getBoundingClientRect();
+  const isRes = field && reservedIndex().has(field.dataprimePath);
+  const m = el('div', 'fbmenu kebabmenu',
+    `<label style="cursor:pointer" data-a="explore"><span>↗</span> Open in Explore Logs</label>
+     <label style="cursor:pointer;color:var(--mock)" data-a="reserve">
+       ${isRes ? '✎ Change declared type' : '⭳ Reserve this field'} <span class="newflag sm">new</span></label>`);
+  m.style.cssText = `position:fixed;top:${r.bottom + 4}px;left:${r.left - 230}px;width:240px;z-index:70`;
+  document.body.appendChild(m);
+  m.querySelector('[data-a="reserve"]').onclick = () => { m.remove(); openReserveDrawer(field); };
+  setTimeout(() => document.addEventListener('click', () => m.remove(), {once: true}), 0);
 }
 
-function openReserve(kp){
-  const f=SCHEMA.find(x=>x.kp===kp);
-  const existing=rows.find(r=>!r.isRemoved && r.fieldName===kp);
-  drw={kp, f, editing:!!existing, id:existing?existing.id:null,
-       type: existing ? existing.type : f.types.find(t=>TYPES[t]) || 'String'};
-  $('#drwTitle').textContent = drw.editing ? 'Change declared type' : 'Reserve field';
-  $('#drwSub').textContent = `${$('#ds').value}/${$('#dt').value}`;
-  $('#drwKp').textContent = kp;
-  $('#drwOk').textContent = drw.editing ? 'Update type' : 'Add to reserved fields';
-  renderDrawer();
-  $('#drwWrap').hidden=false;
-  document.body.style.overflow='hidden';
+/* PROPOSAL — reserve from the explorer (CX-56997 shape). A confirm step, not a
+   one-click write: it states the cost of the cast before the user commits, and it
+   writes an UNSAVED row into the Reserved fields tab. Nothing reaches the server
+   until Save there. */
+function openReserveDrawer(f) {
+  if (!f) return;
+  const idx = reservedIndex();
+  const existing = idx.get(f.dataprimePath);
+  const state = {type: existing ? existing.type : (TYPES[f.types[0]] ? f.types[0] : 'string')};
+  const shares = f.types.map((t, i) => ({t, pct: f.types.length === 1 ? 100 : (i === 0 ? 87 : 13)}));
+  const wrap = el('div');
+  const paint = () => {
+    const cast = shares.filter((x) => x.t !== state.type).reduce((a, x) => a + x.pct, 0);
+    wrap.innerHTML = `
+    <div class="scrim" data-x></div>
+    <aside class="drw" style="width:min(560px,94vw)">
+      <div class="drw-h">
+        <div><h3>${existing ? 'Change declared type' : 'Reserve field'} <span class="newflag sm">new</span></h3>
+          <p>${esc(f.dataprimePath)}</p></div>
+        <button class="icon" style="margin-left:auto" data-x>✕</button>
+      </div>
+      <div class="drw-b">
+        <div>
+          <p class="description" style="margin-top:0"><b>Observed in this snapshot</b></p>
+          ${shares.map((x) => `<div style="margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between">
+              <span>${typeChips([x.t])}</span><span class="caption">${x.pct}% of events</span></div>
+            <div class="pctbar"><i style="width:${x.pct}%"></i></div></div>`).join('')}
+        </div>
+        <div>
+          <p class="description" style="margin-bottom:6px"><b>Declare as</b></p>
+          <select id="rdType">${['string', 'number', 'bool']
+            .map((t) => `<option ${state.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        </div>
+        ${cast ? `<div class="drw-note">Declaring <b>${esc(state.type)}</b> forces a cast at read time.
+          About <b>${cast}% of values</b> arrive as another type and will be read as <code>null</code>.</div>` : ''}
+        <div class="drw-note">This writes an unsaved row into <b>Reserved fields</b>. It takes effect on new data only,
+          and this grid will not show it until the next daily run at 00:00 UTC.</div>
+      </div>
+      <div class="dlg-f">
+        <button class="b outline" data-x>Cancel</button>
+        <button class="b" data-ok>${existing ? 'Update declaration' : 'Add to reserved fields'}</button>
+      </div>
+    </aside>`;
+    wrap.querySelectorAll('[data-x]').forEach((n) => n.onclick = () => wrap.remove());
+    wrap.querySelector('#rdType').onchange = (e) => { state.type = e.target.value; paint(); };
+    wrap.querySelector('[data-ok]').onclick = () => {
+      const row = S.rows.find((r) => r.name === f.dataprimePath && r.state !== 'removed');
+      if (row) {
+        row.type = state.type;
+        row.state = row.state === 'new' ? 'new'
+          : (row.name === row.orig.name && row.type === row.orig.type) ? 'clean' : 'edited';
+      } else {
+        S.rows.unshift({id: 'r' + Date.now(), name: f.dataprimePath, type: state.type,
+          cardinality: f.cardinality, orig: {name: '', type: ''}, state: 'new'});
+      }
+      wrap.remove();
+      renderReserved();
+      renderExplorer();
+    };
+  };
+  paint();
+  $('#overlays').appendChild(wrap);
 }
-function renderDrawer(){
-  const {f,type}=drw;
-  $('#drwObs').innerHTML = f.types.map(t=>`<div class="obs-r">
-      ${typeChip(t)}
-      <span class="bar"><i style="width:${f.shares[t]}%"></i></span>
-      <span class="obs-pc">${f.shares[t]}%</span></div>`).join('');
 
-  $('#drwTypes').innerHTML = Object.keys(TYPES).map(t=>`
-    <button class="tp ${t===type?'on':''}" data-t="${t}">
-      ${typeChip(t)}${f.shares[t]?`<span class="obsd">${f.shares[t]}% observed</span>`:''}
-    </button>`).join('');
+/* PROPOSAL — snapshot freshness. The grid is a daily aggregation, so anything
+   declared today is invisible here until the next run. Say that on the screen
+   rather than leaving the user to work it out. */
+function renderEngineNote() {
+  const n = $('#engineNote');
+  if (!n) return;
+  n.innerHTML = isArchive()
+    ? `<span class="newflag sm">new</span> <b>${esc(S.dataspace)} is the S3 archive.</b> The status column says whether the field has its own parquet column, so it reads <b>Column status</b>, not Mapping status. Mapping exceptions are an OpenSearch concept and the column is not shown here.`
+    : `<b>frequentsearch is OpenSearch.</b> The status column is <b>Mapping status</b> and Mapping Exceptions counts the times a value did not fit the mapped type.`;
+}
 
-  // the consequence of this exact choice, stated before the write
-  const covered=f.shares[type]||0, lost=100-covered;
-  const others=f.types.filter(t=>t!==type);
-  let cls,html;
-  if(covered===100){
-    cls='cons--ok';
-    html=`<b>Every value fits.</b> All observed values are ${type}, so nothing is lost by declaring it.`;
-  } else if(covered===0){
-    cls='cons--bad';
-    html=`<b>No value fits.</b> This keypath was never seen as ${type}. Every value would be read as <code>null</code>.
-      It arrives as ${others.map(t=>`${t} (${f.shares[t]}%)`).join(' and ')}.`;
-  } else {
-    cls='cons--warn';
-    html=`<b>${lost}% of values will be read as <code>null</code>.</b>
-      ${covered}% of events carry ${type}. The rest arrive as ${others.map(t=>`${t} (${f.shares[t]}%)`).join(' and ')},
-      and reserving forces a cast at read time, so anything that cannot cast returns <code>null</code>.`;
+function renderFreshness() {
+  const chip = $('#freshChip');
+  if (!chip) return;
+  const o = startDateOptions()[S.startDate];
+  const pending = S.rows.filter((r) => r.state === 'new' || r.state === 'edited').length;
+  chip.innerHTML = `⏱ Snapshot ${o.label} · built 00:00 UTC` +
+    (pending ? ` · <b>${pending} declared since, not in it</b>` : '');
+  chip.setAttribute('data-tip',
+    'The grid shows the daily aggregation for the selected date. A field reserved or retyped today is not in it and will appear after the next run at 00:00 UTC.');
+}
+
+/* ── drill-down drawer (CX-56465, ships today) ─────────────────── */
+function openDrilldown(f) {
+  if (!f) return;
+  const tab = {v: 'overview'};
+  const wrap = el('div');
+  const paint = () => {
+    wrap.innerHTML = `
+    <div class="scrim" data-x></div>
+    <aside class="drw">
+      <div class="drw-h">
+        <div>
+          <h3>Keypath drill-down</h3>
+          <p>${esc(f.dataprimePath)}</p>
+        </div>
+        <button class="icon" style="margin-left:auto" data-x>✕</button>
+      </div>
+      <div class="drw-tabs">
+        <button class="${tab.v === 'overview' ? 'on' : ''}" data-t="overview">Overview</button>
+        <button class="${tab.v === 'ds' ? 'on' : ''}" data-t="ds">Data source</button>
+      </div>
+      <div class="drw-b">
+      ${tab.v === 'overview' ? `
+        <div class="meta">
+          <div><span>Popularity</span><b>${abbreviateNumber(f.count)}</b></div>
+          <div><span>Cardinality</span><b>${abbreviateNumber(f.cardinality)}</b></div>
+          <div><span>First seen</span><b style="font:var(--f-paragraph-reg)">${seenDate(f.firstSeen)}</b></div>
+          <div><span>Last seen</span><b style="font:var(--f-paragraph-reg)">${seenDate(f.lastSeen)}</b></div>
+        </div>
+        <div class="aibox">
+          <div class="hd">✦ AI Description <button class="b ghost" style="margin-left:auto;height:24px">Edit description</button></div>
+          <p class="description">Identifier written by the ingestion pipeline for every event. Used to correlate a log line with its span.</p>
+          <p class="caption">AI-generated. Accuracy may vary.</p>
+        </div>
+        <div>
+          <p class="description" style="margin-bottom:6px"><b>Popularity over time</b></p>
+          ${sparkline(f.countOverTime, '#5095ed').replace('width="150"', 'width="100%"').replace('height="26"', 'height="90"').replace('viewBox="0 0 150 26"', 'viewBox="0 0 150 26" preserveAspectRatio="none"')}
+        </div>
+        <div>
+          <p class="description" style="margin-bottom:6px"><b>Cardinality over time</b></p>
+          ${sparkline(f.cardinalityOverTime, '#029449').replace('width="150"', 'width="100%"').replace('height="26"', 'height="90"').replace('viewBox="0 0 150 26"', 'viewBox="0 0 150 26" preserveAspectRatio="none"')}
+        </div>
+        <p class="description">The data shown is calculated and summarized daily at 00:00 UTC. Report generation can take several hours and may not be available until later.</p>
+      ` : `
+        <p class="description">Shows which applications and subsystems send data for this keypath, along with each combination's cardinality and when it was first and last seen.</p>
+        <div style="display:flex;gap:8px">
+          <div class="search" style="flex:1"><input placeholder="Search values"></div>
+          <button class="b outline">View query</button>
+          <button class="b outline">Open in Explore Logs ↗</button>
+        </div>
+        <div class="grid"><div class="tablewrap"><table style="min-width:0">
+          <thead><tr><th>applicationName</th><th>subsystemName</th><th>First seen</th><th>Last seen</th><th class="num">Cardinality</th></tr></thead>
+          <tbody>
+            <tr><td class="kp">cx-prod</td><td class="kp">ingress</td><td>${seenDate(f.firstSeen)}</td><td>${seenDate(f.lastSeen)}</td><td class="num">${abbreviateNumber(Math.round(f.cardinality * 0.6))}</td></tr>
+            <tr><td class="kp">cx-prod</td><td class="kp">api</td><td>${seenDate(f.firstSeen)}</td><td>${seenDate(f.lastSeen)}</td><td class="num">${abbreviateNumber(Math.round(f.cardinality * 0.3))}</td></tr>
+            <tr><td class="kp">cx-staging</td><td class="kp">api</td><td>${seenDate(f.firstSeen)}</td><td>${seenDate(f.lastSeen)}</td><td class="num">${abbreviateNumber(Math.round(f.cardinality * 0.1))}</td></tr>
+          </tbody>
+        </table></div></div>
+      `}
+      </div>
+    </aside>`;
+    wrap.querySelectorAll('[data-x]').forEach((n) => n.onclick = () => wrap.remove());
+    wrap.querySelectorAll('[data-t]').forEach((n) => n.onclick = () => { tab.v = n.dataset.t; paint(); });
+  };
+  paint();
+  $('#overlays').appendChild(wrap);
+}
+
+/* ── reserved fields ───────────────────────────────────────────── */
+function summary() {
+  const add = S.rows.filter((r) => r.state === 'new').length;
+  const update = S.rows.filter((r) => r.state === 'edited').length;
+  const remove = S.rows.filter((r) => r.state === 'removed').length;
+  return {add, update, remove, total: add + update + remove};
+}
+function liveCount() { return S.rows.filter((r) => r.state !== 'removed').length; }
+
+function renderReservedToolbarArea() {
+  const s = summary();
+  const isFS = S.dataspace === 'frequentsearch';
+  const resetDisabled = S.resetUsedToday || s.total > 0 || !S.rows.some((r) => r.state === 'new');
+  const tip = S.resetUsedToday ? 'Index has already been reset today.'
+    : s.total > 0 ? 'There are unsaved changes preventing the reset.'
+    : !S.rows.some((r) => r.state === 'new') ? 'No fields have been added today, preventing the reset.' : '';
+  $('#rfActions').innerHTML = isFS ? `
+    <div class="counter" data-tip="Today's ingested fields out of the team's total daily limit">
+      <span>Fields ingested today</span><b>${abbreviateNumber(S.ingestedToday)} / ${abbreviateNumber(S.ingestLimit)}</b>
+    </div>
+    <div class="counter">
+      <span>Mapping exceptions today</span><b>${abbreviateNumber(S.mappingExceptionsToday)}</b>
+      <a class="link">Go to dashboard ↗</a>
+    </div>
+    <button class="b outline" id="resetIdx" ${resetDisabled ? 'disabled' : ''}
+      data-tip="${esc((tip ? tip + ' ' : '') + 'Users can reset the index once per day to map newly added reserved fields immediately.')}">↻ Reset index</button>
+  ` : `<span class="caption">Counters and Reset index are frequentsearch only — the index they reset is the OpenSearch one.</span>`;
+  const rb = $('#resetIdx');
+  if (rb) rb.onclick = () => confirmDialog({
+    title: 'Are you sure you want to reset?',
+    body: 'You may reset the index once per day to map newly added reserved fields immediately. Any fields reserved after the reset will not be mapped until the next automatic split at 00:00.',
+    ok: 'Confirm', cancel: 'Cancel',
+    onOk: () => { S.resetUsedToday = true; renderReserved(); },
+  });
+}
+
+function renderUnsaved() {
+  const s = summary();
+  const w = $('#unsavedWrap');
+  if (!s.total) { w.innerHTML = ''; return; }
+  w.innerHTML = `<div class="unsaved">
+    <div class="l">
+      <span class="i" style="border-color:var(--c-text-interactive);color:var(--c-text-interactive)">i</span>
+      <b>You have unsaved changes:</b>
+      <span>${s.add} fields added, ${s.update} modified, ${s.remove} deleted.</span>
+      <a class="link" id="viewChanges">View changes</a>
+    </div>
+    <div class="r">
+      <button class="b outline" id="revert">Revert</button>
+      <button class="b" id="commit">Save</button>
+    </div>
+  </div>`;
+  $('#viewChanges').onclick = openChangesDialog;
+  $('#revert').onclick = () => { S.rows = mkRows(); S.editing = null; S.selected.clear(); renderReserved(); renderExplorer(); };
+  $('#commit').onclick = () => {
+    S.rows = S.rows.filter((r) => r.state !== 'removed')
+      .map((r) => ({...r, state: 'clean', orig: {name: r.name, type: r.type}}));
+    S.selected.clear(); renderReserved(); renderExplorer();
+  };
+}
+
+/* PROPOSAL (Amnon, 16-09) — bulk change type. Bulk add-with-type and bulk delete
+   already ship; changing the type of rows that exist is one row at a time. The
+   room called this UX work, not backend work, so it is drawn as the selection
+   bulk bar the design system already has (cxui-grid-bulk-bar). */
+function renderBulkBar() {
+  const bar = $('#bulkBar');
+  const n = [...S.selected].filter((id) => S.rows.some((r) => r.id === id && r.state !== 'removed')).length;
+  if (!n || S.editing) { bar.innerHTML = ''; return; }
+  bar.innerHTML = `<div class="bulkbar">
+    <b>${n} selected</b>
+    <span class="newflag sm">new</span>
+    <div class="sp">
+      <button class="b outline" id="bulkType">Change type</button>
+      <button class="b outline" id="bulkDel">Delete</button>
+      <button class="b ghost" id="bulkClear">Clear selection</button>
+    </div></div>`;
+  $('#bulkClear').onclick = () => { S.selected.clear(); renderReserved(); };
+  $('#bulkDel').onclick = () => $('#rfDelete').click();
+  $('#bulkType').onclick = () => openBulkChangeType(n);
+}
+
+function openBulkChangeType(n) {
+  const picked = {t: 'string'};
+  const targets = S.rows.filter((r) => S.selected.has(r.id) && r.state !== 'removed');
+  dialog({
+    title: `Change type for ${n} fields`,
+    body: `
+      <p class="description" style="margin-top:0">Every selected field is declared as the type you pick.
+      The declaration applies to new data. Values already stored keep the type they were written with.</p>
+      <div style="margin:10px 0"><select id="bctType">${['string', 'number', 'bool']
+        .map((t) => `<option>${t}</option>`).join('')}</select></div>
+      <div class="grid"><div class="tablewrap" style="max-height:220px"><table style="min-width:0">
+        <thead><tr><th>Field Name</th><th style="width:120px">From</th><th style="width:120px">To</th></tr></thead>
+        <tbody id="bctRows"></tbody></table></div></div>
+      <div class="drw-note" style="margin-top:10px">This is the case behind the ask: a customer converting many
+        fields from a union to text had to do it one row at a time.</div>`,
+    ok: 'Change type', cancel: 'Cancel',
+    onMount: (root) => {
+      const paint = () => {
+        root.querySelector('#bctRows').innerHTML = targets.map((r) => `<tr>
+          <td class="kp">${esc(r.name)}</td><td>${typeChips([r.type])}</td>
+          <td>${r.type === picked.t ? '<span class="caption">no change</span>' : typeChips([picked.t])}</td></tr>`).join('');
+      };
+      root.querySelector('#bctType').onchange = (e) => { picked.t = e.target.value; paint(); };
+      paint();
+    },
+    onOk: () => {
+      targets.forEach((r) => {
+        r.type = picked.t;
+        if (r.state !== 'new') r.state = (r.name === r.orig.name && r.type === r.orig.type) ? 'clean' : 'edited';
+      });
+      S.selected.clear();
+      renderReserved();
+      renderExplorer();
+    },
+  });
+}
+
+function renderReserved() {
+  renderReservedToolbarArea();
+  renderUnsaved();
+  // the count belongs to the dataset being loaded, so it waits with the rows
+  $('#rfCount').innerHTML = S.rLoading
+    ? '<span class="skel" style="width:14px;height:8px"></span>' : liveCount();
+  $('#rfLimit').textContent = RESERVED_LIMIT;
+  $('#rthead').innerHTML = `<tr>
+    <th style="width:38px"><input type="checkbox" id="selAll"></th>
+    <th>Field Name</th><th style="width:190px">Type</th>
+    <th style="width:90px"></th></tr>`;
+  const tb = $('#rtbody');
+  // PROPOSAL — the dataset selector swaps the whole table's contents, and today the
+  // old rows stay on screen until the new ones land, which reads as "these are your
+  // reserved fields for the dataset you just picked". Skeleton rows say otherwise.
+  if (S.rLoading) {
+    tb.innerHTML = Array.from({length: 6}, () =>
+      `<tr>${'<td><span class="skel"></span></td>'.repeat(4)}</tr>`).join('');
+    ['rfDelete', 'rfBulk', 'rfAdd', 'rfImport', 'rfExport'].forEach((id) => {
+      const b = $('#' + id); if (b) b.disabled = true; });
+    renderBulkBar();
+    return;
   }
-  $('#drwCons').innerHTML=`<div class="cons ${cls}">${html}</div>`;
-}
-function closeReserve(){ drw=null; $('#drwWrap').hidden=true; document.body.style.overflow=''; }
-
-$('#drwTypes').addEventListener('click', e=>{
-  const b=e.target.closest('button[data-t]'); if(!b||!drw) return;
-  drw.type=b.dataset.t; renderDrawer();
-});
-$('#drwOk').onclick=()=>{
-  if(!drw) return;
-  if(drw.editing){
-    const r=rows.find(x=>x.id===drw.id); r.type=drw.type; r.hl=true;
+  const list = S.rows.filter((r) => !S.rq || r.name.toLowerCase().includes(S.rq.toLowerCase()));
+  if (!list.length) {
+    tb.innerHTML = `<tr><td colspan="4"><div class="empty">
+      <h3>No fields have been added yet</h3><p>Start by adding a new field.</p></div></td></tr>`;
   } else {
-    if(live().length>=LIMIT){ alert(`Limit of ${LIMIT} reserved fields reached.`); return; }
-    rows.unshift({id:'r'+(++uid), fieldName:drw.kp, type:drw.type,
-      original:null, isNew:true, isRemoved:false, hl:true});
+    tb.innerHTML = list.map((r) => {
+      const editing = S.editing && S.editing.id === r.id;
+      const badge = r.state === 'new' ? '<span class="badge blue">New</span>'
+        : r.state === 'edited' ? '<span class="badge yellow">Edited</span>'
+        : r.state === 'removed' ? '<span class="badge red">Removed</span>' : '';
+      if (editing) {
+        return `<tr class="editing" data-r="${r.id}">
+          <td></td>
+          <td style="position:relative"><input class="inp" id="edName" value="${esc(S.editing.name)}" placeholder="Select or create a field" autocomplete="off">
+            <div id="suggBox"></div><span class="err" id="edErr"></span></td>
+          <td><select id="edType">${Object.keys(TYPES).filter((t) => ['string', 'number', 'bool'].includes(t))
+            .map((t) => `<option value="${t}" ${S.editing.type === t ? 'selected' : ''}>${TYPES[t].label}</option>`).join('')}</select></td>
+          <td class="rowacts">
+            <button class="icon" id="edOk" title="Save" style="color:var(--c-text-interactive)">✓</button>
+            <button class="icon" id="edCancel" title="Cancel">✕</button></td></tr>`;
+      }
+      return `<tr data-r="${r.id}" ${r.state === 'removed' ? 'style="opacity:.55"' : ''}>
+        <td><input type="checkbox" class="rsel" data-id="${r.id}" ${S.selected.has(r.id) ? 'checked' : ''}></td>
+        <td class="kp" ${r.state === 'removed' ? 'style="text-decoration:line-through"' : ''}>${esc(r.name)} ${badge}</td>
+        <td>${typeChips([r.type])}</td>
+        <td class="rowacts">
+          ${r.state === 'removed'
+            ? `<button class="icon" data-restore="${r.id}" title="Restore">↺</button>`
+            : `<button class="icon" data-edit="${r.id}" title="Edit">✎</button>
+               <button class="icon" data-remove="${r.id}" title="Remove">✕</button>`}
+        </td></tr>`;
+    }).join('');
   }
-  closeReserve();
-  renderBody(engineOf($('#ds').value));
+  wireReservedRows();
+  renderBulkBar();
+}
+
+function wireReservedRows() {
+  const selAll = $('#selAll');
+  if (selAll) selAll.onclick = () => {
+    S.rows.forEach((r) => selAll.checked ? S.selected.add(r.id) : S.selected.delete(r.id));
+    renderReserved();
+  };
+  document.querySelectorAll('.rsel').forEach((c) => c.onclick = () => {
+    c.checked ? S.selected.add(c.dataset.id) : S.selected.delete(c.dataset.id);
+    $('#rfDelete').disabled = !S.selected.size || !!S.editing;
+    renderBulkBar();
+  });
+  document.querySelectorAll('[data-edit]').forEach((b) => b.onclick = () => {
+    const r = S.rows.find((x) => x.id === b.dataset.edit);
+    S.editing = {id: r.id, name: r.name, type: r.type, typeTouched: false};
+    renderReserved();
+    setTimeout(() => $('#edName') && $('#edName').focus(), 0);
+  });
+  document.querySelectorAll('[data-remove]').forEach((b) => b.onclick = () => {
+    const r = S.rows.find((x) => x.id === b.dataset.remove);
+    r.state = r.state === 'new' ? 'gone' : 'removed';
+    S.rows = S.rows.filter((x) => x.state !== 'gone');
+    renderReserved();
+  });
+  document.querySelectorAll('[data-restore]').forEach((b) => b.onclick = () => {
+    const r = S.rows.find((x) => x.id === b.dataset.restore);
+    r.state = (r.name === r.orig.name && r.type === r.orig.type) ? 'clean' : 'edited';
+    renderReserved();
+  });
+  $('#rfDelete').disabled = S.rLoading || !S.selected.size || !!S.editing;
+  $('#rfBulk').disabled = S.rLoading;
+  $('#rfAdd').disabled = S.rLoading;
+  $('#rfImport').disabled = S.rLoading || !!S.editing || liveCount() >= RESERVED_LIMIT;
+  $('#rfExport').disabled = S.rLoading || !liveCount();
+  if (S.editing) wireEditor();
+}
+
+function wireEditor() {
+  const name = $('#edName'), type = $('#edType'), box = $('#suggBox'), err = $('#edErr');
+  let hi = -1;
+  const suggestions = () => S.fields
+    .filter((f) => f.dataprimePath.toLowerCase().includes(name.value.toLowerCase()))
+    .filter((f) => !S.rows.some((r) => r.name === f.dataprimePath && r.id !== S.editing.id))
+    .slice(0, 8);
+  const paintSugg = () => {
+    const list = name.value ? suggestions() : [];
+    if (!list.length) { box.innerHTML = ''; return; }
+    box.className = 'sugg';
+    box.innerHTML = list.map((f, i) =>
+      `<div data-i="${i}" class="${i === hi ? 'on' : ''}"><span>${esc(f.dataprimePath)}</span>
+       <span class="caption">${esc(f.types[0])}</span></div>`).join('');
+    box.querySelectorAll('div[data-i]').forEach((d) => d.onmousedown = (e) => {
+      e.preventDefault(); pick(list[+d.dataset.i]);
+    });
+  };
+  const pick = (f) => {
+    name.value = f.dataprimePath;
+    // CX-57952: a suggested type is adopted ONLY when the user has not set one.
+    if (!S.editing.typeTouched) {
+      const t = f.types[0] === 'array<string>' ? 'string' : f.types[0];
+      if (TYPES[t]) type.value = t;
+    }
+    box.innerHTML = ''; box.className = '';
+  };
+  name.oninput = () => { hi = -1; paintSugg(); err.textContent = ''; name.classList.remove('bad'); };
+  name.onkeydown = (e) => {
+    const list = suggestions();
+    if (e.key === 'ArrowDown') { hi = Math.min(hi + 1, list.length - 1); paintSugg(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { hi = Math.max(hi - 1, 0); paintSugg(); e.preventDefault(); }
+    else if (e.key === 'Enter') { if (hi >= 0 && list[hi]) { pick(list[hi]); } else { commitEdit(); } e.preventDefault(); }
+    else if (e.key === 'Escape') { cancelEdit(); }
+  };
+  type.onchange = () => { S.editing.typeTouched = true; };
+  $('#edOk').onclick = commitEdit;
+  $('#edCancel').onclick = cancelEdit;
+}
+function commitEdit() {
+  const name = $('#edName').value.trim(), type = $('#edType').value, err = $('#edErr');
+  const r = S.rows.find((x) => x.id === S.editing.id);
+  if (!name) { err.textContent = 'Field name is required.'; $('#edName').classList.add('bad'); return; }
+  if (S.rows.some((x) => x.id !== r.id && x.name === name && x.state !== 'removed')) {
+    err.textContent = 'Field already exists.'; $('#edName').classList.add('bad'); return;
+  }
+  r.name = name; r.type = type;
+  const observed = S.fields.find((f) => f.dataprimePath === name);
+  r.cardinality = observed ? observed.cardinality : 0;
+  // CX-57951: a row edited back to its original values is not a change.
+  if (r.state !== 'new') r.state = (r.name === r.orig.name && r.type === r.orig.type) ? 'clean' : 'edited';
+  S.editing = null;
+  renderReserved();
+}
+function cancelEdit() {
+  const r = S.rows.find((x) => x.id === S.editing.id);
+  if (r.state === 'new' && !r.name) S.rows = S.rows.filter((x) => x.id !== r.id);
+  else { r.name = r.orig.name || r.name; r.type = r.orig.type || r.type; } // CX-57950: name AND type restored
+  S.editing = null;
+  renderReserved();
+}
+
+function openChangesDialog() {
+  const changed = S.rows.filter((r) => r.state !== 'clean');
+  dialog({
+    title: 'Unsaved changes',
+    body: `<div class="grid"><div class="tablewrap"><table style="min-width:0">
+      <thead><tr><th>Field Name</th><th style="width:140px">Action made</th><th style="width:140px">Type</th></tr></thead>
+      <tbody>${changed.map((r) => `<tr><td class="kp">${esc(r.name)}</td>
+        <td>${r.state === 'new' ? '<span class="badge blue">Added</span>'
+              : r.state === 'edited' ? '<span class="badge yellow">Modified</span>'
+              : '<span class="badge red">Deleted</span>'}</td>
+        <td>${typeChips([r.type])}</td></tr>`).join('')}</tbody>
+    </table></div></div>`,
+    ok: 'Save changes', cancel: 'Cancel',
+    onOk: () => { $('#commit') && $('#commit').click(); },
+  });
+}
+
+function openBulkAdd() {
+  const picked = new Set();
+  const candidates = S.fields.filter((f) => !S.rows.some((r) => r.name === f.dataprimePath && r.state !== 'removed'));
+  const body = () => `
+    <p class="description" style="margin-top:0">Select reserved fields from your data. The type comes from the observation and can be changed per row.</p>
+    <div class="grid"><div class="tablewrap" style="max-height:340px"><table style="min-width:0">
+      <thead><tr><th style="width:38px"></th><th>Field Name</th><th style="width:170px">Type</th><th class="num" style="width:120px">Cardinality</th></tr></thead>
+      <tbody>${candidates.map((f) => `<tr>
+        <td><input type="checkbox" class="bsel" data-p="${esc(f.dataprimePath)}" ${picked.has(f.dataprimePath) ? 'checked' : ''}></td>
+        <td class="kp">${esc(f.dataprimePath)}</td>
+        <td><select class="btype" data-p="${esc(f.dataprimePath)}">${['string', 'number', 'bool']
+          .map((t) => `<option ${f.types[0] === t ? 'selected' : ''}>${t}</option>`).join('')}</select></td>
+        <td class="num">${abbreviateNumber(f.cardinality)}</td></tr>`).join('')}</tbody>
+    </table></div></div>`;
+  dialog({
+    title: 'Selected Fields', body: body(), ok: 'Add fields', cancel: 'Cancel',
+    onMount: (root) => root.querySelectorAll('.bsel').forEach((c) => c.onclick = () =>
+      c.checked ? picked.add(c.dataset.p) : picked.delete(c.dataset.p)),
+    onOk: (root) => {
+      const types = {};
+      root.querySelectorAll('.btype').forEach((s) => types[s.dataset.p] = s.value);
+      picked.forEach((p) => {
+        const f = S.fields.find((x) => x.dataprimePath === p);
+        S.rows.push({id: 'r' + Date.now() + Math.random(), name: p, type: types[p] || 'string',
+          cardinality: f ? f.cardinality : 0, orig: {name: '', type: ''}, state: 'new'});
+      });
+      renderReserved();
+    },
+  });
+}
+
+/* ════════ EXPORT LIST (CX-53272) ════════════════════════════════
+   Shape taken from the design repo, internal-cx-web-workspace-design
+   src/data-flow/schema-manager/reserved-fields/export-dialog.component.ts and
+   src/shared/data-pipeline/reserved-fields.export.ts. A dialog rather than an
+   immediate download, because WHAT gets exported is otherwise invisible: someone
+   who searched the table and hits download cannot tell whether they got the
+   filtered list or all of it without opening the file. */
+function safeName(x) { return x.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, ''); }
+function defaultExportBaseName() {
+  return `reserved-fields_${safeName(S.dataspace)}_${safeName(S.dataset)}_${new Date().toISOString().slice(0, 10)}`;
+}
+function csvCell(v) { return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+
+function exportRows(scope, includeUnsaved) {
+  const visible = S.rows.filter((r) => !S.rq || r.name.toLowerCase().includes(S.rq.toLowerCase()));
+  let rows = scope === 'all' ? S.rows.filter((r) => includeUnsaved ? r.state !== 'removed' : true)
+    : scope === 'filtered' ? visible
+    : visible.filter((r) => S.selected.has(r.id));
+  if (!includeUnsaved) {
+    // the committed baseline: rows added this session were never reserved, rows
+    // pending deletion still are, and edited rows revert to what was loaded.
+    rows = rows.filter((r) => r.state !== 'new' && r.orig.name)
+      .map((r) => ({...r, name: r.orig.name, type: r.orig.type}));
+  }
+  return rows.filter((r) => r.name);
+}
+function buildExport(fmt, scope, includeUnsaved, baseName) {
+  const rows = exportRows(scope, includeUnsaved);
+  const content = fmt === 'csv'
+    ? ['Field Name,Type'].concat(rows.map((r) => [r.name, r.type].map(csvCell).join(','))).join('\r\n') + '\r\n'
+    : JSON.stringify({dataspace: S.dataspace, dataset: S.dataset, exportedAt: new Date().toISOString(),
+        count: rows.length, fields: rows.map((r) => ({fieldName: r.name, type: r.type}))}, null, 2) + '\n';
+  const base = safeName((baseName || '').trim()) || defaultExportBaseName();
+  return {filename: `${base}.${fmt}`, content, rowCount: rows.length,
+    mime: fmt === 'csv' ? 'text/csv;charset=utf-8' : 'application/json;charset=utf-8'};
+}
+
+function openExportDialog() {
+  const sums = summary();
+  const filtered = !!S.rq;
+  const selCount = [...S.selected].filter((id) => S.rows.some((r) => r.id === id && r.state !== 'removed')).length;
+  const st = {
+    fmt: 'csv',
+    // the narrowest scope the user actually expressed
+    scope: selCount ? 'selected' : filtered ? 'filtered' : 'all',
+    includeUnsaved: true,
+    name: defaultExportBaseName(),
+  };
+  const card = (checked, disabled, label, desc, attr) => `
+    <label class="radcard ${checked ? 'on' : ''} ${disabled ? 'off' : ''}" ${disabled ? '' : attr}>
+      <span class="dot"></span>
+      <span><b>${label}</b><span class="caption" style="display:block">${desc}</span></span></label>`;
+  const body = () => {
+    const pv = buildExport(st.fmt, st.scope, st.includeUnsaved || !sums.total, st.name);
+    const counts = {
+      all: S.rows.filter((r) => r.state !== 'removed').length,
+      filtered: S.rows.filter((r) => S.rq && r.name.toLowerCase().includes(S.rq.toLowerCase())).length,
+      selected: selCount,
+    };
+    return `
+    ${sums.total ? `<div class="unsaved" style="margin-bottom:12px">
+      <div class="l"><span class="i" style="border-color:var(--c-text-interactive);color:var(--c-text-interactive)">i</span>
+      <b>You have unsaved changes:</b>
+      <span>${[sums.add && sums.add + ' added', sums.update && sums.update + ' modified', sums.remove && sums.remove + ' deleted'].filter(Boolean).join(', ')}.</span></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+      <input type="checkbox" id="exUnsaved" ${st.includeUnsaved ? 'checked' : ''}>
+      <span>Include unsaved changes in the export</span></label>` : ''}
+
+    <div class="legendrow">Format</div>
+    <div class="radgroup">
+      ${card(st.fmt === 'csv', false, 'CSV', 'Opens in a spreadsheet', 'data-f="csv"')}
+      ${card(st.fmt === 'json', false, 'JSON', 'Re-importable', 'data-f="json"')}
+    </div>
+
+    <div class="legendrow">Name</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <input class="inp" id="exName" style="height:32px;flex:1;font:var(--f-paragraph-reg)"
+        value="${esc(st.name)}" placeholder="${esc(defaultExportBaseName())}">
+      <span class="caption">.${st.fmt}</span>
+    </div>
+
+    <div class="legendrow">Rows</div>
+    <div class="radgroup">
+      ${card(st.scope === 'all', false, 'All fields', counts.all + ' in this dataset', 'data-s="all"')}
+      ${card(st.scope === 'filtered', !filtered, 'Current view', filtered ? counts.filtered + ' matching the search' : 'No search applied', 'data-s="filtered"')}
+      ${card(st.scope === 'selected', !selCount, 'Selected fields', selCount ? selCount + ' selected' : 'Nothing selected', 'data-s="selected"')}
+    </div>
+
+    <div class="note" style="margin-top:14px"><b>${esc(pv.filename)}</b> · ${pv.rowCount} rows.
+    The file holds Field Name and Type only. JSON round-trips: the same shape Import fields reads.</div>`;
+  };
+  dialog({
+    title: 'Export reserved fields', body: body(), ok: '⭳ Export', cancel: 'Cancel',
+    onMount: (root) => {
+      const rewire = () => {
+        root.querySelector('.dlg-b').innerHTML = body();
+        bind();
+      };
+      const bind = () => {
+        root.querySelectorAll('[data-f]').forEach((n) => n.onclick = () => { st.fmt = n.dataset.f; rewire(); });
+        root.querySelectorAll('[data-s]').forEach((n) => n.onclick = () => { st.scope = n.dataset.s; rewire(); });
+        const u = root.querySelector('#exUnsaved');
+        if (u) u.onchange = () => { st.includeUnsaved = u.checked; rewire(); };
+        const nm = root.querySelector('#exName');
+        if (nm) nm.oninput = () => { st.name = nm.value; };
+      };
+      bind();
+    },
+    onOk: () => {
+      const out = buildExport(st.fmt, st.scope, st.includeUnsaved || !sums.total, st.name);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([out.content], {type: out.mime}));
+      a.download = out.filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    },
+  });
+}
+
+/* ════════ IMPORT FIELDS (CTDL-779 / the 2025 user story) ════════
+   Paste JSON, extract, review side by side, pick, add to list as UNSAVED rows.
+   Defaults from the story: every extracted field selected, type String when the
+   value is missing or unknown, Next disabled until the JSON parses to at least
+   one field, Add to list disabled until something is selected, counter against
+   the team quota. File upload was scoped as a separate ticket and is drawn here
+   as one, feeding the same parser. Duplicates were also deferred to their own
+   ticket; they are shown disabled rather than silently dropped. */
+const TYPE_ALIASES = {string: 'string', str: 'string', text: 'string', keyword: 'string',
+  number: 'number', num: 'number', int: 'number', integer: 'number', long: 'number',
+  float: 'number', double: 'number', bool: 'bool', boolean: 'bool'};
+
+function extractFields(text) {
+  let data;
+  try { data = JSON.parse(text); } catch (e) { return {error: 'Invalid JSON: ' + e.message, fields: []}; }
+  const out = [];
+  const push = (name, type) => {
+    if (!name) return;
+    const t = TYPE_ALIASES[String(type || '').toLowerCase()] || 'string';
+    if (!out.some((f) => f.name === name)) out.push({name, type: t});
+  };
+  // the document an Export produced, so a list round-trips between datasets
+  if (data && Array.isArray(data.fields)) {
+    data.fields.forEach((f) => push(f.fieldName || f.name, f.type));
+  } else if (Array.isArray(data)) {
+    data.forEach((f) => typeof f === 'string' ? push(f, 'string') : push(f.fieldName || f.name, f.type));
+  } else if (data && typeof data === 'object') {
+    // keys are field names, values are types. A nested object is walked, so a
+    // pasted sample event yields keypaths rather than one useless top-level row.
+    const walk = (obj, prefix) => Object.entries(obj).forEach(([k, v]) => {
+      const path = prefix ? prefix + '.' + k : k;
+      if (v && typeof v === 'object' && !Array.isArray(v)) walk(v, path);
+      else push(path, typeof v === 'string' ? v : typeof v);
+    });
+    walk(data, '');
+  }
+  if (!out.length) return {error: 'No fields found in this JSON.', fields: []};
+  return {error: '', fields: out};
+}
+
+function openImportDialog() {
+  const st = {step: 1, text: '', parsed: [], picked: new Set(), q: '', error: ''};
+  const taken = new Set(S.rows.filter((r) => r.state !== 'removed').map((r) => r.name));
+  const remaining = () => RESERVED_LIMIT - liveCount();
+  const wrap = el('div');
+
+  const paint = () => {
+    const shown = st.parsed.filter((f) => !st.q || f.name.toLowerCase().includes(st.q.toLowerCase()));
+    const dupes = st.parsed.filter((f) => taken.has(f.name)).length;
+    const overQuota = st.picked.size > remaining();
+    wrap.innerHTML = `
+    <div class="scrim" data-x></div>
+    <div class="dlg" style="width:min(900px,96vw)">
+      <div class="dlg-h">Import fields <span class="newflag sm">new</span>
+        <span class="caption" style="margin-left:8px">Step ${st.step} of 2</span></div>
+      <div class="dlg-b">
+      ${st.step === 1 ? `
+        <p class="description" style="margin-top:0">Paste a JSON object where the keys are field names and the values are types,
+        or a list exported from another dataset. Nested objects are walked, so a sample event gives you keypaths.</p>
+        <div class="codewrap">
+          <div class="gutter" id="imGutter">1</div>
+          <textarea id="imText" spellcheck="false" placeholder='{\n  "userId": "string",\n  "sessionDuration": "number",\n  "isActive": "boolean"\n}'>${esc(st.text)}</textarea>
+        </div>
+        ${st.error ? `<p class="err" style="margin-top:6px">${esc(st.error)}</p>` : ''}
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <button class="b outline" id="imFile">Upload .json</button>
+          <span class="caption">File upload was scoped as its own ticket. Same parser either way.</span>
+          <input type="file" id="imFileInput" accept=".json,application/json" hidden>
+        </div>
+      ` : `
+        <div class="sbs">
+          <div>
+            <div class="legendrow" style="margin-top:0">Pasted text</div>
+            <div class="codewrap" style="height:300px"><div class="gutter">${
+              st.text.split('\n').map((_, i) => i + 1).join('<br>')}</div>
+              <textarea readonly>${esc(st.text)}</textarea></div>
+          </div>
+          <div>
+            <div class="legendrow" style="margin-top:0;display:flex;align-items:center;gap:8px">
+              <span>Extracted fields</span>
+              <span class="cxui-tag ${overQuota ? 'badge red' : ''}">${st.picked.size} selected · ${remaining()} slots left</span>
+            </div>
+            <div class="search" style="width:100%;margin-bottom:6px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#68686d" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="#68686d" stroke-width="1.6"/></svg>
+              <input id="imQ" placeholder="Search fields" value="${esc(st.q)}">
+            </div>
+            <div class="grid"><div class="tablewrap" style="max-height:250px"><table style="min-width:0">
+              <thead><tr><th style="width:34px"><input type="checkbox" id="imAll"></th>
+                <th>Field Name</th><th style="width:130px">Field Type</th></tr></thead>
+              <tbody>${shown.map((f) => {
+                const dup = taken.has(f.name);
+                return `<tr><td><input type="checkbox" class="imSel" data-n="${esc(f.name)}"
+                    ${st.picked.has(f.name) ? 'checked' : ''} ${dup ? 'disabled' : ''}></td>
+                  <td class="kp">${esc(f.name)}${dup ? '<div class="dupe caption">already reserved</div>' : ''}</td>
+                  <td>${dup ? typeChips([f.type]) : `<select class="imType" data-n="${esc(f.name)}">${
+                    ['string', 'number', 'bool'].map((t) => `<option ${f.type === t ? 'selected' : ''}>${t}</option>`).join('')
+                  }</select>`}</td></tr>`;
+              }).join('')}</tbody></table></div></div>
+            ${dupes ? `<p class="caption dupe" style="margin-top:6px">${dupes} field${dupes > 1 ? 's are' : ' is'} already reserved here and cannot be added twice.</p>` : ''}
+            ${overQuota ? `<p class="err" style="margin-top:6px">Over the limit. ${remaining()} slots left in this dataset.</p>` : ''}
+          </div>
+        </div>
+        <div class="note" style="margin-top:12px">Add to list puts these in as <b>unsaved</b> rows. Nothing reaches the server until you hit Save on the Reserved fields screen.</div>
+      `}
+      </div>
+      <div class="dlg-f">
+        ${st.step === 2 ? '<button class="b outline" data-back>Back</button>' : ''}
+        <button class="b outline" data-x>Cancel</button>
+        ${st.step === 1
+          ? `<button class="b" data-next ${st.text.trim() ? '' : 'disabled'}>Next</button>`
+          : `<button class="b" data-add ${st.picked.size && !overQuota ? '' : 'disabled'}>Add to list</button>`}
+      </div>
+    </div>`;
+    bind();
+  };
+
+  const bind = () => {
+    wrap.querySelectorAll('[data-x]').forEach((n) => n.onclick = () => wrap.remove());
+    const ta = wrap.querySelector('#imText');
+    if (ta) {
+      const gut = wrap.querySelector('#imGutter');
+      const lines = () => { gut.innerHTML = ta.value.split('\n').map((_, i) => i + 1).join('<br>') || '1'; };
+      lines();
+      ta.oninput = () => { st.text = ta.value; lines();
+        wrap.querySelector('[data-next]').disabled = !ta.value.trim(); };
+      ta.onscroll = () => { gut.scrollTop = ta.scrollTop; };
+      wrap.querySelector('#imFile').onclick = () => wrap.querySelector('#imFileInput').click();
+      wrap.querySelector('#imFileInput').onchange = (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => { st.text = rd.result; st.error = ''; paint(); };
+        rd.readAsText(f);
+      };
+    }
+    const nx = wrap.querySelector('[data-next]');
+    if (nx) nx.onclick = () => {
+      const res = extractFields(st.text);
+      if (res.error) { st.error = res.error; paint(); return; }
+      st.parsed = res.fields;
+      // every extracted field selected by default, minus the ones already reserved
+      st.picked = new Set(res.fields.filter((f) => !taken.has(f.name)).map((f) => f.name));
+      st.error = ''; st.step = 2; paint();
+    };
+    const bk = wrap.querySelector('[data-back]');
+    if (bk) bk.onclick = () => { st.step = 1; paint(); };
+    const q = wrap.querySelector('#imQ');
+    if (q) q.oninput = () => { st.q = q.value; paint(); q.focus(); };
+    wrap.querySelectorAll('.imSel').forEach((c) => c.onclick = () => {
+      c.checked ? st.picked.add(c.dataset.n) : st.picked.delete(c.dataset.n); paint();
+    });
+    const all = wrap.querySelector('#imAll');
+    if (all) all.onclick = () => {
+      st.parsed.filter((f) => !taken.has(f.name))
+        .forEach((f) => all.checked ? st.picked.add(f.name) : st.picked.delete(f.name));
+      paint();
+    };
+    wrap.querySelectorAll('.imType').forEach((sel) => sel.onchange = () => {
+      const f = st.parsed.find((x) => x.name === sel.dataset.n); if (f) f.type = sel.value;
+    });
+    const add = wrap.querySelector('[data-add]');
+    if (add) add.onclick = () => {
+      st.parsed.filter((f) => st.picked.has(f.name)).forEach((f) => {
+        const observed = S.fields.find((x) => x.dataprimePath === f.name);
+        S.rows.unshift({id: 'r' + Date.now() + Math.random(), name: f.name, type: f.type,
+          cardinality: observed ? observed.cardinality : 0, orig: {name: '', type: ''}, state: 'new'});
+      });
+      wrap.remove();
+      renderReserved();
+      renderExplorer();
+    };
+  };
+  paint();
+  $('#overlays').appendChild(wrap);
+}
+
+/* ── dialogs ───────────────────────────────────────────────────── */
+function dialog({title, body, ok, cancel, onOk, onMount}) {
+  const wrap = el('div');
+  wrap.innerHTML = `<div class="scrim" data-x></div>
+    <div class="dlg"><div class="dlg-h">${title}</div>
+    <div class="dlg-b">${body}</div>
+    <div class="dlg-f"><button class="b outline" data-x>${cancel}</button><button class="b" data-ok>${ok}</button></div></div>`;
+  wrap.querySelectorAll('[data-x]').forEach((n) => n.onclick = () => wrap.remove());
+  wrap.querySelector('[data-ok]').onclick = () => { onOk && onOk(wrap); wrap.remove(); };
+  $('#overlays').appendChild(wrap);
+  onMount && onMount(wrap);
+}
+function confirmDialog({title, body, ok, cancel, onOk}) {
+  dialog({title, body: `<p class="description" style="margin-top:0">${body}</p>`, ok, cancel, onOk});
+}
+
+/* ── wiring ────────────────────────────────────────────────────── */
+function fillSelect(node, values, current) {
+  node.innerHTML = values.map((v) => `<option ${v === current ? 'selected' : ''}>${v}</option>`).join('');
+}
+function syncSelectors() {
+  fillSelect($('#eDs'), Object.keys(DATASPACES), S.dataspace);
+  fillSelect($('#rDs'), Object.keys(DATASPACES), S.dataspace);
+  fillSelect($('#eDt'), DATASPACES[S.dataspace], S.dataset);
+  fillSelect($('#rDt'), DATASPACES[S.dataspace], S.dataset);
+  $('#expTitle').textContent = `${S.dataspace}/${S.dataset}`;
+  const opts = startDateOptions();
+  $('#startDate').innerHTML = opts.map((o, i) =>
+    `<option value="${i}" ${i === S.startDate ? 'selected' : ''}>${o.label} (${o.caption})</option>`).join('');
+}
+function load() {
+  S.loading = true;
+  renderExplorer();
+  setTimeout(() => { S.loading = false; renderExplorer(); }, S.delay);
+}
+function switchDataspace(next, nextDataset) {
+  const apply = () => {
+    S.dataspace = next;
+    S.dataset = nextDataset || DATASPACES[next][0];
+    S.rows = mkRows(); S.selected.clear(); S.editing = null;
+    S.expanded.clear();
+    S.fStatus = [];
+    S.sort = null;
+    S.rq = '';
+    const rqBox = $('#rq'); if (rqBox) rqBox.value = '';
+    renderStatusFilterOptions();
+    readFilters();
+    syncSelectors();
+    // Both grids are dataset-scoped, so both reload. The declaration list is not a
+    // carry-over from the dataset you just left.
+    S.rLoading = true;
+    renderReserved();
+    setTimeout(() => { S.rLoading = false; renderReserved(); }, S.delay);
+    load();
+  };
+  if (summary().total > 0) {
+    confirmDialog({
+      title: 'You have unsaved changes',
+      body: 'Switching to a different dataspace or dataset will discard your unsaved changes.',
+      ok: 'Switch and discard', cancel: 'Cancel', onOk: apply,
+    });
+    syncSelectors();
+    return;
+  }
+  apply();
+}
+
+$('#tabExp').onclick = () => {
+  S.tab = 'explorer';
+  $('#tabExp').classList.add('active-link'); $('#tabRes').classList.remove('active-link');
+  $('#paneExp').hidden = false; $('#paneRes').hidden = true;
+};
+$('#tabRes').onclick = () => {
+  S.tab = 'reserved';
+  $('#tabRes').classList.add('active-link'); $('#tabExp').classList.remove('active-link');
+  $('#paneRes').hidden = false; $('#paneExp').hidden = true;
+  renderReserved();
+};
+$('#eDs').onchange = (e) => switchDataspace(e.target.value);
+$('#rDs').onchange = (e) => switchDataspace(e.target.value);
+$('#eDt').onchange = (e) => switchDataspace(S.dataspace, e.target.value);
+$('#rDt').onchange = (e) => switchDataspace(S.dataspace, e.target.value);
+$('#gran').onclick = (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  S.granularity = b.dataset.g; S.startDate = 0;
+  $('#gran').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+  syncSelectors(); load();
+};
+$('#startDate').onchange = (e) => { S.startDate = +e.target.value; load(); };
+$('#eq').oninput = (e) => { S.q = e.target.value; renderExplorer(); };
+$('#rq').oninput = (e) => { S.rq = e.target.value; renderReserved(); };
+$('#flatSw').onclick = () => {
+  S.flat = !S.flat;
+  $('#flatSw').classList.toggle('on', S.flat);
   renderExplorer();
 };
-$('#drwCancel').onclick=closeReserve;
-$('#drwX').onclick=closeReserve;
-$('#drwScrim').onclick=closeReserve;
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drw) closeReserve(); });
-
-function setTab(t){
-  activeTab=t;
-  $('#paneExp').hidden = t!=='exp';
-  $('#paneRes').hidden = t!=='res';
-  $('#tabExp').classList.toggle('on', t==='exp');
-  $('#tabRes').classList.toggle('on', t==='res');
-  if(t==='exp') renderExplorer();
-  setCounts(loading);
-}
-
-function load(){
-  const dsId=$('#ds').value, eng=engineOf(dsId), mine=++token;
-  editingId=null; draft=null; sgHide();
-  $('#ctx').className='ctx '+eng.ctxClass;
-  $('#ctx').innerHTML=`<span class="dot"></span><span>${eng.ctxText}</span>`;
-  $('#desc').innerHTML=`Reserved fields keep a keypath and its declared type stable in <b>${dsId}/${$('#dt').value}</b>, stored in ${eng.label}. <a href="#">Learn more</a>`;
-  renderHead(eng);
-  renderTopActions(eng,true);
-  $('#annwrap').innerHTML='';
-  loading=true;
-  $('#tbody').className='loading';
-  $('#tbody').innerHTML=skeletonRows(6);
-  $('#count').innerHTML='<span class="sk sk--num" style="width:22px;display:inline-block;vertical-align:-3px"></span>';
-  setCounts(true);
-  renderExplorer();              // paints the explorer skeleton and its context strip
-  setTimeout(()=>{
-    if(mine!==token) return;     // a newer dataset change won; drop this result
-    loading=false;
-    renderTopActions(eng,false);
-    renderBody(eng);
-    renderExplorer();
-    setCounts(false);
-  }, delay);
-}
-
-// production confirms before discarding uncommitted edits on a dataset switch
-let lastDs=null, lastDt=null;
-function guarded(fn){
-  if(modifications().length &&
-     !confirm('You have unsaved changes on this dataset. Switching will discard them. Continue?')){
-    $('#ds').value=lastDs; fillDatasets(lastDs); $('#dt').value=lastDt; return;
-  }
-  seed(); fn();
-  lastDs=$('#ds').value; lastDt=$('#dt').value;
-}
-$('#ds').addEventListener('change', ()=>guarded(()=>{ fillDatasets($('#ds').value); load(); }));
-$('#dt').addEventListener('change', ()=>guarded(load));
-$('#replay').onclick=load;
-$('#reseed').onclick=()=>{ seed(); load(); };
-$('#slow').onclick=e=>{ delay = delay===700?2500:700;
-  e.target.textContent = delay===700?'Slow network (2.5s)':'Normal speed'; load(); };
-
-$('#tabExp').onclick=()=>setTab('exp');
-$('#tabRes').onclick=()=>setTab('res');
-$('#eq').oninput=()=>{ if(!loading) renderExplorer(); };
-$('#fOnlyIssues').onclick=e=>{ if(loading) return; expFilters.issues=!expFilters.issues;
-  e.target.classList.toggle('btn--primary',expFilters.issues); renderExplorer(); };
-$('#fOnlyUnres').onclick=e=>{ if(loading) return; expFilters.unres=!expFilters.unres;
-  e.target.classList.toggle('btn--primary',expFilters.unres); renderExplorer(); };
-
-// Reserve from the explorer - this is CX-56997 in miniature.
-// It writes into the configuration tab and leaves it unsaved, so the user still confirms.
-$('#etbody').addEventListener('click', e=>{
-  if(loading) return;
-  const b=e.target.closest('button[data-reserve]');
-  if(b){ openReserve(b.dataset.reserve); return; }
-  const tr=e.target.closest('tr[data-kp]');
-  if(tr) openReserve(tr.dataset.kp);
+$('#fbBtn').onclick = (e) => { e.stopPropagation(); $('#fbMenu').hidden = !$('#fbMenu').hidden; };
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.filterby')) $('#fbMenu').hidden = true;
 });
+$('#fbTypes').innerHTML = ['string', 'number', 'bool', 'object', 'array<string>']
+  .map((t) => `<label><input type="checkbox" class="fty" value="${t}"> ${t}</label>`).join('');
+function readFilters() {
+  S.fStatus = [...document.querySelectorAll('.fms:checked')].map((c) => c.value);
+  S.fTypes = [...document.querySelectorAll('.fty:checked')].map((c) => c.value);
+  S.fReserved = [...document.querySelectorAll('.fre:checked')].map((c) => c.value);
+  $('#fbChips').innerHTML = [
+    ...S.fStatus.map((s) => `<span class="fchip">${isArchive() ? 'Column status' : 'Mapping status'}: ${(isArchive() ? COLUMN_STATUS : STATUS)[s].label} <button data-clr="fms:${s}">✕</button></span>`),
+    ...S.fTypes.map((t) => `<span class="fchip">Type: ${t} <button data-clr="fty:${t}">✕</button></span>`),
+    ...S.fReserved.map((r) => `<span class="fchip">${r === 'yes' ? 'Reserved' : 'Not reserved'} <button data-clr="fre:${r}">✕</button></span>`),
+  ].join('');
+  $('#fbChips').querySelectorAll('[data-clr]').forEach((b) => b.onclick = () => {
+    const [cls, val] = b.dataset.clr.split(':');
+    const box = [...document.querySelectorAll('.' + cls)].find((c) => c.value === val);
+    if (box) box.checked = false;
+    readFilters();
+  });
+  renderExplorer();
+}
+document.addEventListener('change', (e) => {
+  if (e.target.classList.contains('fms') || e.target.classList.contains('fty')
+      || e.target.classList.contains('fre')) readFilters();
+});
+$('#rfAdd').onclick = () => {
+  const id = 'r' + Date.now();
+  S.rows.unshift({id, name: '', type: 'string', cardinality: 0, orig: {name: '', type: ''}, state: 'new'});
+  S.editing = {id, name: '', type: 'string', typeTouched: false};
+  renderReserved();
+  setTimeout(() => $('#edName') && $('#edName').focus(), 0);
+};
+$('#rfBulk').onclick = openBulkAdd;
+$('#rfImport').onclick = openImportDialog;
+$('#rfExport').onclick = openExportDialog;
+$('#rfDelete').onclick = () => {
+  S.rows.forEach((r) => { if (S.selected.has(r.id)) r.state = r.state === 'new' ? 'gone' : 'removed'; });
+  S.rows = S.rows.filter((r) => r.state !== 'gone');
+  S.selected.clear();
+  renderReserved();
+};
+$('#mReplay').onclick = load;
+$('#mSlow').onclick = () => { S.delay = S.delay === 700 ? 2500 : 700; load(); };
+$('#mEmpty').onclick = () => { S.forceEmpty = !S.forceEmpty; renderExplorer(); };
+$('#mReset').onclick = () => {
+  S.fields = mkFields(); S.rows = mkRows(); S.selected.clear(); S.editing = null;
+  S.q = ''; S.rq = ''; $('#eq').value = ''; $('#rq').value = '';
+  document.querySelectorAll('.fms,.fty,.fre').forEach((c) => c.checked = false);
+  S.resetUsedToday = false;
+  readFilters(); renderReserved(); load();
+};
 
-$('#limit').textContent=LIMIT;
-fillDataspaces(); fillDatasets('default'); seed();
-lastDs=$('#ds').value; lastDt=$('#dt').value;
+renderStatusFilterOptions();
+syncSelectors();
+$('#flatSw').classList.add('on');
+renderReserved();
 load();
-setTab('exp');
 </script>
 </body>
 </html>
