@@ -228,7 +228,7 @@
           <span class="sec__t">Archive access</span>
           <span class="badge badge--green" id="accessBadge">New</span>
         </div>
-        <p class="sec__d">Coralogix writes to your bucket by assuming a dedicated IAM role you create. The role trusts Coralogix only for your team's External ID, which Coralogix sets and never changes.</p>
+        <p class="sec__d">Coralogix reads and writes your bucket by assuming an IAM role you create. Only Coralogix can assume it, and only on behalf of your team, because the role's trust policy requires the External ID below.</p>
 
         <div class="callout callout--amber" id="migBanner" style="display:none">
           <span class="ic">⚠</span>
@@ -240,19 +240,19 @@
           <div class="cmp">
             <div class="cmp__col cmp__old">
               <div class="cmp__lbl">Basic method, today</div>
-              One shared Coralogix role writes for every customer, and its name isn't secret. There's no per-customer isolation or revocation.
+              One shared Coralogix role reads and writes for every customer, and its name isn't secret. Your data is separated inside Coralogix, but nothing on the AWS side ties that role to your team alone.
             </div>
             <div class="cmp__arrow">→</div>
             <div class="cmp__col cmp__new">
               <div class="cmp__lbl">Your role + External ID</div>
-              Only Coralogix acting for <b>your</b> team can assume the role. The trust policy accepts one fixed External ID that Coralogix sends only for you.
+              The role's trust policy requires an External ID condition, and Coralogix sends your team's value only for you. A policy can list several External IDs if one bucket serves more than one of your teams.
             </div>
           </div>
         </div>
 
         <div class="callout" id="whyNew">
           <span class="ic">🔒</span>
-          <div><b>How Coralogix accesses your bucket.</b> You create a dedicated IAM role that only <b>your</b> Coralogix team can assume. Its trust policy carries the External ID shown below, set by Coralogix, one per team, never changing. Revoke access anytime by editing the role, and every change is audited.</div>
+          <div><b>How Coralogix accesses your bucket.</b> You create an IAM role in the same AWS account as the bucket, and allow the Coralogix principal shown below to assume it. Add the External ID below to the trust policy as a condition, that condition is what limits the access to your team, so Coralogix cannot use the role for anyone else. Give the role access to this bucket and nothing else. Revoke access at any time by deleting the role, or by removing the Coralogix principal from its trust policy. Every change is recorded in your own CloudTrail.</div>
         </div>
 
         <div class="field">
@@ -286,14 +286,13 @@
         <div class="field">
           <div class="lbl">
             External ID
-            <span title="Set by Coralogix, one value for your whole team. Put it in your role's trust policy. It never changes." style="color:var(--text-3);cursor:help">ⓘ</span>
+            <span title="Set by Coralogix, one value for your whole team. Add it to your role's trust policy as a condition. It never changes, and it is not a secret." style="color:var(--text-3);cursor:help">ⓘ</span>
             <span class="spacer"></span>
             <span class="removed" id="goneTag">✕ <span class="gone">Generate</span> removed</span>
           </div>
           <div class="lockrow">
-            <input class="in in--locked" id="extIdIn" type="password" value="us1-555585" readonly tabindex="-1" />
+            <input class="in in--locked" id="extIdIn" type="text" value="us1-555585" readonly tabindex="-1" />
             <div class="icons">
-              <button id="revealBtn" title="Show the value">Show</button>
               <button id="extCopyBtn" data-copy="extIdIn" title="Copy">Copy</button>
             </div>
           </div>
@@ -328,7 +327,7 @@
           </div>
 
           <div class="open-q">
-            <b>Open question, not designed here.</b> One bucket serving several teams. Asaf says the bucket's role carries one External ID condition per team, so five Role ARNs map to five External IDs on the same bucket. Asked in channel 2026-09-08, no reply from Asaf or Nikita yet.
+            <b>Open question, not designed here.</b> One bucket serving several teams. Nikita, 2026-09-10: one trust policy can list several External IDs, which is simpler for the customer and identical for the backend. The blocker is this screen, which knows one company id. Listing every External ID a customer owns needs a group-of-companies lookup we do not have here.
           </div>
         </div>
       </section>
@@ -363,7 +362,7 @@
       <tbody>
         <tr><td class="p">P1</td><td>Required input, placeholder <code>acme-cx-a1b2c3d4</code></td><td class="now">Read-only display, cannot type, paste or clear</td></tr>
         <tr><td class="p">P2</td><td>Generate button beside the field</td><td class="now">Removed. The value never changes</td></tr>
-        <tr><td class="p">P3</td><td>Masked, eye toggle, copy</td><td class="now">Unchanged</td></tr>
+        <tr><td class="p">P3</td><td>Masked, eye toggle, copy</td><td class="now">Shown in clear text, copy only. Nikita, 2026-09-10: for archive buckets the External ID is not a secret</td></tr>
         <tr><td class="p">P4</td><td>Empty until the customer typed it</td><td class="now">Shown before any role is saved, so it can go in the trust policy first</td></tr>
         <tr><td class="p">P5</td><td>One value per binding</td><td class="now">One value per team, every bucket and location</td></tr>
         <tr><td class="p">P6</td><td>Snippet carried what was typed, else a placeholder</td><td class="now">Snippet carries the derived value</td></tr>
@@ -401,14 +400,6 @@
   }
   region.addEventListener('change', syncRegion);
   $('bucketIn').addEventListener('input', syncBucket);
-
-  let revealed = false;
-  $('revealBtn').addEventListener('click', () => {
-    revealed = !revealed;
-    $('extIdIn').type = revealed ? 'text' : 'password';
-    $('revealBtn').textContent = revealed ? 'Hide' : 'Show';
-    $('revealBtn').title = revealed ? 'Hide the value' : 'Show the value';
-  });
 
   document.querySelectorAll('button.copy, #extCopyBtn').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -472,7 +463,6 @@
     if (c.migBadge) { $('migBadge').textContent = c.migBadge[0]; $('migBadge').className = c.migBadge[1]; }
     if (c.migState) { $('migState').className = c.migState[2]; $('migState').innerHTML = '<span class="ic">' + c.migState[0] + '</span><div>' + c.migState[1] + '</div>'; }
     // Mirrors resetForm() in the Brainy component: the reveal toggle resets per drawer open.
-    revealed = false; $('extIdIn').type = 'password'; $('revealBtn').textContent = 'Show'; $('revealBtn').title = 'Show the value';
     closeAll(null); syncBucket(); syncExtId();
   }
   Object.keys(BTN).forEach(k => $(BTN[k]).addEventListener('click', () => setScenario(k)));
