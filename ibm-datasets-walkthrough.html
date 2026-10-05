@@ -277,7 +277,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);fon
       <div class="def">
         <span class="tag t2"><span class="sw"></span>Layer 2</span>
         <h3>Dataset</h3>
-        <p>A named collection of data inside a dataspace, for example <code>payments-logs</code> or <code>audit</code>.</p>
+        <p>A named collection of data inside a dataspace, for example <code>payments-logs</code> or <code>checkout-logs</code>.</p>
         <p>It holds the settings for that data: where it is kept, how long, and who can see it.</p>
       </div>
     </div>
@@ -285,7 +285,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);fon
     <h2 class="subh">What it gives an IBM customer</h2>
     <div class="gives">
       <div class="give"><h3>Access per dataset</h3><p>Data access rules apply to a dataset, so a team sees its own data and not the whole instance.</p></div>
-      <div class="give"><h3>Storage and retention per dataset</h3><p>Each dataset points at its own COS bucket and retention. Audit data can live longer than debug data.</p></div>
+      <div class="give"><h3>Storage and retention per dataset</h3><p>Each dataset points at its own COS bucket and retention. Payment logs can be kept longer than debug logs.</p></div>
       <div class="give"><h3>Streams as a target</h3><p>A dataset can send its data to an Event Streams topic instead of storing it, as part of the same setup.</p></div>
       <div class="give"><h3>Clear usage per dataset</h3><p>Data usage shows one row per dataset, streams included, so the customer sees what each team sends and where it goes.</p></div>
       <div class="give"><h3>Simple routing</h3><p>The TCO policy names the dataset. It does not need to know which bucket or topic sits behind it.</p></div>
@@ -398,7 +398,6 @@ footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);fon
         <tr><th scope="row">Data access rules</th><td><span class="tag green">Yes</span></td><td><span class="tag">Not needed</span><span class="rest">nothing to read</span></td></tr>
         <tr><th scope="row">Retention</th><td><span class="tag green">Yes</span></td><td><span class="tag">Does not apply</span></td></tr>
         <tr><th scope="row">Real-time alerts</th><td><span class="tag green">Yes</span></td><td><span class="tag blue">On the Analyze and alert tier</span></td></tr>
-        <tr><th scope="row">Alerts that query stored data</th><td><span class="tag green">Yes</span></td><td><span class="tag">No</span><span class="rest">nothing is stored</span></td></tr>
         <tr><th scope="row">Shown in data usage</th><td><span class="tag green">Yes</span><span class="rest">per dataset and tier</span></td><td><span class="tag green">Yes</span><span class="rest">as its own row</span></td></tr>
       </tbody>
     </table></div>
@@ -417,12 +416,12 @@ footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);fon
         <label class="second">Try one</label>
         <div class="exrow">
           <button class="ex" type="button" data-v="payments-logs">payments-logs</button>
-          <button class="ex" type="button" data-v="audit">audit</button>
+          <button class="ex" type="button" data-v="checkout-logs">checkout-logs</button>
           <button class="ex" type="button" data-v="bnp-stream">bnp-stream</button>
           <button class="ex" type="button" data-v="team-eu-04">team-eu-04</button>
           <button class="ex" type="button" data-v="something-new">something-new</button>
         </div>
-        <p class="note">Example datasets: payments-logs and audit (archive, COS), bnp-stream (stream, Event Streams). Example template: <code>team-*</code>.</p>
+        <p class="note">Example datasets: payments-logs and checkout-logs (archive, COS), bnp-stream (stream, Event Streams). Example template: <code>team-*</code>.</p>
       </div>
       <div class="path" aria-live="polite">
         <div class="hop" id="h1"><b>1 · Is there a dataset with this exact name?</b><span id="r1"></span></div>
@@ -474,7 +473,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);fon
   // resolver
   var defs={
     'payments-logs':'archive · COS bucket <i>logs-payments</i> · 90 days · team Payments can see it',
-    'audit':'archive · COS bucket <i>logs-audit</i> · 1 year · hidden by default, Security can see it',
+    'checkout-logs':'archive · COS bucket <i>logs-checkout</i> · 1 year · hidden by default, team Checkout can see it',
     'bnp-stream':'stream · Event Streams topic <i>bnp-out</i> · not stored, not searchable'
   };
   var tpl=[{re:/^team-.+/,label:'team-*',out:'creates the dataset with the template defaults: archive · COS bucket <i>logs-teams</i> · 30 days'}];
