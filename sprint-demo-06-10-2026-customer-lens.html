@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint Demo 06-10-2026 &middot; Customer Lens</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --card: #161a22;
+    --card-2: #1c212b;
+    --line: #262c38;
+    --line-2: #323a4a;
+    --text: #ffffff;
+    --text-2: #aab1bf;
+    --text-3: #6f7889;
+    --mint: #00d4aa;
+    --mint-soft: rgba(0,212,170,.14);
+    --mint-line: rgba(0,212,170,.45);
+    --orange: #ff9f43;
+    --orange-soft: rgba(255,159,67,.13);
+    --orange-line: rgba(255,159,67,.45);
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #07080b; color: var(--text); font-family: var(--font); overflow: hidden; }
+
+  /* ---------- stage: fixed 1920x1080, scaled to fit ---------- */
+  #viewport { position: fixed; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; }
+  #deck { width: 1920px; height: 1080px; position: relative; flex: 0 0 auto; transform-origin: center center; }
+  .slide {
+    position: absolute; inset: 0; background: var(--bg); overflow: hidden;
+    padding: 150px 120px 90px; display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transition: opacity .3s ease;
+  }
+  .slide.active { opacity: 1; visibility: visible; }
+
+  /* ---------- shared chrome on each slide ---------- */
+  .top { position: absolute; top: 52px; left: 120px; right: 120px; display: flex; align-items: center; gap: 28px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 600; color: var(--text-2); letter-spacing: .01em; white-space: nowrap; }
+  .brand i { width: 16px; height: 16px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 16px rgba(0,212,170,.6); }
+  .pno { margin-left: auto; font-size: 20px; color: var(--text-3); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  /* path rail: the customer's path, clickable, shows where we are */
+  .rail { display: flex; align-items: center; gap: 0; margin-left: 40px; }
+  .rail button {
+    all: unset; cursor: pointer; display: flex; align-items: center; gap: 12px;
+    font-size: 20px; font-weight: 600; color: var(--text-3); padding: 8px 16px; border-radius: 40px; white-space: nowrap;
+  }
+  .rail button b { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid var(--line-2); color: var(--text-3); }
+  .rail button:hover { color: var(--text); }
+  .rail .sep { width: 34px; height: 2px; background: var(--line-2); }
+  .rail button.on { color: var(--text); background: var(--card); }
+  .rail button.on b { border-color: var(--mint); color: var(--mint); }
+  .rail button.on.or b { border-color: var(--orange); color: var(--orange); }
+  .rail button.done b { border-color: var(--mint-line); background: var(--mint-soft); color: var(--mint); }
+
+  /* chips: wording fixed */
+  .chip { display: inline-flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 10px; color: var(--mint); background: var(--mint-soft); border: 1.5px solid var(--mint-line); white-space: nowrap; line-height: 1; }
+  .chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .chip.or { color: var(--orange); background: var(--orange-soft); border-color: var(--orange-line); }
+  .chip.gr { color: var(--text-2); background: var(--card-2); border-color: var(--line-2); }
+  .chip.sm { font-size: 15px; padding: 6px 12px; gap: 8px; }
+  .chip.sm::before { width: 7px; height: 7px; }
+
+  .eyebrow { font-size: 22px; letter-spacing: .16em; text-transform: uppercase; font-weight: 800; color: var(--mint); }
+  .eyebrow.or { color: var(--orange); }
+
+  /* ---------- title ---------- */
+  .s-title { justify-content: center; padding-top: 120px; }
+  .s-title::after { content: ""; position: absolute; right: -260px; top: -200px; width: 1100px; height: 1100px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,212,170,.10), transparent); pointer-events: none; }
+  .s-title h1 { font-size: 112px; line-height: 1.02; font-weight: 800; letter-spacing: -.03em; margin: 34px 0 0; }
+  .s-title h1 span { display: block; }
+  .s-title h1 .m { color: var(--mint); }
+  .s-title h1 .d { color: var(--text-2); }
+  .s-title .meta { margin-top: 64px; display: flex; gap: 48px; font-size: 26px; color: var(--text-2); }
+  .s-title .meta b { color: var(--text); font-weight: 700; }
+
+  /* ---------- path map ---------- */
+  .s-map h2 { font-size: 64px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; margin-top: 18px; }
+  .map { position: relative; margin-top: 60px; flex: 1; display: flex; flex-direction: column; }
+  .map-line { position: absolute; top: 31px; left: 32px; right: 32px; height: 3px; background: linear-gradient(90deg, var(--mint) 0 66%, var(--orange) 66% 100%); opacity: .9; }
+  .map-cols { position: relative; display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 40px; }
+  .stop { all: unset; cursor: pointer; display: flex; flex-direction: column; }
+  .stop .n { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; color: var(--mint); background: var(--bg); border: 3px solid var(--mint); box-shadow: 0 0 0 10px var(--bg); }
+  .stop.or .n { color: var(--orange); border-color: var(--orange); }
+  .stop .q { font-size: 26px; color: var(--text-2); margin: 30px 0 8px; font-style: italic; }
+  .stop .h { font-size: 40px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; margin-bottom: 26px; }
+  .stop .fs { display: flex; gap: 18px; }
+  .fcard { flex: 1; background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 24px 26px 26px; transition: border-color .15s, transform .15s; }
+  .stop:hover .fcard { border-color: var(--mint-line); }
+  .stop.or:hover .fcard { border-color: var(--orange-line); }
+  .fcard .t { font-size: 26px; font-weight: 700; line-height: 1.2; margin: 16px 0 10px; }
+  .fcard p { font-size: 22px; line-height: 1.38; color: var(--text-2); }
+
+  /* ---------- feature slide ---------- */
+  .feat { display: grid; grid-template-columns: 820px 1fr; gap: 80px; flex: 1; min-height: 0; }
+  .f-left { display: flex; flex-direction: column; }
+  .f-tag { display: flex; align-items: center; gap: 20px; }
+  .f-name { font-size: 26px; font-weight: 700; color: var(--text-2); }
+  .f-q { font-size: 30px; color: var(--text-2); font-style: italic; margin-top: 44px; line-height: 1.3; }
+  .f-h { font-size: 66px; font-weight: 800; line-height: 1.06; letter-spacing: -.025em; margin-top: 16px; text-wrap: balance; }
+  .ba { margin-top: 52px; display: flex; flex-direction: column; gap: 0; border-top: 1.5px solid var(--line); }
+  .ba-row { display: grid; grid-template-columns: 120px 1fr; gap: 28px; padding: 24px 0; border-bottom: 1.5px solid var(--line); align-items: baseline; }
+  .ba-row .k { font-size: 18px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); }
+  .ba-row.now .k { color: var(--mint); }
+  .ba-row p { font-size: 26px; line-height: 1.38; color: var(--text-2); text-wrap: pretty; }
+  .ba-row.now p { color: var(--text); }
+  .gtk { margin-top: auto; padding-top: 36px; }
+  .gtk .k { font-size: 18px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
+  .gtk ul { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; }
+  .gtk li { font-size: 22px; color: var(--text-2); background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 18px; line-height: 1.3; }
+
+  .f-right { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+  .show { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 22px 28px; }
+  .show .k { font-size: 18px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mint); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .show .k::before { content: ""; width: 0; height: 0; border-left: 13px solid var(--mint); border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 0; font-size: 23px; font-weight: 600; }
+  .crumbs span { padding: 6px 14px; background: var(--card-2); border: 1.5px solid var(--line-2); border-radius: 9px; white-space: nowrap; }
+  .crumbs span.hl { border-color: var(--mint-line); color: var(--mint); }
+  .crumbs i { font-style: normal; color: var(--text-3); padding: 0 12px; }
+  .show.or .k { color: var(--orange); }
+  .show.or .k::before { border-left-color: var(--orange); }
+  .show p { font-size: 23px; line-height: 1.4; color: var(--text); }
+
+  /* ---------- product schematics (illustrative, no data) ---------- */
+  .mock { flex: 1; background: #10131a; border: 1.5px solid var(--line); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+  .mock-bar { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 24px; border-bottom: 1.5px solid var(--line); background: var(--card); flex: 0 0 auto; }
+  .mock-bar .d { width: 12px; height: 12px; border-radius: 50%; background: var(--line-2); }
+  .mock-bar .path { margin-left: 16px; font-size: 19px; color: var(--text-3); font-weight: 600; }
+  .mock-bar .path b { color: var(--text); font-weight: 700; }
+  .mock-body { flex: 1; padding: 30px 34px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  .sk { height: 14px; border-radius: 7px; background: var(--line-2); }
+  .tabs { display: flex; gap: 8px; border-bottom: 1.5px solid var(--line); }
+  .tabs span { font-size: 20px; font-weight: 700; color: var(--text-3); padding: 10px 18px 14px; position: relative; }
+  .tabs span.on { color: var(--text); }
+  .tabs span.on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1.5px; height: 3px; border-radius: 3px; background: var(--mint); }
+  .note-tag { position: absolute; font-size: 18px; font-weight: 700; color: var(--bg); background: var(--mint); padding: 8px 14px; border-radius: 10px; white-space: nowrap; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+  .note-tag.or { background: var(--orange); }
+  .note-tag::after { content: ""; position: absolute; width: 14px; height: 14px; background: inherit; transform: rotate(45deg); }
+  .note-tag.dn::after { left: 24px; bottom: -6px; }
+  .note-tag.up::after { left: 24px; top: -6px; }
+  .note-tag.lf::after { left: -6px; top: 50%; margin-top: -7px; }
+
+  /* usage */
+  .u-scope { display: flex; gap: 10px; align-items: center; font-size: 19px; color: var(--text-3); font-weight: 600; }
+  .u-scope span { padding: 6px 14px; border: 1.5px solid var(--line-2); border-radius: 30px; }
+  .u-scope span.on { color: var(--mint); border-color: var(--mint-line); background: var(--mint-soft); }
+  .u-row { display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center; }
+  .u-track { height: 26px; border-radius: 8px; background: var(--card-2); position: relative; overflow: hidden; }
+  .u-track i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(0,212,170,.55), var(--mint)); border-radius: 8px; }
+  .u-track::after { content: ""; position: absolute; top: 0; bottom: 0; right: 14%; width: 3px; background: var(--text-2); opacity: .6; }
+
+  /* policies table */
+  .p-head, .p-row { display: grid; grid-template-columns: 1.1fr 2fr; gap: 20px; align-items: center; }
+  .p-head { font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); padding: 0 6px 10px; border-bottom: 1.5px solid var(--line); }
+  .p-row { padding: 14px 6px; border-bottom: 1.5px solid var(--line); }
+  .p-pris { display: flex; gap: 10px; }
+  .p-pris span { font-size: 18px; font-weight: 700; padding: 7px 14px; border-radius: 8px; color: var(--text-3); border: 1.5px solid var(--line); }
+  .p-pris span.act { color: var(--bg); background: var(--mint); border-color: var(--mint); box-shadow: 0 0 22px rgba(0,212,170,.45); }
+
+  /* code panel */
+  .c-panel { flex: 1; background: #0a0c10; border: 1.5px solid var(--line); border-radius: 14px; padding: 26px 28px; display: flex; flex-direction: column; gap: 15px; position: relative; }
+  .c-ln { display: flex; gap: 12px; align-items: center; }
+  .c-ln .no { width: 26px; font-family: var(--mono); font-size: 16px; color: var(--text-3); text-align: right; }
+  .c-ln .sk { height: 13px; }
+  .c-ln .a { background: rgba(0,212,170,.55); }
+  .c-ln .b { background: rgba(255,255,255,.28); }
+  .c-ln .c { background: rgba(170,177,191,.32); }
+  .c-btns { position: absolute; top: 18px; right: 18px; display: flex; gap: 10px; }
+  .c-btns span { font-size: 17px; font-weight: 700; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line-2); color: var(--text-2); background: var(--card); }
+  .c-btns span.cp { color: var(--bg); background: var(--mint); border-color: var(--mint); }
+
+  /* historical flow */
+  .h-flow { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 46px; padding: 10px 6px; }
+  .h-lane { display: flex; align-items: center; gap: 0; }
+  .h-lab { font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
+  .h-node { background: var(--card); border: 1.5px solid var(--line-2); border-radius: 16px; padding: 18px 22px; font-size: 22px; font-weight: 700; line-height: 1.25; text-align: center; flex: 0 0 auto; }
+  .h-node small { display: block; font-size: 17px; color: var(--text-2); font-weight: 600; margin-top: 4px; }
+  .h-node.m { border-color: var(--mint-line); background: linear-gradient(var(--mint-soft), var(--mint-soft)), var(--card); }
+  .h-arrow { flex: 1; height: 3px; background: var(--mint); position: relative; margin: 0 10px; min-width: 40px; }
+  .h-arrow::after { content: ""; position: absolute; right: -2px; top: -7px; border-left: 14px solid var(--mint); border-top: 8.5px solid transparent; border-bottom: 8.5px solid transparent; }
+  .h-arrow.gr { background: var(--line-2); }
+  .h-arrow.gr::after { border-left-color: var(--line-2); }
+  .h-wall { border-top: 2px dashed var(--line-2); position: relative; }
+  .h-wall span { position: absolute; left: 50%; top: -18px; transform: translateX(-50%); background: #10131a; padding: 4px 16px; font-size: 19px; font-weight: 700; color: var(--text-2); white-space: nowrap; }
+
+  /* monthly */
+  .m-chart { flex: 1; position: relative; display: flex; align-items: flex-end; gap: 7px; padding: 30px 6px 0; border-bottom: 1.5px solid var(--line-2); }
+  .m-chart i { flex: 1; border-radius: 5px 5px 0 0; background: rgba(255,159,67,.55); }
+  .m-chart i.pk { background: var(--orange); }
+  .m-limit { position: absolute; left: 0; right: 0; border-top: 2.5px dashed var(--text-2); }
+  .m-limit span { position: absolute; right: 0; top: -36px; font-size: 18px; font-weight: 700; color: var(--text-2); }
+  .m-axis { display: flex; justify-content: space-between; font-size: 18px; color: var(--text-3); font-weight: 600; padding: 10px 4px 0; }
+  .m-plan { display: flex; align-items: center; gap: 16px; font-size: 20px; font-weight: 700; }
+  .m-plan .bar { flex: 1; height: 18px; border-radius: 9px; background: var(--card-2); overflow: hidden; }
+  .m-plan .bar i { display: block; height: 100%; width: 58%; background: var(--orange); border-radius: 9px; }
+
+  /* ---------- recap ---------- */
+  .s-recap h2, .s-more h2 { font-size: 64px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; margin-top: 18px; }
+  .s-recap .sub { font-size: 30px; color: var(--text-2); margin-top: 18px; }
+  .recap { margin-top: 48px; display: flex; flex-direction: column; border-top: 1.5px solid var(--line); }
+  .rc-row { all: unset; cursor: pointer; display: grid; grid-template-columns: 70px 520px 1fr 300px; gap: 30px; align-items: center; padding: 24px 0; border-bottom: 1.5px solid var(--line); }
+  .rc-row:hover .rc-n { color: var(--mint); }
+  .rc-n { font-size: 28px; font-weight: 800; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .rc-t { font-size: 30px; font-weight: 800; letter-spacing: -.01em; }
+  .rc-d { font-size: 24px; color: var(--text-2); line-height: 1.35; }
+  .rc-row .chip { justify-self: end; }
+  .rc-row.inv { margin-top: 26px; border: 1.5px dashed var(--orange-line); border-radius: 18px; padding: 24px 28px; background: var(--orange-soft); grid-template-columns: 42px 520px 1fr 300px; }
+  .rc-row.inv .rc-n { color: var(--orange); }
+
+  /* ---------- more ---------- */
+  .more { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 54px; flex: 1; }
+  .more h3 { font-size: 22px; letter-spacing: .14em; text-transform: uppercase; font-weight: 800; color: var(--text-3); margin-bottom: 22px; display: flex; align-items: center; gap: 16px; }
+  .m-item { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 26px 30px; }
+  .m-item + .m-item { margin-top: 18px; }
+  .m-item h4 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .m-item p { font-size: 23px; line-height: 1.4; color: var(--text-2); }
+  .m-item.big { padding: 34px 36px; }
+  .m-item.big p.pitch { font-size: 30px; color: var(--mint); font-weight: 600; line-height: 1.3; margin-bottom: 18px; }
+
+  /* ---------- thanks ---------- */
+  .s-thanks { background: var(--mint); color: #03110b; }
+  .s-thanks .brand { color: #03110b; }
+  .s-thanks .brand i { background: #03110b; box-shadow: none; }
+  .s-thanks .pno { color: rgba(3,17,11,.55); }
+  .s-thanks h2 { font-size: 80px; font-weight: 800; letter-spacing: -.025em; margin-top: 40px; line-height: 1.04; }
+  .s-thanks .eyebrow { color: rgba(3,17,11,.7); }
+  .tgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 64px; }
+  .tc { border: 2px solid rgba(3,17,11,.2); background: rgba(3,17,11,.07); border-radius: 18px; padding: 24px 26px; }
+  .tc b { display: block; font-size: 30px; font-weight: 800; }
+  .tc span { display: block; font-size: 23px; margin-top: 6px; color: rgba(3,17,11,.72); }
+
+  /* ---------- controls (outside the scaled deck) ---------- */
+  .ctrl { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex; align-items: center; justify-content: center; gap: 18px; background: #07080b; border-top: 1px solid #1a1e27; z-index: 5; }
+  .ctrl button { background: var(--card); color: var(--text); border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 16px; font: 600 14px var(--font); cursor: pointer; }
+  .ctrl button:hover { border-color: var(--mint-line); color: var(--mint); }
+  .ctrl button:disabled { opacity: .3; cursor: default; }
+  .dots { display: flex; gap: 7px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-2); cursor: pointer; }
+  .dots i.on { background: var(--mint); width: 26px; border-radius: 5px; }
+  .ctrl .hint { position: absolute; right: 20px; font-size: 12px; color: var(--text-3); }
+  .ctrl .pdf { position: absolute; left: 20px; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 64px; max-height: 34vh; overflow-y: auto; background: rgba(7,8,11,.97); border-top: 1px solid var(--mint-line); padding: 18px 32px; font-size: 16px; line-height: 1.55; color: var(--text-2); display: none; z-index: 6; }
+  #notes.show { display: block; }
+  #notes b { color: var(--mint); }
+
+  /* ---------- print / PDF: one slide per page, no notes ---------- */
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; height: auto; background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #viewport { position: static; display: block; }
+    #deck { transform: none !important; width: 1920px; height: auto; }
+    .slide { position: relative; opacity: 1; visibility: visible; width: 1920px; height: 1080px; page-break-after: always; break-after: page; transition: none; }
+    .ctrl, #notes { display: none !important; }
+  }
+
+  .ba-row.ask .k { color: var(--text-3); }
+  .ba-row.ask p { font-size: 24px; color: var(--text-2); }
+  .ba-row.ask p b { color: var(--text); font-weight: 700; }
+  .track { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 18px 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+  .track .k { font-size: 18px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); margin-right: 4px; }
+  .track .grp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .track .lbl { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+  .track a { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 19px; color: var(--text-2); text-decoration: none; background: var(--card-2); border: 1.5px solid var(--line-2); border-radius: 9px; padding: 4px 10px; }
+  .track a.pipe { color: var(--mint); border-color: var(--mint-line); }
+  .track a.bug { color: var(--orange); border-color: var(--orange-line); }
+  .mention .ask { display: block; margin-top: 8px; font-size: 19px; color: var(--text-3); }
+  .mention .ask a { color: var(--mint); text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .f-right .mock { min-height: 0; overflow: hidden; }
+
+  .f-h.cl { font-size: 60px; margin-top: 40px; }
+  .lens { margin-top: 44px; }
+  .lens .ba-row { grid-template-columns: 190px 1fr; padding: 22px 0; }
+  .lens .ba-row.now.or .k { color: var(--orange); }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; flex: 1; min-height: 0; }
+  .duo .col { display: flex; flex-direction: column; min-width: 0; }
+  .duo .d-h { font-size: 46px; font-weight: 800; line-height: 1.08; letter-spacing: -.02em; margin-top: 30px; text-wrap: balance; }
+  .duo .lens { margin-top: 30px; }
+  .duo .lens .ba-row { grid-template-columns: 170px 1fr; padding: 18px 0; }
+  .duo .lens .ba-row p { font-size: 23px; }
+  .duo .track { margin-top: auto; }
+  .also { margin-top: 48px; font-size: 25px; line-height: 1.45; color: rgba(3,17,11,.82); max-width: 1500px; }
+  .also b { color: #03110b; }
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<div id="viewport"><div id="deck">
+
+  <!-- 01 TITLE -->
+  <section class="slide s-map" data-screen-label="02 Customer path">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><span class="pno"></span></div>
+    <div class="eyebrow">Sprint demo &middot; 06-10-2026 &middot; Noam Sheffi</div>
+    <h2>Three things customers asked for. One you can try early.</h2>
+    <div class="map">
+      <div class="map-line"></div>
+      <div class="map-cols">
+        <button class="stop" data-go="usage">
+          <span class="n">1</span>
+          <span class="q">"How much is each team using?"</span>
+          <span class="h">Know what you use</span>
+          <span class="fs"><span class="fcard"><span class="chip sm">Shipped</span><div class="t">Usage and Quota on One Page</div><p>One page answers how much every team uses.</p></span></span>
+        </button>
+        <button class="stop" data-go="priority">
+          <span class="n">2</span>
+          <span class="q">"Is the policy I set actually running?"</span>
+          <span class="h">Trust what your policies do</span>
+          <span class="fs">
+            <span class="fcard"><span class="chip sm">Shipped</span><div class="t">See Which Priority Is Active Now</div><p>Customers see which priority is active right now.</p></span>
+            <span class="fcard" data-go="priority"><span class="chip sm">Shipped</span><div class="t">TCO Policies as Code</div><p>Teams on Terraform copy any policy straight into code.</p></span>
+          </span>
+        </button>
+        <button class="stop" data-go="history">
+          <span class="n">3</span>
+          <span class="q">"Can I bring my past data?"</span>
+          <span class="h">Bring your history with you</span>
+          <span class="fs"><span class="fcard"><span class="chip sm or">Rolling Out</span><div class="t">Historical Data Import</div><p>Customers import old data without blocking live data.</p></span></span>
+        </button>
+      </div>
+      <button class="stop or" data-go="monthly" style="margin-top:auto">
+        <span class="fcard" style="display:flex;align-items:center;gap:36px;border:1.5px dashed var(--orange-line);background:linear-gradient(var(--orange-soft),var(--orange-soft)),var(--card);padding:26px 34px;">
+          <span class="eyebrow or" style="font-size:20px;white-space:nowrap">Try it early</span>
+          <span style="font-size:32px;font-weight:800;white-space:nowrap">Monthly Team Quota</span>
+          <span class="chip or sm">Open to Early Adopters</span>
+          <span style="font-size:24px;color:var(--text-2);margin-left:auto">Customers budget for the month, not for each day.</span>
+        </span>
+      </button>
+    </div>
+    <div class="notes-data" hidden>Open here, no title slide. Say: "This cycle answers three questions customers keep asking. How much are we using? Is the policy I set really running? Can I bring my old data? And one thing we want early adopters for." Each feature slide answers four questions from the customer's seat: what is it, what do I get, how is it different, and what is the magic if I want to achieve X.</div>
+  </section>
+  <section class="slide" data-screen-label="02 Usage and Quota" data-id="usage" data-step="1">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="feat">
+      <div class="f-left">
+        <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">Usage and Quota on One Page</span></div>
+        <h3 class="f-h cl">Want to know what every team uses? Open one page.</h3>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>One Usage and Quota page under Organization.</p></div><div class="ba-row now"><span class="k">What you get</span><p>Usage and limits for every team you can see, side by side. CX units and AI units on their own tabs.</p></div><div class="ba-row"><span class="k">Before</span><p>Usage on one screen, quota on another. Orgs with one team had no quota view at all.</p></div><div class="ba-row ask"><span class="k">Asked by</span><p><b>Mobileye</b> (PIPE), Qube, Island, FactSet, Core Star, LHV, Goldbelly, Proofpoint, Voyado, H2O.ai, Gett, JIO Finance</p></div></div>
+        <div class="gtk"><div class="k">Good to know</div><ul><li>No change to metering, blocking or billing</li></ul></div>
+      </div>
+      <div class="f-right">
+        <div class="mock">
+          <div class="mock-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="path">Organization &rsaquo; <b>Usage and Quota</b></span></div>
+          <div class="mock-body">
+            <div class="tabs"><span class="on">CX units</span><span>AI units</span></div>
+            <div class="u-scope">Scope <span class="on">All teams</span><span>A few teams</span><span>One team</span></div>
+            <div class="u-row"><span class="sk" style="width:120px"></span><div class="u-track"><i style="width:72%"></i></div></div>
+            <div class="u-row"><span class="sk" style="width:90px"></span><div class="u-track"><i style="width:48%"></i></div></div>
+            <div class="u-row"><span class="sk" style="width:130px"></span><div class="u-track"><i style="width:81%"></i></div></div>
+            <div class="u-row"><span class="sk" style="width:100px"></span><div class="u-track"><i style="width:34%"></i></div></div>
+            <div class="u-row"><span class="sk" style="width:110px"></span><div class="u-track"><i style="width:58%"></i></div></div>
+            <span class="note-tag up" style="left:34px;bottom:30px">Usage and quota, every team, one view</span>
+          </div>
+        </div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-50859" target="_blank" rel="noopener">CX-50859</a><a href="https://coralogix.atlassian.net/browse/CX-59176" target="_blank" rel="noopener">CX-59176</a><a href="https://coralogix.atlassian.net/browse/CX-44033" target="_blank" rel="noopener">CX-44033</a></div><div class="grp"><span class="lbl">PIPE</span><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-4099" target="_blank" rel="noopener">PIPEV2-4099</a><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-4049" target="_blank" rel="noopener">PIPEV2-4049</a></div><div class="grp"><span class="lbl">Bugs</span><a class="bug" href="https://coralogix.atlassian.net/browse/CX-62225" target="_blank" rel="noopener">CX-62225</a><a class="bug" href="https://coralogix.atlassian.net/browse/CX-59905" target="_blank" rel="noopener">CX-59905</a><a class="bug" href="https://coralogix.atlassian.net/browse/CX-62236" target="_blank" rel="noopener">CX-62236</a><a class="bug" href="https://coralogix.atlassian.net/browse/CX-62238" target="_blank" rel="noopener">CX-62238</a></div></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing. <b>PIPE:</b> linked PIPEV2-4049 (group by team in Org Quota Manager, Roadmap Item, filed by Nathan Lindley), PIPEV2-4099 (Mobileye, Data Usage pane in the org admin console, Candidate). Related: PIPEV2-3842 (DAZN, current quota lags when moving units). Related by text, not linked: PIPEV2-2584 (Quota Manager reporting). <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows (linked) · CX-59905 write-access shows Disabled · CX-62236 Data Usage shows No Data without S3 (Blocked) · CX-62238 trial team plan error. <b>Customers waiting:</b> Mobileye, Island, Qube, FactSet, Core Star, LHV, Goldbelly, Proofpoint, Voyado, H2O.ai, Gett, JIO Finance.</div>
+  </section>
+
+  <section class="slide" data-screen-label="03 Trust your policies" data-id="priority" data-step="2">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="duo">
+        <div class="col">
+          <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">See Which Priority Is Active Now</span></div>
+          <h3 class="d-h">Want to know your policy is really running? Look for the highlight.</h3>
+          <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>A highlight on the Log Policies table.</p></div><div class="ba-row now"><span class="k">What you get</span><p>The priority in effect for each target, right now.</p></div><div class="ba-row"><span class="k">Before</span><p>Nobody could tell which policy was in effect.</p></div><div class="ba-row ask"><span class="k">Asked by</span><p><b>Miro</b> (PIPE), Kotak, Xplor, NeoGames, COMM-IT, Career Team</p></div></div>
+          <div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-39721" target="_blank" rel="noopener">CX-39721</a></div><div class="grp"><span class="lbl">PIPE</span><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-3564" target="_blank" rel="noopener">PIPEV2-3564</a></div></div>
+        </div>
+        <div class="col">
+          <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">TCO Policies as Code</span></div>
+          <h3 class="d-h">Manage TCO in Terraform? Copy the policy, do not rewrite it.</h3>
+          <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>View as Code on every saved TCO policy.</p></div><div class="ba-row now"><span class="k">What you get</span><p>Terraform HCL and Kubernetes YAML, read-only, ready to copy.</p></div><div class="ba-row"><span class="k">Before</span><p>Alerts and Parsing Rules had it. TCO policies did not.</p></div><div class="ba-row ask"><span class="k">Asked by</span><p><b>Yotpo</b></p></div></div>
+          <div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-43382" target="_blank" rel="noopener">CX-43382</a></div></div>
+        </div>
+    </div>
+    <div class="notes-data" hidden><b>Left, active priority.</b> <b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases. <b>PIPE:</b> PIPEV2-3564 (Miro, the TCO Optimizer Statistics view ask: current effective configuration and a short timeframe). It was rejected on 07-08 only because the reporter left, and this release delivers the effective-configuration half. Related: PIPEV2-2692. <b>Bugs:</b> none found. <b>Customers waiting:</b> Kotak, Xplor, Miro, Career Team, COMM-IT, NeoGames, plus the original requester (unnamed). About 22 more accounts on the release-anticipation tracker ask for gaps this scope does not fix. <br><br><b>Right, policies as code.</b> <b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one. <b>PIPE:</b> none for TCO View as Code. Related IaC asks: PIPEV2-3984 (Zenni Optical, quota-based policy in the TCO operator CRD), PIPEV2-1145. <b>Bugs:</b> none found. <b>Customers waiting:</b> Yotpo. Related asks: Qube, Cleo, SmartAsset.</div>
+  </section>
+
+  <section class="slide" data-screen-label="04 Historical import" data-id="history" data-step="3">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="feat">
+      <div class="f-left">
+        <div class="f-tag"><span class="chip or">Rolling Out</span><span class="f-name">Historical Data Import</span></div>
+        <h3 class="f-h cl">Moving to Coralogix? Bring your history with you.</h3>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>We copy your files from your own S3 into a dedicated dataset.</p></div><div class="ba-row now"><span class="k">What you get</span><p>Your old data, ready to query. Your daily quota is not touched. Billed once, on uncompressed size.</p></div><div class="ba-row"><span class="k">Before</span><p>Data older than 24 hours was rejected, so history stayed behind.</p></div><div class="ba-row ask"><span class="k">Asked by</span><p><b>Axonius</b> (PIPE), Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy, G-Research, OCBC, Tessian</p></div></div>
+        <div class="gtk"><div class="k">Good to know</div><ul><li>Phase 1 is run by our team, not self-serve</li></ul></div>
+      </div>
+      <div class="f-right">
+        <div class="mock">
+          <div class="mock-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="path">How it works</span></div>
+          <div class="mock-body">
+            <div class="h-flow">
+              <div>
+                <div class="h-lab">Historical data</div>
+                <div class="h-lane">
+                  <div class="h-node">Customer S3<small>their own bucket</small></div>
+                  <div class="h-arrow"></div>
+                  <div class="h-node m">Dedicated dataset<small>Compliance tier</small></div>
+                  <div class="h-arrow"></div>
+                  <div class="h-node">Query</div>
+                </div>
+              </div>
+              <div class="h-wall"><span>Measured beside the daily quota, not inside it</span></div>
+              <div>
+                <div class="h-lab">Live data</div>
+                <div class="h-lane">
+                  <div class="h-node">Live ingestion</div>
+                  <div class="h-arrow gr"></div>
+                  <div class="h-node">Daily quota<small>not touched</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-30677" target="_blank" rel="noopener">CX-30677</a><a href="https://coralogix.atlassian.net/browse/CX-41231" target="_blank" rel="noopener">CX-41231</a></div><div class="grp"><span class="lbl">PIPE</span><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-1380" target="_blank" rel="noopener">PIPEV2-1380</a></div></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. <b>PIPE:</b> PIPEV2-1380 (Axonius, ingest old data with the log creation timestamp). Linked task CX-61834 (bill non-log imports under the ingress-files feature ID). <b>Bugs:</b> none found. <b>Customers waiting:</b> Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy, G-Research, OCBC, Tessian. Not verified (from a NotebookLM summary): GBG, SoFi, MoneyGram, Kort, dLocal.</div>
+  </section>
+
+  <section class="slide" data-screen-label="05 Monthly Team Quota" data-id="monthly" data-step="4">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="feat">
+      <div class="f-left">
+        <div class="f-tag"><span class="chip or">Open to Early Adopters</span><span class="f-name">Monthly Team Quota</span></div>
+        <h3 class="f-h cl">Busy weeks and quiet weeks? Budget for the month.</h3>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>A monthly quota plan per account.</p></div><div class="ba-row now or"><span class="k">What you get</span><p>Units across the month, with a daily burst limit so one day cannot use it all.</p></div><div class="ba-row"><span class="k">Today</span><p>Quota is per day. One busy day hits the cap, even when the month has room.</p></div><div class="ba-row ask"><span class="k">Interested</span><p>Emburse, Jiostar, Elsevier, DAZN, Gett, CRED, Jago, Swish, WizzAir, NetRoadshow, Island, Gelato, JFS, Betsson, Razorpay</p></div></div>
+        <div class="gtk"><div class="k">Launch terms</div><ul><li>No PAYG on monthly at launch</li><li>No grace, no rollover</li><li>One plan type per account</li></ul></div>
+      </div>
+      <div class="f-right">
+        <div class="mock">
+          <div class="mock-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="path">How a monthly plan works</span></div>
+          <div class="mock-body">
+            <div class="m-plan"><span>Monthly plan</span><span class="bar"><i></i></span></div>
+            <div class="m-chart" id="mchart"><div class="m-limit" style="bottom:78%"><span>Daily burst limit</span></div></div>
+            <div class="m-axis"><span>1st</span><span>End of month</span></div>
+          </div>
+        </div><div class="show or"><div class="k">Bring us an account</div><p>We are looking for early adopter accounts now. If a customer has busy weeks and quiet weeks, bring them to us.</p></div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-40018" target="_blank" rel="noopener">CX-40018</a></div><div class="grp"><span class="lbl">Bugs</span><a class="bug" href="https://coralogix.atlassian.net/browse/CX-62225" target="_blank" rel="noopener">CX-62225</a></div></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>SAY:</b> this is an invitation, not a release. Backend is done, the Nimbus screens are close, a staging dry run is next, then one pilot account. <b>&#9888; No date.</b> The announcement month is with Chris. <b>&#9888; Launch terms, say them if asked:</b> no PAYG on monthly at launch, no grace, no rollover. When the month runs out, the team is blocked until the 1st unless the AM tops it up. One plan type per account: teams cannot mix daily and monthly. <b>&#9888; Open:</b> monthly warning level (80% in code, 90% in the spec), renewal rule for existing accounts. Design partner candidates raised by the field: Gelato, JFS, Hotstar. <b>PIPE:</b> none linked. <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows. <b>Customers waiting:</b> Emburse, Jiostar, Elsevier, DAZN, Gett, CRED, Jago, Swish, WizzAir, NetRoadshow, Island, Gelato, JFS, Betsson, Razorpay. No pilot account chosen yet.</div>
+  </section>
+
+<section class="slide s-thanks" data-screen-label="06 Thank you">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><span class="pno"></span></div>
+    <div class="eyebrow">Thank you</div>
+    <h2>This cycle was powered by these teams</h2>
+    <div class="tgrid">
+      <div class="tc"><b>Nimbus</b><span>Iulian, Wiktor, Ruben</span></div>
+      <div class="tc"><b>Radiant</b><span>Itay, Anton, Linoy, Naor, Tamir, Tomer</span></div>
+      <div class="tc"><b>Halo</b><span>Rafael, Gaspare, Denis, Simone</span></div>
+      <div class="tc"><b>Citadel</b><span>Asaf, Eliyahu, Roy, Shimon</span></div>
+      <div class="tc"><b>Ecosystem</b><span>David</span></div>
+      <div class="tc"><b>Product Design</b><span>Omer</span></div>
+      <div class="tc"><b>Technical Writing</b><span>Maya</span></div>
+      <div class="tc" style="background:none;border-style:dashed"><b>Questions?</b><span>Noam Sheffi</span></div>
+    </div>
+    <p class="also"><b>Also this cycle:</b> audit team units out of org totals &middot; TCO policy tier takes a unit value (API, asked by Qube) &middot; TCO Optimizer scroll &middot; RUM pipeline routing now GA. <b>Next:</b> Traffic Management, in build, nothing live.</p>
+    <div class="notes-data" hidden>Read the "Also this cycle" line fast, no demo. Unit value is API only, no screen. Traffic Management: research done, engine and design in progress, no date. Then name the teams and hand over to questions.</div>
+  </section>
+
+
+</div></div>
+
+<div id="notes"></div>
+<div class="ctrl">
+  <button class="pdf" id="pdf" title="Print or save as PDF (notes are left out)">Save PDF</button>
+  <button id="prev">&larr;</button>
+  <div class="dots" id="dots"></div>
+  <button id="next">&rarr;</button>
+  <span class="hint">&larr; &rarr; move &middot; 1 to 4 jump &middot; M map &middot; N notes &middot; F fullscreen</span>
+</div>
+
+<script>
+(function () {
+  const deck = document.getElementById('deck');
+  const slides = Array.from(deck.querySelectorAll('.slide'));
+  const total = slides.length;
+  const byId = {};
+  slides.forEach((s, k) => { if (s.dataset.id) byId[s.dataset.id] = k; });
+  const order = ['usage', 'priority', 'history', 'monthly'];
+  const KEY = 'cv-deck-0610-lens';
+  let i = 0;
+  try { const s = parseInt(localStorage.getItem(KEY), 10); if (!isNaN(s)) i = Math.max(0, Math.min(total - 1, s)); } catch (e) {}
+
+  // page numbers
+  slides.forEach((s, k) => { const p = s.querySelector('.pno'); if (p) p.textContent = String(k + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0'); });
+
+  // path rail on feature slides
+  const railSteps = [
+    { n: 1, label: 'Know what you use', go: 'usage' },
+    { n: 2, label: 'Trust your policies', go: 'priority' },
+    { n: 3, label: 'Bring your history', go: 'history' },
+    { n: '+', label: 'Monthly quota', go: 'monthly', or: true }
+  ];
+  slides.forEach(s => {
+    const r = s.querySelector('.rail'); if (!r) return;
+    const step = parseInt(s.dataset.step, 10);
+    r.innerHTML = railSteps.map((st, k) => {
+      const cls = (k + 1 === step ? 'on' : (k + 1 < step ? 'done' : '')) + (st.or ? ' or' : '');
+      return (k ? '<span class="sep"></span>' : '') + '<button class="' + cls + '" data-go="' + st.go + '"><b>' + st.n + '</b>' + st.label + '</button>';
+    }).join('');
+  });
+
+  // monthly bars (illustrative shape only)
+  const mc = document.getElementById('mchart');
+  if (mc) {
+    const h = [30,42,26,18,22,55,61,38,24,20,34,48,70,66,44,28,16,14,26,36,52,74,58,40,30,22,18,32,46,38];
+    mc.insertAdjacentHTML('beforeend', h.map(v => '<i class="' + (v > 60 ? 'pk' : '') + '" style="height:' + v + '%"></i>').join(''));
+  }
+
+  // dots
+  const dots = document.getElementById('dots');
+  dots.innerHTML = slides.map((_, k) => '<i data-k="' + k + '" title="' + slides[k].dataset.screenLabel + '"></i>').join('');
+  dots.addEventListener('click', e => { if (e.target.dataset.k) go(+e.target.dataset.k); });
+
+  const notes = document.getElementById('notes');
+  function render() {
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    Array.from(dots.children).forEach((d, k) => d.classList.toggle('on', k === i));
+    document.getElementById('prev').disabled = i === 0;
+    document.getElementById('next').disabled = i === total - 1;
+    const nd = slides[i].querySelector('.notes-data');
+    notes.innerHTML = nd ? '<b>Speaker note &middot;</b> ' + nd.innerHTML : '';
+    try { window.parent.postMessage({ slideIndexChanged: i }, '*'); } catch (e) {}
+  }
+  function go(n) { i = Math.max(0, Math.min(total - 1, n)); try { localStorage.setItem(KEY, i); } catch (e) {} render(); }
+
+  deck.addEventListener('click', e => {
+    const t = e.target.closest('[data-go]');
+    if (t && byId[t.dataset.go] !== undefined) { e.stopPropagation(); go(byId[t.dataset.go]); }
+  });
+  document.getElementById('prev').onclick = () => go(i - 1);
+  document.getElementById('next').onclick = () => go(i + 1);
+  document.getElementById('pdf').onclick = () => window.print();
+  document.addEventListener('keydown', e => {
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { go(i + 1); e.preventDefault(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') go(i - 1);
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(total - 1);
+    else if (/^[1-4]$/.test(k)) go(byId[order[+k - 1]]);
+    else if (k.toLowerCase() === 'm') go(0);
+    else if (k.toLowerCase() === 'n') notes.classList.toggle('show');
+    else if (k.toLowerCase() === 'f') { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+
+  function fit() {
+    const vp = document.getElementById('viewport');
+    const s = Math.min(vp.clientWidth / 1920, vp.clientHeight / 1080);
+    deck.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
