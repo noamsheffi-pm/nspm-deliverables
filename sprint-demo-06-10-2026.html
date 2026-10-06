@@ -223,6 +223,9 @@
   .value-lead { margin-bottom: 10px; }
   .value-lead .k { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
   .value-lead p { font-size: 27px; line-height: 1.26; font-weight: 700; color: var(--text); max-width: 58ch; }
+  .asked { font-size: 14px; line-height: 1.4; color: var(--text-muted); margin: -8px 0 16px; max-width: 90ch; }
+  .asked .k { color: var(--mint); font-weight: 700; text-transform: uppercase; letter-spacing: .1em; font-size: 11px; margin-right: 6px; }
+  .asked a { color: var(--text-2); }
   .value-rest { font-size: 18px; line-height: 1.4; color: var(--text-2); max-width: 74ch; margin-bottom: 20px; }
   .card .shift { margin-bottom: 14px; }
   .card .shift .half p { font-size: 16px; }
@@ -281,6 +284,7 @@
     <div class="fc-head"><span class="fc-title">Usage and Quota on One Page</span><span class="chip">Shipped</span></div>
     <div class="value-lead"><span class="k">Why it matters</span><p>One page answers how much every team uses.</p></div>
     <p class="value-rest">What you see follows your permissions: one team, a few teams, or all of them. CX units and AI units sit on separate tabs, because they are two separate plans. The AI units tab from Org Quota Manager now lives here too.</p>
+    <p class="asked"><span class="k">Asked by</span>Mobileye (<a href="https://coralogix.atlassian.net/browse/PIPEV2-4099" target="_blank" rel="noopener">PIPEV2-4099</a>), Qube, Island, FactSet, LHV, Proofpoint, Gett and 5 more</p>
     <div class="shift">
       <div class="half before"><div class="lab">Before</div><p>Data Usage and Org Quota Manager showed the same usage at two scopes on two screens. Orgs with one team had no quota view at all.</p></div>
       <div class="arrow">&#8594;</div>
@@ -291,7 +295,7 @@
       <span class="keys">CX-50859 &middot; CX-59176 &middot; CX-44033 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-4049" target="_blank" rel="noopener">PIPEV2-4049</a> <a href="https://coralogix.atlassian.net/browse/PIPEV2-4099" target="_blank" rel="noopener">PIPEV2-4099</a> <span class="lbl">Bugs</span> <a href="https://coralogix.atlassian.net/browse/CX-62225" target="_blank" rel="noopener">CX-62225</a> <a href="https://coralogix.atlassian.net/browse/CX-59905" target="_blank" rel="noopener">CX-59905</a> <a href="https://coralogix.atlassian.net/browse/CX-62236" target="_blank" rel="noopener">CX-62236</a> <a href="https://coralogix.atlassian.net/browse/CX-62238" target="_blank" rel="noopener">CX-62238</a></span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing. <b>PIPE:</b> linked PIPEV2-4049 (group by team in Org Quota Manager, Roadmap Item), PIPEV2-4099 (Data Usage pane in the org admin console, Candidate). Related by text, not linked: PIPEV2-3842 (current quota lags when moving units), PIPEV2-2584 (Quota Manager reporting). <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows (linked) · CX-59905 write-access shows Disabled · CX-62236 Data Usage shows No Data without S3 (Blocked) · CX-62238 trial team plan error. <b>Customers waiting:</b> Mobileye, Island, Qube, FactSet, Core Star, LHV, Goldbelly, Proofpoint, Voyado, H2O.ai, Gett, JIO Finance.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing. <b>PIPE:</b> linked PIPEV2-4049 (group by team in Org Quota Manager, Roadmap Item, filed by Nathan Lindley), PIPEV2-4099 (Mobileye, Data Usage pane in the org admin console, Candidate). Related: PIPEV2-3842 (DAZN, current quota lags when moving units). Related by text, not linked: PIPEV2-3842 (current quota lags when moving units), PIPEV2-2584 (Quota Manager reporting). <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows (linked) · CX-59905 write-access shows Disabled · CX-62236 Data Usage shows No Data without S3 (Blocked) · CX-62238 trial team plan error. <b>Customers waiting:</b> Mobileye, Island, Qube, FactSet, Core Star, LHV, Goldbelly, Proofpoint, Voyado, H2O.ai, Gett, JIO Finance.</div>
   </section>
 
   <!-- 4 SECTION 2 OPENER -->
@@ -315,6 +319,7 @@
     <div class="fc-head"><span class="fc-title">See Which Priority Is Active Now</span><span class="chip">Shipped</span></div>
     <div class="value-lead"><span class="k">Why it matters</span><p>Customers see which priority is active right now.</p></div>
     <p class="value-rest">For quota-based policies the active priority changes with the daily quota thresholds. The table now highlights the priority in effect for each target.</p>
+    <p class="asked"><span class="k">Asked by</span>Miro (<a href="https://coralogix.atlassian.net/browse/PIPEV2-3564" target="_blank" rel="noopener">PIPEV2-3564</a>), Kotak, Xplor, NeoGames, COMM-IT, Career Team</p>
     <div class="shift">
       <div class="half before"><div class="lab">Before</div><p>The same application could appear in several rows, and a 24 hour window mixed old and new state. Nobody could tell which policy was in effect now.</p></div>
       <div class="arrow">&#8594;</div>
@@ -322,10 +327,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://app.notion.com/3e3c048defad81e79364d0220fce5d44" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-39721</span>
+      <span class="keys">CX-39721 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-3564" target="_blank" rel="noopener">PIPEV2-3564</a></span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Radiant</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases (names stay off the slide). <b>PIPE:</b> none linked. <b>Bugs:</b> none found. <b>Customers waiting:</b> Kotak, Xplor, Miro, Career Team, COMM-IT, NeoGames, plus the original requester (unnamed). About 22 more accounts on the release-anticipation tracker ask for gaps this scope does not fix.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases (names stay off the slide). <b>PIPE:</b> PIPEV2-3564 (Miro, the TCO Optimizer Statistics view ask: current effective configuration and a short timeframe). It was rejected on 07-08 only because the reporter left, and this release delivers the effective-configuration half. Related: PIPEV2-2692. <b>Bugs:</b> none found. <b>Customers waiting:</b> Kotak, Xplor, Miro, Career Team, COMM-IT, NeoGames, plus the original requester (unnamed). About 22 more accounts on the release-anticipation tracker ask for gaps this scope does not fix.</div>
   </section>
 
   <!-- 6 CARD 3 -->
@@ -335,6 +340,7 @@
     <div class="fc-head"><span class="fc-title">TCO Policies as Code</span><span class="chip">Shipped</span></div>
     <div class="value-lead"><span class="k">Why it matters</span><p>Teams on Terraform copy any policy straight into code.</p></div>
     <p class="value-rest">A policy built in the UI and the one in your IaC can now be checked against each other. It works the same way as View as Code in Alerts and Parsing Rules.</p>
+    <p class="asked"><span class="k">Asked by</span>Yotpo</p>
     <div class="shift">
       <div class="half before"><div class="lab">Before</div><p>Alerts and Parsing Rules had View as Code, TCO policies did not. Teams on Terraform could not check a UI policy against their own definition.</p></div>
       <div class="arrow">&#8594;</div>
@@ -342,10 +348,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://www.notion.so/3e5c048defad814fbc28f1016aca2d33" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-43382 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-3368" target="_blank" rel="noopener">PIPEV2-3368</a></span>
+      <span class="keys">CX-43382</span>
       <span class="teams"><span class="team">Radiant</span><span class="team">Nimbus</span><span class="team">Ecosystem</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one. <b>PIPE:</b> related by text, not linked: PIPEV2-3368 (bulk export for View as Code, Terraform first, Candidate), PIPEV2-1145 (Dynamic TCO through Terraform). <b>Bugs:</b> none found. <b>Customers waiting:</b> Yotpo. Related asks: Qube, Cleo, SmartAsset.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one. <b>PIPE:</b> none for TCO View as Code. Related IaC asks: PIPEV2-3984 (Zenni Optical, quota-based policy in the TCO operator CRD), PIPEV2-1145. <b>Bugs:</b> none found. <b>Customers waiting:</b> Yotpo. Related asks: Qube, Cleo, SmartAsset.</div>
   </section>
 
   <!-- 7 SECTION 3 OPENER -->
@@ -368,6 +374,7 @@
     <div class="fc-head"><span class="fc-title">Historical Data Import</span><span class="chip roll">Rolling Out</span></div>
     <div class="value-lead"><span class="k">Why it matters</span><p>Customers import old data without blocking live data.</p></div>
     <p class="value-rest">The import is measured beside the daily quota, not inside it, and it is billed once on uncompressed size.</p>
+    <p class="asked"><span class="k">Asked by</span>Axonius (<a href="https://coralogix.atlassian.net/browse/PIPEV2-1380" target="_blank" rel="noopener">PIPEV2-1380</a>), Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy and 3 more</p>
     <div class="shift">
       <div class="half before"><div class="lab">Before</div><p>Live ingestion rejects anything older than 24 hours. A customer moving from another vendor had no way to bring their history with them.</p></div>
       <div class="arrow">&#8594;</div>
@@ -375,10 +382,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://app.notion.com/p/3e7c048defad81a2a272ef34127f514d" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-30677 &middot; CX-41231</span>
+      <span class="keys">CX-30677 &middot; CX-41231 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-1380" target="_blank" rel="noopener">PIPEV2-1380</a></span>
       <span class="teams"><span class="team">Citadel</span><span class="team">Halo</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide. <b>PIPE:</b> none found. Linked task CX-61834 (bill non-log imports under the ingress-files feature ID). <b>Bugs:</b> none found. <b>Customers waiting:</b> Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy, G-Research, OCBC, Tessian. Not verified (from a NotebookLM summary): GBG, SoFi, MoneyGram, Kort, dLocal.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide. <b>PIPE:</b> PIPEV2-1380 (Axonius, ingest old data with the log creation timestamp). Linked task CX-61834 (bill non-log imports under the ingress-files feature ID). <b>Bugs:</b> none found. <b>Customers waiting:</b> Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy, G-Research, OCBC, Tessian. Not verified (from a NotebookLM summary): GBG, SoFi, MoneyGram, Kort, dLocal.</div>
   </section>
 
   <!-- EARLY ADOPTERS: MONTHLY TEAM QUOTA -->
@@ -388,6 +395,7 @@
     <div class="fc-head"><span class="fc-title">Monthly Team Quota</span><span class="chip roll">Open to Early Adopters</span></div>
     <div class="value-lead"><span class="k">Why it matters</span><p>Customers budget for the month, not for each day.</p></div>
     <p class="value-rest">We are looking for early adopter accounts now. If a customer has busy weeks and quiet weeks, bring them to us.</p>
+    <p class="asked"><span class="k">Asked by</span>Emburse, Jiostar, Elsevier, DAZN, Gett, CRED, WizzAir, Razorpay and 7 more</p>
     <div class="shift">
       <div class="half before"><div class="lab">Before</div><p>Quota was enforced per day. A team with one busy day hit the daily cap, even when the monthly budget still had room.</p></div>
       <div class="arrow">&#8594;</div>
@@ -424,7 +432,7 @@
     <h2 style="margin-bottom:20px;">Worth a Mention</h2>
     <div class="mentions">
       <div class="mention"><h4>Audit team units out of org totals</h4><p>Org Quota Manager no longer counts the audit team&#39;s units in the organization totals.</p></div>
-      <div class="mention"><h4>TCO policy tier accepts a unit value</h4><p>Phase 1, API only: a TCO policy tier can take a unit value. No screen yet. PIPE: <a href="https://coralogix.atlassian.net/browse/PIPEV2-4265" target="_blank" rel="noopener">PIPEV2-4265</a></p></div>
+      <div class="mention"><h4>TCO policy tier accepts a unit value</h4><p>Phase 1, API only: a TCO policy tier can take a unit value. No screen yet. Asked by Qube, PIPE: <a href="https://coralogix.atlassian.net/browse/PIPEV2-4265" target="_blank" rel="noopener">PIPEV2-4265</a></p></div>
       <div class="mention"><h4>TCO Optimizer page scroll and section switch</h4><p>The TCO Optimizer page scrolls and switches between sections without losing your place.</p></div>
     </div>
     <div class="callout"><b>Closed since 01-09.</b> Shown last demo as <span class="chip roll">Rolling Out</span>, now generally available: RUM Dataset pipeline routing, phase 1.</div>
@@ -444,7 +452,7 @@
       <div class="p"><div class="h">Sell TCO as code</div><div class="d">Every saved TCO policy now opens as Terraform or Kubernetes code. <b>Customers copy UI policies straight into their IaC pipeline.</b></div></div>
       <div class="p"><div class="h">Sell historical import</div><div class="d">Historical log data now imports into its own dataset from customer S3. <b>Customers bring their history without blocking live data.</b></div></div>
     </div>
-    <div class="notes-data" hidden>Say the claim, then stop and let them read. Names stay off the slide: the live policy status came from Kotak and Xplor cases, historical import from Collibra, CommIT and others. Historical import is run by our team in phase 1. View as Code is parity work. Caveats stay on the cards.</div>
+    <div class="notes-data" hidden>Say the claim, then stop and let them read. The live policy status came from Kotak and Xplor cases, historical import from Collibra, CommIT and others. Historical import is run by our team in phase 1. View as Code is parity work. Caveats stay on the cards.</div>
   </section>
 
   <!-- 11 THANK YOU -->
