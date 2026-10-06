@@ -253,7 +253,7 @@
     <div class="stats">
       <div class="stat"><div class="n">3</div><div class="l">Shipped</div></div>
       <div class="stat"><div class="n">1</div><div class="l">Rolling Out</div></div>
-      <div class="stat"><div class="n">3</div><div class="l">Coming Next</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Open to Early Adopters</div></div>
       <div class="stat"><div class="n">7</div><div class="l">Teams</div></div>
     </div>
     <div class="notes-data" hidden>Three cards are released. Usage and Quota went out on 05-10, so its Jira Feature may still show open. Historical import is Rolling Out: phase 1 is run by our team, not self-serve.</div>
@@ -379,6 +379,26 @@
     <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide.</div>
   </section>
 
+  <!-- EARLY ADOPTERS: MONTHLY TEAM QUOTA -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Quota</span>
+    <div class="fc-head"><span class="fc-title">Monthly Team Quota</span><span class="chip roll">Open to Early Adopters</span></div>
+    <div class="value-lead"><span class="k">Why it matters</span><p>Customers budget for the month, not for each day.</p></div>
+    <p class="value-rest">We are looking for early adopter accounts now. If a customer has busy weeks and quiet weeks, bring them to us.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Quota was enforced per day. A team with one busy day hit the daily cap, even when the monthly budget still had room.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>A monthly plan per account. Teams use units across the month, and a daily burst limit stops one day from using the whole month.</p></div>
+    </div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/3e3c048defad81d58144dd0426da9f56" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-40018</span>
+      <span class="teams"><span class="team">Halo</span><span class="team">Nimbus</span><span class="team">Radiant</span><span class="team">Citadel</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SAY:</b> this is an invitation, not a release. Backend is done, the Nimbus screens are close, a staging dry run is next, then one pilot account. <b>&#9888; No date.</b> The announcement month is with Chris. <b>&#9888; Launch terms, say them if asked:</b> no PAYG on monthly at launch, no grace, no rollover. When the month runs out, the team is blocked until the 1st unless the AM tops it up. One plan type per account: teams cannot mix daily and monthly. <b>&#9888; Open:</b> monthly warning level (80% in code, 90% in the spec), renewal rule for existing accounts. Design partner candidates raised by the field (names stay off the slide): Gelato, JFS, Hotstar.</div>
+  </section>
+
   <!-- 8 COMING NEXT -->
   <section class="slide card">
     <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
@@ -391,20 +411,8 @@
         <p class="t-body">Shown last demo. Since then the Nimbus graph framework research is done. The Radiant engine and the pipeline builder design are in progress. Nothing live.</p>
         <div class="t-keys">CX-49207 &middot; Radiant &middot; Nimbus &middot; Product Design</div>
       </div>
-      <div class="t-card">
-        <div class="t-head"><span class="t-title">Expression-Based Retention</span><span class="chip roll">In Build</span></div>
-        <p class="t-pitch">A record keeps the retention its content earns.</p>
-        <p class="t-body">Shown last demo. Since then the design is done, and the dataset screen has started on Phoenix next to the Citadel rule model. Nothing live.</p>
-        <div class="t-keys">CX-48426 &middot; Citadel &middot; Phoenix &middot; Tech Writing</div>
-      </div>
-      <div class="t-card">
-        <div class="t-head"><span class="t-title">Monthly Team Quota</span><span class="chip roll">In Build</span></div>
-        <p class="t-pitch">Enforce against the monthly budget you contract on.</p>
-        <p class="t-body">Shown last demo. Since then Usage and Quota has shipped, which is the page a monthly plan will sit on. A customer-set daily burst limit on a monthly plan is in progress. Nothing live.</p>
-        <div class="t-keys">CX-40018 &middot; Halo &middot; Radiant &middot; Nimbus &middot; Product Design</div>
-      </div>
     </div>
-    <div class="notes-data" hidden>All three are returning peeks. Lead on what moved, do not re-pitch, and give no dates. Monthly burst limit is CX-58243.</div>
+    <div class="notes-data" hidden>Returning peek. Lead on what moved, do not re-pitch, and give no date. Expression-Based Retention was dropped from this deck: Citadel postponed it.</div>
   </section>
 
   <!-- 9 WORTH A MENTION -->
@@ -460,7 +468,7 @@
 <div class="hint">&larr; &rarr; navigate &middot; N notes &middot; F fullscreen</div>
 <div class="navbar">
   <button id="prev">&larr; Back</button>
-  <span class="counter" id="counter">1 / 13</span>
+  <span class="counter" id="counter">1 / 14</span>
   <button id="next">Next &rarr;</button>
 </div>
 
