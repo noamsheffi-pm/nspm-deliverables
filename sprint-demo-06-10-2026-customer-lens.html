@@ -464,7 +464,7 @@
 
 <div id="notes"></div>
 <div class="ctrl">
-  <button class="pdf" id="pdf" title="Print or save as PDF (notes are left out)">Save PDF</button>
+  <button class="pdf" id="fs" title="Full screen (F)">&#x26F6; Full screen</button>
   <button id="prev">&larr;</button>
   <div class="dots" id="dots"></div>
   <button id="next">&rarr;</button>
@@ -532,7 +532,10 @@
   });
   document.getElementById('prev').onclick = () => go(i - 1);
   document.getElementById('next').onclick = () => go(i + 1);
-  document.getElementById('pdf').onclick = () => window.print();
+  function toggleFs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  const fsBtn = document.getElementById('fs');
+  fsBtn.onclick = toggleFs;
+  document.addEventListener('fullscreenchange', () => { fsBtn.innerHTML = document.fullscreenElement ? '&#x2715; Exit full screen' : '&#x26F6; Full screen'; fit(); });
   document.addEventListener('keydown', e => {
     const k = e.key;
     if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { go(i + 1); e.preventDefault(); }
@@ -542,7 +545,7 @@
     else if (/^[1-4]$/.test(k)) go(byId[order[+k - 1]]);
     else if (k.toLowerCase() === 'm') go(0);
     else if (k.toLowerCase() === 'n') notes.classList.toggle('show');
-    else if (k.toLowerCase() === 'f') { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    else if (k.toLowerCase() === 'f') toggleFs();
   });
 
   function fit() {
