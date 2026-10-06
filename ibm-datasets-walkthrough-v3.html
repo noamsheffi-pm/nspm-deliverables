@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datasets, Scopes, Streams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens: IBM Cloud Logs UI (Carbon g100 dark, g10 light) ---------- */
+:root,:root[data-theme="dark"]{
+  --bg:#161616; --l01:#1e1e1e; --l02:#262626; --l03:#333333; --hover:#2e2e2e;
+  --ink:#f4f4f4; --muted:#c6c6c6; --faint:#a8a8a8; --line:#393939; --line2:#525252;
+  --link:#78a9ff; --btn:#0f62fe; --btn-h:#0353e9; --focus:#ffffff; --sel:#262626;
+  --l3:#be95ff; --l3t:#491d8b; --l3tx:#e8daff;
+  --l2:#3ddbd9; --l2t:#004144; --l2tx:#9ef0f0;
+  --l1:#ff832b; --l1t:#5e2900; --l1tx:#ffd9be;
+  --gr-t:#044317; --gr-tx:#6fdc8c;
+  --gy-t:#393939; --gy-tx:#c6c6c6;
+  --bl-t:#001d6c; --bl-tx:#a6c8ff;
+  --ye-t:#483700; --ye-tx:#f1c21b;
+}
+:root[data-theme="light"]{
+  --bg:#f4f4f4; --l01:#ffffff; --l02:#ffffff; --l03:#e8e8e8; --hover:#e8e8e8;
+  --ink:#161616; --muted:#525252; --faint:#6f6f6f; --line:#e0e0e0; --line2:#c6c6c6;
+  --link:#0f62fe; --btn:#0f62fe; --btn-h:#0353e9; --focus:#0f62fe; --sel:#f4f4f4;
+  --l3:#8a3ffc; --l3t:#e8daff; --l3tx:#6929c4;
+  --l2:#007d79; --l2t:#9ef0f0; --l2tx:#005d5d;
+  --l1:#ba4e00; --l1t:#ffd9be; --l1tx:#8a3800;
+  --gr-t:#a7f0ba; --gr-tx:#0e6027;
+  --gy-t:#e0e0e0; --gy-tx:#393939;
+  --bl-t:#d0e2ff; --bl-tx:#0043ce;
+  --ye-t:#fcf4d6; --ye-tx:#8e6a00;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+a{color:var(--link)}
+code{font-family:"IBM Plex Mono",monospace;font-size:.9em;background:var(--l03);padding:1px 6px;border-radius:2px}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+p{text-wrap:pretty}
+.launch{display:inline-block;width:16px;height:16px;flex:none;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M13 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v1H3v10h10V8h1v5a1 1 0 0 1-1 1z'/%3E%3Cpath d='M10 1v1h3.3L9 6.3l.7.7L14 2.7V6h1V1z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M13 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v1H3v10h10V8h1v5a1 1 0 0 1-1 1z'/%3E%3Cpath d='M10 1v1h3.3L9 6.3l.7.7L14 2.7V6h1V1z'/%3E%3C/svg%3E") center/contain no-repeat}
+
+/* ---------- UI shell header ---------- */
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;height:48px;padding:0 0 0 20px;border-bottom:1px solid var(--line);background:#161616;color:#f4f4f4}
+.brand{font-size:15px;white-space:nowrap;letter-spacing:.01em}
+.brand b{font-weight:600}
+.brand .sub{color:#c6c6c6;margin-left:14px;padding-left:14px;border-left:1px solid #525252}
+#themeBtn{margin-left:auto;width:48px;height:48px;border:0;background:transparent;color:#f4f4f4;font-size:19px;cursor:pointer}
+#themeBtn:hover{background:#2e2e2e}
+#themeBtn:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.tabs{max-width:1240px;margin:0 auto;padding:0 24px}
+.nav{display:flex;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:flex;align-items:center;height:44px;padding:0 16px;font-size:15px;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.nav a:hover{color:var(--ink);background:var(--hover)}
+.nav a.active{color:var(--ink);border-bottom-color:var(--btn);font-weight:600}
+.nav a:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+
+/* ---------- page ---------- */
+main{max-width:1240px;margin:0 auto;padding:0 24px 64px}
+section{scroll-margin-top:110px;margin-top:20px}
+.panel{background:var(--l01);border:1px solid var(--line);border-radius:4px}
+.sec{padding:28px 28px 32px}
+.sec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:6px}
+.sec-h .idx{font:500 13px/1 "IBM Plex Mono",monospace;color:var(--faint)}
+h2{font-size:28px;line-height:1.25}
+h3{font-size:18px;font-weight:600;line-height:1.35}
+.desc{color:var(--muted);margin:4px 0 24px;max-width:820px;font-size:16px}
+
+/* ---------- tags (Carbon) ---------- */
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:4px;font:400 14px/1 "IBM Plex Sans",sans-serif;white-space:nowrap;vertical-align:middle;background:var(--gy-t);color:var(--gy-tx)}
+.tag.later{background:var(--ye-t);color:var(--ye-tx)}
+.tag.green{background:var(--gr-t);color:var(--gr-tx)}
+.tag.blue{background:var(--bl-t);color:var(--bl-tx)}
+.tag.t3{background:var(--l3t);color:var(--l3tx)}
+.tag.t2{background:var(--l2t);color:var(--l2tx)}
+.tag.t1{background:var(--l1t);color:var(--l1tx)}
+.tag .sw{width:8px;height:8px;border-radius:1px;background:currentColor}
+
+/* ---------- buttons ---------- */
+.mk{display:inline-flex;align-items:center;justify-content:space-between;gap:20px;min-height:44px;padding:0 14px 0 16px;border-radius:4px;background:var(--btn);color:#fff;font:400 15px/1.2 "IBM Plex Sans",sans-serif;text-decoration:none;white-space:nowrap;transition:background .1s}
+.mk::after{content:"";width:16px;height:16px;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M13 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v1H3v10h10V8h1v5a1 1 0 0 1-1 1z'/%3E%3Cpath d='M10 1v1h3.3L9 6.3l.7.7L14 2.7V6h1V1z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M13 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v1H3v10h10V8h1v5a1 1 0 0 1-1 1z'/%3E%3Cpath d='M10 1v1h3.3L9 6.3l.7.7L14 2.7V6h1V1z'/%3E%3C/svg%3E") center/contain no-repeat}
+.mk:hover{background:var(--btn-h)}
+.mk:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+/* ---------- hero / page header ---------- */
+.ph{padding:36px 0 8px}
+.ph h1{font-size:40px;line-height:1.2;font-weight:300;max-width:980px;margin:14px 0 12px}
+.ph h1 b{font-weight:600}
+.ph .lead{font-size:18px;color:var(--muted);max-width:820px;margin:0}
+.defs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.def{background:var(--l02);border:1px solid var(--line);border-radius:4px;padding:22px 24px;border-top:3px solid var(--l2)}
+.def .tag{margin-bottom:12px}
+.def h3{font-size:22px;font-weight:400;margin-bottom:6px}
+.def p{margin:6px 0 0;color:var(--muted)}
+.subh{font-size:20px;margin:32px 0 14px}
+.gives{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.give{padding:20px 22px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--l01)}
+.give:nth-child(3n){border-right:0}
+.give:nth-last-child(-n+3){border-bottom:0}
+.give h3{margin-bottom:6px}
+.give p{margin:0;color:var(--muted);font-size:15px}
+
+/* ---------- layer diagram ---------- */
+.dia{display:grid;grid-template-columns:minmax(0,1fr) 88px minmax(0,1fr) 88px minmax(0,1.25fr);align-items:stretch}
+.lyr{background:var(--l02);border:1px solid var(--line);border-radius:4px;border-top:4px solid var(--c);display:flex;flex-direction:column;padding:22px}
+.c3{--c:var(--l3)} .c2{--c:var(--l2)} .c1{--c:var(--l1)}
+.lyr .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.lyr .n{font:300 52px/1 "IBM Plex Sans",sans-serif;color:var(--c)}
+.lyr h3{font-size:22px;font-weight:400}
+.lyr p{margin:6px 0 18px;color:var(--muted);flex:1}
+.targets{display:grid;gap:8px;margin:0 0 18px}
+.tgt{background:var(--l01);border:1px solid var(--line);border-radius:4px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:0 12px;align-items:center}
+.tgt .ic{grid-row:span 2;width:34px;height:34px;border-radius:4px;background:var(--l1t);color:var(--l1tx);display:grid;place-items:center;font:500 12px/1 "IBM Plex Mono",monospace}
+.tgt b{font-weight:600;font-size:16px}
+.tgt small{font-size:15px;color:var(--muted)}
+.arr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.arr .line{width:100%;height:2px;background:var(--line2);position:relative}
+.arr .line::after{content:"";position:absolute;right:0;top:50%;width:11px;height:11px;border-top:2px solid var(--line2);border-right:2px solid var(--line2);transform:translateY(-50%) rotate(45deg)}
+.arr .lbl{font:500 13px/1.2 "IBM Plex Mono",monospace;color:var(--faint);text-align:center}
+
+/* ---------- stepper ---------- */
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.step{display:grid;grid-template-columns:60px minmax(0,1fr);position:relative;counter-increment:s}
+.step::before{content:counter(s);width:40px;height:40px;border-radius:50%;background:var(--l01);border:2px solid var(--btn);color:var(--ink);display:grid;place-items:center;font:600 17px/1 "IBM Plex Sans",sans-serif;position:relative;z-index:1}
+.step::after{content:"";position:absolute;left:19px;top:40px;bottom:0;width:2px;background:var(--line)}
+.step:last-child::after{display:none}
+.step.is-later::before{border-style:dashed;border-color:var(--line2);color:var(--muted)}
+.sbody{background:var(--l02);border:1px solid var(--line);border-radius:4px;padding:20px 22px 18px;margin:0 0 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 32px;align-items:start}
+.step:last-child .sbody{margin-bottom:0}
+.sbody .tag{grid-column:1;justify-self:start}
+.sbody h3{grid-column:1;font-size:21px;font-weight:400;margin-top:6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.sbody .mk{grid-column:2;grid-row:1 / span 3;align-self:start;min-width:196px}
+.sbody p{grid-column:1;margin:0;color:var(--muted);max-width:740px}
+.say{grid-column:1/-1;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;line-height:1.5;color:var(--faint);font-style:italic}
+.say .sl{font:normal 500 11px/1 "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.08em;margin-right:8px;padding:3px 6px;border:1px solid var(--line);border-radius:2px;vertical-align:1px}
+
+/* ---------- table (Carbon data table) ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:16px;line-height:1.4;background:var(--l01)}
+th,td{text-align:left;padding:11px 20px;border-bottom:1px solid var(--line);vertical-align:middle}
+thead th{background:var(--l02);font-size:20px;font-weight:400;padding:14px 20px 12px;color:var(--ink)}
+thead th small{display:flex;align-items:center;gap:8px;font:400 14px/1.3 "IBM Plex Sans",sans-serif;color:var(--muted);margin-top:4px}
+thead th:first-child{width:34%}
+tbody th{font-weight:400;color:var(--muted);font-size:16px}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--hover)}
+td .tag{height:24px;padding:0 9px;font-size:14px;font-weight:600}
+td .rest{display:block;font-size:14px;color:var(--muted);margin-top:2px}
+td.plain{font-weight:600}
+
+/* ---------- resolver ---------- */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+.form{background:var(--l02);border:1px solid var(--line);border-radius:4px;padding:24px}
+.sim label{font-size:14px;color:var(--muted);display:block;margin:0 0 8px}
+.sim label.second{margin-top:22px}
+.sim input{width:100%;font:400 22px/1.2 "IBM Plex Mono",monospace;padding:12px 14px;border:0;border-bottom:1px solid var(--line2);background:var(--l03);color:var(--ink);border-radius:0}
+.sim input:focus{outline:2px solid var(--focus);outline-offset:-2px}
+.exrow{display:flex;flex-wrap:wrap;gap:8px}
+.ex{font:400 15px/1 "IBM Plex Mono",monospace;height:36px;padding:0 12px;border-radius:4px;border:1px solid var(--line2);background:transparent;color:var(--ink);cursor:pointer}
+.ex:hover{background:var(--hover);border-color:var(--link)}
+.ex:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.note{font-size:15px;color:var(--muted);margin:22px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+.path{display:flex;flex-direction:column}
+.hop{background:var(--l02);border:1px solid var(--line);border-radius:4px;padding:16px 18px;font-size:17px;opacity:.5;transition:opacity .2s,background .2s;position:relative}
+.hop + .hop{margin-top:26px}
+.hop + .hop::before{content:"↓";position:absolute;left:24px;top:-25px;line-height:24px;color:var(--line2)}
+.hop b{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-weight:600}
+.hop.on{opacity:1;border-color:var(--gr-tx);box-shadow:inset 4px 0 0 var(--gr-tx)}
+.hop.skip b{text-decoration:line-through;text-decoration-color:var(--faint);font-weight:400}
+.hop .res{margin-top:8px}
+.hop.on .res{color:var(--ink)}
+.hop.skip .res{color:var(--muted)}
+.hop .res i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--l03);padding:1px 5px;border-radius:2px}
+
+/* ---------- topics ---------- */
+#topics .sec{border-top:4px solid var(--btn);border-top-left-radius:0;border-top-right-radius:0}
+.qs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.q{background:var(--l02);border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;padding:24px}
+.q .qn{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.q .qn span:first-child{font:500 13px/1 "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.q .ask{font-size:23px;line-height:1.35;color:var(--ink);margin:0 0 18px;flex:1}
+.q .ask::before{content:"?";display:block;font:300 56px/.9 "IBM Plex Sans",sans-serif;color:var(--link);margin-bottom:12px}
+.q .ctx{font-size:15px;color:var(--muted);margin:0;padding-top:14px;border-top:1px solid var(--line)}
+
+footer{max-width:1240px;margin:0 auto;padding:0 24px 32px;color:var(--faint);font-size:14px}
+
+/* ---------- responsive ---------- */
+@media (max-width:1040px){
+  .dia{grid-template-columns:minmax(0,1fr)}
+  .arr{height:64px;flex-direction:row;gap:14px}
+  .arr .line{width:2px;height:100%}
+  .arr .line::after{right:auto;left:50%;top:auto;bottom:0;transform:translateX(-50%) rotate(135deg)}
+  .qs{grid-template-columns:1fr}
+  .gives{grid-template-columns:1fr 1fr}
+  .give:nth-child(n){border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .give:nth-child(2n){border-right:0}
+  .give:nth-last-child(-n+2){border-bottom:0}
+  .sim{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:720px){
+  .bar{padding-left:16px}
+  .brand .sub{display:none}
+  .tabs,main{padding-left:12px;padding-right:12px}
+  footer{padding:0 16px 24px}
+  .nav a{padding:0 12px}
+  section{scroll-margin-top:100px}
+  .sec{padding:20px 16px 24px}
+  .ph{padding:24px 4px 4px}
+  .ph h1{font-size:30px}
+  h2{font-size:24px}
+  .ph .lead{font-size:17px}
+  .defs{grid-template-columns:1fr}
+  .gives{grid-template-columns:1fr}
+  .give:nth-child(n){border-right:0;border-bottom:1px solid var(--line)}
+  .give:last-child{border-bottom:0}
+  .step{grid-template-columns:44px minmax(0,1fr)}
+  .step::before{width:32px;height:32px;font-size:15px}
+  .step::after{left:15px;top:32px}
+  .sbody{grid-template-columns:minmax(0,1fr);padding:18px 16px 16px}
+  .sbody .mk{grid-column:1;grid-row:auto;margin-top:10px;justify-self:stretch;min-width:0}
+  .sbody h3{font-size:19px}
+  table{font-size:16px}
+  th,td{padding:12px}
+  thead th{font-size:19px;padding:14px 12px}
+  thead th:first-child{width:auto}
+  tbody th{font-size:15px}
+  td .tag{height:26px;font-size:15px;padding:0 8px}
+  td .rest{font-size:15px}
+  .form{padding:18px}
+  .sim input{font-size:19px}
+  .q{padding:20px}
+  .q .ask{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="bar">
+    <span class="brand">IBM <b>Cloud Logs</b><span class="sub">Datasets · Scopes · Streams</span></span>
+    <button id="themeBtn" type="button" aria-label="Switch light or dark" title="Switch light or dark">◐</button>
+  </div>
+  <div class="tabs">
+    <nav class="nav" aria-label="Sections">
+      <a href="#what">What</a><a href="#layers">3 layers</a><a href="#flow">Setup flow</a><a href="#types">Archive vs stream</a><a href="#topics">Open topics</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. WHAT ============ -->
+<section id="what" data-screen-label="01 What">
+  <div class="ph">
+    <span class="tag blue">Concept walkthrough · design mockup, not final</span>
+    <h1>One place to decide <b>where data goes</b>, <b>who sees it</b>, and <b>how long it is kept</b></h1>
+    <p class="lead">Datasets give an IBM Cloud Logs instance named collections of data. Each one has its own storage, retention and access, set once by the admin.</p>
+  </div>
+
+  <div class="panel sec" style="margin-top:28px">
+    <div class="defs">
+      <div class="def">
+        <span class="tag t2"><span class="sw"></span>Layer 2</span>
+        <h3>Dataspace</h3>
+        <p>A group of datasets that belong together, for example one team or one product area.</p>
+        <p>The tier name, such as Priority insights, is part of how a query reads it.</p>
+      </div>
+      <div class="def">
+        <span class="tag t2"><span class="sw"></span>Layer 2</span>
+        <h3>Dataset</h3>
+        <p>A named collection of data inside a dataspace, for example <code>payments-logs</code> or <code>checkout-logs</code>.</p>
+        <p>It holds the settings for that data: where it is kept, how long, and who can see it.</p>
+      </div>
+    </div>
+
+    <h2 class="subh">What it gives an IBM customer</h2>
+    <div class="gives">
+      <div class="give"><h3>Access per dataset</h3><p>Data access rules apply to a dataset, so a team sees its own data and not the whole instance.</p></div>
+      <div class="give"><h3>Storage and retention per dataset</h3><p>Each dataset points at its own COS bucket and retention. Payment logs can be kept longer than debug logs.</p></div>
+      <div class="give"><h3>Streams as a target</h3><p>A dataset can send its data to an Event Streams topic instead of storing it, as part of the same setup.</p></div>
+      <div class="give"><h3>Clear usage per dataset</h3><p>Data usage shows one row per dataset, streams included, so the customer sees what each team sends and where it goes.</p></div>
+      <div class="give"><h3>Simple routing</h3><p>The TCO policy names the dataset. It does not need to know which bucket or topic sits behind it.</p></div>
+      <div class="give"><h3>Same model, UI and API</h3><p>Everything set on the screens can also be set through a public API, so customers can automate it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. LAYERS ============ -->
+<section id="layers" data-screen-label="02 Three layers">
+  <div class="panel sec">
+    <div class="sec-h"><span class="idx">02</span><h2>Three layers. Each layer knows only the layer below it.</h2></div>
+    <p class="desc">TCO → Dataset → COS bucket or Event Streams topic.</p>
+    <div class="dia">
+      <div class="lyr c3">
+        <div class="top"><span class="n">3</span><span class="tag t3"><span class="sw"></span>Layer 3</span></div>
+        <h3>TCO routing</h3>
+        <p>Sends data to a dataset by name, at a tier. It never sees the bucket or the topic.</p>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/tco-optimizer">TCO optimizer</a>
+      </div>
+      <div class="arr" aria-hidden="true"><span class="lbl">routes to</span><span class="line"></span></div>
+      <div class="lyr c2">
+        <div class="top"><span class="n">2</span><span class="tag t2"><span class="sw"></span>Layer 2</span></div>
+        <h3>Datasets</h3>
+        <p>Named collections with their settings: type, location, retention, access.</p>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/dataspace-management">Dataspace management</a>
+      </div>
+      <div class="arr" aria-hidden="true"><span class="lbl">points at</span><span class="line"></span></div>
+      <div class="lyr c1">
+        <div class="top"><span class="n">1</span><span class="tag t1"><span class="sw"></span>Layer 1</span></div>
+        <h3>Physical location</h3>
+        <p style="flex:none;margin-bottom:12px">Where the bytes go:</p>
+        <div class="targets">
+          <div class="tgt"><span class="ic">COS</span><b>COS bucket</b><small>stored, searchable</small></div>
+          <div class="tgt"><span class="ic">ES</span><b>Event Streams topic</b><small>sent out</small></div>
+        </div>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/physical-locations">Physical locations</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. FLOW ============ -->
+<section id="flow" data-screen-label="03 Setup flow">
+  <div class="panel sec">
+    <div class="sec-h"><span class="idx">03</span><h2>Setup flow, in the order a new customer does it</h2></div>
+    <p class="desc"></p>
+    <ol class="steps">
+      <li class="step"><div class="sbody">
+        <span class="tag t1"><span class="sw"></span>Layer 1 · Physical location</span>
+        <h3>Add a physical location</h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/physical-locations">Open in mockup</a>
+        <p>A COS bucket for data you keep, or an Event Streams topic for data you send out.</p>
+        <div class="say"><span class="sl">Show</span>the list of locations, and the difference between a bucket and a stream.</div>
+      </div></li>
+
+      <li class="step"><div class="sbody">
+        <span class="tag t2"><span class="sw"></span>Layer 2 · Datasets</span>
+        <h3>Create a dataset</h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/dataspace-management">Open in mockup</a>
+        <p>Pick the type first: <b>archive</b> or <b>stream</b>. The location list then shows only matching locations. Set the name, retention and description.</p>
+        <div class="say"><span class="sl">Show</span>create a dataset, choose archive, pick the bucket. Then the same with a stream, and note that retention and access disappear.</div>
+      </div></li>
+
+      <li class="step"><div class="sbody">
+        <span class="tag t2"><span class="sw"></span>Layer 2 · Datasets</span>
+        <h3>Set who can see it</h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/dataspace-management">Open in mockup</a>
+        <p>Each archive dataset has data access rules and a default: visible or hidden when no rule matches. Usage data can ship visible to all; sensitive data ships hidden.</p>
+        <div class="say"><span class="sl">Show</span>the access section on an archive dataset. Streams have none, since nothing is stored to read.</div>
+      </div></li>
+
+      <li class="step"><div class="sbody">
+        <span class="tag t3"><span class="sw"></span>Layer 3 · TCO routing</span>
+        <h3>Route data with TCO</h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/tco-optimizer">Open in mockup</a>
+        <p>A TCO policy matches incoming logs and names the target dataspace and dataset, and the tier. One policy can send to more than one dataset; each target is a separate copy.</p>
+        <div class="say"><span class="sl">Show</span>a policy with a dataset target. Point out it names the dataset, not the bucket.</div>
+      </div></li>
+
+      <li class="step"><div class="sbody">
+        <span class="tag">Data usage</span>
+        <h3>See usage per dataset</h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/settings/subscriptions/data-usage">Open in mockup</a>
+        <p>Data usage shows volume per dataset and tier. Stream datasets appear as their own rows.</p>
+        <div class="say"><span class="sl">Show</span>the dataset column, and a stream row next to stored rows.</div>
+      </div></li>
+
+      <li class="step is-later"><div class="sbody">
+        <span class="tag t2"><span class="sw"></span>Layer 2 · Datasets</span>
+        <h3>Templates: datasets created from a name pattern <span class="tag later">later</span></h3>
+        <a class="mk" target="_blank" rel="noopener" href="https://congenial-chainsaw-v3orlln.pages.github.io/master/dev/?ff.ibmMode=true#/data-flow/dataspace-management">Open in mockup</a>
+        <p>A template holds a name pattern and default settings. When data arrives for a name no dataset covers, a matching template creates that dataset. Editing a template changes only new datasets, never existing ones.</p>
+      </div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 4. TYPES ============ -->
+<section id="types" data-screen-label="04 Archive vs stream">
+  <div class="panel sec">
+    <div class="sec-h"><span class="idx">04</span><h2>Archive dataset vs stream dataset</h2></div>
+    <p class="desc"></p>
+    <div class="tw"><table>
+      <thead><tr><th scope="col"><span style="position:absolute;left:-9999px">Property</span></th><th scope="col">Archive<small><span class="tag t1">COS bucket</span></small></th><th scope="col">Stream<small><span class="tag t1">Event Streams topic</span></small></th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Physical location</th><td class="plain">COS bucket</td><td class="plain">Event Streams topic</td></tr>
+        <tr><th scope="row">Data kept in the platform</th><td><span class="tag green">Yes</span></td><td><span class="tag">No</span><span class="rest">it is sent out</span></td></tr>
+        <tr><th scope="row">Searchable in Explore</th><td><span class="tag green">Yes</span></td><td><span class="tag">No</span></td></tr>
+        <tr><th scope="row">Data access rules</th><td><span class="tag green">Yes</span></td><td><span class="tag">Not needed</span><span class="rest">nothing to read</span></td></tr>
+        <tr><th scope="row">Retention</th><td><span class="tag green">Yes</span></td><td><span class="tag">Does not apply</span></td></tr>
+        <tr><th scope="row">Real-time alerts</th><td><span class="tag green">Yes</span></td><td><span class="tag blue">On the Analyze and alert tier</span></td></tr>
+        <tr><th scope="row">Shown in data usage</th><td><span class="tag green">Yes</span><span class="rest">per dataset and tier</span></td><td><span class="tag green">Yes</span><span class="rest">as its own row</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+
+
+<!-- ============ 6. TOPICS ============ -->
+<section id="topics" data-screen-label="05 Open topics">
+  <div class="panel sec">
+    <div class="sec-h"><span class="idx">05</span><h2>Open topics: we want your view</h2></div>
+    <p class="desc"></p>
+    <div class="qs">
+      <div class="q">
+        <div class="qn"><span>Question 1</span><span class="tag">COS bucket</span></div>
+        <p class="ask">Should buckets stay in resource control, or be managed with the datasets?</p>
+        <p class="ctx">Today the bucket is set in IBM resource control and shown read-only. With datasets, a customer may want more than one bucket and to pick one per dataset.</p>
+      </div>
+      <div class="q">
+        <div class="qn"><span>Question 2</span><span class="tag">Streams: tier and charging</span></div>
+        <p class="ask">How should streamed data be charged, and on which tier?</p>
+        <p class="ctx">A stream dataset goes through TCO, so it has a tier. On Analyze and alert, real-time alerts run. On Store and search, cost is lowest. We report stream volume per dataset and tier.</p>
+      </div>
+      <div class="q">
+        <div class="qn"><span>Question 3</span><span class="tag">APIs</span></div>
+        <p class="ask">Which of your flows use today's scope and stream APIs?</p>
+        <p class="ctx">New: a public API for dataspaces and datasets (create, update, delete, list, get) and one for physical locations. Changed: stream setup moves onto datasets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>Screens shown are design mockups and may change. Mockup links open in a new tab, IBM mode.</footer>
+
+<script>
+(function(){
+  // theme toggle; dark by default to match the product UI; storage is a convenience only
+  var root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{var t=localStorage.getItem('ds-theme'); if(t) root.setAttribute('data-theme',t);}catch(e){}
+  btn.addEventListener('click',function(){
+    var n=root.getAttribute('data-theme')==='light'?'dark':'light'; root.setAttribute('data-theme',n);
+    try{localStorage.setItem('ds-theme',n);}catch(e){}
+  });
+
+  // highlight current section tab
+  var links={};
+  document.querySelectorAll('.nav a').forEach(function(a){links[a.getAttribute('href').slice(1)]=a;});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ Object.keys(links).forEach(function(k){links[k].classList.toggle('active',k===e.target.id);}); } });
+    },{rootMargin:'-45% 0px -50% 0px'});
+    Object.keys(links).forEach(function(k){var s=document.getElementById(k); if(s) io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>
