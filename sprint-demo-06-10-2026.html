@@ -170,6 +170,8 @@
   .foot { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
   .foot .rc { font-size: 12px; color: var(--mint); text-decoration: none; border: 1px solid var(--mint-dim); border-radius: 6px; padding: 3px 10px; }
   .foot .keys { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .foot .keys a { color: inherit; text-decoration: underline dotted; }
+  .foot .keys .lbl { font-family: system-ui, sans-serif; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; margin-left: 8px; }
   .foot .teams { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
   .foot .team { font-size: 11px; color: var(--text-2); background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 20px; padding: 3px 10px; }
   .foot .team.cut { text-decoration: line-through; opacity: .45; }
@@ -286,10 +288,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://app.notion.com/3e3c048defad81aa9acddb6f6f86d72b" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-50859 &middot; CX-59176 &middot; CX-44033</span>
+      <span class="keys">CX-50859 &middot; CX-59176 &middot; CX-44033 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-4049" target="_blank" rel="noopener">PIPEV2-4049</a> <a href="https://coralogix.atlassian.net/browse/PIPEV2-4099" target="_blank" rel="noopener">PIPEV2-4099</a> <span class="lbl">Bugs</span> <a href="https://coralogix.atlassian.net/browse/CX-62225" target="_blank" rel="noopener">CX-62225</a> <a href="https://coralogix.atlassian.net/browse/CX-59905" target="_blank" rel="noopener">CX-59905</a> <a href="https://coralogix.atlassian.net/browse/CX-62236" target="_blank" rel="noopener">CX-62236</a> <a href="https://coralogix.atlassian.net/browse/CX-62238" target="_blank" rel="noopener">CX-62238</a></span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing. <b>PIPE:</b> linked PIPEV2-4049 (group by team in Org Quota Manager, Roadmap Item), PIPEV2-4099 (Data Usage pane in the org admin console, Candidate). Related by text, not linked: PIPEV2-3842 (current quota lags when moving units), PIPEV2-2584 (Quota Manager reporting). <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows (linked) · CX-59905 write-access shows Disabled · CX-62236 Data Usage shows No Data without S3 (Blocked) · CX-62238 trial team plan error. <b>Customers waiting:</b> Mobileye, Island, Qube, FactSet, Core Star, LHV, Goldbelly, Proofpoint, Voyado, H2O.ai, Gett, JIO Finance.</div>
   </section>
 
   <!-- 4 SECTION 2 OPENER -->
@@ -323,7 +325,7 @@
       <span class="keys">CX-39721</span>
       <span class="teams"><span class="team">Nimbus</span><span class="team">Radiant</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases (names stay off the slide).</div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases (names stay off the slide). <b>PIPE:</b> none linked. <b>Bugs:</b> none found. <b>Customers waiting:</b> Kotak, Xplor, Miro, Career Team, COMM-IT, NeoGames, plus the original requester (unnamed). About 22 more accounts on the release-anticipation tracker ask for gaps this scope does not fix.</div>
   </section>
 
   <!-- 6 CARD 3 -->
@@ -340,10 +342,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://www.notion.so/3e5c048defad814fbc28f1016aca2d33" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-43382</span>
+      <span class="keys">CX-43382 <span class="lbl">PIPE</span> <a href="https://coralogix.atlassian.net/browse/PIPEV2-3368" target="_blank" rel="noopener">PIPEV2-3368</a></span>
       <span class="teams"><span class="team">Radiant</span><span class="team">Nimbus</span><span class="team">Ecosystem</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one. <b>PIPE:</b> related by text, not linked: PIPEV2-3368 (bulk export for View as Code, Terraform first, Candidate), PIPEV2-1145 (Dynamic TCO through Terraform). <b>Bugs:</b> none found. <b>Customers waiting:</b> Yotpo. Related asks: Qube, Cleo, SmartAsset.</div>
   </section>
 
   <!-- 7 SECTION 3 OPENER -->
@@ -376,7 +378,7 @@
       <span class="keys">CX-30677 &middot; CX-41231</span>
       <span class="teams"><span class="team">Citadel</span><span class="team">Halo</span></span>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide. <b>PIPE:</b> none found. Linked task CX-61834 (bill non-log imports under the ingress-files feature ID). <b>Bugs:</b> none found. <b>Customers waiting:</b> Collibra, eToro, Honeybook, Finonex, CommIT, QRT, Snappy, G-Research, OCBC, Tessian. Not verified (from a NotebookLM summary): GBG, SoFi, MoneyGram, Kort, dLocal.</div>
   </section>
 
   <!-- EARLY ADOPTERS: MONTHLY TEAM QUOTA -->
@@ -393,10 +395,10 @@
     </div>
     <div class="foot">
       <a class="rc" href="https://app.notion.com/3e3c048defad81d58144dd0426da9f56" target="_blank" rel="noopener">&#8599; Roadmap card</a>
-      <span class="keys">CX-40018</span>
+      <span class="keys">CX-40018  <span class="lbl">Bugs</span> <a href="https://coralogix.atlassian.net/browse/CX-62225" target="_blank" rel="noopener">CX-62225</a></span>
       <span class="teams"><span class="team">Halo</span><span class="team">Nimbus</span><span class="team">Radiant</span><span class="team">Citadel</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
     </div>
-    <div class="notes-data" hidden><b>SAY:</b> this is an invitation, not a release. Backend is done, the Nimbus screens are close, a staging dry run is next, then one pilot account. <b>&#9888; No date.</b> The announcement month is with Chris. <b>&#9888; Launch terms, say them if asked:</b> no PAYG on monthly at launch, no grace, no rollover. When the month runs out, the team is blocked until the 1st unless the AM tops it up. One plan type per account: teams cannot mix daily and monthly. <b>&#9888; Open:</b> monthly warning level (80% in code, 90% in the spec), renewal rule for existing accounts. Design partner candidates raised by the field (names stay off the slide): Gelato, JFS, Hotstar.</div>
+    <div class="notes-data" hidden><b>SAY:</b> this is an invitation, not a release. Backend is done, the Nimbus screens are close, a staging dry run is next, then one pilot account. <b>&#9888; No date.</b> The announcement month is with Chris. <b>&#9888; Launch terms, say them if asked:</b> no PAYG on monthly at launch, no grace, no rollover. When the month runs out, the team is blocked until the 1st unless the AM tops it up. One plan type per account: teams cannot mix daily and monthly. <b>&#9888; Open:</b> monthly warning level (80% in code, 90% in the spec), renewal rule for existing accounts. Design partner candidates raised by the field (names stay off the slide): Gelato, JFS, Hotstar. <b>PIPE:</b> none linked. <b>Bugs open:</b> CX-62225 daily plan tooltip shows monthly rows. <b>Customers waiting:</b> Emburse, Jiostar, Elsevier, DAZN, Gett, CRED, Jago, Swish, WizzAir, NetRoadshow, Island, Gelato, JFS, Betsson, Razorpay. No pilot account chosen yet.</div>
   </section>
 
   <!-- 8 COMING NEXT -->
@@ -422,7 +424,7 @@
     <h2 style="margin-bottom:20px;">Worth a Mention</h2>
     <div class="mentions">
       <div class="mention"><h4>Audit team units out of org totals</h4><p>Org Quota Manager no longer counts the audit team&#39;s units in the organization totals.</p></div>
-      <div class="mention"><h4>TCO policy tier accepts a unit value</h4><p>Phase 1, API only: a TCO policy tier can take a unit value. No screen yet.</p></div>
+      <div class="mention"><h4>TCO policy tier accepts a unit value</h4><p>Phase 1, API only: a TCO policy tier can take a unit value. No screen yet. PIPE: <a href="https://coralogix.atlassian.net/browse/PIPEV2-4265" target="_blank" rel="noopener">PIPEV2-4265</a></p></div>
       <div class="mention"><h4>TCO Optimizer page scroll and section switch</h4><p>The TCO Optimizer page scrolls and switches between sections without losing your place.</p></div>
     </div>
     <div class="callout"><b>Closed since 01-09.</b> Shown last demo as <span class="chip roll">Rolling Out</span>, now generally available: RUM Dataset pipeline routing, phase 1.</div>
