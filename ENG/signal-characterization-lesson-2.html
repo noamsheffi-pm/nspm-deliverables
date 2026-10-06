@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מערך שיעור 2 — אפיון אותות בתקשורת</title>
+  <title>מערך שיעור 2 — Wi-Fi, ניהול מוצר וסימולטור אותות</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
@@ -1028,6 +1028,30 @@
     .wifi-channel-controls { display:flex; justify-content:center; gap:12px; margin-bottom:18px; direction:ltr; }
     .wifi-btn { border:2px solid var(--black); background:var(--white); color:var(--black); padding:9px 17px; cursor:pointer; font:800 15px Arial,sans-serif; }
     .wifi-btn:hover, .wifi-btn.active { background:var(--black); color:var(--bg); }
+    .pm-brief { display:grid; grid-template-columns:1.1fr .9fr; gap:22px; align-items:stretch; }
+    .pm-choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:18px; }
+    .pm-choice { border:3px solid var(--black); background:var(--white); color:var(--black); padding:18px; cursor:pointer; text-align:right; box-shadow:7px 7px 0 var(--green); font:800 18px/1.35 Arial,sans-serif; }
+    .pm-choice strong { display:block; color:var(--green); font-family:'Bebas Neue','Arial Narrow',sans-serif; font-size:clamp(28px,3vw,46px); letter-spacing:.04em; }
+    .pm-choice:hover, .pm-choice.active { background:var(--black); color:var(--white); transform:translate(3px,3px); box-shadow:4px 4px 0 var(--green); }
+    .pm-choice.active strong { color:var(--green-light); }
+    .pm-answer { border:3px solid var(--black); background:var(--bg-dark); padding:18px 22px; margin-top:18px; min-height:92px; font:800 clamp(15px,1.35vw,19px)/1.45 Arial,sans-serif; }
+    .pm-answer b { color:var(--green); }
+    .pm-lens { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:18px; }
+    .pm-lens > div { border:2px solid var(--black); background:var(--white); padding:12px; font:800 15px/1.35 Arial,sans-serif; }
+    .pm-lens small { display:block; color:var(--green); font-weight:900; letter-spacing:.08em; margin-bottom:5px; }
+    .wave-lab { display:grid; grid-template-columns:.82fr 1.18fr; gap:24px; align-items:stretch; width:100%; }
+    .wave-controls { border:3px solid var(--black); background:var(--white); padding:18px 22px; display:grid; gap:13px; }
+    .wave-control label { display:flex; justify-content:space-between; gap:12px; font:900 16px Arial,sans-serif; margin-bottom:6px; }
+    .wave-control output { color:var(--green); direction:ltr; unicode-bidi:isolate; }
+    .wave-control input[type="range"] { width:100%; accent-color:var(--green); cursor:pointer; }
+    .wave-stage { border:3px solid var(--black); background:var(--white); box-shadow:10px 10px 0 var(--green); padding:12px 14px; min-width:0; display:flex; flex-direction:column; }
+    .wave-stage canvas { display:block; width:100%; height:min(35vh,315px); min-height:245px; background:var(--white); }
+    .wave-caption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 16px; border-top:2px solid var(--black); padding-top:8px; font:800 13px Arial,sans-serif; }
+    .wave-caption span { direction:ltr; unicode-bidi:isolate; }
+    .wave-equation { direction:ltr; unicode-bidi:isolate; border:3px solid var(--black); background:var(--bg); color:var(--green); padding:10px 12px; text-align:center; font:900 clamp(20px,2.2vw,33px) 'Space Grotesk',Arial,sans-serif; }
+    .wave-bridge { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:17px; }
+    .wave-bridge > div { border:2px solid var(--black); background:var(--bg-dark); padding:11px 15px; font:800 14px/1.4 Arial,sans-serif; }
+    .wave-bridge b { color:var(--green); }
     .channel-spectrum { height:230px; border:3px solid var(--black); background:var(--white); position:relative; overflow:hidden; direction:ltr; }
     .channel-axis { position:absolute; left:7%; right:5%; bottom:36px; height:3px; background:var(--black); }
     .channel-band { position:absolute; bottom:39px; left:50%; transform:translateX(-50%); width:22%; height:132px; background:var(--green); border:3px solid var(--black); opacity:.87; transition:width .3s ease; }
@@ -1041,6 +1065,8 @@
       .time-chip { justify-self:start; }
       .two-col, .three-col, .trap-grid, .agenda { grid-template-columns:1fr; }
       .wifi-metrics { grid-template-columns:1fr; }
+      .pm-brief, .pm-choices, .pm-lens, .wave-lab, .wave-bridge { grid-template-columns:1fr; }
+      .wave-stage canvas { min-height:230px; }
       .step-list { grid-template-columns:1fr 1fr; }
       .step { border-bottom:1.5px solid var(--black); }
       .signal-box svg { height:230px; }
@@ -1060,6 +1086,7 @@
       .slide-rsvp .rsvp-card { padding: 28px; }
     }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -1085,10 +1112,10 @@
       <div class="lesson-body" style="display:grid;grid-template-columns:1.05fr .95fr;gap:5vw;align-items:center;">
         <div>
           <div class="lesson-kicker">COMMUNICATION SYSTEMS · LESSON 02</div>
-          <h1 class="lesson-title green" style="font-size:clamp(48px,7.4vw,108px);">אפיון אותות<br>בתקשורת</h1>
-          <div class="ribbon" style="margin-top:22px;">מחזוריות · Wi‑Fi · ספקטרום · רוחב פס</div>
-          <p class="lesson-text" style="margin-top:18px;max-width:650px;font-weight:700;">מה באמת אומרים 5 GHz ו־80 MHz בנתב הביתי?</p>
-          <div class="hand-note" style="margin-top:18px;">your home network is the lab</div>
+          <h1 class="lesson-title green" style="font-size:clamp(45px,6.8vw,100px);">אותות, Wi‑Fi<br>וניהול מוצר</h1>
+          <div class="ribbon" style="margin-top:22px;">LIVE SIGNAL LAB · WIFI · PRODUCT THINKING</div>
+          <p class="lesson-text" style="margin-top:18px;max-width:680px;font-weight:700;">משנים את הגל בזמן אמת — ומתרגמים את הפיזיקה לחוויית משתמש ולהחלטת מוצר.</p>
+          <div class="hand-note" style="margin-top:18px;">from waveform to product value</div>
         </div>
         <div class="card offset-card" style="padding:22px;transform:rotate(2deg);">
           <svg viewBox="0 0 520 420" role="img" aria-label="אות בזמן וספקטרום בתדר">
@@ -1107,11 +1134,11 @@
           </svg>
         </div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:00–00:03</span><span>סעיף 1.5 בתוכנית הלימודים</span></div>
+      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:00–00:03</span><span>סעיף 1.5 · PRODUCT EDITION</span></div>
       <template class="speaker-note">זמן: 3 דקות.
 פתיחה: בקש מכולם לפתוח את הגדרות ה־Wi‑Fi ולחפש אם מופיעים 2.4 GHz או 5 GHz. אל תבקש להתחבר לרשת חדשה.
-משפט מסגרת: ה־Wi‑Fi הביתי יהיה המעבדה שלנו — דרכו נבין תדר, רוחב פס, ספקטרום ואות מידע.
-<span class="source-note">מקורות: תוכנית הלימודים 11.9004, סעיף 1.5; מדריך שיעור 2; מערך Wi‑Fi אינטראקטיבי מצורף.</span></template>
+משפט מסגרת: היום אתם גם מהנדסי מערכת וגם מנהלי מוצר. בכל תחנה נשאל: מי המשתמש, מה הוא צריך, ומה המחיר של הבחירה ההנדסית?
+<span class="source-note">מקורות: תוכנית הלימודים 11.9004, סעיף 1.5; מדריך שיעור 2 — גרסת מנהל המוצר V2.</span></template>
     </section>
 
     <!-- 02 / AGENDA -->
@@ -1119,37 +1146,37 @@
       <header class="lesson-header"><div><div class="lesson-kicker">135 MINUTES · ROADMAP</div><h2 class="lesson-title">מה נצליח לעשות בסוף השיעור</h2></div><div class="time-chip">4 MIN</div></header>
       <div class="lesson-body">
         <div class="agenda">
-          <div class="agenda-item"><div class="agenda-hour">01 / 45</div><h3>מה אומר 5 GHz?</h3><p>נזהה אות מחזורי ואקראי, נגדיר זמן מחזור ונחלץ תדר רגיל וזוויתי.</p></div>
-          <div class="agenda-item"><div class="agenda-hour">02 / 45</div><h3>מה אומר 80 MHz?</h3><p>נבין את רעיון פורייה, הרמוניות, ספקטרום ורוחב ערוץ Wi‑Fi.</p></div>
-          <div class="agenda-item"><div class="agenda-hour">03 / 45</div><h3>מה רואים ב־Wi‑Fi Analyzer?</h3><p>נבחין בין חלון הזמן לחלון התדר ונפתור תרגיל מלא בסגנון בחינה.</p></div>
+          <div class="agenda-item"><div class="agenda-hour">01 / 45</div><h3>מהו מידע — ומה צריך המוצר?</h3><p>מחזוריות, תדר ואות מידע דרך החלטת תקשורת למד־מים חכם.</p></div>
+          <div class="agenda-item"><div class="agenda-hour">02 / 45</div><h3>כמה “נדל״ן” תופס המוצר?</h3><p>פורייה, הרמוניות ורוחב פס דרך תכנון חוויית Wi‑Fi ביתית.</p></div>
+          <div class="agenda-item"><div class="agenda-hour">03 / 45</div><h3>מה מציגים לדירקטוריון?</h3><p>בדיקות מעבדה, תרגיל בחינה והכרעת מוצר לקולר חכם.</p></div>
         </div>
-        <div class="checkpoint" style="margin-top:30px;">יעד ביצוע: לראות ביטוי מתמטי — ולבנות ממנו תדרים, מחזור וספקטרום</div>
+        <div class="checkpoint" style="margin-top:30px;">יעד כפול: לחשב נכון — ולהסביר איזו החלטת מוצר נובעת מהחישוב</div>
       </div>
       <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:03–00:07</span><span>מפת דרכים</span></div>
       <template class="speaker-note">זמן: 4 דקות.
-הצג את שלושת חלקי השיעור. בקש מהסטודנטים לסמן לעצמם את יעד הביצוע האחרון — זה יהיה בסיס לכרטיס היציאה.
+הצג את שלושת חלקי השיעור. הדגש שלא צריך ניסיון עסקי: “ניהול מוצר” כאן הוא היכולת לבחור פתרון לפי צורך ואילוצים.
 אין לפתוח כאן הסברים; זהו תיאום ציפיות בלבד.
 <span class="source-note">מקור: מדריך שיעור 2, סקירה כללית — 135 דקות.</span></template>
     </section>
 
-    <!-- 03 / WIFI HOOK -->
+    <!-- 03 / INFORMATION PARADOX -->
     <section class="slide lesson-slide" data-index="2" data-time="7 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">YOUR ROUTER SPEAKS IN NUMBERS</div><h2 class="lesson-title">בנתב כתוב 5 GHz, ‏80 MHz ו־‎−67 dBm — מה מכל זה הוא “מהירות”?</h2></div><div class="time-chip">7 MIN</div></header>
+      <header class="lesson-header"><div><div class="lesson-kicker">THE INFORMATION PARADOX · SHANNON</div><h2 class="lesson-title">נתב משדר גל מושלם במשך שעה — כמה מידע הוא העביר?</h2></div><div class="time-chip">7 MIN</div></header>
       <div class="lesson-body">
-        <div class="wifi-metrics" id="wifiMetrics">
-          <button class="wifi-metric" type="button" data-wifi="carrier"><strong>5 GHz</strong><span>בחרו כדי לגלות</span></button>
-          <button class="wifi-metric" type="button" data-wifi="bandwidth"><strong>80 MHz</strong><span>בחרו כדי לגלות</span></button>
-          <button class="wifi-metric" type="button" data-wifi="power"><strong>−67 dBm</strong><span>בחרו כדי לגלות</span></button>
+        <div class="wifi-metrics">
+          <button class="wifi-metric paradox-choice" type="button" data-paradox="zero"><strong>0 bit</strong><span>אין שינוי, אין הפתעה</span></button>
+          <button class="wifi-metric paradox-choice" type="button" data-paradox="five"><strong>5 Gbit</strong><span>כי הגל הוא 5 GHz?</span></button>
+          <button class="wifi-metric paradox-choice" type="button" data-paradox="infinite"><strong>∞</strong><span>שעה שלמה היא המון זמן</span></button>
         </div>
-        <div class="wifi-answer" id="wifiAnswer"><b>הימור כיתתי:</b> איזה מספר מתאר תדר נושא, איזה מתאר רוחב ערוץ ואיזה מתאר עוצמת קליטה? לחצו על הכרטיסים.</div>
-        <div class="checkpoint" style="margin-top:20px;">התשובה המפתיעה: אף אחד מהמספרים אינו מהירות גלישה בפני עצמו</div>
+        <div class="wifi-answer" id="paradoxAnswer"><b>הימור כיתתי:</b> בחרו תשובה. רמז: אם אפשר לנבא במדויק את המחזור הבא — האם קיבלנו משהו חדש?</div>
+        <div class="checkpoint" style="margin-top:20px;">גל נושא מחזורי הוא השליח; השינויים הבלתי־צפויים הם המידע</div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:07–00:14</span><span>הוק Wi‑Fi אינטראקטיבי</span></div>
+      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:07–00:14</span><span>הוק: מידע = הפתעה</span></div>
       <template class="speaker-note">זמן: 7 דקות.
-בקש הצבעה לפני הלחיצה. תשובות: 5 GHz הוא תחום תדרי הגל הנושא; 80 MHz הוא רוחב הערוץ; ‎−67 dBm הוא הספק הקליטה המשוער.
-דיוק: קצב הנתונים תלוי בשילוב של רוחב ערוץ, יחס אות־לרעש, שיטת אפנון, מספר זרמים מרחביים ועומס הרשת.
-החיבור לשיעור: נפריד בין תדר, רוחב פס ועוצמה — שלושה מושגים שהסטודנטים רואים בטלפון אך נוטים לערבב.
-<span class="source-note">מקור: מערך Wi‑Fi אינטראקטיבי מצורף; תוכנית הלימודים, סעיף 1.5.</span></template>
+בקש הצבעה לפני הלחיצה. התשובה: 0 ביטים. תדר גבוה מתאר כמה מהר הגל חוזר — לא כמה מידע חדש הוא נושא.
+חבר לשנון באופן אינטואיטיבי: מידע דורש שינוי או הפתעה. גל קבוע לחלוטין ניתן לחיזוי ולכן אינו מוסיף מידע חדש.
+זווית מוצרית: “מהירות טכנולוגית” אינה ערך למשתמש אם אין מידע שימושי שעובר.
+<span class="source-note">מקור: מדריך שיעור 2 — גרסת מנהל המוצר V2, פתיחת פרדוקס המידע.</span></template>
     </section>
 
     <!-- 04 / WHAT IS A SIGNAL -->
@@ -1181,8 +1208,8 @@
     </section>
 
     <!-- 05 / PERIODIC DEFINITION -->
-    <section class="slide lesson-slide" data-index="4" data-time="8 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">PERIODICITY · THE TEST</div><h2 class="lesson-title">אות מחזורי חוזר בדיוק לאחר זמן קבוע</h2></div><div class="time-chip">8 MIN</div></header>
+    <section class="slide lesson-slide" data-index="4" data-time="7 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">PERIODICITY · THE TEST</div><h2 class="lesson-title">אות מחזורי חוזר בדיוק לאחר זמן קבוע</h2></div><div class="time-chip">7 MIN</div></header>
       <div class="lesson-body">
         <div class="formula big">x(t) = x(t + T)</div>
         <div class="signal-box" style="margin-top:10px;min-height:285px;">
@@ -1202,8 +1229,8 @@
           <div class="card green"><h3>דוגמת Wi‑Fi</h3><p><span class="latin">5 GHz → T = 0.2 ns</span><br>הגל משלים 5 מיליארד מחזורים בשנייה.</p></div>
         </div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:20–00:28</span><span>הגדרה מתמטית</span></div>
-      <template class="speaker-note">זמן: 8 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:20–00:27</span><span>הגדרה מתמטית</span></div>
+      <template class="speaker-note">זמן: 7 דקות.
 כתוב את ההגדרה על הלוח. סמן מחזור אחד בגרף.
 שאל: האם גם 2T הוא זמן שבו האות חוזר? כן, אך T מוגדר כזמן החיובי המזערי.
 טעות נפוצה: למדוד בין שני חיתוכי אפס סמוכים במקום בין שתי נקודות בעלות אותו מופע.
@@ -1211,56 +1238,67 @@
 <span class="source-note">מקור: תקשורת תקבילית וספרתית, עמ׳ 27–31; מדריך שיעור 2.</span></template>
     </section>
 
-    <!-- 06 / SINUSOID PARAMETERS -->
-    <section class="slide lesson-slide" data-index="5" data-time="9 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">THE PURE TONE</div><h2 class="lesson-title">ארבעת הפרמטרים של אות סינוסואידלי</h2></div><div class="time-chip">9 MIN</div></header>
+    <!-- 06 / LIVE SIGNAL ANATOMY -->
+    <section class="slide lesson-slide" data-index="5" data-time="8 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">LIVE LAB · SIGNAL ANATOMY · FIXED TIME WINDOW</div><h2 class="lesson-title">בנו גל — וראו מה כל פרמטר משנה באמת</h2></div><div class="time-chip">8 MIN</div></header>
       <div class="lesson-body">
-        <div class="formula">x(t) = A cos(ω₀t + φ)</div>
-        <div class="step-list" style="margin-top:20px;">
-          <div class="step"><div class="step-num">A</div><strong>תנופה</strong><p>גובה מרבי של האות. לרוב בוולט.</p></div>
-          <div class="step"><div class="step-num">T</div><strong>זמן מחזור</strong><p>הזמן עד שהצורה חוזרת.</p></div>
-          <div class="step"><div class="step-num">f</div><strong>תדר</strong><p>מספר המחזורים בשנייה, בהרץ.</p></div>
-          <div class="step"><div class="step-num">φ</div><strong>מופע</strong><p>הזזה אופקית ביחס לראשית.</p></div>
+        <div class="wave-lab" id="lessonWaveLab">
+          <div style="display:grid;gap:13px;">
+            <div class="wave-controls">
+              <div class="wave-control"><label for="lessonAmp"><span>תנופה A</span><output id="lessonAmpVal">2.0 V</output></label><input id="lessonAmp" type="range" min="0.5" max="5" step="0.1" value="2"></div>
+              <div class="wave-control"><label for="lessonFreq"><span>תדר f</span><output id="lessonFreqVal">5 Hz</output></label><input id="lessonFreq" type="range" min="1" max="12" step="1" value="5"></div>
+              <div class="wave-control"><label for="lessonPhase"><span>מופע φ</span><output id="lessonPhaseVal">0°</output></label><input id="lessonPhase" type="range" min="-180" max="180" step="15" value="0"></div>
+              <div class="wave-control"><label for="lessonDc"><span>רכיב DC</span><output id="lessonDcVal">0.00 V</output></label><input id="lessonDc" type="range" min="-2" max="2" step="0.25" value="0"></div>
+            </div>
+            <div class="wave-equation" id="lessonWaveEquation" aria-live="polite">x(t)=0 + 2sin(2π·5t + 0°)</div>
+          </div>
+          <div class="wave-stage">
+            <canvas id="lessonWaveCanvas" role="img" aria-label="גרף חי של אות סינוס בחלון זמן קבוע של 0.6 שנייה"></canvas>
+            <div class="wave-caption" aria-live="polite"><span id="lessonWavePeriod">T=0.200 s</span><span id="lessonWaveCycles">3.0 cycles</span><span>TIME WINDOW: 0–0.6 s</span></div>
+          </div>
         </div>
-        <div class="two-col" style="margin-top:22px;">
-          <div class="formula small">f₀ = 1/T</div>
-          <div class="formula small">ω₀ = 2πf₀ = 2π/T</div>
+        <div class="wave-bridge">
+          <div><b>חיבור ל־Wi‑Fi:</b> הגרף הוא מודל מואט. אותם יחסים פועלים ב־5GHz: כאשר <span class="latin">f</span> גדל, <span class="latin">T=1/f</span> קטן. חלון הזמן כאן נשאר קבוע ולכן רואים יותר מחזורים.</div>
+          <div><b>עדשת מנהל המוצר:</b> A,‏ f,‏ φ ו־DC הם מנופים הנדסיים — הערך שלהם נמדד לפי כיסוי, אנרגיה, סנכרון ואמינות שהמשתמש צריך.</div>
         </div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:28–00:37</span><span>נוסחאות יסוד</span></div>
-      <template class="speaker-note">זמן: 9 דקות.
-הצג את הביטוי הכללי. אין צורך להעמיק בטריגונומטריה; המטרה היא לזהות את המקדם של t ואת התנופה.
-דוגמה בעל פה: cos(200πt) — ω=200π ולכן f=100 Hz.
-הדגש: ω נמדד ברדיאנים לשנייה; f בהרץ.
+      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:27–00:35</span><span>ניסוי חי · Wi‑Fi · מנופי מוצר</span></div>
+      <template class="speaker-note">זמן: 8 דקות.
+עבוד בסדר קבוע: נבא → הזז בקר אחד → תאר מה השתנה ומה לא. התחל מ־A, עבור ל־f, אחר כך φ ולבסוף DC.
+ניסוי חובה: שנה f מ־5 ל־10 Hz בלי לשנות A. בחלון הקבוע מספר המחזורים עולה מ־3 ל־6 ו־T יורד מ־0.2 ל־0.1 שנייה. זה מתקן את אשליית ה־zoom האוטומטי שבה תמיד נראו אותו מספר מחזורים.
+הסבר: A משנה גובה; f משנה צפיפות ומחזור; φ מזיז את הגל בזמן; DC מזיז את קו האמצע. אין צורך להעמיק בטריגונומטריה.
+חיבור Wi‑Fi: 5 GHz הוא תדר פיזיקלי אמיתי, אך מהיר מדי להצגה ישירה. הסימולציה מואטת ושומרת את היחס T=1/f.
+חיבור מוצרי: אל תגיד “תדר גבוה צורך יותר סוללה” כחוק יחיד. צריכת אנרגיה תלויה גם בהספק, זמן שידור, פרוטוקול, עיבוד וכיסוי.
 <span class="source-note">מקורות: נוסחאון מערכות תקשורת, עמ׳ 4–5; תקשורת תקבילית וספרתית, איורים 2.3 ו־2.6.</span></template>
     </section>
 
-    <!-- 07 / PERIODIC VS RANDOM -->
-    <section class="slide lesson-slide" data-index="6" data-time="8 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">PERIODIC VS RANDOM</div><h2 class="lesson-title">הבדיקה: האם אפשר לחזות את הצורה הבאה?</h2></div><div class="time-chip">8 MIN</div></header>
-      <div class="lesson-body two-col">
-        <div class="card">
-          <span class="card-label">מחזורי</span>
-          <div class="signal-box" style="border-width:2px;min-height:210px;">
-            <svg viewBox="0 0 500 220"><line x1="25" y1="110" x2="475" y2="110" stroke="#1A1A1A" stroke-width="2"/><path d="M25 110 C55 35 85 35 115 110 S175 185 205 110 S265 35 295 110 S355 185 385 110 S445 35 475 110" fill="none" stroke="#008F4D" stroke-width="7"/></svg>
+    <!-- 07 / PRODUCT DILEMMA: SMART WATER METER -->
+    <section class="slide lesson-slide" data-index="6" data-time="10 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">PRODUCT BRIEF 01 · SMART WATER METER</div><h2 class="lesson-title">סוללה לעשר שנים — איזו תקשורת נבחר?</h2></div><div class="time-chip">10 MIN</div></header>
+      <div class="lesson-body">
+        <div class="pm-brief">
+          <div class="card offset-card">
+            <span class="card-label">צורך משתמש</span>
+            <h3>מד מים קבור שולח קריאה אחת ביום</h3>
+            <p>העירייה רוצה תחזוקה מינימלית. טכנאי שמחליף סוללה בבור רטוב עולה יותר מהחומרה.</p>
+            <div class="pm-lens"><div><small>USER</small>עירייה</div><div><small>JOB</small>קריאה יומית</div><div><small>CONSTRAINT</small>10 שנות סוללה</div><div><small>KPI</small>אחוז מסירות</div></div>
           </div>
-          <h3 style="margin-top:14px;">צפוי וחוזר</h3><p>גל הנושא של Wi‑Fi לפני שמלבישים עליו מידע.</p>
-        </div>
-        <div class="card khaki">
-          <span class="card-label" style="background:var(--black);">אקראי / לא־מחזורי</span>
-          <div class="signal-box" style="border-width:2px;min-height:210px;">
-            <svg viewBox="0 0 500 220"><line x1="25" y1="110" x2="475" y2="110" stroke="#1A1A1A" stroke-width="2"/><polyline points="25,110 42,87 59,130 76,52 93,145 110,118 127,66 144,99 161,157 178,78 195,93 212,42 229,134 246,123 263,171 280,84 297,104 314,61 331,142 348,112 365,75 382,162 399,96 416,126 433,49 450,137 475,110" fill="none" stroke="#1A1A1A" stroke-width="6"/></svg>
+          <div class="card khaki">
+            <span class="card-label">בחרו MVP</span>
+            <div class="pm-choices" style="grid-template-columns:1fr;">
+              <button class="pm-choice" type="button" data-pm-case="water" data-pm-choice="fast"><strong>5 GHz / 5G</strong>מהיר מאוד · חדירות חלשה · צריכת אנרגיה גבוהה</button>
+              <button class="pm-choice" type="button" data-pm-case="water" data-pm-choice="lean"><strong>900 MHz IoT</strong>מעט ביטים · חדירות טובה · שינה רוב הזמן</button>
+            </div>
           </div>
-          <h3 style="margin-top:14px;">נושא מידע</h3><p>הביטים של הסרטון, ההודעה או המשחק משתנים ואינם צפויים מראש.</p>
         </div>
+        <div class="pm-answer" id="waterAnswer"><b>שאלת מנהל המוצר:</b> האם אנחנו צריכים את הטכנולוגיה המהירה ביותר — או את זו שמבצעת את העבודה בעלות הנכונה?</div>
       </div>
-      <div class="checkpoint" style="margin-top:20px;">הנתב משנה גל נושא מחזורי לפי הביטים המשתנים — זהו רעיון האפנון</div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:37–00:45</span><span>סיכום שעה א׳</span></div>
-      <template class="speaker-note">זמן: 8 דקות.
-בקש מהכיתה לסווג: צפצוף בדיקה, משפט מדובר, שעון דיגיטלי, רעש תרמי.
-הדגש שאקראי אינו חסר משמעות. רצף המידע של YouTube אינו צפוי מראש, ולכן הוא יכול לשאת מידע חדש. גל נושא קבוע ללא שינוי אינו מוסיף מידע חדש לאורך זמן.
-סכם את שעה א׳ לפני המעבר.
-<span class="source-note">מקורות: תוכנית הלימודים, סעיף 1.5; תקשורת תקבילית וספרתית, איורים 2.1–2.2.</span></template>
+      <div class="lesson-footer"><span class="hour-tag">HOUR A · 00:35–00:45</span><span>PM: צורך → אילוץ → החלטה</span></div>
+      <template class="speaker-note">זמן: 10 דקות.
+תן לצוותים שתי דקות לבחור ולנמק. הבחירה המועדפת בתרחיש היא פתרון IoT צר־פס סביב 900 MHz עם מחזורי שינה ארוכים.
+דיוק חשוב: תדר גבוה לבדו אינו “מרוקן סוללה”. צריכת האנרגיה תלויה בהספק השידור, זמן הפעילות, פרוטוקול, קצב, עיבוד וכיסוי. בתרחיש הזה היתרון מגיע מכל מעטפת הפתרון צרת־הפס וה־duty cycle הנמוך.
+חבר למחזורי/אקראי: הגל הנושא מחזורי; חבילת הקריאה המשתנה היא המידע.
+<span class="source-note">מקור: מדריך שיעור 2 — גרסת מנהל המוצר V2, דילמת מד המים החכם.</span></template>
     </section>
 
     <!-- 08 / TIME VS FREQUENCY -->
@@ -1294,24 +1332,24 @@
     </section>
 
     <!-- 10 / SUM OF SINES -->
-    <section class="slide lesson-slide" data-index="9" data-time="10 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">BUILDING A COMPLEX SIGNAL</div><h2 class="lesson-title">שני סינוסים פשוטים יוצרים אות מורכב — ועדיין מחזורי</h2></div><div class="time-chip">10 MIN</div></header>
+    <section class="slide lesson-slide" data-index="9" data-time="8 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">BUILDING A COMPLEX SIGNAL</div><h2 class="lesson-title">שני סינוסים פשוטים יוצרים אות מורכב — ועדיין מחזורי</h2></div><div class="time-chip">8 MIN</div></header>
       <div class="lesson-body three-col">
         <div class="card"><span class="card-label">רכיב 1</span><h3><span class="latin">100 Hz · 1 V</span></h3><div class="signal-box" style="min-height:220px;border-width:2px;"><svg viewBox="0 0 360 210"><line x1="20" y1="105" x2="340" y2="105" stroke="#1A1A1A" stroke-width="2"/><path d="M20 105 C60 25 100 25 140 105 S220 185 260 105 S320 45 340 75" fill="none" stroke="#008F4D" stroke-width="6"/></svg></div></div>
         <div class="card khaki"><span class="card-label">רכיב 2</span><h3><span class="latin">200 Hz · 0.5 V</span></h3><div class="signal-box" style="min-height:220px;border-width:2px;"><svg viewBox="0 0 360 210"><line x1="20" y1="105" x2="340" y2="105" stroke="#1A1A1A" stroke-width="2"/><path d="M20 105 C40 60 60 60 80 105 S120 150 140 105 S180 60 200 105 S240 150 260 105 S300 60 320 105 S340 130 340 120" fill="none" stroke="#1A1A1A" stroke-width="5"/></svg></div></div>
         <div class="card green"><span class="card-label" style="background:var(--black);">הסכום</span><h3><span class="latin">x₁(t)+x₂(t)</span></h3><div class="signal-box" style="min-height:220px;border-width:2px;"><svg viewBox="0 0 360 210"><line x1="20" y1="105" x2="340" y2="105" stroke="#1A1A1A" stroke-width="2"/><path d="M20 105 C40 35 70 45 90 82 C110 120 120 165 150 153 C180 140 175 80 205 57 C235 34 250 78 270 112 C290 146 315 153 340 95" fill="none" stroke="#008F4D" stroke-width="7"/></svg></div></div>
       </div>
       <div class="checkpoint" style="margin-top:18px;">התדר האיטי ביותר הוא f₀ = 100 Hz ולכן T = 10 ms</div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:00–01:10</span><span>איור 2.6 — בנייה מהרמוניות</span></div>
-      <template class="speaker-note">זמן: 10 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:00–01:08</span><span>איור 2.6 — בנייה מהרמוניות</span></div>
+      <template class="speaker-note">זמן: 8 דקות.
 צייר את שלושת הגרפים על הלוח בצבעים שונים. הדגש שהרכיב השני משלים שני מחזורים בזמן שהראשון משלים אחד.
 לכן הסכום חוזר לאחר 10 ms. הרכיב ב־200 Hz הוא ההרמוניה השנייה.
 <span class="source-note">מקור: תקשורת תקבילית וספרתית, עמ׳ 31, איור 2.6.</span></template>
     </section>
 
     <!-- 11 / FUNDAMENTAL AND HARMONICS -->
-    <section class="slide lesson-slide" data-index="10" data-time="8 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">FUNDAMENTAL + HARMONICS</div><h2 class="lesson-title">הספקטרום מציג “מחט” לכל רכיב סינוסואידלי</h2></div><div class="time-chip">8 MIN</div></header>
+    <section class="slide lesson-slide" data-index="10" data-time="7 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">FUNDAMENTAL + HARMONICS</div><h2 class="lesson-title">הספקטרום מציג “מחט” לכל רכיב סינוסואידלי</h2></div><div class="time-chip">7 MIN</div></header>
       <div class="lesson-body two-col">
         <div class="signal-box">
           <svg viewBox="0 0 650 350" role="img" aria-label="ספקטרום הרמוניות">
@@ -1328,16 +1366,16 @@
           <p class="hand-note" style="margin-top:18px;">the spectrum is the ingredient list</p>
         </div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:10–01:18</span><span>ספקטרום תנופה</span></div>
-      <template class="speaker-note">זמן: 8 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:08–01:15</span><span>ספקטרום תנופה</span></div>
+      <template class="speaker-note">זמן: 7 דקות.
 הסבר שכל מחט היא רכיב סינוסואידלי אחד. מיקום המחט = תדר; גובה = תנופה.
 שאל: אם f₀=100 Hz, מהו תדר ההרמוניה החמישית? 500 Hz.
 <span class="source-note">מקור: תקשורת תקבילית וספרתית, עמ׳ 33, איור 2.8.</span></template>
     </section>
 
     <!-- 12 / BANDWIDTH -->
-    <section class="slide lesson-slide" data-index="11" data-time="12 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">BANDWIDTH · OCCUPIED RANGE</div><h2 class="lesson-title">רוחב הפס הוא המרחק בין הקצה העליון לקצה התחתון</h2></div><div class="time-chip">12 MIN</div></header>
+    <section class="slide lesson-slide" data-index="11" data-time="15 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">PRODUCT BRIEF 02 · SPECTRUM REAL ESTATE</div><h2 class="lesson-title">רוחב פס הוא נדל״ן: יותר קצב, יותר מקום, יותר סיכון לחפיפה</h2></div><div class="time-chip">15 MIN</div></header>
       <div class="lesson-body two-col">
         <div class="card offset-card">
           <div class="formula big">BW = fmax − fmin</div>
@@ -1345,7 +1383,7 @@
           <p class="lesson-text" style="text-align:center;font-weight:800;margin-top:12px;">לא סופרים מחטים — מודדים תחום תדרים.</p>
         </div>
         <div class="card khaki" style="padding:20px;">
-          <span class="card-label">ערוץ Wi‑Fi</span>
+          <span class="card-label">בחירת מוצר · ערוץ Wi‑Fi</span>
           <div class="wifi-channel-controls" id="channelControls">
             <button class="wifi-btn active" type="button" data-width="20">20 MHz</button>
             <button class="wifi-btn" type="button" data-width="40">40 MHz</button>
@@ -1359,27 +1397,29 @@
           <div class="channel-caption"><div id="channelBenefit">20 MHz: פחות תדרים זמינים בכל רגע, אך קל יותר למצוא מקום פנוי.</div><div id="channelCost">פחות חפיפה עם רשת השכן.</div></div>
         </div>
       </div>
-      <div class="checkpoint" style="margin-top:22px;">ערוץ רחב יכול לאפשר קצב גבוה יותר — אבל תופס יותר ספקטרום ועלול לחפוף לשכנים</div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:18–01:30</span><span>סיכום שעה ב׳</span></div>
-      <template class="speaker-note">זמן: 12 דקות.
-פתור את הדוגמה 100–500 Hz. לאחר מכן לחץ על 20/40/80 MHz ושאל מה היתרון ומה המחיר.
+      <div class="pm-lens"><div><small>USER</small>דירה צפופה</div><div><small>NEED</small>וידאו חלק</div><div><small>TRADE-OFF</small>קצב מול חפיפה</div><div><small>KPI</small>יציבות, לא רק שיא</div></div>
+      <div class="checkpoint" style="margin-top:14px;">MVP טוב אינו “80 MHz תמיד” — הוא מתאים את רוחב הערוץ לסביבה ולחוויית המשתמש</div>
+      <div class="lesson-footer"><span class="hour-tag">HOUR B · 01:15–01:30</span><span>PM: ספקטרום כמשאב מוגבל</span></div>
+      <template class="speaker-note">זמן: 15 דקות.
+פתור את הדוגמה 100–500 Hz. לאחר מכן לחץ על 20/40/80 MHz ושאל מה היתרון, המחיר ומדד ההצלחה של המשתמש.
 דיוק: רוחב ערוץ גדול לבדו אינו מבטיח מהירות גבוהה; צריך גם SNR מתאים, אפנון, זרמים מרחביים ורשת שאינה עמוסה.
 המלבן המקווקו מייצג רשת שכנה. ככל שהערוץ מתרחב, הסיכוי לחפיפה גדל.
-<span class="source-note">מקורות: מדריך שיעור 2; תקשורת תקבילית וספרתית, עמ׳ 33–36; מערך Wi‑Fi אינטראקטיבי מצורף.</span></template>
+חבר ל־Wi-Fi 5/6E/7: פתיחת תחומי 5 ו־6 GHz מגדילה את מרחב התכנון, אך גם משנה טווח, תאימות ועלות. אין צורך להבטיח מספרי קצב ספציפיים.
+<span class="source-note">מקורות: מדריך שיעור 2 — גרסת מנהל המוצר V2; תקשורת תקבילית וספרתית, עמ׳ 33–36.</span></template>
     </section>
 
     <!-- 13 / INSTRUMENTS -->
-    <section class="slide lesson-slide" data-index="12" data-time="10 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">LAB VIEWPOINTS · WIFI ANALYZER</div><h2 class="lesson-title">מהאוסצילוסקופ במעבדה לאפליקציית Wi‑Fi Analyzer</h2></div><div class="time-chip">10 MIN</div></header>
+    <section class="slide lesson-slide" data-index="12" data-time="6 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">LAB VIEWPOINTS · PRODUCT EVIDENCE</div><h2 class="lesson-title">באיזה מכשיר נמדוד את הבעיה שהמשתמש מדווח עליה?</h2></div><div class="time-chip">6 MIN</div></header>
       <div class="lesson-body two-col">
         <div class="card black"><span class="card-label">OSCILLOSCOPE</span><div class="signal-box" style="background:#20251f;border-color:var(--bg);"><svg viewBox="0 0 500 230"><g stroke="#546052" stroke-width="1"><path d="M0 46H500M0 92H500M0 138H500M0 184H500M100 0V230M200 0V230M300 0V230M400 0V230"/></g><path d="M0 115 C40 30 80 30 120 115 S200 200 240 115 S320 30 360 115 S440 200 500 90" fill="none" stroke="#00A85D" stroke-width="7"/></svg></div><h3 style="margin-top:14px;color:var(--white);">מודד T, תנופה ועיוות בזמן</h3></div>
         <div class="card"><span class="card-label">SPECTRUM / WIFI ANALYZER</span><div class="signal-box"><svg viewBox="0 0 500 230"><line x1="30" y1="200" x2="470" y2="200" stroke="#1A1A1A" stroke-width="3"/><line x1="30" y1="25" x2="30" y2="200" stroke="#1A1A1A" stroke-width="3"/><path d="M50 200 Q105 55 160 200 Q230 95 300 200 Q355 120 430 200" fill="none" stroke="#008F4D" stroke-width="8"/></svg></div><h3 style="margin-top:14px;">מציג רשתות לפי ערוץ, רוחב ועוצמה</h3></div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:30–01:40</span><span>חיבור למעבדה</span></div>
-      <template class="speaker-note">זמן: 10 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:30–01:36</span><span>מדידה לפני החלטה</span></div>
+      <template class="speaker-note">זמן: 6 דקות.
 הצג את שני המכשירים כשני חלונות. באוסצילוסקופ מודדים זמן בין שתי פסגות; במנתח הספקטרום קוראים תדר ועוצמה.
 אפליקציית Wi‑Fi Analyzer אינה מחליפה מנתח ספקטרום מקצועי: היא מציגה מידע שהטלפון מפיק על רשתות Wi‑Fi מזוהות, לא בהכרח כל מקור RF בסביבה.
-שאל: איפה רואים חפיפה בין רשתות שכנות? בתחום התדר.
+שאל: איפה רואים חפיפה בין רשתות שכנות? בתחום התדר. זווית מוצרית: תלונת משתמש היא השערה; המדידה היא הראיה.
 <span class="source-note">מקורות: מדריך שיעור 2 — חיבור למעבדה; מערך Wi‑Fi אינטראקטיבי מצורף.</span></template>
     </section>
 
@@ -1396,7 +1436,7 @@
         </div>
         <p class="hand-note" style="margin-top:28px;">data first · formula second · units always</p>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:40–01:43</span><span>קריאת השאלה</span></div>
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:36–01:39</span><span>קריאת דרישת הבדיקה</span></div>
       <template class="speaker-note">זמן: 3 דקות.
 קרא את השאלה. תן דקה שקטה לסימון המקדם של כל סינוס והמקדם של t.
 בקש מהסטודנטים לנבא אם f₂ גדול או קטן מ־f₁ לפני החישוב.
@@ -1404,23 +1444,23 @@
     </section>
 
     <!-- 15 / EXERCISE COMPONENTS -->
-    <section class="slide lesson-slide" data-index="14" data-time="7 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PART A</div><h2 class="lesson-title">מחלצים תנופה ותדר מכל רכיב</h2></div><div class="time-chip">7 MIN</div></header>
+    <section class="slide lesson-slide" data-index="14" data-time="6 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PART A</div><h2 class="lesson-title">מחלצים תנופה ותדר מכל רכיב</h2></div><div class="time-chip">6 MIN</div></header>
       <div class="lesson-body two-col">
         <div class="card"><span class="card-label">רכיב 1</span><div class="formula small">x₁(t)=3sin(1000πt)</div><p class="lesson-text"><b>A₁ = 3 V</b><br>ω₁ = 1000π rad/s</p><div class="formula small">f₁ = 1000π / 2π = 500 Hz</div></div>
         <div class="card khaki"><span class="card-label">רכיב 2</span><div class="formula small">x₂(t)=2sin(3000πt+30°)</div><p class="lesson-text"><b>A₂ = 2 V</b><br>ω₂ = 3000π rad/s</p><div class="formula small">f₂ = 3000π / 2π = 1500 Hz</div></div>
       </div>
       <div class="checkpoint" style="margin-top:22px;">זווית המופע 30° אינה משנה את גובה המחט בספקטרום התנופה</div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:43–01:50</span><span>פתרון סעיף א׳</span></div>
-      <template class="speaker-note">זמן: 7 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:39–01:45</span><span>פתרון סעיף א׳</span></div>
+      <template class="speaker-note">זמן: 6 דקות.
 פתור לאט: המקדם מחוץ לסינוס הוא התנופה; המקדם של t הוא ω ולא f.
 כתוב בכל שלב יחידות. שאל מה תפקיד 30° — מופע בלבד.
 <span class="source-note">מקורות: מדריך שיעור 2; נוסחאון — ω=2πf.</span></template>
     </section>
 
     <!-- 16 / FUNDAMENTAL + T -->
-    <section class="slide lesson-slide" data-index="15" data-time="5 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PART B</div><h2 class="lesson-title">התדר היסודי הוא המחלק המשותף של רכיבי התדר</h2></div><div class="time-chip">5 MIN</div></header>
+    <section class="slide lesson-slide" data-index="15" data-time="4 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PART B</div><h2 class="lesson-title">התדר היסודי הוא המחלק המשותף של רכיבי התדר</h2></div><div class="time-chip">4 MIN</div></header>
       <div class="lesson-body">
         <div class="three-col">
           <div class="card"><div class="metric" style="font-size:72px;">500</div><div class="metric-caption">Hz · רכיב ראשון</div></div>
@@ -1429,8 +1469,8 @@
         </div>
         <div class="formula big" style="margin-top:25px;">T = 1/f₀ = 1/500 = 2 ms</div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:50–01:55</span><span>פתרון סעיף ב׳</span></div>
-      <template class="speaker-note">זמן: 5 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:45–01:49</span><span>פתרון סעיף ב׳</span></div>
+      <template class="speaker-note">זמן: 4 דקות.
 הצג 1500=3×500. לכן שני הרכיבים חוזרים יחד לאחר מחזור של 500 Hz.
 אפשר לומר לתלמידים מתקדמים: מחפשים GCD כאשר התדרים רציונליים וביחידות משותפות.
 המר 0.002 s ל־2 ms.
@@ -1438,16 +1478,16 @@
     </section>
 
     <!-- 17 / SPECTRUM + BW -->
-    <section class="slide lesson-slide" data-index="16" data-time="8 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PARTS C + D</div><h2 class="lesson-title">בונים את הספקטרום ומחשבים את התחום</h2></div><div class="time-chip">8 MIN</div></header>
+    <section class="slide lesson-slide" data-index="16" data-time="6 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">SOLUTION · PARTS C + D</div><h2 class="lesson-title">בונים את הספקטרום ומחשבים את התחום</h2></div><div class="time-chip">6 MIN</div></header>
       <div class="lesson-body two-col">
         <div class="signal-box">
           <svg viewBox="0 0 650 360"><line x1="70" y1="300" x2="600" y2="300" stroke="#1A1A1A" stroke-width="4"/><line x1="70" y1="50" x2="70" y2="300" stroke="#1A1A1A" stroke-width="4"/><line x1="230" y1="300" x2="230" y2="80" stroke="#008F4D" stroke-width="13"/><line x1="510" y1="300" x2="510" y2="150" stroke="#008F4D" stroke-width="13"/><text x="205" y="332" font-size="24">500</text><text x="475" y="332" font-size="24">1500</text><text x="185" y="70" font-size="24">3 V</text><text x="520" y="145" font-size="24">2 V</text><text x="570" y="350" font-size="20">f [Hz]</text></svg>
         </div>
         <div class="card offset-card"><span class="card-label">רוחב פס</span><div class="formula big" style="font-size:clamp(33px,4vw,65px);">BW = 1500 − 500</div><div class="metric" style="font-size:clamp(58px,7vw,110px);">1 kHz</div><p class="lesson-text" style="text-align:center;font-weight:800;">המחט ב־1500 Hz היא ההרמוניה השלישית</p></div>
       </div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:55–02:03</span><span>פתרון סעיפים ג׳–ד׳</span></div>
-      <template class="speaker-note">זמן: 8 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:49–01:55</span><span>פתרון סעיפים ג׳–ד׳</span></div>
+      <template class="speaker-note">זמן: 6 דקות.
 שרטט צירים עם יחידות. מקם מחט ב־500 Hz בגובה 3 V ומחט ב־1500 Hz בגובה 2 V.
 הדגש: 1500 Hz = 3f₀, ולכן זו ההרמוניה השלישית; ההרמוניה השנייה אינה חייבת להופיע.
 חשב BW=1000 Hz.
@@ -1455,57 +1495,61 @@
     </section>
 
     <!-- 18 / TRAPS -->
-    <section class="slide lesson-slide" data-index="17" data-time="8 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">EXAM TRAPS · GOLDEN WARNINGS</div><h2 class="lesson-title">שלוש טעויות שמורידות נקודות גם כשהרעיון ברור</h2></div><div class="time-chip">8 MIN</div></header>
+    <section class="slide lesson-slide" data-index="17" data-time="6 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">EXAM TRAPS · GOLDEN WARNINGS</div><h2 class="lesson-title">שלוש טעויות שמורידות נקודות גם כשהרעיון ברור</h2></div><div class="time-chip">6 MIN</div></header>
       <div class="lesson-body trap-grid">
         <div class="trap"><h3>מלכודת 2π</h3><p><span class="latin">sin(1000t)</span> מכיל <span class="latin">ω=1000</span>, לא <span class="latin">f=1000</span>.<br><b>תמיד:</b> <span class="latin">f=ω/2π</span>.</p></div>
         <div class="trap"><h3>רכיב DC</h3><p>קבוע בביטוי הוא מחט בתדר <span class="latin">0 Hz</span>. לגבי BW — פועלים לפי הגדרת התחום שניתנה בשאלה.</p></div>
         <div class="trap"><h3>קידומות</h3><p><span class="latin">ms=10⁻³ s</span><br><span class="latin">μs=10⁻⁶ s</span><br><span class="latin">kHz=10³ Hz</span></p></div>
       </div>
       <div class="checkpoint" style="margin-top:28px;">נוהל בחינה: סמן יחידות → זהה ω או f → המר → חשב → בדוק סדר גודל</div>
-      <div class="lesson-footer"><span class="hour-tag">HOUR C · 02:03–02:11</span><span>מלכודות בחינה</span></div>
-      <template class="speaker-note">זמן: 8 דקות.
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 01:55–02:01</span><span>מלכודות בחינה</span></div>
+      <template class="speaker-note">זמן: 6 דקות.
 הדגם את מלכודת 2π: f=1000/(2π)=159.15 Hz.
 ב־DC הוסף דיוק: רכיב DC קיים בספקטרום. אופן הכללתו ב־BW תלוי בהגדרת השאלה או במוסכמה של רוחב פס AC; אין להתעלם אוטומטית.
 פתח את טבלת הקידומות בנוסחאון.
 <span class="source-note">מקורות: מדריך שיעור 2 — אזהרות זהב; נוסחאון, טבלת קידומות.</span></template>
     </section>
 
-    <!-- 19 / EXIT TICKET -->
-    <section class="slide lesson-slide" data-index="18" data-time="4 דקות">
-      <header class="lesson-header"><div><div class="lesson-kicker">EXIT TICKET · INDIVIDUAL</div><h2 class="lesson-title">ארבע דקות לבד — בלי להעתיק</h2></div><div class="time-chip">4 MIN</div></header>
+    <!-- 19 / BOARDROOM CHALLENGE -->
+    <section class="slide lesson-slide" data-index="18" data-time="10 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">THE BOARDROOM · PRODUCT DECISION</div><h2 class="lesson-title">קולר חכם ל־500 פרות: מה נכניס ל־MVP?</h2></div><div class="time-chip">10 MIN</div></header>
       <div class="lesson-body">
-        <div class="card offset-card" style="padding:30px 42px;">
+        <div class="pm-lens"><div><small>USER</small>חקלאי בגולן</div><div><small>JOB</small>מיקום פעם בשעה</div><div><small>CONSTRAINT</small>5 שנות סוללה</div><div><small>SUCCESS</small>כיסוי + תחזוקה</div></div>
+        <div class="pm-choices">
+          <button class="pm-choice" type="button" data-pm-case="collar" data-pm-choice="5g"><strong>אפשרות A · 5G</strong>100 MHz · 3.5 GHz · BOM גבוה · קצב עצום</button>
+          <button class="pm-choice" type="button" data-pm-case="collar" data-pm-choice="iot"><strong>אפשרות B · LoRa / NB‑IoT</strong>125 kHz · סביב 900 MHz · מעט ביטים · חיי סוללה ארוכים</button>
+        </div>
+        <div class="pm-answer" id="collarAnswer"><b>Pitch של 30 שניות:</b> בחרו אפשרות והגנו עליה באמצעות צורך המשתמש, רוחב פס, כיסוי, סוללה ועלות.</div>
+        <div class="checkpoint" style="margin-top:14px;">עקרון מוצר: לא ממקסמים מפרט — ממקסמים ערך תחת אילוצים</div>
+      </div>
+      <div class="lesson-footer"><span class="hour-tag">HOUR C · 02:01–02:11</span><span>אתגר דירקטוריון</span></div>
+      <template class="speaker-note">זמן: 10 דקות.
+חלק לצוותים: 3 דקות החלטה, 4 דקות pitches, 3 דקות סיכום. הבחירה המתאימה לדרישות הנתונות היא פתרון IoT צר־פס.
+בקש לנמק לפי חמישה ממדים: צורך, כמות מידע, כיסוי, סוללה ועלות. אל תקבל “LoRa כי הוא טוב יותר” ללא קשר לדרישות.
+דיוק: LoRa ו־NB-IoT אינם אותו פתרון ויש ביניהם הבדלים בפריסה, רישוי, מפעיל, latency ועלות. כאן הם מייצגים משפחת חלופות צרות־פס לצורך ההשוואה הפדגוגית.
+<span class="source-note">מקור: מדריך שיעור 2 — גרסת מנהל המוצר V2, אתגר הקולר החכם.</span></template>
+    </section>
+
+    <!-- 20 / EXIT TICKET -->
+    <section class="slide lesson-slide" data-index="19" data-time="4 דקות">
+      <header class="lesson-header"><div><div class="lesson-kicker">EXIT TICKET · ENGINEER + PM</div><h2 class="lesson-title">חשבו כמו מהנדסים. החליטו כמו מנהלי מוצר.</h2></div><div class="time-chip">4 MIN</div></header>
+      <div class="lesson-body">
+        <div class="card offset-card" style="padding:26px 38px;">
           <div class="formula small">y(t) = 4 + 3cos(2000πt) + cos(6000πt) [V]</div>
-          <div class="three-col" style="margin-top:24px;">
-            <div><h3>01</h3><p class="lesson-text">מהם רכיבי התדר והתנופות?</p></div>
-            <div><h3>02</h3><p class="lesson-text">מהם f₀ ו־T?</p></div>
-            <div><h3>03</h3><p class="lesson-text">שרטטו ספקטרום וסמנו DC.</p></div>
+          <div class="three-col" style="margin-top:20px;">
+            <div><h3>01 · CALCULATE</h3><p class="lesson-text">מצאו f₀, ‏T ורכיבי הספקטרום.</p></div>
+            <div><h3>02 · EXPLAIN</h3><p class="lesson-text">מה רוחב הפס של רכיבי ה־AC?</p></div>
+            <div><h3>03 · DECIDE</h3><p class="lesson-text">איזה נתון נוסף חסר לפני בחירת טכנולוגיה?</p></div>
           </div>
         </div>
-        <div class="checkpoint" style="margin-top:20px;">משפט סיום: “5 GHz הוא ___ ; ‏80 MHz הוא ___”</div>
+        <div class="checkpoint" style="margin-top:18px;">משפט סיום: “הפתרון המהיר ביותר אינו בהכרח הטוב ביותר, כי ___”</div>
       </div>
       <div class="lesson-footer"><span class="hour-tag">HOUR C · 02:11–02:15</span><span>סיום 135 דקות</span></div>
       <template class="speaker-note">זמן: 4 דקות.
-פתרון למרצה: DC בגובה 4 V בתדר 0; רכיב 3 V בתדר 1000 Hz; רכיב 1 V בתדר 3000 Hz. f₀=1000 Hz, T=1 ms. רוחב הפס של רכיבי ה־AC הוא 2 kHz; אם השאלה מגדירה span כולל DC, התחום 0–3 kHz.
-אסוף 2–3 תשובות לפני היציאה. השלמת המשפט: 5 GHz הוא תחום תדר הנושא; 80 MHz הוא רוחב הערוץ.
-<span class="source-note">תרגיל מסכם שנבנה לפי יעדי סעיף 1.5, המדריך ומקרה Wi‑Fi.</span></template>
-    </section>
-
-    <!-- 20 / OPTIONAL DISCUSSION -->
-    <section class="slide lesson-slide" data-index="19" data-time="רשות">
-      <header class="lesson-header"><div><div class="lesson-kicker">OPTIONAL · WIFI TROUBLESHOOTING</div><h2 class="lesson-title">עכשיו מסבירים תקלות Wi‑Fi בשפה הנדסית</h2></div><div class="time-chip">BONUS</div></header>
-      <div class="lesson-body three-col">
-        <div class="card green"><span class="card-label" style="background:var(--black);">01</span><h3>המיקרוגל הופעל</h3><p>מדוע דווקא רשת 2.4 GHz עלולה לסבול מהפרעה חזקה יותר?</p></div>
-        <div class="card"><span class="card-label">02</span><h3>80 MHz בדירה צפופה</h3><p>למה ערוץ רחב עשוי להגדיל מהירות — אך גם להגדיל חפיפה?</p></div>
-        <div class="card khaki"><span class="card-label">03</span><h3>שלושה פסי קליטה</h3><p>האם עוצמת קליטה טובה מבטיחה קצב גבוה? אילו גורמים נוספים נדרשים?</p></div>
-      </div>
-      <div class="checkpoint" style="margin-top:28px;">השיעור הבא: מתנדים וגל הנושא — המקור הסינוסואידלי של מערכת התקשורת</div>
-      <div class="lesson-footer"><span class="hour-tag">APPENDIX</span><span>שאלות העמקה / שיעורי בית</span></div>
-      <template class="speaker-note">שקף רשות — אינו נכלל ב־135 הדקות.
-תשובות מנחות: (1) מיקרוגל ורשת 2.4 GHz חולקים תחום תדרים קרוב ולכן דליפה יכולה להעלות את הרעש. (2) ערוץ רחב תופס יותר ספקטרום ולכן עשוי לחפוף לרשתות שכנות. (3) לא; נדרשים גם SNR, עומס נמוך, אפנון מתאים, מספר זרמים מרחביים וחיבור אינטרנט מספק.
-אפשר לתת אחת השאלות כשיעורי בית.
-<span class="source-note">מקור: מערך Wi‑Fi אינטראקטיבי מצורף; חיבור ליעדי שיעור 2.</span></template>
+פתרון חישובי: DC בגובה 4 V בתדר 0; רכיב 3 V בתדר 1000 Hz; רכיב 1 V בתדר 3000 Hz. f₀=1000 Hz, T=1 ms. רוחב הפס של רכיבי ה־AC הוא 2 kHz.
+בשאלת ההחלטה קבל כמה תשובות תקפות: כמות המידע, טווח, זמן סוללה, כיסוי זמין, latency, עלות או רגולציה. המטרה היא לזהות שהמפרט לבדו אינו מספיק ללא דרישת משתמש.
+<span class="source-note">תרגיל מסכם לפי יעדי סעיף 1.5 ומדריך מנהל המוצר V2.</span></template>
     </section>
 
     <!-- SLIDE 1: HERO TITLE -->
@@ -1746,6 +1790,7 @@
         slideCounter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
         const note = slides[index].querySelector('.speaker-note');
         noteContent.innerHTML = note ? note.innerHTML : 'אין הערות לשקף זה.';
+        if (index === 5) setTimeout(drawLessonWave, 40);
       }
 
       function next() {
@@ -1766,6 +1811,8 @@
         if (e.key.toLowerCase() === 'n') {
           e.preventDefault();
           notesPanel.classList.toggle('open');
+        } else if (['INPUT','BUTTON','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) {
+          return;
         } else if (e.key === 'Home') {
           e.preventDefault(); current = 0; updateSlide(current);
         } else if (e.key === 'End') {
@@ -1780,7 +1827,7 @@
       });
 
       document.addEventListener('click', (e) => {
-        if (e.target.closest('#notesToggle') || e.target.closest('#notesPanel') || e.target.closest('.wifi-metric') || e.target.closest('.wifi-btn')) return;
+        if (e.target.closest('#notesToggle') || e.target.closest('#notesPanel') || e.target.closest('.wifi-metric') || e.target.closest('.wifi-btn') || e.target.closest('.pm-choice') || e.target.closest('.wave-lab')) return;
         const x = e.clientX;
         const w = window.innerWidth;
         if (x > w / 2) {
@@ -1795,17 +1842,104 @@
         notesPanel.classList.toggle('open');
       });
 
-      const wifiExplanations = {
-        carrier: '<b>5 GHz — תדר נושא/תחום עבודה.</b> זהו מספר המחזורים של הגל האלקטרומגנטי בשנייה, לא קצב הורדת הקובץ.',
-        bandwidth: '<b>80 MHz — רוחב הערוץ.</b> זהו תחום התדרים שהרשת תופסת; ערוץ רחב עשוי לאפשר יותר מידע אך צורך יותר ספקטרום.',
-        power: '<b>−67 dBm — עוצמת הקליטה.</b> זהו הספק האות שמגיע לטלפון. ערך חזק יותר בדרך כלל מסייע, אך אינו מבטיח מהירות לבדו.'
+      const lessonWave = {
+        canvas: document.getElementById('lessonWaveCanvas'),
+        amp: document.getElementById('lessonAmp'),
+        freq: document.getElementById('lessonFreq'),
+        phase: document.getElementById('lessonPhase'),
+        dc: document.getElementById('lessonDc'),
+        ampVal: document.getElementById('lessonAmpVal'),
+        freqVal: document.getElementById('lessonFreqVal'),
+        phaseVal: document.getElementById('lessonPhaseVal'),
+        dcVal: document.getElementById('lessonDcVal'),
+        equation: document.getElementById('lessonWaveEquation'),
+        period: document.getElementById('lessonWavePeriod'),
+        cycles: document.getElementById('lessonWaveCycles')
       };
-      document.querySelectorAll('.wifi-metric').forEach(button => {
+
+      function drawLessonWave() {
+        const {canvas,amp,freq,phase,dc,ampVal,freqVal,phaseVal,dcVal,equation,period,cycles} = lessonWave;
+        if (!canvas) return;
+        const A = Number(amp.value), f = Number(freq.value), phaseDeg = Number(phase.value), D = Number(dc.value);
+        const phaseRad = phaseDeg * Math.PI / 180, duration = 0.6;
+        ampVal.textContent = A.toFixed(1) + ' V';
+        freqVal.textContent = f.toFixed(0) + ' Hz';
+        phaseVal.textContent = phaseDeg + '°';
+        dcVal.textContent = D.toFixed(2) + ' V';
+        const phaseSign = phaseDeg >= 0 ? '+' : '−';
+        equation.textContent = `x(t)=${D.toFixed(2)} + ${A.toFixed(1)} sin(2π·${f.toFixed(0)}t ${phaseSign} ${Math.abs(phaseDeg)}°)`;
+        period.textContent = `T=${(1/f).toFixed(3)} s`;
+        cycles.textContent = `${(f*duration).toFixed(1)} cycles`;
+        canvas.setAttribute('aria-label', `אות סינוס: תנופה ${A.toFixed(1)} וולט, תדר ${f} הרץ, מופע ${phaseDeg} מעלות ורכיב DC ${D.toFixed(2)} וולט`);
+
+        const box = canvas.getBoundingClientRect();
+        const w = Math.max(320, box.width), h = Math.max(245, box.height);
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(w * ratio); canvas.height = Math.round(h * ratio);
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(ratio,0,0,ratio,0,0);
+        const css = getComputedStyle(document.documentElement);
+        const ink = css.getPropertyValue('--black').trim();
+        const green = css.getPropertyValue('--green').trim();
+        const paper = css.getPropertyValue('--white').trim();
+        const khaki = css.getPropertyValue('--bg-dark').trim();
+        const left = 52, right = w - 18, top = 18, bottom = h - 38, mid = (top + bottom) / 2, yScale = (bottom-top) / 14;
+        ctx.fillStyle = paper; ctx.fillRect(0,0,w,h);
+        ctx.strokeStyle = khaki; ctx.lineWidth = 1;
+        for (let i=0;i<=6;i++) { const x=left+(right-left)*i/6; ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke(); }
+        for (let v=-6;v<=6;v+=2) { const y=mid-v*yScale; ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke(); }
+        ctx.strokeStyle = ink; ctx.lineWidth = 2.5;
+        ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(left,bottom);ctx.moveTo(left,mid);ctx.lineTo(right,mid);ctx.stroke();
+        const dcY = mid - D*yScale;
+        ctx.save();ctx.strokeStyle=ink;ctx.globalAlpha=.42;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(left,dcY);ctx.lineTo(right,dcY);ctx.stroke();ctx.restore();
+        ctx.strokeStyle = green; ctx.lineWidth = 4; ctx.beginPath();
+        for (let px=left;px<=right;px++) {
+          const t=(px-left)/(right-left)*duration;
+          const value=D+A*Math.sin(2*Math.PI*f*t+phaseRad);
+          const y=mid-value*yScale;
+          if (px===left) ctx.moveTo(px,y); else ctx.lineTo(px,y);
+        }
+        ctx.stroke();
+        ctx.fillStyle=ink;ctx.font='700 12px Arial';ctx.textAlign='center';
+        for (let i=0;i<=6;i++) { const x=left+(right-left)*i/6;ctx.fillText((i/10).toFixed(1),x,h-17); }
+        ctx.textAlign='left';ctx.fillText('t [s]',right-28,h-3);ctx.fillText('V',12,25);
+      }
+      ['amp','freq','phase','dc'].forEach(key => lessonWave[key].addEventListener('input', drawLessonWave));
+      if ('ResizeObserver' in window) new ResizeObserver(() => { if (current === 5) drawLessonWave(); }).observe(document.getElementById('lessonWaveLab'));
+      window.addEventListener('resize', () => { if (current === 5) drawLessonWave(); });
+
+      const paradoxCopy = {
+        zero: '<b>נכון — 0 ביטים.</b> גל קבוע לחלוטין ניתן לחיזוי. הוא יכול להיות גל נושא, אך בלי שינוי אין מידע חדש.',
+        five: '<b>לא.</b> 5 GHz הוא קצב החזרה של הגל הנושא, לא קצב המידע. תדר נושא וקצב נתונים הם מושגים שונים.',
+        infinite: '<b>לא.</b> משך שידור ארוך אינו יוצר מידע אם האות אינו משתנה. שעה של “טיק־טק” צפוי נשארת צפויה.'
+      };
+      document.querySelectorAll('.paradox-choice').forEach(button => {
         button.addEventListener('click', (e) => {
           e.stopPropagation();
-          document.querySelectorAll('.wifi-metric').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.paradox-choice').forEach(b => b.classList.remove('active'));
           button.classList.add('active');
-          document.getElementById('wifiAnswer').innerHTML = wifiExplanations[button.dataset.wifi];
+          document.getElementById('paradoxAnswer').innerHTML = paradoxCopy[button.dataset.paradox];
+        });
+      });
+
+      const pmCopy = {
+        water: {
+          fast: '<b>פתרון מרשים — אך לא מתאים לצורך.</b> הקריאה היומית זעירה, והמחיר בסוללה, חדירות ועלות אינו מייצר ערך נוסף לעירייה.',
+          lean: '<b>בחירה מוצרית מתאימה.</b> מעט מידע, תדר נמוך יותר, פתרון צר־פס ומצב שינה ארוך תומכים בכיסוי ובחיי סוללה.'
+        },
+        collar: {
+          '5g': '<b>Over-engineering לתרחיש הנתון.</b> קצב עצום אינו פותר את האילוצים המרכזיים: כיסוי שטח, חיי סוללה ועלות ל־500 יחידות.',
+          iot: '<b>המלצת MVP.</b> הודעת מיקום קצרה אינה דורשת פס רחב. פתרון IoT צר־פס מתאים טוב יותר לכמות המידע, לכיסוי ולתחזוקה.'
+        }
+      };
+      document.querySelectorAll('.pm-choice').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const group = button.dataset.pmCase;
+          document.querySelectorAll(`.pm-choice[data-pm-case="${group}"]`).forEach(b => b.classList.remove('active'));
+          button.classList.add('active');
+          const target = group === 'water' ? 'waterAnswer' : 'collarAnswer';
+          document.getElementById(target).innerHTML = pmCopy[group][button.dataset.pmChoice];
         });
       });
 
@@ -1828,10 +1962,13 @@
 
       // Touch support
       let touchStartX = 0;
+      let touchBlocked = false;
       document.addEventListener('touchstart', (e) => {
+        touchBlocked = Boolean(e.target.closest('.wave-lab'));
         touchStartX = e.changedTouches[0].screenX;
       });
       document.addEventListener('touchend', (e) => {
+        if (touchBlocked) { touchBlocked = false; return; }
         const touchEndX = e.changedTouches[0].screenX;
         if (touchStartX - touchEndX > 50) {
           next();

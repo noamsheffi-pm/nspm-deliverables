@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint Demo 06-10-2026 &middot; Data Pipeline</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-alt: #111111;
+    --border: #1f1f1f;
+    --border-strong: #2a2a2a;
+    --code-bg: #050505;
+    --text: #ffffff;
+    --text-2: #a1a1aa;
+    --text-muted: #52525b;
+    --mint: #00d4aa;
+    --mint-dim: #0aa888;
+    --mint-soft: rgba(0, 212, 170, 0.15);
+    --mint-faint: rgba(0, 212, 170, 0.06);
+    --warning: #ff9f43;
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(0, 212, 170, 0.06), transparent 60%),
+      var(--bg);
+  }
+
+  /* ---- Deck stage (16:9 landscape) ---- */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw 9vh;
+  }
+  .slide {
+    display: none;
+    width: min(100%, 1280px);
+    height: min(100%, 720px);
+    aspect-ratio: 16 / 9;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 56px 72px;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* lead slides */
+  .slide.lead { justify-content: center; text-align: left; }
+  .slide.lead::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 20% 30%, rgba(0,212,170,0.10), transparent 55%);
+    pointer-events: none;
+  }
+  .slide.invert { background: var(--mint); color: #03110b; }
+  .slide.invert .kicker { color: #03110b; opacity: .7; }
+
+  .kicker {
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--mint); font-weight: 700; margin-bottom: 20px;
+  }
+  h1 { font-size: 52px; line-height: 1.08; font-weight: 800; letter-spacing: -.02em; }
+  h1 .accent { color: var(--mint); }
+  h2 { font-size: 38px; line-height: 1.12; font-weight: 800; letter-spacing: -.01em; margin-bottom: 28px; }
+  .sub { font-size: 24px; color: var(--text-2); margin-top: 18px; font-weight: 500; }
+
+  ul { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+  li {
+    font-size: 23px; line-height: 1.4; color: var(--text); padding-left: 30px; position: relative;
+  }
+  li::before {
+    content: ""; position: absolute; left: 0; top: 13px;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--mint);
+    box-shadow: 0 0 12px rgba(0,212,170,.5);
+  }
+  li b { color: var(--mint); font-weight: 700; }
+  .grouplabel { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 12px; font-weight: 700; }
+  .grouplabel:first-of-type { margin-top: 0; }
+
+  .callout {
+    margin-top: 26px; padding: 18px 24px; border-left: 3px solid var(--mint);
+    background: var(--mint-faint); border-radius: 8px; font-size: 21px; color: var(--text-2);
+  }
+  .callout b { color: #fff; }
+  .big-quote { font-size: 30px; font-weight: 700; line-height: 1.3; max-width: 22ch; }
+
+  code, .mono { font-family: var(--mono); background: var(--code-bg); padding: 2px 8px; border-radius: 6px; color: var(--mint); font-size: .9em; }
+
+  /* slide number tag */
+  .tag {
+    position: absolute; top: 28px; right: 32px; font-size: 13px; color: var(--text-muted);
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  }
+  .brand { position: absolute; top: 28px; left: 32px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); letter-spacing: .04em; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px rgba(0,212,170,.6); }
+  .invert .dot { background: #03110b; box-shadow: none; }
+  .invert .brand { color: #03110b; }
+
+  /* ---- nav bar ---- */
+  .navbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 7vh; min-height: 48px;
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    background: rgba(0,0,0,.6); border-top: 1px solid var(--border); backdrop-filter: blur(8px); z-index: 10;
+  }
+  .navbar button {
+    background: var(--surface-alt); color: var(--text); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 8px 18px; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); transition: .15s;
+  }
+  .navbar button:hover { border-color: var(--mint-dim); color: var(--mint); }
+  .navbar button:disabled { opacity: .3; cursor: default; }
+  .counter { font-size: 14px; color: var(--text-2); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--mint); z-index: 20; transition: width .3s; box-shadow: 0 0 10px rgba(0,212,170,.6); }
+
+  /* speaker notes */
+  .notes {
+    position: fixed; bottom: 7vh; left: 0; right: 0; max-height: 32vh; overflow-y: auto;
+    background: rgba(5,5,5,.96); border-top: 1px solid var(--mint-dim); padding: 18px 32px;
+    font-size: 16px; line-height: 1.5; color: var(--text-2); display: none; z-index: 9;
+  }
+  .notes.show { display: block; }
+  .notes b { color: var(--mint); }
+  .notes code { font-size: 15px; }
+  .hint { position: fixed; bottom: calc(7vh + 8px); right: 16px; font-size: 12px; color: var(--text-muted); z-index: 11; }
+
+  /* ================= sprint-demo v2 feature card, ported ================= */
+  .slide.card { justify-content: center; padding: 62px 72px 48px; }
+
+  .chip { font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; padding: 4px 11px; border-radius: 7px; color: var(--mint); background: var(--mint-soft); border: 1px solid var(--mint-dim); white-space: nowrap; }
+  .chip.roll { color: var(--warning); background: rgba(255,159,67,.12); border-color: rgba(255,159,67,.4); }
+
+  .fc-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .fc-title { font-size: 36px; font-weight: 800; letter-spacing: -.01em; line-height: 1.1; }
+
+  .pitch { font-size: 22px; line-height: 1.35; color: var(--mint); font-weight: 600; max-width: 46ch; margin-bottom: 22px; }
+
+  .shift { display: flex; align-items: stretch; gap: 16px; margin-bottom: 18px; }
+  .shift .half { flex: 1; border-radius: 12px; padding: 16px 20px; }
+  .shift .before { background: var(--surface-alt); border: 1px solid var(--border-strong); opacity: .72; }
+  .shift .after { background: var(--mint-faint); border: 1px solid var(--mint-dim); }
+  .shift .lab { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
+  .shift .after .lab { color: var(--mint); }
+  .shift .half p { font-size: 17px; line-height: 1.36; color: var(--text-2); }
+  .shift .after p { color: var(--text); }
+  .shift .arrow { display: flex; align-items: center; font-size: 26px; color: var(--mint); flex: 0 0 auto; }
+
+  .value { display: flex; gap: 14px; align-items: baseline; margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .value .k { flex: 0 0 62px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--mint); }
+  .value p { font-size: 18px; line-height: 1.38; color: var(--text); max-width: 82ch; }
+
+  .foot { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .foot .rc { font-size: 12px; color: var(--mint); text-decoration: none; border: 1px solid var(--mint-dim); border-radius: 6px; padding: 3px 10px; }
+  .foot .keys { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .foot .teams { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+  .foot .team { font-size: 11px; color: var(--text-2); background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 20px; padding: 3px 10px; }
+  .foot .team.cut { text-decoration: line-through; opacity: .45; }
+
+  /* visible framing line: the stake, said on screen not in the notes */
+  .frame { font-size: 21px; line-height: 1.42; color: var(--text-2); max-width: 74ch; margin-top: 18px; padding-left: 16px; border-left: 3px solid var(--mint-dim); }
+  .frame b { color: var(--text); font-weight: 700; }
+
+  /* closing argument */
+  .close-claim { font-size: 27px; line-height: 1.34; font-weight: 700; max-width: 62ch; margin-top: 4px; }
+  .proof { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+  .proof .p { background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 12px; padding: 18px 20px; }
+  .proof .p .h { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+  .proof .p .d { font-size: 17px; line-height: 1.38; color: var(--text-2); }
+  .proof .p .d b { color: var(--text); font-weight: 700; }
+
+  /* section opener: title + the cards it contains */
+  .agenda { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+  .agenda-row { display: flex; align-items: center; gap: 14px; font-size: 22px; }
+  .agenda-row .n { flex: 0 0 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: var(--mint-soft); color: var(--mint); border: 1px solid var(--mint-dim); }
+  .agenda-row .t { font-weight: 600; }
+
+  /* stats row */
+  .stats { display: flex; gap: 18px; margin-top: 8px; }
+  .stat { flex: 1; background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 14px; padding: 26px 22px; text-align: center; }
+  .stat .n { font-size: 46px; font-weight: 800; color: var(--mint); line-height: 1; }
+  .stat .l { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-top: 10px; }
+
+  /* two-up teaser grid (Coming Next) */
+  .teaser { display: flex; gap: 20px; margin-top: 6px; }
+  .teaser .t-card { flex: 1; background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 14px; padding: 24px 26px; display: flex; flex-direction: column; }
+  .teaser .t-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .teaser .t-title { font-size: 25px; font-weight: 800; line-height: 1.12; }
+  .teaser .t-pitch { font-size: 18px; line-height: 1.35; color: var(--mint); font-weight: 600; margin-bottom: 14px; }
+  .teaser .t-body { font-size: 16px; line-height: 1.38; color: var(--text-2); }
+  .teaser .t-keys { font-family: var(--mono); font-size: 12px; color: var(--text-muted); margin-top: auto; padding-top: 14px; }
+
+  /* mentions grid */
+  .mentions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 6px; }
+  .mention { background: var(--surface-alt); border: 1px solid var(--border-strong); border-radius: 12px; padding: 20px 22px; }
+  .mention h4 { font-size: 20px; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+  .mention p { font-size: 16px; line-height: 1.36; color: var(--text-2); }
+
+  /* thank-you grid */
+  .teams-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px; }
+  .tcard { background: rgba(3,17,11,.10); border: 1px solid rgba(3,17,11,.22); border-radius: 12px; padding: 14px 16px; }
+  .tcard .tn { font-size: 16px; font-weight: 800; color: #03110b; line-height: 1.2; }
+  .tcard .tm { font-size: 13px; color: rgba(3,17,11,.72); margin-top: 5px; line-height: 1.3; }
+  .value-lead { margin-bottom: 10px; }
+  .value-lead .k { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+  .value-lead p { font-size: 27px; line-height: 1.26; font-weight: 700; color: var(--text); max-width: 58ch; }
+  .value-rest { font-size: 18px; line-height: 1.4; color: var(--text-2); max-width: 74ch; margin-bottom: 20px; }
+  .card .shift { margin-bottom: 14px; }
+  .card .shift .half p { font-size: 16px; }
+  @media (max-width: 720px) { .proof { grid-template-columns: 1fr; } }
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="stage" id="stage">
+
+  <!-- 0 TITLE -->
+  <section class="slide lead active">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Sprint Demo &middot; 06-10-2026</span>
+    <div class="kicker">Pipeline &middot; Governance &middot; Monetization</div>
+    <h1 style="font-size:64px;">Data Pipeline<br><span class="accent">What We Shipped</span></h1>
+    <p class="sub" style="font-size:22px;">Noam Sheffi &middot; Product Manager</p>
+    <p class="sub" style="font-size:18px;color:var(--text-muted);margin-top:26px;">Five weeks &middot; 01-09 to 06-10-2026</p>
+    <div class="notes-data" hidden>Two questions this cycle: how much are we using, and is the policy we set really running. Talk use case, not screen.</div>
+  </section>
+
+  <!-- 1 THEME + STATS -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">This cycle</span>
+    <h2>Know what you use. <span style="color:var(--mint)">Trust what your policies do.</span></h2>
+    <div class="frame">Customers asked two questions we could not answer in one place: <b>how much is each team using, and is the policy I set actually running?</b> Three releases answer them, and customers can now bring their old data in too.</div>
+    <div class="callout">Cards marked <span class="chip roll">Rolling Out</span> are built but not yet closed as released, so treat them as <b>available rather than final</b>.</div>
+    <div class="stats">
+      <div class="stat"><div class="n">3</div><div class="l">Shipped</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Rolling Out</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Coming Next</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Teams</div></div>
+    </div>
+    <div class="notes-data" hidden>Three cards are released. Usage and Quota went out on 05-10, so its Jira Feature may still show open. Historical import is Rolling Out: phase 1 is run by our team, not self-serve.</div>
+  </section>
+
+  <!-- 2 SECTION 1 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Quota</span>
+    <div class="kicker">Section one</div>
+    <h1>One Page for<br><span class="accent">Usage and Quota</span></h1>
+    <div class="frame">Usage lived on one screen and quota on another, with the same data shown at two scopes. <b>Orgs with a single team had no quota view at all.</b> Now there is one page.</div>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">1</span><span class="t">Usage and Quota on One Page</span></div>
+    </div>
+    <div class="notes-data" hidden>The frame: two screens, one question. Data Usage was single team and GB first. Org Quota Manager was org to team, units first, and only for orgs with two or more teams.</div>
+  </section>
+
+  <!-- 3 CARD 1 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Monetization &middot; Quota</span>
+    <div class="fc-head"><span class="fc-title">Usage and Quota on One Page</span><span class="chip">Shipped</span></div>
+    <div class="value-lead"><span class="k">Why it matters</span><p>One page answers how much every team uses.</p></div>
+    <p class="value-rest">What you see follows your permissions: one team, a few teams, or all of them. CX units and AI units sit on separate tabs, because they are two separate plans. The AI units tab from Org Quota Manager now lives here too.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Data Usage and Org Quota Manager showed the same usage at two scopes on two screens. Orgs with one team had no quota view at all.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>One Usage and Quota page under Organization. Its scope follows the viewer's permissions, with CX units and AI units on their own tabs.</p></div>
+    </div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/3e3c048defad81aa9acddb6f6f86d72b" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-50859 &middot; CX-59176 &middot; CX-44033</span>
+      <span class="teams"><span class="team">Nimbus</span><span class="team">Halo</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> Organization &gt; Usage &amp; Quota. Open the CX units tab, then the AI units tab. <b>&#9888; Jira legs not all closed:</b> Nimbus CX-53024 still In Progress and the docs epic CX-59602 in Backlog on 05-10. <b>&#9888; Known UI issue (28-09):</b> the AI units chart shows all three segments as AI units. Do not zoom into that chart. <b>&#9888; Not a repeat of 01-09:</b> last demo showed AI costs on one screen and AI getting its own units plan. This card is the page that replaces Data Usage and Org Quota Manager. Say plan, not pool: CX units and AI units do not move between each other. No change to metering, blocking or billing.</div>
+  </section>
+
+  <!-- 4 SECTION 2 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="kicker">Section two</div>
+    <h1>TCO Policies<br>You Can <span class="accent">Trust</span></h1>
+    <div class="frame">A TCO policy decides where data goes and what it costs. Customers could not see which priority was active, and <b>could not read a policy as code.</b> These two close those gaps.</div>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">2</span><span class="t">See Which Priority Is Active Now</span></div>
+      <div class="agenda-row"><span class="n">3</span><span class="t">TCO Policies as Code</span></div>
+    </div>
+    <div class="notes-data" hidden>The frame: see what is active, and read it as code.</div>
+  </section>
+
+  <!-- 5 CARD 2 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="fc-head"><span class="fc-title">See Which Priority Is Active Now</span><span class="chip">Shipped</span></div>
+    <div class="value-lead"><span class="k">Why it matters</span><p>Customers see which priority is active right now.</p></div>
+    <p class="value-rest">For quota-based policies the active priority changes with the daily quota thresholds. The table now highlights the priority in effect for each target.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>The same application could appear in several rows, and a 24 hour window mixed old and new state. Nobody could tell which policy was in effect now.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>The Log Policies table highlights the active priority for each target, fed by a live status from the backend.</p></div>
+    </div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/3e3c048defad81e79364d0220fce5d44" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-39721</span>
+      <span class="teams"><span class="team">Nimbus</span><span class="team">Radiant</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO &gt; Log Policies, open a quota-based policy and point at the highlighted priority chip per target. Needs a quota-based policy on the tenant. <b>&#9888; Docs epic CX-60189 still In Progress.</b> <b>&#9888; Do not promise the shorter time picker</b>, it is not confirmed as shipped. Customer asks behind it: Kotak and Xplor support cases (names stay off the slide).</div>
+  </section>
+
+  <!-- 6 CARD 3 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Pipeline &middot; TCO</span>
+    <div class="fc-head"><span class="fc-title">TCO Policies as Code</span><span class="chip">Shipped</span></div>
+    <div class="value-lead"><span class="k">Why it matters</span><p>Teams on Terraform copy any policy straight into code.</p></div>
+    <p class="value-rest">A policy built in the UI and the one in your IaC can now be checked against each other. It works the same way as View as Code in Alerts and Parsing Rules.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Alerts and Parsing Rules had View as Code, TCO policies did not. Teams on Terraform could not check a UI policy against their own definition.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>Any saved TCO policy opens a read-only View as Code panel with Terraform HCL and Kubernetes YAML, ready to copy.</p></div>
+    </div>
+    <div class="foot">
+      <a class="rc" href="https://www.notion.so/3e5c048defad814fbc28f1016aca2d33" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-43382</span>
+      <span class="teams"><span class="team">Radiant</span><span class="team">Nimbus</span><span class="team">Ecosystem</span><span class="team">Product Design</span><span class="team">Tech Writing</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> TCO, a policy row, three-dot menu &gt; View as Code. Switch between the Terraform and Kubernetes tabs. <b>&#9888; Docs task CX-43385 still Backlog</b>, so there is no doc link yet. CX-43386 was cancelled in June. Parity work, not a customer story, so do not claim demand for this one.</div>
+  </section>
+
+  <!-- 7 SECTION 3 OPENER -->
+  <section class="slide lead">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Governance &middot; Datasets</span>
+    <div class="kicker">Section three</div>
+    <h1>Bring Your<br><span class="accent">History</span> With You</h1>
+    <div class="frame">Live ingestion rejects anything older than 24 hours. A customer moving to Coralogix had <b>no way to bring their past data with them.</b> Now they can.</div>
+    <div class="agenda">
+      <div class="agenda-row"><span class="n">4</span><span class="t">Historical Data Import</span></div>
+    </div>
+    <div class="notes-data" hidden>The frame: the 24 hour rule is right for live data and wrong for this path. Lead with "we copy, we do not process" and "it does not touch the daily quota".</div>
+  </section>
+
+  <!-- 8 CARD 4 -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Governance &middot; Datasets</span>
+    <div class="fc-head"><span class="fc-title">Historical Data Import</span><span class="chip roll">Rolling Out</span></div>
+    <div class="value-lead"><span class="k">Why it matters</span><p>Customers import old data without blocking live data.</p></div>
+    <p class="value-rest">The import is measured beside the daily quota, not inside it, and it is billed once on uncompressed size.</p>
+    <div class="shift">
+      <div class="half before"><div class="lab">Before</div><p>Live ingestion rejects anything older than 24 hours. A customer moving from another vendor had no way to bring their history with them.</p></div>
+      <div class="arrow">&#8594;</div>
+      <div class="half after"><div class="lab">Now</div><p>We copy the customer's files from their own S3 into a dedicated dataset on the Compliance tier. It can be queried and does not touch the daily quota.</p></div>
+    </div>
+    <div class="foot">
+      <a class="rc" href="https://app.notion.com/p/3e7c048defad81a2a272ef34127f514d" target="_blank" rel="noopener">&#8599; Roadmap card</a>
+      <span class="keys">CX-30677 &middot; CX-41231</span>
+      <span class="teams"><span class="team">Citadel</span><span class="team">Halo</span></span>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> the example: test import runs on two customer sample files (Collibra CX-59795, Honeybook CX-55825), then query the imported dataset. <b>&#9888; Phase 1 is manual:</b> Citadel runs it with an internal tool. No customer UI or API, so do not promise self-serve. <b>&#9888; Feature CX-30677 is still In Progress.</b> Files must be partitioned by hour; most exports are not, and the customer converts them. No alerts, not in live search, not in custom dashboards. Names stay off the slide.</div>
+  </section>
+
+  <!-- 8 COMING NEXT -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Coming Next</span>
+    <h2 style="margin-bottom:20px;">Coming Next</h2>
+    <div class="teaser">
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Traffic Management Phase 1</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">One place that shows where traffic goes and what happens to it.</p>
+        <p class="t-body">Shown last demo. Since then the Nimbus graph framework research is done. The Radiant engine and the pipeline builder design are in progress. Nothing live.</p>
+        <div class="t-keys">CX-49207 &middot; Radiant &middot; Nimbus &middot; Product Design</div>
+      </div>
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Expression-Based Retention</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">A record keeps the retention its content earns.</p>
+        <p class="t-body">Shown last demo. Since then the design is done, and the dataset screen has started on Phoenix next to the Citadel rule model. Nothing live.</p>
+        <div class="t-keys">CX-48426 &middot; Citadel &middot; Phoenix &middot; Tech Writing</div>
+      </div>
+      <div class="t-card">
+        <div class="t-head"><span class="t-title">Monthly Team Quota</span><span class="chip roll">In Build</span></div>
+        <p class="t-pitch">Enforce against the monthly budget you contract on.</p>
+        <p class="t-body">Shown last demo. Since then Usage and Quota has shipped, which is the page a monthly plan will sit on. A customer-set daily burst limit on a monthly plan is in progress. Nothing live.</p>
+        <div class="t-keys">CX-40018 &middot; Halo &middot; Radiant &middot; Nimbus &middot; Product Design</div>
+      </div>
+    </div>
+    <div class="notes-data" hidden>All three are returning peeks. Lead on what moved, do not re-pitch, and give no dates. Monthly burst limit is CX-58243.</div>
+  </section>
+
+  <!-- 9 WORTH A MENTION -->
+  <section class="slide card">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">Also shipped</span>
+    <h2 style="margin-bottom:20px;">Worth a Mention</h2>
+    <div class="mentions">
+      <div class="mention"><h4>Audit team units out of org totals</h4><p>Org Quota Manager no longer counts the audit team&#39;s units in the organization totals.</p></div>
+      <div class="mention"><h4>TCO policy tier accepts a unit value</h4><p>Phase 1, API only: a TCO policy tier can take a unit value. No screen yet.</p></div>
+      <div class="mention"><h4>TCO Optimizer page scroll and section switch</h4><p>The TCO Optimizer page scrolls and switches between sections without losing your place.</p></div>
+    </div>
+    <div class="callout"><b>Closed since 01-09.</b> Shown last demo as <span class="chip roll">Rolling Out</span>, now generally available: RUM Dataset pipeline routing, phase 1.</div>
+    <div class="notes-data" hidden>Read fast, demo nothing. Audit units CX-44817, unit value CX-57725 (API only, do not show a screen), Optimizer CX-55586. RUM is CX-32890, closed 27-09, and its Nimbus screen CX-56217 was finished after the last demo.</div>
+  </section>
+
+  <!-- 10 THE CLOSE -->
+  <section class="slide">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <span class="tag">What changed</span>
+    <h2 style="margin-bottom:14px;">What you can sell now</h2>
+    <div class="close-claim">Four things customers could not do last month. <span style="color:var(--mint)">You can offer all four today.</span></div>
+    <div class="frame" style="margin-top:14px;font-size:19px;">Three came from customer requests. <b>The fourth brings TCO in line with Alerts and Parsing Rules.</b></div>
+    <div class="proof">
+      <div class="p"><div class="h">Sell one usage page</div><div class="d">Usage and quota for every team now sit on one page. <b>Customers stop moving between two screens for one answer.</b></div></div>
+      <div class="p"><div class="h">Sell TCO you can trust</div><div class="d">The Log Policies table now shows the priority active right now. <b>Customers see whether their quota policy has switched tiers.</b></div></div>
+      <div class="p"><div class="h">Sell TCO as code</div><div class="d">Every saved TCO policy now opens as Terraform or Kubernetes code. <b>Customers copy UI policies straight into their IaC pipeline.</b></div></div>
+      <div class="p"><div class="h">Sell historical import</div><div class="d">Historical log data now imports into its own dataset from customer S3. <b>Customers bring their history without blocking live data.</b></div></div>
+    </div>
+    <div class="notes-data" hidden>Say the claim, then stop and let them read. Names stay off the slide: the live policy status came from Kotak and Xplor cases, historical import from Collibra, CommIT and others. Historical import is run by our team in phase 1. View as Code is parity work. Caveats stay on the cards.</div>
+  </section>
+
+  <!-- 11 THANK YOU -->
+  <section class="slide invert">
+    <div class="brand"><span class="dot"></span> Coralogix &middot; NSPM</div>
+    <div class="kicker">Thank you</div>
+    <h1 style="font-size:44px;color:#03110b;margin-bottom:6px;">This cycle was powered by these teams</h1>
+    <div class="teams-grid">
+      <div class="tcard"><div class="tn">Nimbus</div><div class="tm">Iulian, Wiktor</div></div>
+      <div class="tcard"><div class="tn">Radiant</div><div class="tm">Itay</div></div>
+      <div class="tcard"><div class="tn">Halo</div><div class="tm">Rafael</div></div>
+      <div class="tcard"><div class="tn">Citadel</div><div class="tm">Roy, Shimon</div></div>
+      <div class="tcard"><div class="tn">Ecosystem</div><div class="tm">David</div></div>
+      <div class="tcard"><div class="tn">Product Design</div><div class="tm">Omer</div></div>
+      <div class="tcard"><div class="tn">Technical Writing</div><div class="tm">Maya</div></div>
+    </div>
+    <div class="notes-data" hidden>Name the teams out loud. Then hand over to questions.</div>
+  </section>
+
+</div>
+
+<div class="notes" id="notes"></div>
+<div class="hint">&larr; &rarr; navigate &middot; N notes &middot; F fullscreen</div>
+<div class="navbar">
+  <button id="prev">&larr; Back</button>
+  <span class="counter" id="counter">1 / 13</span>
+  <button id="next">Next &rarr;</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const notes = document.getElementById('notes');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  let notesOn = false;
+
+  function render() {
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    counter.textContent = (i + 1) + ' / ' + total;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === total - 1;
+    const note = slides[i].querySelector('.notes-data');
+    notes.innerHTML = note ? '<b>Speaker note &middot;</b> ' + note.innerHTML : '';
+  }
+  function go(n) { i = Math.max(0, Math.min(total - 1, n)); render(); }
+
+  prevBtn.onclick = () => go(i - 1);
+  nextBtn.onclick = () => go(i + 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { go(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(i - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(total - 1); }
+    else if (e.key.toLowerCase() === 'n') { notesOn = !notesOn; notes.classList.toggle('show', notesOn); }
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  render();
+</script>
+</body>
+</html>
