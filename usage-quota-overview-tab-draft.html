@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usage Overview tab</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f7f8;--card:#fff;--ink:#161616;--ink2:#393939;--muted:#525252;--line:#e0e0e0;--line2:#c6c6c6;
+  --green:#198038;--green-bar:#24a148;--blue:#0f62fe;--blue-ink:#0043ce;--blue-bg:#edf5ff;
+  --red:#da1e28;--red-ink:#a2191f;--red-bg:#fff1f1;--orange:#ff832b;--orange-ink:#8a3800;
+  --warn:#f1c21b;--warn-bg:#fcf4d6;--warn-ink:#8e6a00;--green-bg:#defbe6;--green-ink:#0e6027;
+  --ai:#8a3ffc;--ai-bg:#e8daff;--ai-ink:#6929c4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px}
+a{color:var(--blue)}
+.mono{font-family:'IBM Plex Mono',monospace}
+.shell{position:sticky;top:0;z-index:10;background:#161616;display:flex;gap:4px;padding:8px 16px;flex-wrap:wrap;align-items:center}
+.shell span{font-size:12px;color:#c6c6c6;margin-right:12px}
+.shell button{font:inherit;font-size:13px;background:transparent;color:#c6c6c6;border:1px solid #393939;border-radius:4px;padding:6px 12px;cursor:pointer}
+.shell button.on{background:#fff;color:#161616;border-color:#fff}
+.view{display:none}.view.on{display:block}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+h1{margin:0;font-size:24px;font-weight:600}
+h2{margin:0;font-size:16px;font-weight:600}
+.sub{font-size:12px;color:var(--muted)}
+.chip{font-size:12px;padding:2px 9px;border-radius:10px;display:inline-block;font-weight:600}
+.c-ok{background:var(--green-bg);color:var(--green-ink)}
+.c-risk{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn)}
+.c-out{background:var(--warn);color:var(--ink)}
+.c-blk{background:var(--red-bg);color:var(--red-ink)}
+.btn{font:inherit;font-size:12px;border:1px solid var(--line2);background:#fff;border-radius:4px;padding:4px 10px;cursor:pointer}
+.btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pill{font:inherit;font-size:12px;border:1px solid var(--line2);background:#fff;border-radius:14px;padding:4px 11px;cursor:pointer}
+.pill.on{border-color:var(--blue);background:var(--blue-bg);color:var(--blue-ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink2)}
+.legend i{display:inline-block;width:16px;vertical-align:middle;margin-right:6px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:'IBM Plex Sans',sans-serif}
+.uq{display:flex;min-height:100vh}
+.side{flex:0 0 220px;border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:2px;color:var(--ink2)}
+.side .h{font-size:12px;color:var(--muted);margin:12px 8px 4px}
+.side a{color:var(--ink2);text-decoration:none;padding:6px 8px}
+.side a.on{color:var(--green);font-weight:600}
+.main{flex:999 1 600px;min-width:0;display:flex;flex-direction:column}
+.head{padding:18px 24px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:28px;margin-top:14px;flex-wrap:wrap;align-items:flex-end}
+.tabs a{text-decoration:none;color:var(--ink2);padding:8px 0;font-size:15px;cursor:pointer}
+.tabs a.on{color:var(--green);border-bottom:2px solid var(--green)}
+.newtag{font-size:10px;font-weight:600;background:var(--blue);color:#fff;padding:1px 7px;border-radius:9px;vertical-align:2px;margin-left:4px}
+.body{padding:16px 24px 48px;background:var(--bg);display:flex;flex-direction:column;gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;position:relative}
+.g2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+.g3{display:grid;gap:18px;grid-template-columns:2fr 1fr}
+@media (max-width:1100px){.g3{grid-template-columns:1fr}}
+.nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.nums .v{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:500}
+.cell{display:flex;flex-direction:column;gap:2px}
+.planline{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12px;color:var(--ink2);background:var(--bg);border-radius:4px;padding:8px 10px}
+.planline b{color:var(--ink);font-family:'IBM Plex Mono',monospace;font-weight:500}
+.meter{position:relative;height:14px;background:var(--line);border-radius:3px}
+.meter>div{position:absolute;top:0;bottom:0}
+.meter .mk{top:-4px;bottom:-4px;width:2px}
+.status{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 16px;position:relative}
+.status .line{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+.concept{position:absolute;top:-10px;right:14px;font-size:11px;font-weight:600;background:#161616;color:#fff;padding:2px 8px;border-radius:9px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal div{height:34px;border-radius:3px;font-size:10px;padding:3px 4px;display:flex;flex-direction:column;justify-content:space-between}
+.cal-h{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;font-size:10px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+td.num,th.num{text-align:right}td.num{font-family:'IBM Plex Mono',monospace}
+.goto{font-size:13px;text-decoration:none;font-weight:500;cursor:pointer}
+.fade{opacity:.55}
+.map{background:#fff;border:1px dashed var(--blue);border-radius:6px;padding:14px 16px;font-size:13px;display:flex;flex-direction:column;gap:8px}
+.map div{display:flex;gap:10px;align-items:flex-start}
+.map .concept{position:static;flex:none}
+@media (max-width:760px){.side{display:none}.nums{grid-template-columns:repeat(2,minmax(0,1fr))}.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="shell" role="tablist" aria-label="Mockup boards">
+  <span>Initial draft · ideation, not a design</span>
+  <button class="on" data-view="v1">1 · Overview tab (lands here)</button>
+  <button data-view="v2">2 · CX units tab (as today + 2 lines)</button>
+</div>
+
+<!-- ================= BOARD 1: OVERVIEW TAB ================= -->
+<section class="view on" id="v1">
+<div class="uq">
+  <aside class="side" aria-label="Settings">
+    <span class="h">Organization</span>
+    <a href="#">My Teams</a><a href="#">Manage Admins</a><a href="#">Quota Manager (Legacy)</a><a href="#" class="on">Usage &amp; Quota</a><a href="#">Organization Settings</a>
+    <span class="h">Account</span><a href="#">Preferences</a><a href="#">Notifications</a>
+  </aside>
+  <div class="main">
+    <div class="head">
+      <div class="row between"><h1>Usage &amp; Quota</h1><button class="btn" style="font-size:14px;padding:8px 14px">Ask Olly</button></div>
+      <div class="row between" style="align-items:flex-end">
+        <nav class="tabs">
+          <a class="on">Overview<span class="newtag">NEW</span></a>
+          <a data-go="v2">CX units <span class="sub">(1,485 / 9,486)</span></a>
+          <a>AI units <span class="sub">(505 / 1,240)</span></a>
+        </nav>
+        <div class="row" style="padding-bottom:6px">
+          <span class="sub">Cycle Aug 1 to 31 · day 26 · data through Aug 26, 08:00 UTC</span>
+          <button class="btn" style="font-size:13px;padding:6px 12px">All teams ▾</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="status" aria-label="Status">
+        <span class="concept">Status · one line per plan</span>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1 1 600px">
+          <div class="line"><span class="chip c-out">Will run out</span><b>CX units run out on Aug 31, about 02:00 UTC</b><span style="color:var(--ink2)">at this pace, almost a day early. Keep to about 267 units a day to last to Aug 31.</span></div>
+          <div class="line"><span class="chip c-ok">On track</span><b>AI units last the month</b><span style="color:var(--ink2)">59% used on day 26. Past months ended at 71% to 104%.</span></div>
+          <div class="line"><span class="chip c-blk">Blocked today</span><b>data-platform</b><span style="color:var(--ink2)">hit its daily burst at 14:20. New data starts again at 00:00 UTC.</span></div>
+        </div>
+        <a href="#" style="font-size:13px;align-self:center">Ask for more units</a>
+      </div>
+
+      <div class="g2">
+        <article class="card">
+          <span class="concept">B · two meters</span>
+          <div class="row between"><div class="row"><h2>CX units</h2><span class="chip c-out">Will run out</span></div><a class="goto" data-go="v2">Open CX units →</a></div>
+          <div class="planline"><span>Plan <b>Monthly</b></span><span>Budget <b>9,486</b> = 306 × 31</span><span>Daily rate <b>306</b></span><span>Daily burst <b>918</b> (3×)</span><span>Resets <b>Sep 1</b></span></div>
+          <div class="cell" style="gap:6px">
+            <div class="row between" style="font-size:13px"><b>This month</b><span class="mono">8,001 / 9,486</span></div>
+            <div class="meter" id="mCxMonth"></div>
+            <div class="row between sub"><span>Hatched = forecast to Aug 31 (103%)</span><span>Blue mark = 306-a-day pace</span></div>
+          </div>
+          <div class="cell" style="gap:6px">
+            <div class="row between" style="font-size:13px"><b>Today</b><span class="mono">118 / 918</span></div>
+            <div class="meter" id="mCxToday"></div>
+            <div class="row between sub"><span>Black = daily rate 306 · blue = safe 267</span><span>End = burst 918, then blocked to 00:00 UTC</span></div>
+          </div>
+          <div class="nums">
+            <div class="cell"><span class="sub">Left this month</span><span class="v">1,485</span></div>
+            <div class="cell"><span class="sub">Forecast</span><span class="v" style="color:var(--warn-ink)">103%</span></div>
+            <div class="cell"><span class="sub">Runs out</span><span class="v" style="color:var(--red-ink)">Aug 31</span></div>
+            <div class="cell"><span class="sub">Safe a day</span><span class="v" style="color:var(--blue-ink)">267</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="concept">B · two meters</span>
+          <div class="row between"><div class="row"><h2>AI units</h2><span class="chip c-ok">On track</span></div><a class="goto">Open AI units →</a></div>
+          <div class="planline"><span>Plan <b>Monthly</b></span><span>Budget <b>1,240</b></span><span>Olly + AI Center</span><span>Resets <b>Sep 1</b></span><span>Separate from CX units</span></div>
+          <div class="cell" style="gap:6px">
+            <div class="row between" style="font-size:13px"><b>This month</b><span class="mono">735 / 1,240</span></div>
+            <div class="meter" id="mAiMonth"></div>
+            <div class="row between sub"><span>Light band = where past months ended (71% to 104%)</span><span>No straight-line forecast</span></div>
+          </div>
+          <div class="cell" style="gap:6px">
+            <b style="font-size:13px">Last 3 months at month end</b>
+            <svg id="aiHist" viewBox="0 0 440 70" role="img" aria-label="AI units at month end, last 3 months"></svg>
+          </div>
+          <div class="nums">
+            <div class="cell"><span class="sub">Left this month</span><span class="v">505</span></div>
+            <div class="cell"><span class="sub">Used</span><span class="v">59%</span></div>
+            <div class="cell"><span class="sub">Month passed</span><span class="v">84%</span></div>
+            <div class="cell"><span class="sub">Blocked</span><span class="v">0 days</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="g3">
+        <article class="card">
+          <span class="concept">A · burn-up / burn-down</span>
+          <div class="row between">
+            <div><h2>CX units this cycle</h2><div class="sub" style="margin-top:2px" id="burnSub"></div></div>
+            <div class="row" style="gap:6px">
+              <div class="row" role="group" aria-label="Chart type" style="gap:4px"><button class="btn on" data-burn="up">Burn-up</button><button class="btn" data-burn="down">Burn-down</button></div>
+              <span class="sub">Based on last</span><button class="btn">7d</button><button class="btn on">30d</button><button class="btn">90d</button>
+            </div>
+          </div>
+          <svg id="burn" viewBox="0 0 900 270" role="img" aria-label="CX units this cycle"></svg>
+          <div class="legend" id="burnLegend"></div>
+        </article>
+
+        <article class="card">
+          <span class="concept">D · runway what-if</span>
+          <h2>How long CX units last</h2>
+          <div class="row" style="align-items:baseline;gap:8px"><span class="mono" style="font-size:36px;font-weight:500" id="rwDays"></span><span style="color:var(--ink2)">days of budget · <span id="rwCycle"></span> days left in the cycle</span></div>
+          <div class="row" role="group" aria-label="Pace" style="gap:6px" id="rwPaces"></div>
+          <div style="position:relative;height:56px" id="rwStrip"></div>
+          <div id="rwNote" style="border-radius:4px;padding:10px 12px;font-size:13px"></div>
+        </article>
+      </div>
+
+      <div class="g3">
+        <article class="card">
+          <span class="concept">Teams to watch</span>
+          <div class="row between"><h2>Teams by run-out date</h2><a class="goto" data-go="v2">See all teams in CX units →</a></div>
+          <table>
+            <thead><tr><th>Team</th><th>Status</th><th class="num">Budget</th><th class="num">Forecast</th><th>Runs out</th><th>Today vs burst</th><th></th></tr></thead>
+            <tbody id="teams"></tbody>
+          </table>
+          <div class="sub">Units move between teams the same day, CX to CX only.</div>
+        </article>
+
+        <article class="card">
+          <span class="concept">C · cycle calendar</span>
+          <div class="row between"><h2>August, day by day</h2><span class="sub">CX units</span></div>
+          <div class="cal-h"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div class="cal" id="cal"></div>
+          <div class="legend" style="gap:10px">
+            <span><i style="height:10px;width:10px;background:#d9fbfb"></i>Under rate</span>
+            <span><i style="height:10px;width:10px;background:var(--orange-ink)"></i>Spike</span>
+            <span><i style="height:10px;width:10px;border:2px solid var(--red)"></i>Blocked</span>
+            <span><i style="height:10px;width:10px;border:1px dashed #8d8d8d"></i>Safe 267</span>
+          </div>
+        </article>
+      </div>
+
+      <article class="card">
+        <span class="concept">Blocks · who, why, when it lifts</span>
+        <div class="row between"><h2>Blocks this cycle</h2><a class="goto" data-go="v2">Open in CX units →</a></div>
+        <table>
+          <thead><tr><th>When</th><th>Team</th><th>Plan</th><th>Why</th><th>Lifts</th><th class="num">Units not taken (est.)</th></tr></thead>
+          <tbody>
+            <tr><td>Today 14:20</td><td>data-platform</td><td>CX units</td><td>Daily burst reached</td><td>Tonight 00:00 UTC</td><td class="num">—</td></tr>
+            <tr><td>Aug 24, 16:05</td><td>checkout-api</td><td>CX units</td><td>Daily burst reached</td><td>Aug 25, 00:00 UTC</td><td class="num">122</td></tr>
+            <tr><td>Aug 17, 11:40</td><td>data-platform</td><td>CX units</td><td>Daily burst reached</td><td>Aug 18, 00:00 UTC</td><td class="num">143</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <section class="map" aria-label="Where each idea sits">
+        <b>Where each idea sits on this tab (black tags)</b>
+        <div><span class="concept">Status</span><span>One line per plan, plus any block now. The same sentences go in the warning and forecast emails.</span></div>
+        <div><span class="concept">B · two meters</span><span>In each plan card: the month and today, two limits side by side.</span></div>
+        <div><span class="concept">A · burn-up / burn-down</span><span>One chart with a switch. Burn-up by default (the shape account teams already use). Burn-down adds the "burst every day" line.</span></div>
+        <div><span class="concept">D · runway what-if</span><span>Days of budget left, and what another pace does to the end date.</span></div>
+        <div><span class="concept">C · cycle calendar</span><span>Which days used the budget, spike days, blocked days. For AMs and reviews.</span></div>
+        <div><span class="concept">Teams · Blocks</span><span>Who needs action, and every block with its reason and the time it lifts.</span></div>
+        <div style="color:var(--muted)">Not on this tab: filters, group by, aggregation, time picker. They stay on the CX units and AI units tabs. This tab always shows the current cycle. Each "Open …" link goes to that tab.</div>
+      </section>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ================= BOARD 2: CX UNITS TAB ================= -->
+<section class="view" id="v2">
+<div class="uq">
+  <aside class="side" aria-label="Settings">
+    <span class="h">Organization</span>
+    <a href="#">My Teams</a><a href="#">Manage Admins</a><a href="#">Quota Manager (Legacy)</a><a href="#" class="on">Usage &amp; Quota</a><a href="#">Organization Settings</a>
+  </aside>
+  <div class="main">
+    <div class="head">
+      <div class="row between"><h1>Usage &amp; Quota</h1><button class="btn" style="font-size:14px;padding:8px 14px">Ask Olly</button></div>
+      <div class="row between" style="align-items:flex-end">
+        <nav class="tabs"><a data-go="v1">Overview<span class="newtag">NEW</span></a><a class="on">CX units <span class="sub">(1,485 / 9,486)</span></a><a>AI units <span class="sub">(505 / 1,240)</span></a></nav>
+        <div class="row" style="padding-bottom:6px"><a href="#" style="color:var(--green);text-decoration:none">Move CX units</a><button class="btn" style="font-size:14px;padding:6px 14px;color:var(--green)">Last 30 Days</button></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="card fade" style="flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px"><span class="btn" style="font-size:14px">Total CX units ▾</span><span>Filtered by +</span><span>Group data by <b style="color:var(--green)">Select Field</b></span><span style="margin-left:auto">Aggregation: <b>Daily</b> · Weekly · Monthly</span></div>
+      <div class="card fade">
+        <div class="row between"><h2>Overview</h2><span class="sub">No change on this tab</span></div>
+        <div class="sub">Monthly quota left · Today's quota left · Blocked days · Blocked units · Max / Min / Avg daily usage · PAYG. All as today.</div>
+      </div>
+      <article class="card">
+        <div class="row between"><h2>Counted units per day <span class="newtag">2 LINES ADDED</span></h2><div class="legend"><span><i style="height:10px;width:10px;border-radius:50%;background:var(--green-bar)"></i>Normal</span><span><i style="height:10px;width:10px;border-radius:50%;background:var(--orange)"></i>Warning</span><span><i style="height:10px;width:10px;border-radius:50%;background:var(--red)"></i>Blocked</span></div></div>
+        <svg id="daily" viewBox="0 0 960 300" role="img" aria-label="Counted units per day"></svg>
+        <div class="legend">
+          <span><i style="border-top:2px dashed var(--red)"></i>Daily burst 918 (exists)</span>
+          <span><i style="border-top:2px dashed var(--orange)"></i>Daily rate 306 (exists)</span>
+          <span><i style="border-top:2px dotted var(--blue)"></i>Safe daily spend 267 (new)</span>
+          <span><i style="height:10px;width:10px;border:1px dashed #8d8d8d"></i>Days left this cycle (new)</span>
+        </div>
+      </article>
+      <div class="card fade"><div class="sub">Teams table and team drawer: as today. "Open CX units" and "See all teams" on the Overview tab land here, with the same team filter.</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<script>
+const fmt = v => Math.round(v).toLocaleString('en-US');
+const pct = v => Math.min(100, Math.max(0, v)).toFixed(1) + '%';
+const D = 31, R = 306, B = R * D, BU = 918, NOWD = 25, TOD = 118, PACE = 315, LO = 231, HI = 340;
+const spikes = { 12: 850, 17: 1035, 24: 1040 };
+const base = [228,241,219,236,267,222,230,239,226,244,0,233,229,0,238,221,0,240,225,234,231,246,227,0,231];
+const a = []; let sum = 0;
+for (let d = 1; d <= NOWD; d++) { const v = spikes[d] || base[d - 1]; a.push(v); sum += v; }
+// spread the rounding gap over the normal days so 7,883 is used before today (+118 today = 8,001)
+(() => { let gap = 7883 - sum; const normal = a.map((v, i) => spikes[i + 1] ? -1 : i).filter(i => i >= 0); normal.forEach((i, k) => { const s = Math.round(gap / (normal.length - k)); a[i] += s; gap -= s; }); })();
+const done = 7883, used = done + TOD, left = B - used, dl = D - NOWD;
+const safe = (B - done) / dl, proj = done + dl * PACE, runDay = NOWD + (B - done) / PACE;
+const P = p => p.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
+const tk = [1, 5, 10, 15, 20, 25, 31];
+const NOW = NOWD + 0.35;
+
+function show(id) {
+  document.querySelectorAll('.shell button').forEach(x => x.classList.toggle('on', x.dataset.view === id));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id));
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.shell button').forEach(b => b.onclick = () => show(b.dataset.view));
+document.querySelectorAll('[data-go]').forEach(el => el.onclick = e => { e.preventDefault(); show(el.dataset.go); });
+
+// B · meters
+document.getElementById('mCxMonth').innerHTML = `
+  <div style="left:0;width:${pct(used / B * 100)};background:#393939;border-radius:3px 0 0 3px"></div>
+  <div style="left:${pct(used / B * 100)};width:${pct(100 - used / B * 100)};background:repeating-linear-gradient(45deg,#ffd8b8,#ffd8b8 4px,#fff 4px,#fff 8px)"></div>
+  <div class="mk" style="left:${pct(R * NOW / B * 100)};background:var(--blue)"></div>`;
+document.getElementById('mCxToday').innerHTML = `
+  <div style="left:0;width:${pct(TOD / BU * 100)};background:#78a9ff;border-radius:3px 0 0 3px"></div>
+  <div class="mk" style="left:${pct(R / BU * 100)};background:#161616"></div>
+  <div class="mk" style="left:${pct(safe / BU * 100)};background:var(--blue)"></div>`;
+document.getElementById('mAiMonth').innerHTML = `
+  <div style="left:71%;width:29%;background:#e8daff"></div>
+  <div style="left:0;width:59.3%;background:var(--ai);border-radius:3px 0 0 3px"></div>`;
+(() => {
+  const m = [['Jun', 71], ['Jul', 104], ['Aug so far', 59]];
+  let g = '';
+  m.forEach(([n, v], i) => {
+    const y = 6 + i * 21, w = v / 110 * 330;
+    g += `<text x="0" y="${y + 10}" font-size="11" fill="#525252">${n}</text><rect x="70" y="${y}" width="${w}" height="13" fill="${v > 100 ? '#da1e28' : '#8a3ffc'}" opacity="${i === 2 ? 0.6 : 1}" rx="2"/><text x="${76 + w}" y="${y + 10}" font-size="11" fill="#161616">${v}%</text>`;
+  });
+  const x100 = 70 + 330 * 100 / 110;
+  g += `<line x1="${x100}" x2="${x100}" y1="2" y2="68" stroke="#da1e28" stroke-dasharray="3 3"/>`;
+  document.getElementById('aiHist').innerHTML = g;
+})();
+
+// A · burn-up / burn-down
+function drawBurn(mode) {
+  const X0 = 60, X1 = 885, Y0 = 234, Y1 = 14, M = 11000;
+  const xd = d => X0 + d / D * (X1 - X0), y = v => Y0 - Math.max(0, v) / M * (Y0 - Y1);
+  let g = '';
+  [0, 2500, 5000, 7500, 10000].forEach(v => g += `<line x1="${X0}" x2="${X1}" y1="${y(v)}" y2="${y(v)}" stroke="#e0e0e0"/><text x="${X0 - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#525252">${v ? v / 1000 + 'k' : '0'}</text>`);
+  tk.forEach(d => g += `<text x="${xd(d - .5)}" y="256" text-anchor="middle" font-size="11" fill="#525252">Aug ${d}</text>`);
+  let c = 0; const cum = [[0, 0]]; a.forEach((v, i) => { c += v; cum.push([i + 1, c]); }); cum.push([NOW, used]);
+  if (mode === 'up') {
+    const band = [[xd(NOWD), y(done)], [xd(D), y(done + dl * HI)], [xd(D), y(done + dl * LO)]].map(q => q.join(',')).join(' ');
+    g += `<polygon points="${band}" fill="#ff832b" fill-opacity=".18"/>
+      <line x1="${xd(0)}" y1="${y(0)}" x2="${xd(D)}" y2="${y(B)}" stroke="#8d8d8d" stroke-width="1.5" stroke-dasharray="2 4"/>
+      <line x1="${X0}" x2="${X1}" y1="${y(B)}" y2="${y(B)}" stroke="#da1e28" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="66" y="${y(B) - 6}" font-size="12" fill="#a2191f">Budget 9,486</text>
+      <path d="${P([[xd(NOWD), y(done)], [xd(D), y(proj)]])}" fill="none" stroke="#ff832b" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="${P(cum.map(q => [xd(q[0]), y(q[1])]))}" fill="none" stroke="#161616" stroke-width="2.5"/>`;
+    document.getElementById('burnSub').textContent = 'Used units climb toward the budget. Where the forecast meets it, you run out.';
+    document.getElementById('burnLegend').innerHTML = `<span><i style="height:3px;background:#161616"></i>Used</span><span><i style="border-top:2px dashed #ff832b"></i>Forecast</span><span><i style="height:10px;background:#ffe2cc"></i>Likely range (80%)</span><span><i style="border-top:2px dotted #8d8d8d"></i>306-a-day pace</span><span><i style="border-top:2px dashed #da1e28"></i>Budget</span>`;
+  } else {
+    const wEnd = NOWD + (B - done) / BU;
+    g += `<path d="${P(cum.map(q => [xd(q[0]), y(B - q[1])]))}" fill="none" stroke="#161616" stroke-width="2.5"/>
+      <path d="${P([[xd(NOWD), y(B - done)], [xd(Math.min(D, runDay)), y(0)]])}" fill="none" stroke="#ff832b" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="${P([[xd(NOWD), y(B - done)], [xd(D), y(0)]])}" fill="none" stroke="#0f62fe" stroke-width="2" stroke-dasharray="2 4"/>
+      <path d="${P([[xd(NOWD), y(B - done)], [xd(wEnd), y(0)]])}" fill="none" stroke="#da1e28" stroke-width="2"/>
+      <text x="${xd(wEnd) - 6}" y="${y(0) - 90}" text-anchor="end" font-size="11" fill="#a2191f">Burst every day: empty Aug ${Math.ceil(wEnd)}</text>`;
+    document.getElementById('burnSub').textContent = 'What is left falls to zero. Three paces: yours, the safe one, and the burst every day.';
+    document.getElementById('burnLegend').innerHTML = `<span><i style="height:3px;background:#161616"></i>Left</span><span><i style="border-top:2px dashed #ff832b"></i>My pace (30d)</span><span><i style="border-top:2px dotted #0f62fe"></i>Safe pace 267</span><span><i style="height:2px;background:#da1e28"></i>Burst every day</span>`;
+  }
+  g += `<line x1="${xd(NOW)}" x2="${xd(NOW)}" y1="${Y1}" y2="${Y0}" stroke="#0f62fe"/><text x="${xd(NOW) - 4}" y="${Y0 - 8}" text-anchor="end" font-size="11" fill="#0043ce">Today</text>
+    <line x1="${xd(runDay)}" x2="${xd(runDay)}" y1="${Y1}" y2="${Y0}" stroke="#da1e28" stroke-dasharray="3 3"/>
+    <text x="${xd(runDay) - 4}" y="${Y1 + 10}" text-anchor="end" font-size="11" fill="#a2191f">Runs out Aug 31, 02:00</text>`;
+  document.getElementById('burn').innerHTML = g;
+  document.querySelectorAll('[data-burn]').forEach(b => b.classList.toggle('on', b.dataset.burn === mode));
+}
+document.querySelectorAll('[data-burn]').forEach(b => b.onclick = () => drawBurn(b.dataset.burn));
+drawBurn('up');
+
+// D · runway what-if
+(() => {
+  const cycle = D - NOW;
+  const paces = [['Last 7 days', 236], ['Last 30 days', PACE], ['Burst every day', BU], ['Safe pace', safe]];
+  const box = document.getElementById('rwPaces');
+  box.innerHTML = paces.map(p => `<button class="pill">${p[0]}</button>`).join('');
+  function render(i) {
+    const p = paces[i][1], days = left / p, end = Math.min(D, NOW + days), short = NOW + days < D - 0.01;
+    document.getElementById('rwDays').textContent = days.toFixed(1);
+    document.getElementById('rwCycle').textContent = cycle.toFixed(1);
+    box.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', j === i));
+    document.getElementById('rwStrip').innerHTML = `
+      <div style="position:absolute;left:0;right:0;top:18px;height:18px;background:#e0e0e0;border-radius:3px"></div>
+      <div style="position:absolute;left:0;top:18px;height:18px;width:${pct(NOW / D * 100)};background:#393939;border-radius:3px 0 0 3px"></div>
+      <div style="position:absolute;left:${pct(NOW / D * 100)};top:18px;height:18px;width:${pct((end - NOW) / D * 100)};background:#a6c8ff"></div>
+      <div style="position:absolute;left:${pct(end / D * 100)};top:10px;height:34px;width:2px;background:${short ? '#da1e28' : '#198038'}"></div>
+      <span style="position:absolute;left:0;top:0;font-size:11px;color:#525252">Aug 1</span>
+      <span style="position:absolute;right:0;top:0;font-size:11px;color:#525252">Aug 31</span>
+      <span style="position:absolute;right:0;top:40px;font-size:11px;color:${short ? '#a2191f' : '#0e6027'}">${short ? 'Budget ends Aug ' + Math.ceil(NOW + days) : 'Lasts the cycle'}</span>`;
+    const gap = Math.max(0, used + p * cycle - B);
+    const n = document.getElementById('rwNote');
+    n.innerHTML = short ? `About <b>${fmt(gap)}</b> units short. Ask your account team, or use about <b>${fmt(gap / cycle)}</b> fewer a day.` : 'At this pace the budget lasts to Aug 31.';
+    n.style.background = short ? 'var(--warn-bg)' : 'var(--green-bg)';
+  }
+  box.querySelectorAll('button').forEach((b, i) => b.onclick = () => render(i));
+  render(1);
+})();
+
+// C · calendar (Aug 1 2026 is a Saturday)
+(() => {
+  let s = '<div></div><div></div><div></div><div></div><div></div>';
+  const blocked = { 17: 1, 24: 1 };
+  for (let d = 1; d <= D; d++) {
+    let bg, fg = '#161616', bd = '1px solid transparent', v;
+    if (d <= NOWD) { const u = a[d - 1]; bg = u > R * 2 ? '#8a3800' : u > R ? '#ffd8b8' : '#d9fbfb'; if (u > R * 2) fg = '#fff'; v = u; if (blocked[d]) bd = '2px solid #da1e28'; }
+    else if (d === NOWD + 1) { bg = '#edf5ff'; fg = '#0043ce'; bd = '2px solid #0f62fe'; v = TOD; }
+    else { bg = '#fff'; fg = '#525252'; bd = '1px dashed #c6c6c6'; v = '≤' + Math.round(safe); }
+    s += `<div style="background:${bg};color:${fg};border:${bd}"><span>${d}</span><span class="mono">${v}</span></div>`;
+  }
+  document.getElementById('cal').innerHTML = s;
+})();
+
+// Teams to watch (budgets add up to 9,486)
+(() => {
+  const t = [
+    ['checkout-api', 'Will run out', 'c-out', 2480, 118, 'Aug 28', '210 / 240', 'Add units'],
+    ['payments-prod', 'At risk', 'c-risk', 3100, 101, 'Aug 31', '40 / 300', ''],
+    ['data-platform', 'Blocked today', 'c-blk', 1860, 97, 'Lasts', '180 / 180', 'Why blocked'],
+    ['search', 'On track', 'c-ok', 1240, 88, 'Lasts', '24 / 120', ''],
+    ['ml-features', 'On track', 'c-ok', 806, 52, 'Lasts', '6 / 78', 'Give ~380 units']
+  ];
+  document.getElementById('teams').innerHTML = t.map(r => `<tr><td><b>${r[0]}</b></td><td><span class="chip ${r[2]}">${r[1]}</span></td><td class="num">${fmt(r[3])}</td><td class="num" style="color:${r[4] > 100 ? '#a2191f' : '#161616'}">${r[4]}%</td><td style="color:${r[5] === 'Lasts' ? '#0e6027' : '#a2191f'}">${r[5]}</td><td class="mono">${r[6]}</td><td>${r[7] ? `<a href="#">${r[7]}</a>` : ''}</td></tr>`).join('');
+})();
+
+// Board 2 · counted units per day + 2 lines
+(() => {
+  const X0 = 64, X1 = 940, Y0 = 262, Y1 = 14, M = 1500, sl = (X1 - X0) / D, bw = sl * .7, y = v => Y0 - v / M * (Y0 - Y1);
+  let g = ''; [0, 500, 1000, 1500].forEach(v => g += `<line x1="${X0}" x2="${X1}" y1="${y(v)}" y2="${y(v)}" stroke="#e0e0e0"/><text x="${X0 - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#525252">${v}</text>`);
+  for (let d = 1; d <= D; d++) {
+    const x = X0 + (d - 1) * sl + (sl - bw) / 2;
+    if (d <= NOWD) {
+      const v = a[d - 1], st = v > BU ? '#da1e28' : v > R * 2 ? '#ff832b' : '#24a148';
+      if (v > R * 2) g += `<rect x="${X0 + (d - 1) * sl}" y="${Y1}" width="${sl}" height="${Y0 - Y1}" fill="${v > BU ? '#fff1f1' : '#fff2e8'}"/>`;
+      let yy = Y0; [[v * .25, '#4589ff'], [v * .3, '#e8606a'], [v * .45, '#3ab7cf']].forEach(([h, c]) => { const hh = h / M * (Y0 - Y1); yy -= hh; g += `<rect x="${x}" y="${yy}" width="${bw}" height="${hh}" fill="${c}"/>`; });
+      g += `<rect x="${X0 + (d - 1) * sl + 1}" y="${Y0 + 4}" width="${sl - 2}" height="8" fill="${st}"/>`;
+    } else if (d === NOWD + 1) {
+      g += `<rect x="${x}" y="${y(TOD)}" width="${bw}" height="${Y0 - y(TOD)}" fill="#a6c8ff"/><rect x="${x}" y="${y(safe)}" width="${bw}" height="${y(TOD) - y(safe)}" fill="none" stroke="#0f62fe" stroke-dasharray="3 2"/>`;
+    } else g += `<rect x="${x}" y="${y(safe)}" width="${bw}" height="${Y0 - y(safe)}" fill="#fff" stroke="#8d8d8d" stroke-dasharray="3 2"/>`;
+  }
+  tk.forEach(d => g += `<text x="${X0 + (d - .5) * sl}" y="290" text-anchor="middle" font-size="11" fill="#525252">Aug ${d}</text>`);
+  g += `<line x1="${X0}" x2="${X1}" y1="${y(BU)}" y2="${y(BU)}" stroke="#da1e28" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <line x1="${X0}" x2="${X1}" y1="${y(R)}" y2="${y(R)}" stroke="#ff832b" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <line x1="${X0}" x2="${X1}" y1="${y(safe)}" y2="${y(safe)}" stroke="#0f62fe" stroke-width="1.5" stroke-dasharray="2 3"/>
+    <text x="${X1 - 4}" y="${y(BU) - 6}" text-anchor="end" font-size="11" fill="#a2191f">Daily burst 918</text>
+    <text x="${X1 - 4}" y="${y(R) - 6}" text-anchor="end" font-size="11" fill="#8a3800">Daily rate 306</text>
+    <text x="${X1 - 4}" y="${y(safe) + 14}" text-anchor="end" font-size="11" fill="#0043ce">Safe 267</text>`;
+  document.getElementById('daily').innerHTML = g;
+})();
+</script>
+</body>
+</html>
