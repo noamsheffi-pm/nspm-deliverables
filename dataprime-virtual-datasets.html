@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataPrime Virtual Datasets</title>
+<style>
+:root{
+  --bg:#F8FAFC; --surface:#FFFFFF; --hover:#0000000D; --focus:#E6FFF2;
+  --tx:#1C1C1C; --tx2:#68686D; --tx3:#A9A9AE; --link:#029449; --on:#FFFFFF;
+  --bd:#ECECEE; --bd2:#DEDEE0; --bdi:#029449; --btn:#02763A;
+  --warn:#E4B83C; --err:#D64545; --err-bg:#FDECEC;
+  --grey-bg:#C9D1D933; --grey-tx:#323D4E;
+  --blue-bg:#5095ED33; --blue-tx:#1E6F81;
+  --green-bg:#3CC67E33; --green-tx:#24734B;
+  --purple-bg:#8B5CF626; --purple-tx:#6D3FD1;
+  --later-bg:#E4B83C33; --later-tx:#8A6A12;
+  --kw:#6D3FD1;
+  --r-sm:4px; --r-md:6px; --r-lg:8px;
+  --font:'Nunito Sans',Helvetica,Roboto,Arial,sans-serif;
+  --mono:'Inconsolata','SF Mono',Menlo,Consolas,monospace;
+  --sh-dd:0 5px 10px 0 rgba(33,43,59,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161A; --surface:#1C1F24; --hover:#FFFFFF12; --focus:#0E3B26;
+    --tx:#ECECEE; --tx2:#A9A9AE; --tx3:#6E6E74; --link:#3CC67E;
+    --bd:#2A2E35; --bd2:#373C44; --bdi:#3CC67E;
+    --err:#F07070; --err-bg:#3A1C1C;
+    --grey-tx:#C9D1D9; --blue-tx:#7FC1D2; --green-tx:#7FDCA9; --purple-tx:#B79BFF; --later-tx:#E9C766; --kw:#B79BFF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161A; --surface:#1C1F24; --hover:#FFFFFF12; --focus:#0E3B26;
+  --tx:#ECECEE; --tx2:#A9A9AE; --tx3:#6E6E74; --link:#3CC67E;
+  --bd:#2A2E35; --bd2:#373C44; --bdi:#3CC67E;
+  --err:#F07070; --err-bg:#3A1C1C;
+  --grey-tx:#C9D1D9; --blue-tx:#7FC1D2; --green-tx:#7FDCA9; --purple-tx:#B79BFF; --later-tx:#E9C766; --kw:#B79BFF;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+code{font-family:var(--mono);font-size:12px}
+
+.pagehead{background:var(--surface);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pagehead h1{font:600 20px/1.4 var(--font)}
+.spacer{flex:1}
+.note{font:400 11px/1.5 var(--font);color:var(--tx2)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;padding:16px;max-width:1240px}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{font:600 15px/1.5 var(--font)}
+.card h3{font:700 11px/1.5 var(--font);color:var(--tx2);text-transform:uppercase;letter-spacing:.05em}
+.sub{color:var(--tx2)}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;border-radius:var(--r-sm);font:600 10px/1.6 var(--font);white-space:nowrap}
+.t-logs{background:var(--green-bg);color:var(--green-tx)}
+.t-spans{background:var(--blue-bg);color:var(--blue-tx)}
+.t-mixed,.t-host{background:var(--grey-bg);color:var(--grey-tx)}
+.t-virtual{background:var(--purple-bg);color:var(--purple-tx)}
+.t-later{background:var(--later-bg);color:var(--later-tx)}
+
+/* editor: a real textarea over a highlighted layer */
+.ed{position:relative;border:1px solid var(--bd2);border-radius:var(--r-md);background:var(--surface)}
+.ed:focus-within{border-color:var(--bdi);box-shadow:0 0 0 2px var(--focus)}
+.ed pre,.ed textarea{margin:0;padding:8px 10px;font:400 13px/22px var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;letter-spacing:0;tab-size:2}
+.ed pre{min-height:40px;pointer-events:none;color:var(--tx)}
+.ed textarea{position:absolute;inset:0;width:100%;height:100%;resize:none;border:0;outline:0;background:transparent;color:transparent;caret-color:var(--tx);overflow:hidden}
+.ed textarea::selection{background:#02944933;color:transparent}
+.k{color:var(--kw)} .kp{color:var(--blue-tx)} .lit{color:var(--green-tx)}
+.vr{background:var(--purple-bg);color:var(--purple-tx);border-radius:3px;font-weight:700}
+.er{text-decoration:underline wavy var(--err);text-underline-offset:4px;text-decoration-skip-ink:none}
+.hl{background:#E4B83C59;border-radius:2px}
+/* hover popup, after cx-ui code-editor hover-overlay (CodeMirror 6) */
+.hpop{position:fixed;z-index:60;width:max-content;max-width:min(36rem,calc(100vw - 2rem));max-height:min(30rem,calc(100vh - 2rem));overflow-y:auto;background:var(--surface);color:var(--tx);border:1px solid var(--bd2);border-radius:var(--r-md);box-shadow:0 8px 24px rgba(33,43,59,.18);font:400 12px/1.5 var(--font)}
+.hsec{padding:8px 12px}
+.hsec + .hsec{border-top:1px solid var(--bd)}
+.hmsg{overflow-wrap:break-word}
+.hmsg .sev{float:left;display:flex;height:1.5em;align-items:center;padding-right:6px}
+.hmsg .sev i{width:14px;height:14px;border-radius:50%;background:var(--err);color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 10px/1 var(--font);font-style:normal}
+.hmsg .cp{float:right;margin-left:8px;border:0;background:transparent;color:var(--tx2);cursor:pointer;font:400 12px/1 var(--font);padding:2px}
+.hmsg .cp:hover{color:var(--link)}
+.mlist{list-style:none;margin:2px 0 0;padding:0 0 0 .5em}
+.mlist > li{position:relative;display:block;padding-left:1.3em}
+.mlist .disc{appearance:none;position:absolute;left:0;top:0;width:1.3em;height:1.5em;border:0;background:transparent;color:inherit;cursor:pointer;padding:0;font:inherit}
+.mlist .disc::before{content:'\25BE';opacity:.7}
+.mlist .disc[aria-expanded="false"]::before{content:'\25B8'}
+.mtree{list-style:none;margin:0;padding:0}
+.mtree > li{position:relative;display:block;padding-left:1.6em}
+.mtree > li::before{content:'';position:absolute;left:.35em;top:0;bottom:0;width:.8em;border-left:1px solid currentColor;opacity:.35}
+.mtree > li::after{content:'';position:absolute;left:.35em;top:.75em;width:.8em;border-top:1px solid currentColor;opacity:.35}
+.mtree > li:last-child::before{bottom:auto;height:.75em;border-bottom:1px solid currentColor;border-bottom-left-radius:.3em}
+.mtree > li:last-child::after{content:none}
+.msrc{cursor:default;border-radius:2px;text-decoration:underline dotted var(--tx3);text-underline-offset:2px}
+.msrc:hover{background:#E4B83C40}
+.hdoc .dh{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+.hdoc code{font-family:var(--mono)}
+.hdoc .codebox{margin-top:4px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r-sm);padding:6px 8px}
+.edlabel{display:flex;gap:6px;align-items:center;font:600 11px/1.5 var(--font);color:var(--tx2)}
+
+.dd{position:absolute;z-index:30;top:calc(100% + 4px);left:0;width:min(420px,100%);background:var(--surface);border:1px solid var(--bd2);border-radius:var(--r-md);box-shadow:var(--sh-dd);padding:4px;max-height:260px;overflow:auto}
+.opt{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:var(--r-sm);cursor:pointer}
+.opt.sel,.opt:hover{background:var(--hover)}
+.opt .nm{font:400 12px/1.5 var(--mono)}
+.opt .rt{margin-left:auto;display:flex;gap:4px}
+.grouphd{padding:6px 8px 2px;font:700 10px/1.5 var(--font);color:var(--tx2);text-transform:uppercase;letter-spacing:.05em}
+.ddhint{padding:4px 8px;font:400 11px/1.5 var(--font);color:var(--tx3);border-top:1px solid var(--bd);margin-top:4px}
+
+.problems{display:flex;flex-direction:column;gap:8px}
+.prob{border:1px solid #D6454540;background:var(--err-bg);border-radius:var(--r-md);padding:8px 10px}
+.prob .ph{display:flex;gap:8px;align-items:flex-start;font:600 12px/1.5 var(--font)}
+.dot{width:16px;height:16px;border-radius:50%;background:var(--err);color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 11px/1 var(--font);flex:none;margin-top:1px}
+.tree{margin:4px 0 0;padding:0 0 0 24px;list-style:none;font:400 12px/1.7 var(--font)}
+.tree li{position:relative;padding-left:14px}
+.tree li::before{content:"";position:absolute;left:0;top:0;bottom:50%;width:9px;border-left:1px solid var(--tx3);border-bottom:1px solid var(--tx3)}
+.tree li.g{padding-left:0;font-weight:600}
+.tree li.g::before{display:none}
+.ok{display:flex;gap:8px;align-items:center;color:var(--green-tx);font:600 12px/1.5 var(--font)}
+
+.card-def{border:1px solid var(--bd2);border-radius:var(--r-md);padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.codebox{font:400 12px/1.6 var(--mono);white-space:pre-wrap;word-break:break-word}
+
+.results{border:1px solid var(--bd);border-radius:var(--r-md);overflow:auto}
+.results table{border-collapse:collapse;width:100%;font:400 12px/1.5 var(--mono)}
+.results th{background:var(--bg);font:700 10px/1.5 var(--font);color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:7px 10px;border-bottom:1px solid var(--bd)}
+.results td{padding:7px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.results tr:last-child td{border-bottom:0}
+.empty{padding:14px 10px;color:var(--tx2);font:400 12px/1.5 var(--font)}
+
+.btn{padding:5px 10px;font:600 12px/1.4 var(--font);color:var(--tx2);background:var(--surface);border:1px solid var(--bd2);border-radius:var(--r-md);cursor:pointer}
+.btn:hover{color:var(--link);border-color:var(--bdi)}
+.chip{padding:3px 8px;font:400 12px/1.5 var(--mono);color:var(--tx);background:var(--bg);border:1px solid var(--bd2);border-radius:100px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--bdi)}
+.chip small{font:400 11px/1.4 var(--font);color:var(--tx2);margin-left:4px}
+.vdlist{display:flex;flex-direction:column;gap:2px}
+.vd{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-sm);cursor:pointer;border:1px solid transparent}
+.vd:hover{background:var(--hover)}
+.vd.on{border-color:var(--bdi);background:var(--focus)}
+.vd .nm{font:600 12px/1.5 var(--mono)}
+.vd .rt{margin-left:auto;display:flex;gap:4px}
+label.ck{display:flex;gap:8px;align-items:center;font:400 12px/1.5 var(--font);cursor:pointer}
+label.ck code{font-size:12px}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule{border:1px solid var(--bd);border-left:3px solid var(--bdi);border-radius:var(--r-md);padding:9px 11px;background:var(--bg)}
+.rule b{display:block;font:700 12px/1.5 var(--font);margin-bottom:2px}
+.rule span{font:400 12px/1.5 var(--font);color:var(--tx2)}
+.rule.open{border-left-color:var(--warn)}
+footer{padding:0 16px 24px;max-width:1240px;color:var(--tx2);font:400 11px/1.6 var(--font)}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .pagehead h1{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<div class="pagehead">
+  <h1>DataPrime: virtual datasets</h1>
+  <span class="tag t-host">DLI language tooling</span>
+  <div class="spacer"></div>
+  <span class="note">Interactive reference, 2026-10-12 · replaces the 09-09 Explore screen</span>
+</div>
+
+<div class="layout">
+  <div class="col">
+    <div class="card">
+      <div class="row"><h2>Query</h2><span class="spacer"></span>
+        <span class="note">Same in every DataPrime editor:</span>
+        <span class="tag t-host">Explore</span><span class="tag t-host">Dashboards</span><span class="tag t-host">Alerts</span><span class="tag t-host">API</span>
+      </div>
+      <p class="sub">Type a query. Write <code>source fin</code> to see autocomplete. Point at a red line, a marked name or a keyword to see the popup, as in the product.</p>
+      <div class="ed" id="qEd"><pre id="qPre"></pre><textarea id="qTa" spellcheck="false" autocomplete="off" aria-label="DataPrime query"></textarea><div class="dd" id="qDd" hidden></div></div>
+      <div class="row">
+        <button class="btn" id="clearBtn" title="Clear the query">✕ Clear</button>
+        <button class="btn" id="inlineBtn" hidden>Replace the name with its definition</button>
+        <button class="btn" id="undoInline" hidden>Back to the name</button>
+        <span class="note" id="inlineNote"></span>
+      </div>
+      <div class="problems" id="qProbs"></div>
+      <div class="row"><h3>Results</h3><span class="spacer"></span><span id="resMeta" class="row"></span></div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <div class="card">
+      <h2>Rules this mock follows</h2>
+      <div class="rules">
+        <div class="rule"><b>It is the language, not Explore</b><span>Autocomplete, the name mark and the errors come from DataPrime tooling. Every editor and the API get the same behavior.</span></div>
+        <div class="rule"><b>A virtual dataset is a full query</b><span>Any operator. It is read at query time, like a view. No schema tracking.</span></div>
+        <div class="rule"><b>Errors point at the name</b><span>A problem inside the definition shows on the virtual dataset as a whole. It never points at a source inside it.</span></div>
+        <div class="rule"><b>The virtual one is read first</b><span><code>source transactions</code> reads the virtual dataset. <code>source "transactions"</code>, in quotes, reads the dataset itself.</span></div>
+        <div class="rule"><b>No access to a source, no results</b><span>If the user cannot read a source inside the definition, the query does not run. Partial results are a later phase.</span></div>
+        <div class="rule open"><b>Open: definition on hover</b><span>This mock shows the full definition on hover to users who may view it. CX-41805 lists hover as not phase 1. The permission does not hide the definition everywhere yet; that is accepted for now.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <h2>Try</h2>
+      <div class="row" id="examples"></div>
+    </div>
+
+    <div class="card">
+      <h2>Virtual datasets</h2>
+      <p class="sub">Click one to edit its definition. Errors here point inside the definition, as in any query.</p>
+      <div class="vdlist" id="vdList"></div>
+      <div class="edlabel" id="defLabel"></div>
+      <div class="ed" id="dEd"><pre id="dPre"></pre><textarea id="dTa" spellcheck="false" autocomplete="off" aria-label="Virtual dataset definition"></textarea><div class="dd" id="dDd" hidden></div></div>
+      <div class="problems" id="dProbs"></div>
+    </div>
+
+    <div class="card">
+      <h2>This user can</h2>
+      <div id="access"></div>
+      <label class="ck"><input type="checkbox" id="canDef" checked> view virtual dataset definitions</label>
+      <p class="note">Point at a marked name. With this permission the popup shows the full definition and everything it reads. Without it, only the name and the result type.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Sources: Virtual Datasets sync 12-10 (Ievgen) · CX-41805 Q&amp;A as of 12-10 14:46 · Harel, Data Engine 11-10.
+  The dataset picker in Explore is Explore's own control and is not part of this mock.
+  The checker here is a small stand-in for the DataPrime parser. It is a reference for a design ticket, not production behavior.
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- catalog ---------- */
+var DS = {
+  'payments':             { et: 'logs',  f: { amount: 'number', currency: 'string', status: 'string', region: 'string', blocked: 'bool' } },
+  'transactions':         { et: 'logs',  f: { amount: 'number', currency: 'string', status: 'string', region: 'string', merchant: 'string' } },
+  'transactions-archive': { et: 'logs',  f: { amount: 'number', currency: 'string', status: 'string', region: 'string', merchant: 'string' } },
+  'compliance':           { et: 'logs',  f: { rule: 'string', status: 'string', region: 'string', blocked: 'number' } },
+  'eu-ledger':            { et: 'logs',  f: { amount: 'number', currency: 'string', status: 'string', region: 'string' } },
+  'spans':                { et: 'spans', f: { duration: 'number', service: 'string', status: 'string' } }
+};
+/* transactions shadows the dataset with the same name, so finance below reads the virtual one:
+   a virtual dataset inside a virtual dataset, next to two datasets. */
+var VDS = {
+  'finance':          'source payments, transactions, compliance',
+  'failed-by-region': "source payments, transactions | filter $d.status == 'failed' | countby $d.region",
+  'finance-eu':       "source finance, eu-ledger | filter $d.region == 'eu'",
+  'transactions':     'source "transactions", transactions-archive'
+};
+var VDNOTE = {
+  'finance':          'three datasets under one name',
+  'failed-by-region': 'two datasets, a filter and countby',
+  'finance-eu':       'a virtual dataset and a dataset',
+  'transactions':     'same name as a dataset: current plus archive'
+};
+var ACCESS = {};
+Object.keys(DS).forEach(function(k){ ACCESS[k] = true; });
+var canDef = true;
+var KW = ['source', 'filter', 'union', 'choose', 'limit', 'count', 'countby', 'groupby', 'aggregate'];
+
+/* ---------- checker ---------- */
+function splitStages(text, base){
+  var out = [], depth = 0, q = null, start = 0, i, c;
+  for (i = 0; i < text.length; i++){
+    c = text[i];
+    if (q){ if (c === q) q = null; continue; }
+    if (c === "'" || c === '"'){ q = c; continue; }
+    if (c === '(') depth++;
+    else if (c === ')') depth = Math.max(0, depth - 1);
+    else if (c === '|' && depth === 0){ out.push({ t: text.slice(start, i), s: base + start }); start = i + 1; }
+  }
+  out.push({ t: text.slice(start), s: base + start });
+  return out;
+}
+function newRes(){ return { schema: {}, ets: {}, errs: [], refs: [], noAccess: false }; }
+function typesOf(sf){ return Object.keys(sf.types); }
+function addField(schema, name, type, label, rng){
+  if (!schema[name]) schema[name] = { types: {}, from: [] };
+  schema[name].types[type] = true;
+  schema[name].from.push({ type: type, label: label, r: rng || null });
+}
+function it(t, r){ return { t: t, r: r || null }; }
+
+function evalQ(text, base, stack){
+  var r = newRes();
+  var stages = splitStages(text, base);
+  for (var i = 0; i < stages.length; i++){
+    var st = stages[i];
+    var lead = /^\s*/.exec(st.t)[0].length;
+    var tr = st.t.trim();
+    var s0 = st.s + lead, e0 = s0 + tr.length;
+    if (!tr){
+      if (stages.length > 1 || i > 0) r.errs.push({ s: Math.max(base, st.s - 1), e: st.s, msg: 'empty step after |' });
+      else r.errs.push({ s: base, e: base, msg: 'A query starts with source <name>', quiet: true });
+      continue;
+    }
+    if (i === 0){
+      var m = /^source\s+(.+)$/.exec(tr);
+      if (!m){ r.errs.push({ s: s0, e: e0, msg: 'A query starts with source <name>' }); return r; }
+      var parts0 = m[1].split(','), off0 = s0 + tr.indexOf(m[1], 6);
+      for (var q0 = 0; q0 < parts0.length; q0++){
+        var raw0 = parts0[q0], k0 = raw0.trim(), kS0 = off0 + raw0.indexOf(k0);
+        /* a name in quotes reads the dataset itself, never a virtual dataset with the same name */
+        var mm = /^(")?([A-Za-z0-9_-]+)(")?$/.exec(k0);
+        if (!mm || !!mm[1] !== !!mm[3]) r.errs.push({ s: kS0, e: kS0 + Math.max(k0.length, 1), msg: mm ? 'a quote is not closed' : 'expected a dataset name, like payments' });
+        else { var nS = kS0 + (mm[1] ? 1 : 0); resolve(r, mm[2], !!mm[1], nS, nS + mm[2].length, stack); }
+        off0 += raw0.length + 1;
+      }
+      r.srcCount = parts0.length;
+      if (r.errs.length) return r;
+      continue;
+    }
+    var mf, mc, mu, ml;
+    if ((mf = /^filter\s+(.*)$/.exec(tr))){
+      var ex = mf[1], exS = s0 + tr.indexOf(ex, 6);
+      var mk = /^\$d\.(\w+)\s*(==|!=|>=|<=|>|<)?\s*(.*)$/.exec(ex);
+      if (!mk){ r.errs.push({ s: exS, e: e0, msg: 'filter needs a condition, like $d.amount > 0' }); continue; }
+      var f = mk[1], kpE = exS + 3 + f.length, sf = r.schema[f];
+      if (!sf){ r.errs.push({ s: exS, e: kpE, msg: 'unknown keypath $d.' + f, tree: hintTree(r.schema) }); continue; }
+      var need = !mk[2] ? 'bool' : (/[<>]/.test(mk[2]) ? 'number' : null);
+      if (need){
+        var got = typesOf(sf);
+        if (got.length !== 1 || got[0] !== need){
+          var extra = r.refs.filter(function(rf){ return rf.v && sf.from.some(function(x){ return x.label.indexOf('virtual dataset ' + rf.name) >= 0; }); });
+          r.errs.push({ s: exS, e: kpE, extra: extra, msg: 'type mismatch: got ' + got.join(' or ') + ', expected ' + need,
+            tree: [ { head: need + ' is expected by:', items: [it('filter condition', { s: exS, e: e0 }), it('keypath at $d.' + f, { s: exS, e: kpE })] },
+                    { head: 'other types come from:', items: sf.from.filter(function(x){ return x.type !== need; }).map(function(x){ return it(x.type + ', ' + x.label, x.r); }) } ] });
+        }
+      }
+      continue;
+    }
+    if ((mc = /^choose\s+(.*)$/.exec(tr))){
+      var keep = {}, parts = mc[1].split(','), off = s0 + tr.indexOf(mc[1], 6), bad = false;
+      for (var p = 0; p < parts.length; p++){
+        var raw = parts[p], k = raw.trim(), kS = off + raw.indexOf(k);
+        var km = /^\$d\.(\w+)$/.exec(k);
+        if (!km){ r.errs.push({ s: kS, e: kS + k.length, msg: 'choose takes keypaths, like $d.amount' }); bad = true; }
+        else if (!r.schema[km[1]]){ r.errs.push({ s: kS, e: kS + k.length, msg: 'unknown keypath ' + k, tree: hintTree(r.schema) }); bad = true; }
+        else keep[km[1]] = r.schema[km[1]];
+        off += raw.length + 1;
+      }
+      if (!bad) r.schema = keep;
+      continue;
+    }
+    if ((mu = /^union\s*\(([\s\S]*)\)$/.exec(tr))){
+      var inS = s0 + tr.indexOf('(') + 1;
+      var sub = evalQ(mu[1], inS, stack);
+      r.errs = r.errs.concat(sub.errs); r.refs = r.refs.concat(sub.refs);
+      if (sub.noAccess) r.noAccess = true;
+      Object.keys(sub.schema).forEach(function(n){ sub.schema[n].from.forEach(function(x){ addField(r.schema, n, x.type, x.label, x.r); }); });
+      Object.keys(sub.ets).forEach(function(e){ r.ets[e] = true; });
+      continue;
+    }
+    var mcb = /^countby\s+\$d\.(\w+)$/.exec(tr) || /^groupby\s+\$d\.(\w+)\s+aggregate\s+count\(\)(?:\s+as\s+(\w+))?$/.exec(tr);
+    if (mcb){
+      var g = mcb[1], gS = s0 + tr.indexOf('$d.');
+      if (!r.schema[g]){ r.errs.push({ s: gS, e: gS + 3 + g.length, msg: 'unknown keypath $d.' + g, tree: hintTree(r.schema) }); continue; }
+      var gs = {}; gs[g] = r.schema[g];
+      addField(gs, mcb[2] || '_count', 'number', 'count of rows for each ' + g, { s: s0, e: e0 });
+      r.schema = gs;
+      continue;
+    }
+    if ((ml = /^limit\s+\d+$/.exec(tr))) continue;
+    if (tr === 'count'){ r.schema = {}; addField(r.schema, 'count', 'number', 'count'); continue; }
+    var w = tr.split(/\s+/)[0];
+    r.errs.push({ s: s0, e: s0 + w.length, msg: 'unknown operator ' + w, tree: [{ head: 'this mock knows:', items: [it('filter, choose, union (…), countby, groupby … aggregate count(), limit N, count')] }] });
+  }
+  return r;
+}
+function hintTree(schema){
+  var ks = Object.keys(schema);
+  return ks.length ? [{ head: 'available here:', items: [it(ks.map(function(k){ return '$d.' + k; }).join(', '))] }] : null;
+}
+function resolve(r, name, phys, s, e, stack){
+  if (!phys && VDS[name] != null){
+    r.refs.push({ s: s, e: e, name: name, v: true });
+    if (stack.indexOf(name) >= 0){ r.errs.push({ s: s, e: e, msg: 'loop: virtual dataset ' + name + ' uses itself' }); return; }
+    var sub = evalQ(VDS[name], 0, stack.concat(name));
+    if (sub.noAccess){
+      r.noAccess = true;
+      r.errs.push({ s: s, e: e, msg: 'You do not have access to all the data in ' + name + '. The query did not run.', kind: 'access' });
+      return;
+    }
+    if (sub.errs.length){
+      r.errs.push({ s: s, e: e, msg: 'virtual dataset ' + name + ' has an error in its definition', tree: [{ head: 'what to do:', items: [it('ask an admin to fix it on the Virtual datasets page')] }] });
+      return;
+    }
+    Object.keys(sub.schema).forEach(function(n){
+      typesOf(sub.schema[n]).forEach(function(t){ addField(r.schema, n, t, 'field ' + n + ' of virtual dataset ' + name, { s: s, e: e }); });
+    });
+    Object.keys(sub.ets).forEach(function(x){ r.ets[x] = true; });
+    return;
+  }
+  if (DS[name]){
+    r.refs.push({ s: s, e: e, name: name, v: false });
+    if (!ACCESS[name]){ r.noAccess = true; r.errs.push({ s: s, e: e, msg: 'You do not have access to dataset ' + name, kind: 'access' }); return; }
+    Object.keys(DS[name].f).forEach(function(n){ addField(r.schema, n, DS[name].f[n], 'keypath ' + n + ' of source ' + name, { s: s, e: e }); });
+    r.ets[DS[name].et] = true;
+    return;
+  }
+  r.errs.push({ s: s, e: e, msg: 'unknown dataset ' + name });
+}
+
+/* ---------- rendering ---------- */
+function esc(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function highlight(text, res, hl){
+  var n = text.length, cls = new Array(n), i, m;
+  for (i = 0; i < n; i++) cls[i] = '';
+  function mark(s, e, c){ for (var j = Math.max(0, s); j < Math.min(n, e); j++) cls[j] += ' ' + c; }
+  var re = /\b(source|filter|union|choose|limit|countby|count|groupby|aggregate)\b|\$d\.\w+|'[^']*'|"[^"]*"|\b\d+\b/g;
+  while ((m = re.exec(text))){
+    var t = m[0], c = /^\$d/.test(t) ? 'kp' : (/^'|^\d/.test(t) ? 'lit' : 'k');
+    mark(m.index, m.index + t.length, c);
+  }
+  res.refs.forEach(function(r){ if (r.v && r.s >= 0) mark(r.s, r.e, 'vr'); });
+  res.errs.forEach(function(er){
+    if (er.quiet) return;
+    mark(er.s, Math.max(er.e, er.s + 1), 'er');
+    (er.extra || []).forEach(function(x){ mark(x.s, x.e, 'er'); });
+  });
+  if (hl) mark(hl.s, hl.e, 'hl');
+  var out = '', cur = null, buf = '', bs = 0;
+  function flush(){ if (buf) out += '<span data-o="' + bs + '"' + (cur ? ' class="' + cur.trim() + '"' : '') + '>' + esc(buf) + '</span>'; }
+  for (i = 0; i < n; i++){
+    if (cls[i] !== cur){ flush(); buf = ''; cur = cls[i]; bs = i; }
+    buf += text[i];
+  }
+  flush();
+  return out + '\n';
+}
+function probsHTML(errs){
+  var shown = errs.filter(function(e){ return !e.quiet; });
+  if (!shown.length) return '';
+  return shown.map(function(e){
+    var tree = '';
+    if (e.tree) tree = '<ul class="tree">' + e.tree.map(function(g){
+      return '<li class="g">' + esc(g.head) + '</li>' + g.items.map(function(x){ return '<li>' + esc(x.t || x) + '</li>'; }).join('');
+    }).join('') + '</ul>';
+    return '<div class="prob"><div class="ph"><span class="dot">!</span><span>' + esc(e.msg) + '</span></div>' + tree + '</div>';
+  }).join('');
+}
+function etTags(ets){
+  var k = Object.keys(ets);
+  if (!k.length) return '';
+  if (k.length > 1) return '<span class="tag t-mixed">' + esc(k.join(' + ')) + '</span>';
+  return '<span class="tag t-' + esc(k[0]) + '">' + esc(k[0]) + '</span>';
+}
+function vdEts(name){ var r = evalQ(VDS[name], 0, [name]); return r.errs.length ? '' : etTags(r.ets); }
+
+var SAMPLE = { number: ['118', '42', '9031'], bool: ['true', 'false', 'true'], string: ['eu', 'ok', 'acme'] };
+var FS = { region: ['eu', 'us', 'apac'], status: ['failed', 'ok', 'failed'], currency: ['EUR', 'USD', 'GBP'], merchant: ['acme', 'globex', 'initech'],
+  rule: ['aml-1', 'kyc-3', 'aml-2'], service: ['checkout', 'auth', 'ledger'], amount: ['118', '42', '9031'], _count: ['37', '12', '5'], duration: ['120', '85', '310'] };
+function resultsHTML(res){
+  var cols = Object.keys(res.schema).slice(0, 4);
+  if (!cols.length) return '<div class="empty">No columns.</div>';
+  var agg = !!res.schema._count;  /* an aggregation returns groups, not timed rows */
+  var h = '<table><thead><tr>' + (agg ? '' : '<th>timestamp</th>') + cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  for (var r = 0; r < 3; r++){
+    h += '<tr>' + (agg ? '' : '<td style="color:var(--tx2)">' + ['12:04:11.220', '12:04:10.103', '12:04:09.861'][r] + '</td>');
+    cols.forEach(function(c){ var t = typesOf(res.schema[c])[r % typesOf(res.schema[c]).length]; h += '<td>' + esc(t !== 'bool' && FS[c] ? FS[c][r] : SAMPLE[t][r]) + '</td>'; });
+    h += '</tr>';
+  }
+  return h + '</tbody></table>';
+}
+
+/* ---------- editor wiring ---------- */
+function Editor(ids, opts){
+  var ta = document.getElementById(ids.ta), pre = document.getElementById(ids.pre), dd = document.getElementById(ids.dd);
+  var items = [], sel = 0, prefixStart = -1, quotedAc = false;
+  function size(){ ta.style.height = 'auto'; pre.style.minHeight = ''; var h = Math.max(pre.scrollHeight, ta.scrollHeight); pre.style.minHeight = h + 'px'; ta.style.height = h + 'px'; }
+  function acContext(){
+    var pos = ta.selectionStart, before = ta.value.slice(0, pos);
+    var m = /(?:^|[|(]\s*)source\s+(?:"?[A-Za-z0-9_-]+"?\s*,\s*)*("?)([A-Za-z0-9_-]*)$/.exec(before);
+    if (!m || ta.selectionStart !== ta.selectionEnd) return null;
+    return { prefix: m[2], start: pos - m[2].length, quoted: !!m[1] };
+  }
+  function buildAc(){
+    var ctx = acContext();
+    if (!ctx || document.activeElement !== ta){ dd.hidden = true; items = []; return; }
+    var p = ctx.prefix.toLowerCase();
+    var v = ctx.quoted ? [] : Object.keys(VDS).filter(function(n){ return n.indexOf(p) === 0; });
+    var d = Object.keys(DS).filter(function(n){ return n.indexOf(p) === 0 && ACCESS[n]; });
+    items = v.map(function(n){ return { n: n, v: true }; }).concat(d.map(function(n){ return { n: n, v: false }; }));
+    if (!items.length){ dd.hidden = true; return; }
+    if (items.length === 1 && items[0].n === ctx.prefix){ dd.hidden = true; return; }
+    prefixStart = ctx.start; quotedAc = ctx.quoted; sel = Math.min(sel, items.length - 1);
+    var h = '', idx = 0;
+    if (v.length){ h += '<div class="grouphd">Virtual datasets</div>'; v.forEach(function(n){ h += opt(n, true, idx++); }); }
+    if (d.length){ h += '<div class="grouphd">Datasets</div>'; d.forEach(function(n){ h += opt(n, false, idx++); }); }
+    h += '<div class="ddhint">Shows the entity type of the result. Datasets the user cannot read are not offered.</div>';
+    dd.innerHTML = h; dd.hidden = false;
+  }
+  function opt(n, v, i){
+    var tags = v ? '<span class="tag t-virtual">virtual</span>' + vdEts(n) : '<span class="tag t-' + DS[n].et + '">' + DS[n].et + '</span>';
+    if (v && DS[n]) tags += '<span class="tag t-host" title="A dataset has the same name">shadows a dataset</span>';
+    return '<div class="opt' + (i === sel ? ' sel' : '') + '" data-i="' + i + '"><span class="nm">' + esc(n) + '</span><span class="rt">' + tags + '</span></div>';
+  }
+  function pick(i){
+    var it = items[i]; if (!it) return;
+    var pos = ta.selectionStart, val = ta.value;
+    var ins = it.n + (quotedAc ? '" ' : ' ');
+    ta.value = val.slice(0, prefixStart) + ins + val.slice(pos).replace(/^[A-Za-z0-9_-]*"?\s?/, '');
+    var c = prefixStart + ins.length; ta.setSelectionRange(c, c);
+    dd.hidden = true; items = []; sel = 0; refresh();
+  }
+  dd.addEventListener('mousedown', function(e){ var o = e.target.closest('.opt'); if (o){ e.preventDefault(); pick(+o.getAttribute('data-i')); } });
+  ta.addEventListener('keydown', function(e){
+    if (dd.hidden || !items.length) return;
+    if (e.key === 'ArrowDown'){ e.preventDefault(); sel = (sel + 1) % items.length; buildAc(); }
+    else if (e.key === 'ArrowUp'){ e.preventDefault(); sel = (sel - 1 + items.length) % items.length; buildAc(); }
+    else if (e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); pick(sel); }
+    else if (e.key === 'Escape'){ dd.hidden = true; }
+  });
+  ta.addEventListener('keydown', function(e){ if (e.key === 'Enter' && dd.hidden) e.preventDefault(); });
+  var api = { ta: ta, pre: pre, res: newRes(), text: '' };
+  function refresh(){
+    hClose();
+    api.text = ta.value;
+    api.res = opts.onChange(ta.value);
+    api.repaint(null);
+    size(); buildAc();
+  }
+  api.repaint = function(hl){ pre.innerHTML = highlight(api.text, api.res, hl); };
+  api.set = function(v){ ta.value = v; refresh(); };
+  api.size = size;
+  ta.addEventListener('input', function(){ sel = 0; refresh(); });
+  ['click', 'keyup', 'focus'].forEach(function(ev){ ta.addEventListener(ev, function(e){ if (ev === 'keyup' && /Arrow(Up|Down)|Enter|Tab|Escape/.test(e.key) && !dd.hidden) return; buildAc(); }); });
+  ta.addEventListener('blur', function(){ setTimeout(function(){ dd.hidden = true; }, 120); });
+  window.addEventListener('resize', size);
+  /* hover: rest 150ms on the text to open, 150ms grace to reach the popup */
+  ta.addEventListener('mousemove', function(e){
+    clearTimeout(H.closeT); clearTimeout(H.openT);
+    var x = e.clientX, y = e.clientY;
+    H.openT = setTimeout(function(){ hQuery(api, x, y); }, HOVER_MS);
+  });
+  ta.addEventListener('mouseleave', function(){ clearTimeout(H.openT); hScheduleClose(); });
+  ta.addEventListener('mousedown', hClose);
+  return api;
+}
+
+/* ---------- hover popup (after cx-ui code-editor: hover-controller + hover-overlay) ---------- */
+var HOVER_MS = 150, CLOSE_MS = 150;
+var H = { ed: null, openT: null, closeT: null, key: null };
+var pop = document.createElement('div');
+pop.className = 'hpop'; pop.hidden = true; pop.setAttribute('role', 'tooltip');
+document.body.appendChild(pop);
+function escA(t){ return esc(String(t)).replace(/"/g, '&quot;'); }
+function hClose(){
+  clearTimeout(H.openT); clearTimeout(H.closeT);
+  if (!pop.hidden){ pop.hidden = true; if (H.ed) H.ed.repaint(null); }
+  H.ed = null; H.key = null;
+}
+function hScheduleClose(){ clearTimeout(H.closeT); H.closeT = setTimeout(hClose, CLOSE_MS); }
+pop.addEventListener('mouseenter', function(){ clearTimeout(H.closeT); });
+pop.addEventListener('mouseleave', hScheduleClose);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') hClose(); });
+window.addEventListener('scroll', function(e){ if (!pop.contains(e.target)) hClose(); }, true);
+
+function offsetAt(ed, x, y){
+  ed.ta.style.pointerEvents = 'none'; ed.pre.style.pointerEvents = 'auto';
+  var el = document.elementFromPoint(x, y), off = null;
+  if (el && ed.pre.contains(el) && el.hasAttribute && el.hasAttribute('data-o')){
+    var rg = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null;
+    var inner = 0;
+    if (rg && rg.startContainer && el.contains(rg.startContainer)) inner = rg.startOffset;
+    else if (document.caretPositionFromPoint){ var cp = document.caretPositionFromPoint(x, y); if (cp && el.contains(cp.offsetNode)) inner = cp.offset; }
+    off = +el.getAttribute('data-o') + inner;
+  }
+  ed.ta.style.pointerEvents = ''; ed.pre.style.pointerEvents = '';
+  return off === null ? null : { off: off, rect: el.getBoundingClientRect() };
+}
+var DOCS = {
+  source: 'Sets what the query reads. A virtual dataset name runs its definition in its place.',
+  filter: 'Keeps only the rows where the condition is true.',
+  union: 'Adds the rows of another query to this one.',
+  choose: 'Keeps only the listed keypaths.',
+  limit: 'Returns at most N rows.',
+  count: 'Returns the number of rows.',
+  countby: 'Counts the rows for each value of a keypath.',
+  groupby: 'Groups rows by a keypath and runs an aggregation on each group.',
+  aggregate: 'The aggregation groupby runs, like count().'
+};
+function kwAt(text, off){
+  var a = off, b = off;
+  while (a > 0 && /[a-z]/.test(text[a - 1])) a--;
+  while (b < text.length && /[a-z]/.test(text[b])) b++;
+  var w = text.slice(a, b);
+  return DOCS[w] ? { w: w, s: a } : null;
+}
+function errSec(er){
+  var h = '<div class="hsec"><div class="hmsg"><span class="sev"><i>!</i></span>' +
+    '<button type="button" class="cp" title="Copy" data-copy="' + escA(er.msg) + '">⧉</button>' + esc(er.msg) + '</div>';
+  if (er.tree) h += '<ul class="mlist">' + er.tree.map(function(g){
+    return '<li><button type="button" class="disc" aria-expanded="true"></button><div>' + esc(g.head) + '</div><ul class="mtree">' +
+      g.items.map(function(x){
+        var t = esc(x.t || x);
+        return '<li>' + (x.r ? '<span class="msrc" data-s="' + x.r.s + '" data-e="' + x.r.e + '">' + t + '</span>' : t) + '</li>';
+      }).join('') + '</ul></li>';
+  }).join('') + '</ul>';
+  return h + '</div>';
+}
+var LBL = 'style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--tx2);margin-top:8px;display:block"';
+/* What a virtual dataset reads, all the way down: nested virtual datasets open into their own sources. */
+function readsTree(name, stack){
+  var refs = evalQ(VDS[name], 0, stack).refs;
+  return '<ul class="mtree">' + refs.map(function(r){
+    if (r.v){
+      var loop = stack.indexOf(r.name) >= 0;
+      return '<li><span class="vr">' + esc(r.name) + '</span> <span class="note">virtual dataset' + (loop ? ', loop' : '') + '</span>' +
+        (loop ? '' : readsTree(r.name, stack.concat(r.name))) + '</li>';
+    }
+    return '<li><code>' + (VDS[r.name] != null ? '"' + esc(r.name) + '"' : esc(r.name)) + '</code> <span class="note">dataset' + (VDS[r.name] != null ? ', the one with the same name' : '') + '</span></li>';
+  }).join('') + '</ul>';
+}
+function vdSec(name){
+  var h = '<div class="hsec hdoc"><div class="dh"><span class="tag t-virtual">virtual dataset</span><code>' + esc(name) + '</code>' + vdEts(name) + '</div>';
+  if (DS[name]) h += '<div class="sub">It has the same name as a dataset. Write <code>source "' + esc(name) + '"</code>, in quotes, to read the dataset.</div>';
+  if (canDef){
+    var def = VDS[name], res = evalQ(def, 0, [name]);
+    h += '<b ' + LBL + '>Definition</b><div class="codebox">' + highlight(def, res, null).replace(/\n$/, '') + '</div>' +
+      '<b ' + LBL + '>Reads</b>' + readsTree(name, [name]) +
+      '<div class="note" style="margin-top:6px">⌘ click opens it on the Virtual datasets page.</div>';
+  } else {
+    h += '<div class="sub">The query runs its definition in this place. You do not have permission to view the definition.</div>';
+  }
+  return h + '</div>';
+}
+function docSec(w){ return '<div class="hsec hdoc"><div class="dh"><code class="k">' + w + '</code></div><div>' + esc(DOCS[w]) + '</div></div>'; }
+function sectionsAt(ed, off){
+  var res = ed.res, secs = [], key = [];
+  res.errs.forEach(function(er, i){
+    if (er.quiet) return;
+    var rs = [{ s: er.s, e: Math.max(er.e, er.s + 1) }].concat(er.extra || []);
+    if (rs.some(function(r){ return off >= r.s && off < r.e; })){ secs.push(errSec(er)); key.push('e' + i); }
+  });
+  /* an error hides the reference docs beside it (hideDocsOnError, as the DataPrime editor sets it) */
+  if (!secs.length){
+    var ref = res.refs.filter(function(r){ return r.v && off >= r.s && off < r.e; })[0];
+    if (ref){ secs.push(vdSec(ref.name)); key.push('v' + ref.s); }
+    else { var kw = kwAt(ed.text, off); if (kw){ secs.push(docSec(kw.w)); key.push('k' + kw.s); } }
+  }
+  return { html: secs.join(''), key: key.join(',') };
+}
+function hQuery(ed, x, y){
+  var hit = offsetAt(ed, x, y);
+  if (!hit){ hScheduleClose(); return; }
+  var sec = sectionsAt(ed, hit.off);
+  if (!sec.html){ hScheduleClose(); return; }
+  clearTimeout(H.closeT);
+  if (H.ed === ed && H.key === sec.key && !pop.hidden) return;
+  if (H.ed && H.ed !== ed) H.ed.repaint(null);
+  H.ed = ed; H.key = sec.key;
+  pop.innerHTML = sec.html; pop.hidden = false;
+  /* placement 'below', pushed back into the viewport rather than flipped */
+  var w = pop.offsetWidth, h = pop.offsetHeight;
+  pop.style.left = Math.max(8, Math.min(hit.rect.left, innerWidth - w - 8)) + 'px';
+  pop.style.top = Math.max(8, Math.min(hit.rect.bottom + 4, innerHeight - h - 8)) + 'px';
+}
+pop.addEventListener('mouseover', function(e){
+  var m = e.target.closest('.msrc');
+  if (m && H.ed) H.ed.repaint({ s: +m.getAttribute('data-s'), e: +m.getAttribute('data-e') });
+});
+pop.addEventListener('mouseout', function(e){
+  var m = e.target.closest('.msrc');
+  if (m && H.ed && !(e.relatedTarget && m.contains(e.relatedTarget))) H.ed.repaint(null);
+});
+pop.addEventListener('click', function(e){
+  var d = e.target.closest('.disc');
+  if (d){
+    var open = d.getAttribute('aria-expanded') !== 'false';
+    d.setAttribute('aria-expanded', open ? 'false' : 'true');
+    d.parentNode.querySelector('.mtree').hidden = open;
+    return;
+  }
+  var c = e.target.closest('.cp');
+  if (c){
+    try { navigator.clipboard.writeText(c.getAttribute('data-copy')); } catch (err) {}
+    c.textContent = '✓'; setTimeout(function(){ c.textContent = '⧉'; }, 900);
+  }
+});
+
+/* ---------- query side ---------- */
+var lastRes = null, beforeInline = null;
+var q = Editor({ ta: 'qTa', pre: 'qPre', dd: 'qDd' }, {
+  onChange: function(v){
+    var res = evalQ(v, 0, []);
+    lastRes = res;
+    document.getElementById('qProbs').innerHTML = probsHTML(res.errs);
+    var ok = !res.errs.length;
+    document.getElementById('results').innerHTML = !v.trim() ? '<div class="empty">Type a query to see results.</div>' : (ok ? resultsHTML(res) : '<div class="empty">The query did not run.</div>');
+    var first = res.refs[0], meta = '';
+    if (ok){
+      meta = etTags(res.ets);
+      if (first) meta += '<span class="note">from ' + (first.v ? 'virtual dataset ' : 'dataset ') + '<code>' + esc(first.name) + '</code></span>';
+    }
+    document.getElementById('resMeta').innerHTML = meta;
+    var vfirst = res.refs.filter(function(r){ return r.v; })[0];
+    var ib = document.getElementById('inlineBtn');
+    ib.hidden = !vfirst || beforeInline !== null || res.srcCount !== 1;
+    ib.setAttribute('data-name', vfirst ? vfirst.name : '');
+    document.getElementById('undoInline').hidden = beforeInline === null;
+    if (beforeInline === null) document.getElementById('inlineNote').textContent = vfirst ? 'Shows how errors look without a virtual dataset.' : '';
+    return res;
+  }
+});
+document.getElementById('inlineBtn').addEventListener('click', function(){
+  var name = this.getAttribute('data-name'), v = q.ta.value;
+  var r = lastRes.refs.filter(function(x){ return x.v && x.name === name; })[0];
+  if (!r) return;
+  var before = v.slice(0, r.s), m = /source\s+$/.exec(before);
+  if (!m) return;
+  beforeInline = v;
+  var start = r.s - m[0].length;
+  document.getElementById('inlineNote').textContent = 'Without the name, the error points inside the query, at the source it comes from.';
+  q.set(v.slice(0, start) + VDS[name] + v.slice(r.e));
+});
+document.getElementById('clearBtn').addEventListener('click', function(){
+  beforeInline = null; q.set(''); q.ta.focus();
+});
+document.getElementById('undoInline').addEventListener('click', function(){
+  var v = beforeInline; beforeInline = null; q.set(v);
+});
+
+/* ---------- definition side ---------- */
+var editing = 'finance';
+var d = Editor({ ta: 'dTa', pre: 'dPre', dd: 'dDd' }, {
+  onChange: function(v){
+    VDS[editing] = v;
+    var res = evalQ(v, 0, [editing]);
+    document.getElementById('dProbs').innerHTML = res.errs.length ? probsHTML(res.errs) : '<div class="ok">✓ Valid. Result: ' + etTags(res.ets) + '</div>';
+    renderList();
+    if (q){ q.set(q.ta.value); }
+    return res;
+  }
+});
+function renderList(){
+  document.getElementById('vdList').innerHTML = Object.keys(VDS).map(function(n){
+    var bad = evalQ(VDS[n], 0, [n]).errs.length;
+    return '<div class="vd' + (n === editing ? ' on' : '') + '" data-n="' + esc(n) + '"><span class="nm">' + esc(n) + '</span><span class="rt">' +
+      (DS[n] ? '<span class="tag t-host">shadows a dataset</span>' : '') + (bad ? '<span class="tag" style="background:var(--err-bg);color:var(--err)">error</span>' : vdEts(n)) + '</span></div>' +
+      (VDNOTE[n] ? '<div class="note" style="padding:0 8px 4px">' + esc(VDNOTE[n]) + '</div>' : '');
+  }).join('');
+  document.getElementById('defLabel').innerHTML = 'Definition of <code>' + esc(editing) + '</code> · DataPrime mode';
+}
+document.getElementById('vdList').addEventListener('click', function(e){
+  var row = e.target.closest('.vd'); if (!row) return;
+  editing = row.getAttribute('data-n'); d.set(VDS[editing]);
+});
+
+/* ---------- access ---------- */
+document.getElementById('access').innerHTML = Object.keys(DS).map(function(n){
+  return '<label class="ck"><input type="checkbox" data-ds="' + esc(n) + '" checked> read dataset <code>' + esc(n) + '</code></label>';
+}).join('');
+document.getElementById('access').addEventListener('change', function(e){
+  var n = e.target.getAttribute('data-ds'); if (!n) return;
+  ACCESS[n] = e.target.checked; d.set(VDS[editing]);
+});
+document.getElementById('canDef').addEventListener('change', function(e){
+  canDef = e.target.checked; hClose();
+});
+
+/* ---------- examples ---------- */
+var EX = [
+  ["source finance | filter $d.status == 'failed'", 'three datasets under one name'],
+  ['source finance | countby $d.region', 'an operator on top of them'],
+  ['source failed-by-region | filter $d._count > 10', 'the operator is inside the definition'],
+  ['source finance-eu | limit 10', 'virtual inside virtual, plus a dataset'],
+  ['source transactions | filter $d.amount > 100', 'same name: reads current and archive'],
+  ['source "transactions" | filter $d.amount > 100', 'in quotes: the dataset itself only'],
+  ['source finance, spans | limit 5', 'a virtual dataset and a dataset in one source'],
+  ['source finance | filter $d.blocked', 'type error, shown on the name']
+];
+document.getElementById('examples').innerHTML = EX.map(function(x, i){
+  return '<button class="chip" data-i="' + i + '">' + esc(x[0]) + '<small>' + esc(x[1]) + '</small></button>';
+}).join('') + '<p class="note">Untick <code>transactions-archive</code> under "This user can". <code>source finance</code> then fails on the name, two levels up: finance reads transactions, which reads the archive.</p>';
+document.getElementById('examples').addEventListener('click', function(e){
+  var b = e.target.closest('.chip'); if (!b) return;
+  beforeInline = null; q.set(EX[+b.getAttribute('data-i')][0]); q.ta.focus();
+});
+
+/* ---------- start ---------- */
+d.set(VDS[editing]);
+var start = new URLSearchParams(location.search).get('q');
+q.set(start || EX[0][0]);
+})();
+</script>
+</body>
+</html>
