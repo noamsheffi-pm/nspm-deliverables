@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Datasets</title>
+<style>
+/* Tokens from cx-web-workspace/libs/cx-ui/theme/tokens.json (light, CX brand) */
+:root{
+  --c-background-surface-primary:#F8FAFC;
+  --c-background-surface-secondary:#FFFFFF;
+  --c-background-card:#FFFFFF;
+  --c-background-hover:#0000000D;
+  --c-background-focus:#E6FFF2;
+  --c-background-label:#DBE9FD;
+  --c-background-overlay:rgba(9,7,25,.5);
+  --c-text-primary:#1C1C1C;
+  --c-text-secondary:#68686D;
+  --c-text-placeholder:#D0D0D3;
+  --c-text-interactive:#029449;
+  --c-text-on-color:#FFFFFF;
+  --c-text-error:#EB6166;
+  --c-border-subtle:#ECECEE;
+  --c-border-strong:#DEDEE0;
+  --c-border-interactive:#029449;
+  --c-button-primary:#02763A;
+  --c-button-primary-hover:#029449;
+  --c-icon-primary:#68686D;
+  --c-icon-warning:#E4B83C;
+  --c-chip-label:#DBE9FD;
+  --c-tag-lightgrey-bg:#C9D1D933;
+  --c-tag-lightgrey-tx:#323D4E;
+  --c-tag-blue-bg:#5095ED33;
+  --c-tag-blue-tx:#1E6F81;
+  --c-tag-green-bg:#3CC67E33;
+  --c-tag-green-tx:#24734B;
+  --r-sm:4px; --r-md:6px; --r-lg:8px;
+  --font:'Nunito Sans',Helvetica,Roboto,Arial,sans-serif;
+  --mono:'Inconsolata',monospace;
+  --shadow-dropdown:0 5px 10px 0 rgba(33,43,59,.1);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{background:var(--c-background-surface-primary);color:var(--c-text-primary);font:400 12px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,p{margin:0}
+code{font:400 12px/1.5 var(--mono);color:var(--c-text-primary);background:var(--c-background-surface-primary);padding:0 4px;border-radius:var(--r-sm)}
+
+.pagehead{background:var(--c-background-surface-secondary);padding-top:12px}
+.pagehead .row{display:flex;align-items:center;padding:0 16px}
+.pagehead h1{font:600 20px/1.5 var(--font)}
+.pagehead .spacer{flex:1}
+.tabs{display:flex;gap:8px;padding:0 16px;height:32px;border-bottom:1px solid var(--c-border-subtle);margin-top:10px}
+.tab{position:relative;padding:4px 8px;font:600 12px/1.5 var(--font);color:var(--c-text-secondary);background:none;border:none;cursor:pointer;font-family:var(--font)}
+.tab:hover,.tab.on{color:var(--c-text-interactive)}
+.tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--c-border-interactive)}
+main{padding:16px}
+
+.card{background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:16px}
+.titlesec{display:flex;align-items:flex-start;gap:16px}
+.titlesec .txt{width:min(100%,800px);display:flex;flex-direction:column;gap:4px}
+.titlesec h2{font:600 16px/1.5 var(--font);display:flex;align-items:center;gap:8px}
+.titlesec p{font:600 12px/1.5 var(--font);color:var(--c-text-secondary)}
+.titlesec .spacer{flex:1}
+.cnt{font:400 12px/1.5 var(--font);color:var(--c-text-secondary)}
+
+.btn{min-height:32px;min-width:80px;padding:2px 8px;border-radius:var(--r-md);font:600 12px/1.5 var(--font);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--c-text-primary);font-family:var(--font)}
+.btn:active{transform:scale(.99)}
+.btn-solid{background:var(--c-button-primary);color:var(--c-text-on-color);border-color:var(--c-button-primary)}
+.btn-solid:hover{background:var(--c-button-primary-hover)}
+.btn-solid:disabled{background:var(--c-border-strong);border-color:var(--c-border-strong);cursor:not-allowed}
+.btn-outline{border-color:var(--c-border-subtle)}
+.btn-outline:hover{background:var(--c-background-hover)}
+.btn-ghost{border-color:transparent}
+.btn-ghost:hover{background:var(--c-background-hover)}
+.btn-icon{min-width:32px;width:32px;height:32px;padding:0;color:var(--c-icon-primary);font-size:15px}
+.btn-icon:hover{color:var(--c-text-interactive)}
+.btn-icon.blocked{color:var(--c-text-placeholder);cursor:not-allowed}
+.btn-icon.blocked:hover{color:var(--c-text-placeholder);background:transparent}
+.btn-link{min-width:0;min-height:0;padding:0;color:var(--c-text-interactive);font:400 12px/1.5 var(--font);border:none}
+
+.notice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:12px;background:var(--c-background-surface-secondary)}
+.notice .ic{color:var(--c-icon-warning);font-size:14px;line-height:1.3;flex:0 0 auto}
+.notice .bd{display:flex;flex-direction:column;gap:4px;color:var(--c-text-secondary)}
+.notice b{color:var(--c-text-primary);font-weight:600}
+
+.grid{border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);overflow:hidden}
+.gtoolbar{height:48px;display:flex;align-items:center;padding:0 8px;border-bottom:1px solid var(--c-border-subtle)}
+.search{width:min(600px,100%);height:32px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:0 8px;font:400 12px/1.5 var(--font);color:var(--c-text-primary)}
+.search::placeholder{color:var(--c-text-placeholder)}
+.search:focus{outline:none;border-color:var(--c-border-interactive)}
+.gtoolbar .spacer{flex:1}
+.fchips{display:flex;gap:4px}
+.fchip{height:24px;padding:0 8px;border-radius:var(--r-sm);border:1px solid var(--c-border-subtle);background:transparent;color:var(--c-text-secondary);font:400 12px/1.5 var(--font);cursor:pointer}
+.fchip.on{background:var(--c-background-label);color:var(--c-tag-lightgrey-tx);border-color:var(--c-background-label)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1080px}
+thead th{height:32px;text-align:left;padding:0 8px;font:400 12px/1.5 var(--font);color:var(--c-text-secondary);background:var(--c-background-surface-secondary);border-bottom:1px solid var(--c-border-subtle);white-space:nowrap}
+tbody td{height:44px;padding:0 8px;border-bottom:1px solid var(--c-border-subtle);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.data{cursor:pointer}
+tbody tr.data:hover{background:var(--c-background-hover)}
+tbody tr.grp td{height:30px;background:var(--c-background-surface-primary);color:var(--c-text-secondary);font-weight:600}
+.nm{font:400 12px/1.5 var(--mono);color:var(--c-text-primary)}
+.sub{color:var(--c-text-secondary);line-height:1.35;margin-top:1px}
+.pat{font:400 12px/1.5 var(--mono);color:var(--c-tag-blue-tx)}
+.badge{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--r-sm);font:400 12px/1.5 var(--font);white-space:nowrap}
+.b-cx{background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx)}
+.b-custom{background:var(--c-tag-lightgrey-bg);color:var(--c-text-secondary)}
+.count{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--c-text-interactive);flex:0 0 6px}
+.count span{color:var(--c-text-secondary)}
+.refs{color:var(--c-text-secondary)}
+.acts{text-align:right;white-space:nowrap}
+tbody tr.data .acts .btn-icon{opacity:0;transition:opacity .1s}
+tbody tr.data:hover .acts .btn-icon{opacity:1}
+
+.scrim{position:fixed;inset:0;background:var(--c-background-overlay);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:75%;min-width:560px;max-width:98vw;background:var(--c-background-surface-primary);transform:translateX(100%);transition:transform .2s ease;z-index:50;display:flex;flex-direction:column}
+.drawer.on{transform:translateX(0)}
+.drawer.resizing{transition:none;user-select:none}
+.dgrip{position:absolute;top:0;left:0;width:6px;height:100%;cursor:col-resize;z-index:2}
+.dgrip::after{content:"";position:absolute;top:0;left:2px;width:2px;height:100%;background:transparent;transition:background .12s}
+.dgrip:hover::after,.drawer.resizing .dgrip::after{background:var(--c-border-interactive)}
+.dhead{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--c-border-subtle);background:var(--c-background-surface-secondary)}
+.dhead .lead{display:flex;align-items:center;gap:8px;min-width:0}
+.dhead h2{font:600 16px/1.5 var(--font);white-space:nowrap}
+.dbody{flex:1;display:flex;min-height:0;justify-content:center}
+.dform{flex:1 1 52%;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;min-width:0}
+.sub-card{background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:16px}
+.sub-card>.st{font:600 16px/1.5 var(--font)}
+.warncard{display:flex;gap:8px;align-items:flex-start;background:var(--c-background-card);border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);padding:12px;color:var(--c-text-secondary)}
+.warncard.err{border-color:var(--c-text-error);background:#FDF0F1}
+.warncard .ic{flex:0 0 auto;line-height:1.3;color:var(--c-icon-warning)}
+.warncard.err .ic{color:var(--c-text-error)}
+.warncard b{color:var(--c-text-primary);font-weight:600}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{display:flex;align-items:center;gap:2px;font:400 12px/1.5 var(--font);color:var(--c-text-primary)}
+.field label .req{color:var(--c-text-error)}
+.field label .opt{color:var(--c-text-placeholder)}
+.input{width:100%;height:32px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:0 8px;font:400 12px/1.5 var(--font);color:var(--c-text-primary);background:#fff}
+.input.mono{font-family:var(--mono)}
+.input:focus{outline:none;border-color:var(--c-border-interactive)}
+textarea.input{height:auto;min-height:76px;padding:8px;line-height:1.6;resize:vertical}
+.hint{color:var(--c-text-secondary)}
+.hint .det{color:var(--c-text-interactive);font-weight:600}
+.err{color:var(--c-text-error)}
+.seg{display:flex;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);overflow:hidden;width:fit-content}
+.seg button{height:32px;padding:0 12px;border:none;border-right:1px solid var(--c-border-subtle);background:#fff;color:var(--c-text-secondary);font:400 12px/1.5 var(--font);cursor:pointer}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:var(--c-background-hover)}
+.seg button.on{background:var(--c-button-primary);color:var(--c-text-on-color);font-weight:600}
+
+.picker{position:relative}
+.pickctl{width:100%;min-height:32px;display:flex;align-items:center;gap:8px;padding:4px 8px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);background:#fff;font:400 12px/1.5 var(--font);color:var(--c-text-primary);cursor:pointer;text-align:left}
+.pickctl.open{border-color:var(--c-border-interactive)}
+.picksel{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.picksel .ph{color:var(--c-text-placeholder)}
+.picksel .chip{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--r-md);background:var(--c-chip-label);border:1px solid var(--c-border-subtle);font-family:var(--mono);max-width:200px}
+.picksel .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picksel .chip b{cursor:pointer;color:var(--c-icon-primary);font-weight:400}
+.picksel .chip b:hover{color:var(--c-text-error)}
+.caret{color:var(--c-icon-primary)}
+.pickpanel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:5;background:#fff;border:1px solid var(--c-border-subtle);border-radius:var(--r-lg);box-shadow:var(--shadow-dropdown);overflow:hidden}
+.picksearch{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--c-border-subtle)}
+.picksearch input{flex:1;border:none;outline:none;font:400 12px/1.5 var(--font)}
+.picksearch input::placeholder{color:var(--c-text-placeholder)}
+.picklist{max-height:220px;overflow-y:auto}
+.pickrow{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;cursor:pointer}
+.pickrow:hover{background:var(--c-background-hover)}
+.pickrow.sel{background:var(--c-background-focus)}
+.cb{width:14px;height:14px;flex:0 0 14px;border:1px solid var(--c-border-strong);border-radius:3px;display:grid;place-items:center;font-size:10px;color:#fff;background:#fff}
+.pickrow.sel .cb,label.on .cb{background:var(--c-button-primary);border-color:var(--c-button-primary)}
+.pickrow .dn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
+.pickrow .et{color:var(--c-text-secondary);white-space:nowrap}
+.pickfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--c-border-subtle)}
+.pickfoot label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.pickfoot .divider{width:1px;height:14px;background:var(--c-border-subtle)}
+.patrow{display:flex;gap:8px;align-items:center}
+.patrow select{flex:0 0 auto;width:auto;min-width:132px}
+.patrow input{flex:1;min-width:0}
+
+.syntax{border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:8px;background:var(--c-background-surface-primary);font:400 12px/1.6 var(--mono);word-break:break-all}
+.syntax .eq{display:block;margin-top:6px;color:var(--c-text-secondary)}
+
+/* ---- v5 additions ---- */
+.pin{display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 6px;border-radius:9px;font:700 10px/1 var(--font);white-space:nowrap;vertical-align:middle;cursor:help}
+.pin.h{background:#FFE9A8;color:#6B4E00;border:1px solid #E4B83C}
+.pin.r{background:#E3DAFF;color:#43308F;border:1px solid #9B87E6}
+.pin.o{background:#FDE2E3;color:#9C2A2F;border:1px solid #EB6166}
+body.nonotes .pin,body.nonotes .pinlbl,body.nonotes .notecard{display:none !important}
+.notecard{border:1px dashed #E4B83C;background:#FFFBEA;border-radius:var(--r-lg);padding:10px 12px;color:var(--c-text-primary);display:flex;flex-direction:column;gap:4px}
+.notecard b{font-weight:700}
+.tagv{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:var(--r-sm);font:600 11px/1 var(--font);background:var(--c-tag-blue-bg);color:var(--c-tag-blue-tx);margin-left:6px}
+.tagp{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:var(--r-sm);font:600 11px/1 var(--font);background:var(--c-tag-lightgrey-bg);color:var(--c-tag-lightgrey-tx);margin-left:6px}
+.tags{background:#FFF3D6;color:#8A5A00}
+.dform{max-width:720px}
+.drawer{width:720px;min-width:0}
+.condrow{display:flex;gap:8px;align-items:flex-start}
+.condrow>select{width:140px;flex:0 0 140px}
+.condrow .grow{flex:1;min-width:0}
+.trash{border:none;background:none;color:var(--c-icon-primary);cursor:pointer;height:32px;width:28px}
+.trash:disabled{color:var(--c-text-placeholder);cursor:not-allowed}
+.linkbtn{border:none;background:none;color:var(--c-text-interactive);font:600 12px/1.5 var(--font);cursor:pointer;padding:0;display:inline-flex;gap:4px;align-items:center}
+.linkbtn:disabled{color:var(--c-text-placeholder);cursor:not-allowed}
+.rowbetween{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.code{width:100%;min-height:150px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:8px;font:400 12px/1.6 var(--mono);resize:vertical;background:#fff}
+.code:focus{outline:none;border-color:var(--c-border-interactive)}
+.info{display:flex;gap:8px;align-items:flex-start;border:1px solid #BFD6F6;background:#F1F7FE;border-radius:var(--r-lg);padding:10px 12px;color:var(--c-text-primary)}
+.info .ic{color:#1E6F81}
+.polrow{display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center}
+.rule{display:grid;grid-template-columns:1fr 190px 150px 28px;gap:8px;align-items:center}
+.rule select{font-weight:600}
+.pickfoot{gap:10px !important;flex-wrap:nowrap !important;white-space:nowrap}
+.pickfoot label{gap:4px !important}
+.gbar{position:relative;flex:1;min-height:32px;display:flex;align-items:center;gap:6px;padding:3px 6px 3px 8px;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);background:#fff;cursor:pointer}
+.gbar.open,.gbar:hover{border-color:var(--c-border-interactive)}
+.gbar-chips{flex:1;display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+.gbar .ph{color:var(--c-text-placeholder)}
+.gbar .pre,.rule .pre{height:26px;width:auto;max-width:190px;font-weight:600;background:var(--c-tag-lightgrey-bg)}
+.rule .pre{height:32px;max-width:none}
+.tfilters{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tfilters select{width:auto;height:28px;padding:0 6px}
+.gtoolbar{height:auto;min-height:48px;padding:8px;gap:8px;flex-wrap:wrap}
+.flbl{font-weight:700;color:var(--c-text-secondary);text-transform:uppercase;font-size:10px;letter-spacing:.04em;margin-right:-6px}
+.xbtn{border:none;background:none;color:var(--c-icon-primary);cursor:pointer;font-size:15px}
+.gchips{display:flex;flex-wrap:wrap;gap:4px;min-height:32px;align-items:center;border:1px solid var(--c-border-subtle);border-radius:var(--r-md);padding:4px 8px;background:#fff}
+.gchip{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--r-md);background:var(--c-chip-label)}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:70;background:var(--c-background-overlay)}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:var(--r-lg);width:min(640px,94vw);max-height:84vh;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.mbox h3{margin:0;font:600 16px/1.5 var(--font)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px}
+.kv .k{color:var(--c-text-secondary)}
+.tree{font:400 12px/1.7 var(--mono)}
+.tree .ind{padding-left:16px}
+.legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--c-text-secondary)}
+.toggle{display:inline-flex;gap:6px;align-items:center;cursor:pointer;color:var(--c-text-secondary)}
+.polcard{max-width:820px}
+.poltable td,.poltable th{height:36px}
+.na{color:var(--c-text-placeholder);text-decoration:line-through}
+</style>
+</head>
+<body class="nonotes">
+
+<header class="pagehead">
+  <div class="row">
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <h1>Virtual datasets</h1>
+      <span class="hint" style="font-size:13px">Give a group of datasets one queryable name, so a saved query keeps working as the datasets behind it change. <a href="#" style="color:var(--c-text-interactive)">Learn more</a></span>
+    </div>
+    <span class="spacer"></span>
+    <div class="legend">
+      <span class="badge b-cx">Mockup v5 · 12-10 · base: Brainy master (24-09), route data-flow/virtual-datasets</span>
+      <span class="pin h">H 11-10</span><span class="pinlbl"> Harel ruling</span>
+      <span class="pin r">R 04-10</span><span class="pinlbl"> Redlus room</span>
+      <span class="pin o">OPEN</span><span class="pinlbl"> not decided</span>
+      <label class="toggle"><input type="checkbox" onchange="document.body.classList.toggle('nonotes',!this.checked)"> Show notes</label>
+    </div>
+  </div>
+</header>
+
+<main id="p_vd">
+  <div class="card">
+    <div class="titlesec">
+      <div class="txt">
+        <h2>All virtual datasets <span class="cnt" id="cnt"></span></h2>
+        <p>A virtual dataset is a named DataPrime query, built with the Builder or written in DataPrime. Anyone with read on it can write <code>source &lt;name&gt;</code> anywhere, and the query runs as if its definition was typed there. <span class="pin h" title="Brainy today: a name resolved to a list, a pattern, an entity type or a full DataPrime query; unique across datasets and virtual datasets.">H 11-10</span></p>
+      </div>
+      <span class="spacer"></span>
+      <button class="btn btn-solid" onclick="openCreate()">+ Add virtual dataset</button>
+    </div>
+
+    <div class="notice">
+      <span class="ic">&#9432;</span>
+      <div class="bd">
+        <span><b>A virtual dataset can have the same name as a dataset. The virtual one is read first.</b> To read the dataset itself, put its name in quotes: <code>source "default/logs"</code>. <span class="pin r" title="04-10 room (Harel's idea, relayed): quotes force the physical dataset.">R 04-10</span> <span class="pin o" title="11-10: Harel and Ievgen's CX-41805 comment use virtual=false (Option 2: logs(virtual=false)). Quotes vs virtual=false is not settled. Could be: quotes in the query editor, virtual=false as the engine flag.">OPEN: quotes vs virtual=false</span></span>
+        <span>Access to a virtual dataset is set on the virtual dataset. The datasets it reads keep their own access rules at query time. <span class="pin h" title="Harel 11-10: own read permission; source PBAC still applies; two layers, no merge.">H 11-10</span></span>
+      </div>
+    </div>
+    <div class="notecard">
+      <span><b>Brainy today:</b> "Names are unique across datasets and virtual datasets… Access is inherited from the datasets it resolves to." Both lines change.</span>
+    </div>
+
+    <div class="grid">
+      <div class="gtoolbar">
+        <input class="search" id="q" placeholder="Search virtual datasets" oninput="render()" style="width:min(360px,100%)">
+        <span class="spacer"></span>
+        <div class="tfilters">
+          <select class="input" id="ff_ds" onchange="render()"><option value="">Dataspace: All</option><option>default</option><option>security</option><option>payments</option></select>
+          <select class="input" id="ff_pil" onchange="render()"><option value="">Pillar: All</option><option value="logs">Logs</option><option value="spans">Spans</option><option value="data">Data</option></select>
+          <select class="input" id="ff_def" onchange="render()"><option value="">Definition: All</option><option value="builder">Builder</option><option value="dp">DataPrime</option></select>
+          <select class="input" id="ff_read" onchange="render()"><option value="">Read access: All</option><option>All users</option><option>Payments devs</option><option>SRE team</option><option>Support</option></select>
+          <label class="toggle"><input type="checkbox" id="ff_sh" onchange="render()"> Shadows a dataset</label>
+          <button class="linkbtn" onclick="['ff_ds','ff_pil','ff_def','ff_read'].forEach(id=>document.getElementById(id).value='');document.getElementById('ff_sh').checked=false;document.getElementById('q').value='';render()">Clear</button>
+        </div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:220px">Name</th>
+              <th style="width:180px">Description</th>
+              <th style="width:70px">Pillar</th>
+              <th>Resolves to</th>
+              <th style="width:130px">Read access <span class="pin h">new</span></th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-label="Virtual dataset editor">
+  <div class="dhead">
+    <div class="lead">
+      <button class="btn btn-ghost btn-icon" onclick="closeDrawer()" title="Close">&#10005;</button>
+      <h2 id="dtitle">Create virtual dataset</h2>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-outline" onclick="openPreview()">Preview</button>
+      <button class="btn btn-solid" id="savebtn" onclick="closeDrawer()">Create</button>
+    </div>
+  </div>
+
+  <div class="dbody">
+    <div class="dform">
+      <div class="notecard">
+        <span><b>One drawer, no preview pane.</b> Preview opens on click. Harel 11-10: "I don't like the double drawers". The form is name, description, definition, access policy. <span class="pin h">H 11-10</span></span>
+      </div>
+
+      <div class="sub-card">
+        <span class="st">Details</span>
+        <div class="field">
+          <label>Dataspace <span class="req">*</span></label>
+          <select class="input" id="f_ds" onchange="check()"><option>default</option><option>security</option><option>payments</option></select>
+          <span class="hint">Where the name lives. Sources can come from any dataspace.</span>
+        </div>
+        <div class="field">
+          <label>Virtual dataset name <span class="req">*</span></label>
+          <input class="input mono" id="f_name" oninput="check()" placeholder="logs">
+          <span class="hint">Try <code>payments/logs</code> (a dataset has it) or <code>checkout_flow</code> (another virtual dataset has it).</span>
+        </div>
+        <div id="nameclash"></div>
+        <div class="field">
+          <label>Description <span class="opt">(optional)</span></label>
+          <textarea class="input" id="f_desc" placeholder="What this virtual dataset is for" style="min-height:52px"></textarea>
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <div class="rowbetween">
+          <span class="st">Definition <span class="req" style="color:var(--c-text-error)">*</span></span>
+          <div style="display:flex;gap:6px;align-items:center">
+          <button type="button" class="btn btn-ghost btn-icon" id="resetbtn" hidden onclick="resetExpr()" title="Reset expression">&#8634;</button>
+          <div class="seg" id="f_mode">
+            <button data-m="builder" class="on" onclick="switchMode('builder')">Builder</button>
+            <button data-m="dp" onclick="switchMode('dp')">DataPrime</button>
+          </div>
+          </div>
+        </div>
+        <div class="notecard">
+          <span><b>Brainy today:</b> Builder only. The DataPrime option was removed on 23-09 (CX-59911). <span class="pin h">H 11-10</span> brings it back as a full query. The API keeps three options: dataset list, name pattern, DataPrime.</span>
+        </div>
+
+        <div id="wrap_builder">
+          <p class="hint" style="margin-bottom:8px">Pick the datasets to read. Rows are joined with OR.</p>
+          <div class="field" style="margin-bottom:8px">
+            <label>Match on <span class="pin o" title="Harel 11-10 listed dataset list and starts with / ends with / contains only. Entity type was not mentioned.">OPEN</span></label>
+            <div class="seg" id="f_match"><button data-mo="name" class="on" onclick="setMatch('name')">Dataset name</button><button data-mo="et" onclick="setMatch('et')" title="In Brainy today. Keep or drop? Ask Harel.">Entity type</button></div>
+          </div>
+          <div id="wrap_name">
+          <div id="conds" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div style="margin-top:8px"><button class="linkbtn" onclick="addCond()">+ Add condition</button></div>
+          </div>
+          <div id="wrap_et" class="field" hidden>
+            <label>Entity type <span class="req">*</span></label>
+            <select class="input" id="f_et" onchange="check()"><option value="">Select an entity type</option><option>logs</option><option>spans</option><option>logEvents</option></select>
+            <span class="hint">Every dataset of this entity type, in any dataspace, including ones created later.</span>
+          </div>
+          <span class="hint">Datasets created later that match a pattern are included automatically.</span>
+          <div class="rowbetween" style="margin-top:12px">
+            <span class="hint">Need a filter, aggregation or join? Continue in DataPrime.</span>
+            <button class="linkbtn" onclick="switchMode('dp')">Open in DataPrime &rarr;</button>
+          </div>
+        </div>
+
+        <div id="wrap_dp" hidden>
+          <textarea class="code" id="f_q" oninput="check()"></textarea>
+          <span class="err" id="qerr" style="display:block"></span>
+          <span class="hint">Any DataPrime query: filter, aggregation, union, join, <code>choose</code>, <code>enrich</code>. A source can be a dataset or another virtual dataset. <span class="pin h">H 11-10</span></span>
+          <div class="notecard" style="margin-top:8px"><span><b>Same as production TCO (cx-web-workspace <code>dpxl-matcher</code>, master 12-10):</b> Builder → DataPrime writes the query. Back to Builder only when the query converts; else the Builder button is disabled with "The current query can't be represented in the builder." The <b>&#8634; Reset expression</b> icon sits left of the toggle in DataPrime mode. It is on whenever the query is not the default, <b>including when it fails validation</b>. It clears the query and the error, with no confirm, so Builder opens again. <span class="pin o" title="Production resets with no confirm. A virtual dataset query can be long; a confirm may be worth it. Omer's call.">OPEN: confirm?</span></span></div>
+          <div class="info" id="backnote" style="margin-top:8px" hidden><span class="ic">&#9432;</span><span>This query uses advanced syntax and cannot be converted to builder mode.</span></div>
+          <div class="notecard" style="margin-top:8px">
+            <span><b>Examples from Harel 11-10:</b>
+            <a href="#" onclick="ex(0);return false">backfill under the same name</a> ·
+            <a href="#" onclick="ex(1);return false">rename on read</a> ·
+            <a href="#" onclick="ex(2);return false">hide fields</a> ·
+            <a href="#" onclick="ex(3);return false">enrichment</a> ·
+            <a href="#" onclick="ex(4);return false">aggregation</a> ·
+            <a href="#" onclick="ex(5);return false">loop (error)</a></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <div class="rowbetween">
+          <span class="st">Access Policy <span title="Choose whether other users can access this resource when access policies are enabled." style="color:var(--c-icon-primary);font-weight:400">&#9432;</span> <span class="pin h" title="Harel 11-10">H 11-10</span></span>
+          <span style="display:flex;gap:14px;align-items:center">
+            <label class="toggle" title="View or edit the policy that controls who can access and manage this item."><span>Policy permissions</span><input type="checkbox" id="f_adv" checked onchange="renderRules()"></label>
+            <button class="linkbtn" onclick="if(confirm('Reset access policy?\n\nThis will reset the access policy to the default settings.')){rules=[];newSel=[];renderRules();}">&#8634; Reset</button>
+          </span>
+        </div>
+        <span class="st" style="font-size:13px">Apply to target groups</span>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <div class="gbar" id="gbar" onclick="toggleGrp(event)"></div>
+          <button class="btn btn-outline" id="applybtn" onclick="applyNew()">Apply</button>
+        </div>
+        <div id="rules" style="display:flex;flex-direction:column;gap:8px"></div>
+        <span class="st" style="font-size:13px;margin-top:4px">General access</span>
+        <div class="rule"><div class="gchips" style="border:none;padding-left:0">&#127760; Everyone in Coralogix-prod</div>
+          <select class="input"><option>Virtual dataset: No access</option><option>Virtual dataset: Read</option></select>
+          <select class="input"><option>Policy: View</option><option>Policy: None</option><option>Policy: Edit</option></select><span></span></div>
+        <div class="notecard"><span><b>Same component as Dataspace Management in production</b> (cx-web-workspace <code>access-policy-form-v2</code>, master 12-10): click the bar to open the group list with checkboxes. A group that already has a rule is shown checked and greyed, with its rule (e.g. <i>Virtual dataset: Read | Policy: Edit</i>). After you pick groups, the permission and policy dropdowns appear inside the bar; Apply adds the rule. Only difference: the preset list is <b>Read / No access</b>, since a virtual dataset has no Append or Override.</span></div>
+        <div class="notecard"><span><b>Redlus 04-10:</b> a <code>view definitions</code> permission decides if a user sees the query on hover. Still needed. <span class="pin r">R 04-10</span></span>
+          <span><span class="pin o">OPEN</span> 04-10 said "list a virtual dataset only if the user can read at least one source". Does that rule stay next to its own Read permission? AAA sheet rows still to add.</span></div>
+        <span class="hint">Groups without read do not see this virtual dataset in suggestions, and <code>source</code> says it does not exist. No filter expression here: a virtual dataset has read only, no scope.</span>
+        <div class="info"><span class="ic">&#128274;</span><span>The datasets it reads keep their own access rules. A user can get partial or empty results, with no error and no warning.</span></div>
+        <div class="notecard"><span><b>Brainy today:</b> an info note, "A virtual dataset never grants access… set in Settings, then Roles". Replaced by a real policy on the virtual dataset.</span></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="modal" id="pv" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="mbox">
+    <div class="rowbetween"><h3>Preview: <span id="pv_name" class="nm"></span></h3><button class="btn btn-ghost btn-icon" onclick="document.getElementById('pv').classList.remove('on')">&#10005;</button></div>
+    <div class="kv">
+      <span class="k">Runs as</span><div class="syntax" id="pv_q"></div>
+      <span class="k">Entity type of result</span><span id="pv_et"></span>
+      <span class="k">Reads</span><div class="tree" id="pv_tree"></div>
+    </div>
+    <div class="notecard"><span><b>Redlus 04-10:</b> preview shows the DataPrime text and the resulting entity type (logs + rum events gives logs). <b>Harel 11-10:</b> preview on click, not a second pane.</span></div>
+  </div>
+</div>
+
+<script>
+const DATASETS=[
+  {n:"default/logs",et:"logs"},{n:"default/logs_backfill",et:"logs"},{n:"default/rum-events",et:"logs"},
+  {n:"default/spans",et:"spans"},{n:"default/log_events",et:"logEvents"},{n:"payments/logs",et:"logs"},{n:"payments/logs_backfill",et:"logs"},{n:"security/cloudtrail",et:"logs"},
+  {n:"security/cloudwatch",et:"logs"},{n:"default/ugly_ds_2024_v3",et:"logs"},{n:"default/aws-prod-payment-logs",et:"logs"}
+];
+const VDS=[
+  {name:"default/logs",mode:"dp",shadows:true,q:"source \"default/logs\", logs_backfill",read:"All users",refs:"~1000 dashboards",desc:"Keeps old dashboards working after the backfill"},
+  {name:"default/beautiful",mode:"dp",q:"source ugly_ds_2024_v3",read:"All users",refs:"2 dashboards",desc:"Rename on read"},
+  {name:"default/checkout_flow",mode:"builder",q:"source aws-prod-payment-logs, payments/logs",read:"Payments devs",refs:"11 dashboards, 7 alerts",desc:"Picked explicitly"},
+  {name:"security/aws_logs",mode:"builder",q:"source security/cloudtrail, security/cloudwatch",read:"SRE team",refs:"4 alerts",desc:"All AWS logs"},
+  {name:"default/moshe",mode:"dp",q:"source logs | choose $l.applicationname, $d.status, $d.message",read:"Support",refs:"1 saved view",desc:"Hides fields: three fields only"},
+  {name:"default/enriched_logs",mode:"dp",q:"source logs | enrich $d.ip into $d.geo using geo_lookup",read:"All users",refs:"3 dashboards",desc:"Enrichment"},
+  {name:"default/payment_errors",et:"data",mode:"dp",q:"source payments/logs | filter $d.status >= 500 | groupby $d.service aggregate count()",read:"Payments devs",refs:"2 alerts",desc:"Aggregation"},
+  {name:"default/all_aws",mode:"dp",q:"source security/aws_logs, default/beautiful",read:"SRE team",refs:"none",desc:"Virtual on virtual"}
+];
+const EX=[
+  ["payments/logs","source \"payments/logs\", payments/logs_backfill"],
+  ["beautiful","source ugly_ds_2024_v3"],
+  ["moshe","source logs | choose $l.applicationname, $d.status, $d.message"],
+  ["enriched_logs","source logs | enrich $d.ip into $d.geo using geo_lookup"],
+  ["payment_errors","source payments/logs | filter $d.status >= 500 | groupby $d.service aggregate count()"],
+  ["loop_a","source default/loop_a"]
+];
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function render(){
+  const q=(document.getElementById("q").value||"").toLowerCase();
+  const g=id=>document.getElementById(id).value, ds=g("ff_ds"), pil=g("ff_pil"), def=g("ff_def"), rd=g("ff_read"), sh=document.getElementById("ff_sh").checked;
+  const rows=VDS.filter(v=>(!q||v.name.includes(q)||v.q.toLowerCase().includes(q)||v.desc.toLowerCase().includes(q))
+    &&(!ds||v.name.split("/")[0]===ds)&&(!pil||(v.et==="data"?"data":(v.pillar||"logs"))===pil)&&(!def||v.mode===def)&&(!rd||v.read===rd)&&(!sh||v.shadows));
+  if(!rows.length){document.getElementById("rows").innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--c-text-secondary);height:100px">No virtual datasets match these filters.</td></tr>';document.getElementById("cnt").textContent="0 / "+VDS.length;return;}
+  document.getElementById("rows").innerHTML=rows.map(v=>
+    '<tr class="data" onclick="openEdit(\''+v.name+'\')"><td><div class="nm">'+v.name
+    +(v.shadows?'<span class="tagp tags" title="A dataset has the same name. The virtual one is read first.">Shadows dataset</span>':'')
+    +'</div><div class="sub">'+(v.mode==="dp"?"DataPrime":"Builder")+'</div></td><td>'+esc(v.desc)+'</td><td>'+(v.et==="data"?"data":(v.pillar||"logs"))+'</td><td><span class="pat">'+esc(v.q)+'</span></td><td>'+v.read+'</td>'
+    +'<td class="acts"><button class="btn btn-ghost btn-icon" title="Edit">&#9998;</button></td></tr>').join("");
+  document.getElementById("cnt").textContent=rows.length===VDS.length?VDS.length:rows.length+" / "+VDS.length;
+}
+let mode="builder",conds=[],editing=null;
+function setMode(m){
+  mode=m;
+  document.querySelectorAll("#f_mode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  document.getElementById("wrap_builder").hidden=m!=="builder";
+  document.getElementById("wrap_dp").hidden=m!=="dp";
+  check();
+}
+/* TCO pattern (tco-policy-drawer setFilterMode): Builder -> DataPrime always writes the query, like Jira basic -> JQL.
+   DataPrime -> Builder only when the Builder can show the query; otherwise the segment is blocked and Reset is offered. */
+function parseToBuilder(q){
+  q=(q||"").trim();
+  let m=/^source\s+\*\s+entityType\s*=\s*(\w+)$/.exec(q);
+  if(m) return {match:"et",et:m[1]};
+  m=/^source\s+([^|()]+)$/.exec(q); if(!m) return null;
+  const toks=m[1].split(",").map(t=>t.trim()).filter(Boolean); if(!toks.length) return null;
+  const is=[],pats=[];
+  for(const t of toks){
+    if(t.indexOf('"')>-1) return null;
+    if(/^\*.+\*$/.test(t)) pats.push({op:"co",sel:[],val:t.slice(1,-1)});
+    else if(/^\*/.test(t)) pats.push({op:"ew",sel:[],val:t.slice(1)});
+    else if(/\*$/.test(t)) pats.push({op:"sw",sel:[],val:t.slice(0,-1)});
+    else if(/\*/.test(t)) return null;
+    else is.push(t.indexOf("/")>-1?t:"default/"+t);
+  }
+  return {match:"name",conds:(is.length?[{op:"is",sel:is,val:""}]:[]).concat(pats)};
+}
+function builderBlocked(){const q=document.getElementById("f_q").value.trim();return mode==="dp" && !!q && (!!dpInvalid(q) || !parseToBuilder(q));}
+function switchMode(m){
+  if(m===mode) return;
+  if(m==="dp"){document.getElementById("f_q").value=builderQ()||"source ";setMode("dp");return;}
+  if(builderBlocked()) return;
+  const r=parseToBuilder(document.getElementById("f_q").value);
+  if(r){ if(r.match==="et"){setMatch("et");document.getElementById("f_et").value=r.et;} else {setMatch("name");conds=r.conds.length?r.conds:[{op:"is",sel:[],val:""}];renderConds();} }
+  setMode("builder");
+}
+function resetExpr(){document.getElementById("f_q").value="";document.getElementById("qerr").textContent="";check();}
+function dpInvalid(q){q=(q||"").trim(); if(!q) return null; if(!/^source\s+\S/.test(q)) return "Invalid DataPrime query: it must start with source and a dataset name.";
+  if((q.match(/"/g)||[]).length%2) return "Invalid DataPrime query: a quote is not closed."; if(/\|\s*$/.test(q)) return "Invalid DataPrime query: nothing after the last |."; return null;}
+function syncBack(){
+  const q=document.getElementById("f_q").value.trim(), inv=mode==="dp"?dpInvalid(q):null;
+  const b=mode==="dp" && !!q && (!!inv || !parseToBuilder(q)), btn=document.querySelector('#f_mode button[data-m="builder"]');
+  btn.setAttribute("aria-disabled",b?"true":"false"); btn.style.opacity=b?".45":""; btn.style.cursor=b?"not-allowed":"";
+  btn.title=b?"The current query can't be represented in the builder.":"";
+  const rb=document.getElementById("resetbtn"); if(rb){rb.hidden=mode!=="dp"; rb.disabled=!q; rb.style.opacity=q?"":".4";}
+  const note=document.getElementById("backnote"); if(note) note.hidden=!(b&&!inv);
+}
+const OPS=[["is","Is"],["sw","Starts with"],["co","Contains"],["ew","Ends with"]];
+function addCond(){conds.push({op:"is",sel:[],val:""});renderConds();}
+function delCond(i){conds.splice(i,1);renderConds();}
+function renderConds(){
+  document.getElementById("conds").innerHTML=conds.map((c,i)=>{
+    const opSel='<select class="input" onchange="conds['+i+'].op=this.value;renderConds()">'+OPS.map(o=>'<option value="'+o[0]+'"'+(o[0]===c.op?' selected':'')+'>'+o[1]+'</option>').join("")+'</select>';
+    let rhs;
+    if(c.op==="is"){
+      rhs='<div class="picker"><button type="button" class="pickctl'+(openPick===i?' open':'')+'" onclick="togglePick2('+i+',event)"><span class="picksel">'
+        +(c.sel.length?c.sel.map(n=>{const it=pickItem(n);return '<span class="chip"><span>'+n+'</span>'+(it&&it.v?'<span class="tagv" style="margin-left:2px">Virtual</span>':'')+'<b onclick="event.stopPropagation();conds['+i+'].sel.splice('+c.sel.indexOf(n)+',1);renderConds()">&#10005;</b></span>';}).join(""):'<span class="ph">Select datasets or virtual datasets, any dataspace</span>')
+        +'</span><span class="caret">&#9662;</span></button>'
+        +(openPick===i?pickPanel(i):'')+'</div>';
+    } else rhs='<input class="input mono" value="'+esc(c.val)+'" oninput="conds['+i+'].val=this.value;check()" placeholder="Enter a value, * for any characters">';
+    return '<div class="condrow">'+opSel+'<div class="grow">'+rhs+'</div><button class="trash" '+(conds.length<2?'disabled':'')+' onclick="delCond('+i+')">&#128465;</button></div>';
+  }).join("")
+  +'<div class="notecard"><span><span class="pin r">R 04-10</span> Sources from any dataspace (Brainy limits them to the chosen dataspace and pillar). <span class="pin h">H 11-10</span> Virtual datasets can be sources, marked Virtual (Brainy: real datasets only). Loops are blocked.</span></div>';
+  check();
+}
+let matchOn="name";
+function setMatch(m){matchOn=m;document.querySelectorAll("#f_match button").forEach(b=>b.classList.toggle("on",b.dataset.mo===m));
+  document.getElementById("wrap_name").hidden=m!=="name";document.getElementById("wrap_et").hidden=m!=="et";check();}
+const GROUPS=["admin - no cspm","Admins","advantage-group","AE Pocket Demo Group","ai-admin","AllPbac","Payments devs","Platform admins","SRE team","Support"];
+let rules=[{g:["Admins"],vd:"read",pol:"edit"},{g:["SRE team","Payments devs"],vd:"read",pol:"view"}];
+let newSel=[], newVd="read", newPol="view", grpOpen=false, grpQ="";
+const VDL={read:"Read",none:"No access"}, POLL={none:"None",view:"View",edit:"Edit"};
+function adv(){const x=document.getElementById("f_adv");return !x||x.checked;}
+function ruleOf(g){return rules.find(r=>r.g.indexOf(g)>-1);}
+function toggleGrp(e){e.stopPropagation();grpOpen=!grpOpen;renderRules();}
+function pickGrp(g,e){e.stopPropagation();if(ruleOf(g))return;const k=newSel.indexOf(g);k>-1?newSel.splice(k,1):newSel.push(g);renderRules();}
+function applyNew(){if(!newSel.length)return;rules.push({g:newSel.slice(),vd:newVd,pol:newPol});newSel=[];grpOpen=false;renderRules();}
+function sel(opts,cur,prefix,on){return '<select class="input pre" onclick="event.stopPropagation()" onchange="'+on+'">'+Object.keys(opts).map(k=>'<option value="'+k+'"'+(k===cur?" selected":"")+'>'+prefix+': '+opts[k]+'</option>').join("")+'</select>';}
+function renderRules(){
+  const bar=document.getElementById("gbar"); if(!bar) return;
+  bar.classList.toggle("open",grpOpen);
+  bar.innerHTML='<div class="gbar-chips">'+(newSel.length?newSel.map(g=>'<span class="gchip">'+esc(g)+' <b onclick="pickGrp(\''+g+'\',event)" style="cursor:pointer;font-weight:400">&#10005;</b></span>').join(""):'<span class="ph">Add groups to define a rule</span>')+'</div>'
+    +(newSel.length?sel(VDL,newVd,"Virtual dataset","newVd=this.value")+(adv()?sel(POLL,newPol,"Policy","newPol=this.value"):""):"")
+    +(grpOpen?'<div class="pickpanel" style="top:calc(100% + 4px)" onclick="event.stopPropagation()"><div class="picksearch"><span>&#9906;</span><input id="gq" value="'+esc(grpQ)+'" placeholder="Search groups" oninput="grpQ=this.value;renderRules();const x=document.getElementById(\'gq\');x.focus();x.setSelectionRange(x.value.length,x.value.length)"></div><div class="picklist">'
+      +GROUPS.filter(g=>!grpQ||g.toLowerCase().includes(grpQ.toLowerCase())).map(g=>{const r=ruleOf(g),on=newSel.indexOf(g)>-1;
+        return '<div class="pickrow'+(on?' sel':'')+'" style="'+(r?'cursor:default;color:var(--c-text-secondary)':'')+'" onclick="pickGrp(\''+g+'\',event)"><span class="cb" style="'+(r?'background:var(--c-border-strong);border-color:var(--c-border-strong)':'')+'">'+(on||r?'&#10003;':'')+'</span><span class="dn" style="font-family:var(--font)">'+esc(g)+'</span>'
+          +(r?'<span class="et" style="font-size:11px"><b>Virtual dataset:</b> '+VDL[r.vd]+(adv()?' &nbsp;|&nbsp; <b>Policy:</b> '+POLL[r.pol]:'')+'</span>':'')+'</div>';}).join("")+'</div></div>':'');
+  document.getElementById("applybtn").disabled=!newSel.length;
+  document.getElementById("rules").innerHTML=rules.map((r,i)=>'<div class="rule"><div class="gchips">'+r.g.map((g,j)=>'<span class="gchip">'+esc(g)+' <b style="cursor:pointer;font-weight:400" onclick="rules['+i+'].g.splice('+j+',1);if(!rules['+i+'].g.length)rules.splice('+i+',1);renderRules()">&#10005;</b></span>').join("")+'</div>'
+    +sel(VDL,r.vd,"Virtual dataset","rules["+i+"].vd=this.value")
+    +(adv()?sel(POLL,r.pol,"Policy","rules["+i+"].pol=this.value"):'<span></span>')
+    +'<button class="xbtn" title="Remove rule" onclick="rules.splice('+i+',1);renderRules()">&#8855;</button></div>').join("");
+}
+document.addEventListener("click",()=>{if(grpOpen){grpOpen=false;renderRules();}});
+let openPick=null, pq="", pf={logs:false,spans:false,logEvents:false,virtual:false,physical:false};
+const ET_LABEL={logs:"Logs",spans:"Spans",logEvents:"Log events",data:"Data"};
+function pickItems(){return DATASETS.map(d=>({n:d.n,et:d.et,v:false})).concat(VDS.map(v=>({n:v.name,et:v.et||"logs",v:true})));}
+function pickItem(n){return pickItems().find(x=>x.n===n);}
+function togglePick2(i,e){e.stopPropagation();openPick=openPick===i?null:i;pq="";renderConds();}
+function pickPanel(i){
+  const ets=["logs","spans","logEvents"].filter(k=>pf[k]), kinds=["virtual","physical"].filter(k=>pf[k]);
+  const rows=pickItems().filter(x=>(!ets.length||ets.indexOf(x.et)>-1)&&(!kinds.length||kinds.indexOf(x.v?"virtual":"physical")>-1)&&(!pq||x.n.toLowerCase().includes(pq.toLowerCase())));
+  const sel=conds[i].sel;
+  const chk=(k,l)=>'<label class="'+(pf[k]?"on":"")+'" onclick="event.stopPropagation();pf.'+k+'=!pf.'+k+';renderConds()"><span class="cb">'+(pf[k]?"&#10003;":"")+'</span>'+l+'</label>';
+  return '<div class="pickpanel" onclick="event.stopPropagation()">'
+    +'<div class="picksearch"><span>&#9906;</span><input id="pq" value="'+esc(pq)+'" placeholder="Search datasets" oninput="pq=this.value;renderConds();const x=document.getElementById(\'pq\');x.focus();x.setSelectionRange(x.value.length,x.value.length)"></div>'
+    +'<div class="pickrow" style="height:26px;cursor:default;color:var(--c-text-secondary);font-weight:600"><span class="cb" style="visibility:hidden"></span><span class="dn" style="font-family:var(--font)">Name</span><span style="width:84px">Type</span><span class="et" style="width:90px">Entity type</span></div>'
+    +'<div class="picklist">'+(rows.length?rows.map(x=>{const on=sel.indexOf(x.n)>-1;
+      return '<div class="pickrow'+(on?' sel':'')+'" onclick="event.stopPropagation();const s=conds['+i+'].sel,k=s.indexOf(\''+x.n+'\');k>-1?s.splice(k,1):s.push(\''+x.n+'\');renderConds()"><span class="cb">'+(on?'&#10003;':'')+'</span><span class="dn">'+x.n+'</span><span style="width:84px">'+(x.v?'<span class="tagv" style="margin:0">Virtual</span>':'<span class="tagp" style="margin:0">Dataset</span>')+'</span><span class="et" style="width:90px">'+(ET_LABEL[x.et]||x.et)+'</span></div>';}).join(""):'<div class="pickrow" style="cursor:default;color:var(--c-text-secondary)">No datasets match.</div>')+'</div>'
+    +'<div class="pickfoot"><span class="flbl">Pillar</span>'+chk("logs","Logs")+chk("spans","Spans")+chk("logEvents","Log events")+'<span class="divider"></span><span class="flbl">Type</span>'+chk("physical","Datasets")+chk("virtual","Virtual")+'</div></div>';
+}
+document.addEventListener("click",()=>{if(openPick!==null){openPick=null;renderConds();}});
+function builderQ(){
+  if(matchOn==="et"){const e=document.getElementById("f_et").value;return e?"source * entityType = "+e:"";}
+  const parts=[];
+  conds.forEach(c=>{
+    if(c.op==="is") parts.push.apply(parts,c.sel);
+    else if(c.val) parts.push(c.op==="sw"?c.val+"*":c.op==="ew"?"*"+c.val:"*"+c.val+"*");
+  });
+  return parts.length?"source "+parts.join(", "):"";
+}
+function curName(){const n=(document.getElementById("f_name").value||"").trim();return n?(n.indexOf("/")>-1?n:document.getElementById("f_ds").value+"/"+n):"";}
+function curQ(){return mode==="dp"?document.getElementById("f_q").value.trim():builderQ();}
+function check(){
+  if(typeof syncBack==="function") syncBack();
+  const n=curName(), box=document.getElementById("nameclash");
+  const phys=DATASETS.find(d=>d.n===n), virt=VDS.find(v=>v.name===n&&v.name!==editing);
+  let html="";
+  if(virt) html='<div class="warncard err"><span class="ic">&#9888;</span><div><b>Another virtual dataset is already called <code>'+n+'</code>.</b> Pick a different name.</div></div>';
+  else if(phys) html='<div class="info"><span class="ic">&#9432;</span><div><b>A dataset is also called <code>'+n+'</code>.</b> This virtual dataset will be read first when someone writes <code>source '+n+'</code>, in every dashboard, alert and saved view. To read the dataset, put its name in quotes: <code>source "'+n+'"</code>. <span class="pin h" title="Harel 11-10: shadowing is a requirement. Brainy today blocks this name with an error.">H 11-10</span></div></div>'
+    +'<div class="notecard"><span><b>Brainy today:</b> error "The name is taken by the dataset…". Harel: allowed, virtual wins. Risk he accepted: an admin can shadow a dataset by mistake; deleting the virtual dataset undoes it.</span></div>';
+  box.innerHTML=html;
+  const q=curQ(), err=document.getElementById("qerr");
+  err.textContent=mode==="dp"?(dpInvalid(q)||""):"";
+  if(mode==="dp"&&n&&q.match(new RegExp("source\\s+"+n.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&")+"(\\s|,|$)")))
+    err.textContent="This query reads itself. To read the dataset with the same name, put it in quotes: \""+n+"\".";
+  document.getElementById("savebtn").disabled=!n||!q||!!virt||!!err.textContent;
+}
+function ex(i){document.getElementById("f_name").value=EX[i][0];document.getElementById("f_q").value=EX[i][1];check();}
+function resolveTree(q,depth,seen){
+  const m=/source\s+([^|]+)/.exec(q||""); if(!m) return "";
+  return m[1].split(",").map(s=>s.trim()).filter(Boolean).map(tok=>{
+    const bare=tok.replace(/"/g,"");
+    const name=bare.indexOf("/")>-1?bare:"default/"+bare;
+    const forced=/^".*"$/.test(tok);
+    const v=!forced&&VDS.find(x=>x.name===name);
+    if(v&&seen.indexOf(name)<0) return '<div class="ind" style="padding-left:'+(depth*16)+'px">'+name+' <span class="tagv">Virtual</span></div>'+resolveTree(v.q,depth+1,seen.concat(name));
+    return '<div style="padding-left:'+(depth*16)+'px">'+name+(forced?' <span class="tagp">Dataset</span>':'')+'</div>';
+  }).join("");
+}
+function openPreview(){
+  const n=curName()||"<name>", q=curQ();
+  document.getElementById("pv_name").textContent=n;
+  document.getElementById("pv_q").innerHTML=q?esc(q):'<span class="hint">Nothing defined yet</span>';
+  document.getElementById("pv_et").textContent=q?(/groupby|aggregate/.test(q)?"data (aggregated result)":"logs"):"";
+  document.getElementById("pv_tree").innerHTML=resolveTree(q,0,[n])||'<span class="hint">No sources yet</span>';
+  document.getElementById("pv").classList.add("on");
+}
+function openCreate(){editing=null;if(typeof setMatch==="function")setMatch("name");document.getElementById("dtitle").textContent="Create virtual dataset";document.getElementById("savebtn").textContent="Create";
+  ["f_name","f_desc","f_q"].forEach(id=>document.getElementById(id).value="");conds=[{op:"is",sel:[],val:""}];renderConds();setMode("builder");openDrawer();}
+function openEdit(name){const v=VDS.find(x=>x.name===name);editing=name;document.getElementById("dtitle").textContent="Edit virtual dataset";document.getElementById("savebtn").textContent="Save";
+  const p=name.split("/");document.getElementById("f_ds").value=p[0];document.getElementById("f_name").value=p[1];document.getElementById("f_desc").value=v.desc;
+  if(v.mode==="builder"){conds=[{op:"is",sel:v.q.replace("source ","").split(",").map(s=>s.trim()),val:""}];renderConds();setMode("builder");}
+  else{document.getElementById("f_q").value=v.q;setMode("dp");}
+  openDrawer();}
+function openDrawer(){document.getElementById("drawer").classList.add("on");document.getElementById("scrim").classList.add("on");}
+function closeDrawer(){document.getElementById("drawer").classList.remove("on");document.getElementById("scrim").classList.remove("on");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();document.getElementById("pv").classList.remove("on");}});
+render();renderRules();
+if(location.hash==="#create"){openCreate();}
+if(location.hash==="#shadow"){openCreate();document.getElementById("f_name").value="logs";setMode("dp");ex(0);}
+if(location.hash==="#preview"){openEdit("default/all_aws");openPreview();}
+if(location.hash==="#groups"){openCreate();newSel=["Support"];grpOpen=true;renderRules();document.querySelector(".dform").scrollTop=900;}
+if(location.hash==="#invalid"){openCreate();document.getElementById("f_q").value="source payments/logs | filter $d.status >= 500 |";setMode("dp");document.querySelector(".dform").scrollTop=380;}
+if(location.hash==="#pick"){openCreate();conds=[{op:"is",sel:["default/logs","security/aws_logs"],val:""}];openPick=0;renderConds();document.querySelector(".dform").scrollTop=380;}
+if(location.hash==="#switch"){openCreate();conds=[{op:"is",sel:["default/logs","payments/logs"],val:""},{op:"sw",sel:[],val:"security/"}];renderConds();switchMode("dp");document.querySelector(".dform").scrollTop=520;}
+if(location.hash==="#back"){openCreate();document.getElementById("f_q").value="source payments/logs, *-logs";setMode("dp");switchMode("builder");document.querySelector(".dform").scrollTop=520;}
+if(location.hash==="#blocked"){openCreate();document.getElementById("f_q").value="source payments/logs | filter $d.status >= 500";setMode("dp");switchMode("builder");document.querySelector(".dform").scrollTop=520;}
+if(location.hash==="#et"){openCreate();setMatch("et");document.getElementById("f_et").value="logs";check();document.getElementById("drawer").querySelector(".dform").scrollTop=600;}
+</script>
+</body>
+</html>
