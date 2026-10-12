@@ -275,7 +275,7 @@ body.nonotes .pin,body.nonotes .pinlbl,body.nonotes .notecard{display:none !impo
     <div class="notice">
       <span class="ic">&#9432;</span>
       <div class="bd">
-        <span><b>A virtual dataset can have the same name as a dataset. The virtual one is read first.</b> To read the dataset itself, put its name in quotes: <code>source "default/logs"</code>. <span class="pin o" title="Noam 12-10: quotes, virtual=false dropped. CX-41805 (Ievgen, 12-10 14:46) still keeps virtual=false and strikes out quotes. To align with Ievgen.">OPEN: CX-41805 still says virtual=false</span></span>
+        <span><b>A virtual dataset can have the same name as a dataset. The virtual one is read first.</b> To read the dataset itself, add a parameter: <code>source default/logs(virtual=false)</code>. <span class="pin h" title="Ievgen 12-10, after a call with Harel: we go with the virtual parameter, virtual=false reads the dataset. Double quotes are kept for something else. Open: the parameter defaults to undefined and 'returns both', meaning not yet clear.">H + Ievgen 12-10</span></span>
         <span>Access to a virtual dataset is set on the virtual dataset. The datasets it reads keep their own access rules at query time. <span class="pin h" title="Harel 11-10: own read permission; source PBAC still applies; two layers, no merge.">H 11-10</span></span>
       </div>
     </div>
@@ -324,6 +324,7 @@ body.nonotes .pin,body.nonotes .pinlbl,body.nonotes .notecard{display:none !impo
       <h2 id="dtitle">Create virtual dataset</h2>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-ghost" id="explorebtn" onclick="showInExplore(editing||document.getElementById('f_name').value)" title="Opens Explore with this virtual dataset as the source">Show in Explore &#8599; <span class="pin h" title="Ievgen 12-10: you may want to add a show in Explore button in the Virtual datasets screen.">Ievgen 12-10</span></button>
       <button class="btn btn-outline" onclick="openPreview()">Preview</button>
       <button class="btn btn-solid" id="savebtn" onclick="closeDrawer()">Create</button>
     </div>
@@ -457,7 +458,7 @@ const DATASETS=[
   {n:"security/cloudwatch",et:"logs"},{n:"default/ugly_ds_2024_v3",et:"logs"},{n:"default/aws-prod-payment-logs",et:"logs"}
 ];
 const VDS=[
-  {name:"default/logs",mode:"dp",shadows:true,q:"source \"default/logs\", logs_backfill",read:"All users",refs:"~1000 dashboards",desc:"Keeps old dashboards working after the backfill"},
+  {name:"default/logs",mode:"dp",shadows:true,q:"source default/logs(virtual=false), logs_backfill",read:"All users",refs:"~1000 dashboards",desc:"Keeps old dashboards working after the backfill"},
   {name:"default/beautiful",mode:"dp",q:"source ugly_ds_2024_v3",read:"All users",refs:"2 dashboards",desc:"Rename on read"},
   {name:"default/checkout_flow",mode:"builder",q:"source aws-prod-payment-logs, payments/logs",read:"Payments devs",refs:"11 dashboards, 7 alerts",desc:"Picked explicitly"},
   {name:"security/aws_logs",mode:"builder",q:"source security/cloudtrail, security/cloudwatch",read:"SRE team",refs:"4 alerts",desc:"All AWS logs"},
@@ -485,7 +486,7 @@ function render(){
     '<tr class="data" onclick="openEdit(\''+v.name+'\')"><td><div class="nm">'+v.name
     +(v.shadows?'<span class="tagp tags" title="A dataset has the same name. The virtual one is read first.">Shadows dataset</span>':'')
     +'</div><div class="sub">'+(v.mode==="dp"?"DataPrime":"Builder")+'</div></td><td>'+esc(v.desc)+'</td><td>'+(v.et==="data"?"data":(v.pillar||"logs"))+'</td><td><span class="pat">'+esc(v.q)+'</span></td><td>'+v.read+'</td>'
-    +'<td class="acts"><button class="btn btn-ghost btn-icon" title="Edit">&#9998;</button></td></tr>').join("");
+    +'<td class="acts"><button class="btn btn-ghost btn-icon" title="Show in Explore" onclick="event.stopPropagation();showInExplore(\''+v.name+'\')">&#8599;</button><button class="btn btn-ghost btn-icon" title="Edit">&#9998;</button></td></tr>').join("");
   document.getElementById("cnt").textContent=rows.length===VDS.length?VDS.length:rows.length+" / "+VDS.length;
 }
 let mode="builder",conds=[],editing=null;
@@ -617,13 +618,13 @@ function check(){
   const phys=DATASETS.find(d=>d.n===n), virt=VDS.find(v=>v.name===n&&v.name!==editing);
   let html="";
   if(virt) html='<div class="warncard err"><span class="ic">&#9888;</span><div><b>Another virtual dataset is already called <code>'+n+'</code>.</b> Pick a different name.</div></div>';
-  else if(phys) html='<div class="info"><span class="ic">&#9432;</span><div><b>A dataset is also called <code>'+n+'</code>.</b> This virtual dataset will be read first when someone writes <code>source '+n+'</code>, in every dashboard, alert and saved view. To read the dataset, put its name in quotes: <code>source "'+n+'"</code>. <span class="pin h" title="Harel 11-10: shadowing is a requirement. Brainy today blocks this name with an error.">H 11-10</span></div></div>'
+  else if(phys) html='<div class="info"><span class="ic">&#9432;</span><div><b>A dataset is also called <code>'+n+'</code>.</b> This virtual dataset will be read first when someone writes <code>source '+n+'</code>, in every dashboard, alert and saved view. To read the dataset, add a parameter: <code>source '+n+'(virtual=false)</code>. <span class="pin h" title="Harel 11-10: shadowing is a requirement. Brainy today blocks this name with an error.">H 11-10</span></div></div>'
     +'<div class="notecard"><span><b>Brainy today:</b> error "The name is taken by the dataset…". Harel: allowed, virtual wins. Risk he accepted: an admin can shadow a dataset by mistake; deleting the virtual dataset undoes it.</span></div>';
   box.innerHTML=html;
   const q=curQ(), err=document.getElementById("qerr");
   err.textContent=mode==="dp"?(dpInvalid(q)||""):"";
   if(mode==="dp"&&n&&q.match(new RegExp("source\\s+"+n.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&")+"(\\s|,|$)")))
-    err.textContent="This query reads itself. To read the dataset with the same name, put it in quotes: \""+n+"\".";
+    err.textContent="This query reads itself. To read the dataset with the same name, write "+n+"(virtual=false).";
   document.getElementById("savebtn").disabled=!n||!q||!!virt||!!err.textContent;
 }
 function ex(i){document.getElementById("f_name").value=EX[i][0];document.getElementById("f_q").value=EX[i][1];check();}
@@ -637,6 +638,13 @@ function resolveTree(q,depth,seen){
     if(v&&seen.indexOf(name)<0) return '<div class="ind" style="padding-left:'+(depth*16)+'px">'+name+' <span class="tagv">Virtual</span></div>'+resolveTree(v.q,depth+1,seen.concat(name));
     return '<div style="padding-left:'+(depth*16)+'px">'+name+(forced?' <span class="tagp">Dataset</span>':'')+'</div>';
   }).join("");
+}
+function showInExplore(n){
+  if(!n) return;
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1C1C1C;color:#fff;padding:8px 14px;border-radius:6px;font:400 13px/1.5 var(--font,sans-serif);z-index:99;box-shadow:0 6px 18px rgba(0,0,0,.2)";document.body.appendChild(t);}
+  t.innerHTML='Opens Explore in a new tab with <code style="color:#B79BFF">source '+esc(n)+'</code>';
+  t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>{t.style.display="none";},2600);
 }
 function openPreview(){
   const n=curName()||"<name>", q=curQ();

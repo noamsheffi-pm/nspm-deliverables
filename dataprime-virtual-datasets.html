@@ -193,7 +193,8 @@ footer{padding:0 16px 24px;max-width:1240px;color:var(--tx2);font:400 11px/1.6 v
         <div class="rule"><b>It is the language, not Explore</b><span>Autocomplete, the name mark and the errors come from DataPrime tooling. Every editor and the API get the same behavior.</span></div>
         <div class="rule"><b>A virtual dataset is a full query</b><span>Any operator. It is read at query time, like a view. No schema tracking.</span></div>
         <div class="rule"><b>Errors point at the name</b><span>A problem inside the definition shows on the virtual dataset as a whole. It never points at a source inside it.</span></div>
-        <div class="rule"><b>The virtual one is read first</b><span><code>source transactions</code> reads the virtual dataset. <code>source "transactions"</code>, in quotes, reads the dataset itself.</span></div>
+        <div class="rule"><b>The virtual one is read first</b><span><code>source transactions</code> reads the virtual dataset. <code>source transactions(virtual=false)</code> reads the dataset itself. Double quotes are not used for this.</span></div>
+        <div class="rule open"><b>Open: what a bare name returns</b><span>Ievgen 12-10: the <code>virtual</code> parameter defaults to undefined and "returns both". Not yet clear if that means the virtual one wins, or both are read. This mock reads the virtual one.</span></div>
         <div class="rule"><b>No access to a source, no results</b><span>If the user cannot read a source inside the definition, the query does not run. Partial results are a later phase.</span></div>
         <div class="rule open"><b>Open: definition on hover</b><span>This mock shows the full definition on hover to users who may view it. CX-41805 lists hover as not phase 1. The permission does not hide the definition everywhere yet; that is accepted for now.</span></div>
       </div>
@@ -249,7 +250,7 @@ var VDS = {
   'finance':          'source payments, transactions, compliance',
   'failed-by-region': "source payments, transactions | filter $d.status == 'failed' | countby $d.region",
   'finance-eu':       "source finance, eu-ledger | filter $d.region == 'eu'",
-  'transactions':     'source "transactions", transactions-archive'
+  'transactions':     'source transactions(virtual=false), transactions-archive'
 };
 var VDNOTE = {
   'finance':          'three datasets under one name',
@@ -304,10 +305,15 @@ function evalQ(text, base, stack){
       var parts0 = m[1].split(','), off0 = s0 + tr.indexOf(m[1], 6);
       for (var q0 = 0; q0 < parts0.length; q0++){
         var raw0 = parts0[q0], k0 = raw0.trim(), kS0 = off0 + raw0.indexOf(k0);
-        /* a name in quotes reads the dataset itself, never a virtual dataset with the same name */
-        var mm = /^(")?([A-Za-z0-9_-]+)(")?$/.exec(k0);
-        if (!mm || !!mm[1] !== !!mm[3]) r.errs.push({ s: kS0, e: kS0 + Math.max(k0.length, 1), msg: mm ? 'a quote is not closed' : 'expected a dataset name, like payments' });
-        else { var nS = kS0 + (mm[1] ? 1 : 0); resolve(r, mm[2], !!mm[1], nS, nS + mm[2].length, stack); }
+        /* name(virtual=false) reads the dataset itself; name(virtual=true) only a virtual dataset */
+        var mm = /^([A-Za-z0-9_-]+)(?:\(\s*virtual\s*=\s*(true|false)\s*\))?$/.exec(k0);
+        if (!mm){
+          var qm = /^"([A-Za-z0-9_-]+)"$/.exec(k0);
+          r.errs.push({ s: kS0, e: kS0 + Math.max(k0.length, 1), msg: qm ? 'double quotes do not pick a dataset. Use ' + qm[1] + '(virtual=false)' : 'expected a dataset name, like payments' });
+        }
+        else if (mm[2] === 'true' && VDS[mm[1]] == null) r.errs.push({ s: kS0, e: kS0 + mm[1].length, msg: 'no virtual dataset called ' + mm[1] });
+        else if (mm[2] === 'false' && !DS[mm[1]]) r.errs.push({ s: kS0, e: kS0 + mm[1].length, msg: 'no dataset called ' + mm[1] });
+        else resolve(r, mm[1], mm[2] === 'false', kS0, kS0 + mm[1].length, stack);
         off0 += raw0.length + 1;
       }
       r.srcCount = parts0.length;
@@ -411,7 +417,7 @@ function highlight(text, res, hl){
   var n = text.length, cls = new Array(n), i, m;
   for (i = 0; i < n; i++) cls[i] = '';
   function mark(s, e, c){ for (var j = Math.max(0, s); j < Math.min(n, e); j++) cls[j] += ' ' + c; }
-  var re = /\b(source|filter|union|choose|limit|countby|count|groupby|aggregate)\b|\$d\.\w+|'[^']*'|"[^"]*"|\b\d+\b/g;
+  var re = /\b(source|filter|union|choose|limit|countby|count|groupby|aggregate)\b|\$d\.\w+|'[^']*'|\b\d+\b|\bvirtual\b|\btrue\b|\bfalse\b/g;
   while ((m = re.exec(text))){
     var t = m[0], c = /^\$d/.test(t) ? 'kp' : (/^'|^\d/.test(t) ? 'lit' : 'k');
     mark(m.index, m.index + t.length, c);
@@ -474,9 +480,9 @@ function Editor(ids, opts){
   function size(){ ta.style.height = 'auto'; pre.style.minHeight = ''; var h = Math.max(pre.scrollHeight, ta.scrollHeight); pre.style.minHeight = h + 'px'; ta.style.height = h + 'px'; }
   function acContext(){
     var pos = ta.selectionStart, before = ta.value.slice(0, pos);
-    var m = /(?:^|[|(]\s*)source\s+(?:"?[A-Za-z0-9_-]+"?\s*,\s*)*("?)([A-Za-z0-9_-]*)$/.exec(before);
+    var m = /(?:^|[|(]\s*)source\s+(?:[A-Za-z0-9_-]+(?:\([^)]*\))?\s*,\s*)*()([A-Za-z0-9_-]*)$/.exec(before);
     if (!m || ta.selectionStart !== ta.selectionEnd) return null;
-    return { prefix: m[2], start: pos - m[2].length, quoted: !!m[1] };
+    return { prefix: m[2], start: pos - m[2].length, quoted: false };
   }
   function buildAc(){
     var ctx = acContext();
@@ -613,12 +619,12 @@ function readsTree(name, stack){
       return '<li><span class="vr">' + esc(r.name) + '</span> <span class="note">virtual dataset' + (loop ? ', loop' : '') + '</span>' +
         (loop ? '' : readsTree(r.name, stack.concat(r.name))) + '</li>';
     }
-    return '<li><code>' + (VDS[r.name] != null ? '"' + esc(r.name) + '"' : esc(r.name)) + '</code> <span class="note">dataset' + (VDS[r.name] != null ? ', the one with the same name' : '') + '</span></li>';
+    return '<li><code>' + esc(r.name) + (VDS[r.name] != null ? '(virtual=false)' : '') + '</code> <span class="note">dataset' + (VDS[r.name] != null ? ', same name as a virtual dataset' : '') + '</span></li>';
   }).join('') + '</ul>';
 }
 function vdSec(name){
   var h = '<div class="hsec hdoc"><div class="dh"><span class="tag t-virtual">virtual dataset</span><code>' + esc(name) + '</code>' + vdEts(name) + '</div>';
-  if (DS[name]) h += '<div class="sub">It has the same name as a dataset. Write <code>source "' + esc(name) + '"</code>, in quotes, to read the dataset.</div>';
+  if (DS[name]) h += '<div class="sub">It has the same name as a dataset. Write <code>source ' + esc(name) + '(virtual=false)</code> to read the dataset.</div>';
   if (canDef){
     var def = VDS[name], res = evalQ(def, 0, [name]);
     h += '<b ' + LBL + '>Definition</b><div class="codebox">' + highlight(def, res, null).replace(/\n$/, '') + '</div>' +
@@ -770,7 +776,7 @@ var EX = [
   ['source failed-by-region | filter $d._count > 10', 'the operator is inside the definition'],
   ['source finance-eu | limit 10', 'virtual inside virtual, plus a dataset'],
   ['source transactions | filter $d.amount > 100', 'same name: reads current and archive'],
-  ['source "transactions" | filter $d.amount > 100', 'in quotes: the dataset itself only'],
+  ['source transactions(virtual=false) | filter $d.amount > 100', 'the dataset itself only'],
   ['source finance, spans | limit 5', 'a virtual dataset and a dataset in one source'],
   ['source finance | filter $d.blocked', 'type error, shown on the name']
 ];
