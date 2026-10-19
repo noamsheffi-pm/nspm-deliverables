@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Labels Mockup</title>
+<style>
+:root{
+  --bg:#F8FAFC; --surface:#FFFFFF; --hover:#0000000D; --focus:#E6FFF2;
+  --tx:#1C1C1C; --tx2:#68686D; --ph:#B0B0B5; --green:#029449; --green-d:#02763A;
+  --err:#EB6166; --bd:#ECECEE; --bd2:#DEDEE0; --warn-bg:#FFF7E0; --warn-bd:#E4B83C;
+  --blue-bg:#5095ED22; --blue-tx:#1E5F9E; --vl-bg:#8E5BE822; --vl-tx:#6B3FC4;
+  --grey-bg:#C9D1D933; --grey-tx:#323D4E;
+  --font:'Nunito Sans',Helvetica,Roboto,Arial,sans-serif; --mono:'Inconsolata',ui-monospace,monospace;
+  --shadow:0 8px 24px rgba(33,43,59,.16);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:400 12px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+code{font:400 12px/1.5 var(--mono);background:var(--bg);padding:0 4px;border-radius:4px;border:1px solid var(--bd)}
+
+.note{background:#FFFDF5;border-bottom:1px solid var(--warn-bd);padding:12px 16px;display:flex;gap:24px;flex-wrap:wrap}
+.note h2{font:700 13px/1.5 var(--font);width:100%}
+.note .col{flex:1 1 260px;min-width:0}
+.note b{font-weight:700}
+.note ul{margin:4px 0 0;padding-left:18px}
+.note li{margin:2px 0}
+.pending{display:inline-block;font:600 10px/1.6 var(--font);color:#8A6A00;background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:4px;padding:0 5px;margin-left:4px;vertical-align:1px}
+
+.screens{display:flex;gap:6px;padding:10px 16px;background:#1C1C1C;align-items:center;flex-wrap:wrap}
+.screens span{color:#B0B0B5;font-weight:600;margin-right:6px}
+.screens button{background:transparent;color:#E6E6E8;border:1px solid #444;border-radius:6px;padding:4px 10px;font:600 12px/1.5 var(--font);cursor:pointer}
+.screens button.on{background:var(--green);border-color:var(--green);color:#fff}
+
+.pagehead{background:var(--surface);padding:12px 16px 0}
+.crumb{color:var(--tx2);font-weight:600}
+.pagehead h1{font:600 20px/1.5 var(--font)}
+.tabs{display:flex;gap:8px;height:32px;border-bottom:1px solid var(--bd);margin-top:8px}
+.tab{position:relative;padding:4px 8px;font:600 12px/1.5 var(--font);color:var(--tx2);background:none;border:none;cursor:default}
+.tab.on{color:var(--green)}
+.tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--green)}
+main{padding:16px}
+
+.card{background:var(--surface);border:1px solid var(--bd);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:16px}
+.titlesec{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.titlesec .txt{flex:1 1 300px;display:flex;flex-direction:column;gap:4px}
+.titlesec h2{font:600 16px/1.5 var(--font)}
+.titlesec p{font-weight:600;color:var(--tx2)}
+
+.btn{min-height:32px;padding:2px 12px;border-radius:6px;font:600 12px/1.5 var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--tx)}
+.btn-solid{background:var(--green-d);color:#fff}
+.btn-solid:hover{background:var(--green)}
+.btn-outline{border-color:var(--bd2)}
+.btn-outline:hover{background:var(--hover)}
+.btn-link{padding:0;min-height:0;color:var(--green);border:none}
+.btn-icon{width:28px;min-height:28px;padding:0;justify-content:center;color:var(--tx2)}
+.btn-icon:hover{background:var(--hover)}
+
+.card>*{min-width:0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{text-align:left;font-weight:700;color:var(--tx2);padding:8px 10px;border-bottom:1px solid var(--bd2);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+tr.row:hover td{background:var(--hover)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td{font-weight:700;border-top:1px solid var(--bd2)}
+tr.unmatched td{color:var(--tx2);font-style:italic}
+
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:0 6px;font-weight:600;line-height:20px}
+.tag.vl{background:var(--vl-bg);color:var(--vl-tx)}
+.tag.ph{background:var(--grey-bg);color:var(--grey-tx)}
+.tag.blue{background:var(--blue-bg);color:var(--blue-tx)}
+
+.empty-hint{color:var(--tx2)}
+
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(9,7,25,.45);display:flex;justify-content:flex-end;z-index:10}
+.drawer{width:min(720px,100%);height:100%;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.drawer header{padding:16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.drawer header h2{font:600 16px/1.5 var(--font);flex:1}
+.drawer .body{padding:16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:18px}
+.drawer footer{padding:12px 16px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-weight:700}
+.field .help{color:var(--tx2)}
+.input{height:32px;border:1px solid var(--bd2);border-radius:6px;padding:0 8px;font:400 12px/1.5 var(--font);width:100%;background:#fff;color:var(--tx)}
+.input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--focus)}
+.prefix{display:flex;align-items:center;border:1px solid var(--bd2);border-radius:6px;overflow:hidden;max-width:320px}
+.prefix span{padding:0 8px;background:var(--bg);color:var(--tx2);font-family:var(--mono);line-height:30px;border-right:1px solid var(--bd2)}
+.prefix input{border:none;height:30px;padding:0 8px;font:400 12px/1.5 var(--mono);flex:1;min-width:0}
+.prefix input:focus{outline:none}
+
+.source{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.opt{border:1px solid var(--bd2);border-radius:8px;padding:10px;display:flex;gap:8px;cursor:pointer;background:#fff;text-align:left;font:inherit;color:inherit}
+.opt.on{border-color:var(--green);background:var(--focus)}
+.opt.off{opacity:.55;cursor:not-allowed}
+.dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--bd2);flex:none;margin-top:2px;position:relative;background:#fff}
+.opt.on .dot{border-color:var(--green)}
+.opt.on .dot::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--green)}
+.opt b{display:block}
+.opt small{color:var(--tx2);font-size:11px}
+
+.map td{padding:6px 6px}
+.map select,.map input{height:28px;border:1px solid var(--bd2);border-radius:6px;padding:0 6px;font:400 12px/1.5 var(--font);width:100%;background:#fff}
+.map td.arrow{color:var(--tx2);text-align:center;width:24px}
+.conflict td{background:#FDECEC}
+.conflict .msg{color:var(--err);font-weight:600;font-size:11px}
+
+.preview{border:1px solid var(--bd);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.preview h3{font:700 12px/1.5 var(--font)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--bd)}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--tx2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.info{display:flex;gap:8px;padding:10px;border-radius:6px;background:var(--blue-bg);color:var(--blue-tx)}
+
+/* usage screen */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.groupby{display:flex;align-items:center;gap:6px;border:1px solid var(--bd2);border-radius:6px;padding:3px 6px;background:#fff;position:relative}
+.groupby .lbl{color:var(--tx2);font-weight:600}
+.gb-menu{position:absolute;top:36px;left:0;background:#fff;border:1px solid var(--bd2);border-radius:6px;box-shadow:var(--shadow);min-width:240px;z-index:5;padding:4px 0}
+.gb-menu .sec{padding:6px 10px 2px;color:var(--tx2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+.gb-menu button{display:flex;width:100%;gap:6px;align-items:center;padding:6px 10px;border:none;background:none;font:inherit;cursor:pointer;text-align:left}
+.gb-menu button:hover{background:var(--hover)}
+.chart{display:flex;gap:10px;align-items:flex-end;height:150px;padding:8px 4px;border-bottom:1px solid var(--bd2)}
+.chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
+.chart .stack{width:100%;max-width:56px;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;overflow:hidden}
+.chart .stack i{display:block}
+.chart small{color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.reconcile{display:flex;align-items:center;gap:6px;color:#24734B;font-weight:600}
+</style>
+</head>
+<body>
+
+<section class="note" aria-label="Notes for Omer">
+  <h2>Virtual labels: mockup for design kickoff (Omer, 19-10)</h2>
+  <div class="col">
+    <b>What it is.</b> An admin defines a label such as <code>team</code> from env + service. It is computed at read time. Nothing is written to the data, so ingested and billed units never change.
+    <ul>
+      <li>Screen 1: list of virtual labels.</li>
+      <li>Screen 2: create or edit one (mapping).</li>
+      <li>Screen 3: data usage grouped by the label.</li>
+    </ul>
+  </div>
+  <div class="col">
+    <b>Open, do not lock yet.</b>
+    <ul>
+      <li>Where the definition screen lives. Shown under Data Usage here only as a placeholder. <span class="pending">Arch RFC</span></li>
+      <li>Does a mapping change re-label past periods? <span class="pending">Arch RFC</span></li>
+      <li>One env + service mapped to two values: reject, split or first wins? Shown as "reject". <span class="pending">open</span></li>
+    </ul>
+  </div>
+  <div class="col">
+    <b>Not in v1.</b> A label read from a <code>$d</code> field (shown disabled, the design should leave room). Quota per label. Labels written at ingest.
+    <br><b>Reference only.</b> Layout and data are a starting point for your design, not a spec. Numbers are sample data.
+    <br>Epic: <a href="https://coralogix.atlassian.net/browse/CX-59797">CX-59797</a> · RFC: <a href="https://coralogix.atlassian.net/browse/CX-64630">CX-64630</a>
+  </div>
+</section>
+
+<nav class="screens" aria-label="Screens">
+  <span>Screen:</span>
+  <button data-screen="list" class="on">1 · Virtual labels list</button>
+  <button data-screen="edit">2 · Create / edit</button>
+  <button data-screen="usage">3 · Usage by virtual label</button>
+</nav>
+
+<div class="pagehead">
+  <div class="crumb">Settings / Data Usage</div>
+  <h1>Data Usage</h1>
+  <div class="tabs">
+    <button class="tab" id="tab-usage">Usage</button>
+    <button class="tab">Quota</button>
+    <button class="tab on" id="tab-vl">Virtual labels <span class="pending">placement TBD</span></button>
+  </div>
+</div>
+
+<main>
+  <!-- SCREEN 1 -->
+  <section id="s-list" class="card">
+    <div class="titlesec">
+      <div class="txt">
+        <h2>Virtual labels</h2>
+        <p>Group usage by your own units, such as team. Labels are computed when you read data. They never change ingested or billed units.</p>
+      </div>
+      <button class="btn btn-solid" id="new-vl">+ New virtual label</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Name</th><th>Source</th><th class="num">Values</th><th class="num">Usage matched (7d)</th><th>Updated</th><th></th></tr></thead>
+        <tbody id="vl-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SCREEN 3 -->
+  <section id="s-usage" class="card" hidden>
+    <div class="titlesec">
+      <div class="txt">
+        <h2>Usage</h2>
+        <p>Last 7 days · units</p>
+      </div>
+      <div class="toolbar">
+        <div class="groupby" id="gb">
+          <span class="lbl">Group by</span>
+          <span class="tag vl" id="gb-current">team · virtual</span>
+          <button class="btn btn-icon" id="gb-toggle" aria-label="Change group by">▾</button>
+          <div class="gb-menu" id="gb-menu" hidden>
+            <div class="sec">Labels</div>
+            <button data-gb="application"><span class="tag ph">application</span></button>
+            <button data-gb="subsystem"><span class="tag ph">subsystem</span></button>
+            <button data-gb="pillar"><span class="tag ph">pillar</span></button>
+            <div class="sec">Virtual labels</div>
+            <button data-gb="team"><span class="tag vl">team · virtual</span></button>
+            <button data-gb="business_unit"><span class="tag vl">business_unit · virtual</span></button>
+          </div>
+        </div>
+        <button class="btn btn-outline">Filter: team = any</button>
+      </div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="legend">
+      <span><i style="background:#3B82C4"></i>Logs</span>
+      <span><i style="background:#8E5BE8"></i>Spans</span>
+      <span><i style="background:#3CC67E"></i>Metrics</span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th id="gb-head">team</th><th class="num">Logs</th><th class="num">Spans</th><th class="num">Metrics</th><th class="num">Total units</th><th class="num">Share</th></tr></thead>
+        <tbody id="usage-rows"></tbody>
+      </table>
+    </div>
+    <div class="reconcile" style="color:var(--tx2)">Unmatched usage stays visible, so the split never hides units. Must the total match billed units exactly? <span class="pending">Halo RFC</span></div>
+  </section>
+</main>
+
+<!-- SCREEN 2: drawer -->
+<div class="overlay" id="drawer" hidden>
+  <div class="drawer" role="dialog" aria-labelledby="dr-title">
+    <header>
+      <h2 id="dr-title">New virtual label</h2>
+      <button class="btn btn-icon" id="dr-close" aria-label="Close">✕</button>
+    </header>
+    <div class="body">
+      <div class="field">
+        <label for="vl-name">Name</label>
+        <div class="prefix"><span>$l.</span><input id="vl-name" value="team"></div>
+        <div class="help">Users query it as <code>$l.team</code> in DataPrime and group usage by it.</div>
+      </div>
+
+      <div class="field">
+        <label>Source</label>
+        <div class="source">
+          <button class="opt on" type="button"><span class="dot"></span><span><b>Map existing labels</b><small>env + service to a value</small></span></button>
+          <button class="opt" type="button" id="opt-stack"><span class="dot"></span><span><b>Map another virtual label</b><small>e.g. team to business unit</small></span></button>
+          <button class="opt off" type="button" disabled><span class="dot"></span><span><b>From a data field</b><small>read a <code>$d</code> field · not in v1</small></span></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Mapping</label>
+        <div class="help">Each env + service pair gets one value. Usage that matches no row shows as "Unmatched".</div>
+        <div class="tablewrap">
+          <table class="map">
+            <thead><tr><th>env</th><th>service</th><th></th><th>team</th><th></th></tr></thead>
+            <tbody id="map-rows"></tbody>
+          </table>
+        </div>
+        <div><button class="btn btn-link" id="add-row">+ Add row</button> · <button class="btn btn-link">Import CSV</button></div>
+      </div>
+
+      <div class="preview">
+        <h3>Preview, last 7 days</h3>
+        <div class="bar" id="pv-bar"></div>
+        <div class="legend" id="pv-legend"></div>
+      </div>
+
+      <div class="info">ⓘ <span>Saving changes nothing in stored data. Whether past periods show the new mapping is still open. <span class="pending">Arch RFC</span></span></div>
+    </div>
+    <footer>
+      <button class="btn btn-outline" id="dr-cancel">Cancel</button>
+      <button class="btn btn-solid" id="dr-save">Save</button>
+    </footer>
+  </div>
+</div>
+
+<script>
+var COLORS=['#3B82C4','#8E5BE8','#3CC67E','#E4B83C','#E86B5B','#5BC0DE'];
+var labels=[
+  {name:'team',source:'env + service',values:4,matched:'91%',updated:'19-10 · Noam'},
+  {name:'business_unit',source:'team (virtual)',values:2,matched:'91%',updated:'19-10 · Noam'}
+];
+var mapping=[
+  ['prod','checkout','payments'],
+  ['prod','billing-api','payments'],
+  ['prod','search','discovery'],
+  ['staging','checkout','payments-staging'],
+  ['prod','auth','platform'],
+  ['prod','search','growth']
+];
+var usage={
+  team:[['payments',412000,188000,96000],['discovery',260000,90000,41000],['platform',150000,77000,52000],['payments-staging',38000,9000,6000],['Unmatched',61000,25000,17000]],
+  business_unit:[['commerce',710000,287000,143000],['core',150000,77000,52000],['Unmatched',61000,25000,17000]],
+  application:[['web',520000,210000,80000],['mobile',240000,110000,62000],['backend',161000,69000,70000]],
+  subsystem:[['checkout',450000,180000,90000],['search',260000,90000,41000],['auth',150000,77000,52000],['other',61000,42000,29000]],
+  pillar:[['logs',921000,0,0],['spans',0,389000,0],['metrics',0,0,212000]]
+};
+var gbVirtual={team:1,business_unit:1};
+var gb='team';
+
+function $(id){return document.getElementById(id)}
+function fmt(n){return n.toLocaleString('en-US')}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+function renderList(){
+  $('vl-rows').innerHTML=labels.map(function(l){
+    return '<tr class="row"><td><span class="tag vl">'+esc(l.name)+'</span></td><td>'+esc(l.source)+'</td><td class="num">'+l.values+'</td><td class="num">'+l.matched+'</td><td>'+esc(l.updated)+'</td><td><button class="btn btn-link edit">Edit</button></td></tr>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.edit'),function(b){b.onclick=function(){openDrawer('Edit virtual label')}});
+}
+
+function renderMap(){
+  var seen={};
+  $('map-rows').innerHTML=mapping.map(function(r,i){
+    var k=r[0]+'|'+r[1], dup=seen[k]!==undefined; seen[k]=i;
+    return '<tr'+(dup?' class="conflict"':'')+'><td><select data-i="'+i+'" data-c="0">'+opts(['prod','staging','dev'],r[0])+'</select></td>'+
+      '<td><select data-i="'+i+'" data-c="1">'+opts(['checkout','billing-api','search','auth','ingest-gw'],r[1])+'</select></td>'+
+      '<td class="arrow">→</td><td><input data-i="'+i+'" data-c="2" value="'+esc(r[2])+'">'+(dup?'<div class="msg">This pair already has a value. One pair, one value.</div>':'')+'</td>'+
+      '<td><button class="btn btn-icon del" data-i="'+i+'" aria-label="Remove row">✕</button></td></tr>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#map-rows select,#map-rows input'),function(el){
+    el.onchange=function(){mapping[+el.dataset.i][+el.dataset.c]=el.value;renderMap();};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#map-rows .del'),function(b){
+    b.onclick=function(){mapping.splice(+b.dataset.i,1);renderMap();};
+  });
+  renderPreview();
+}
+function opts(list,v){if(list.indexOf(v)<0)list=list.concat([v]);return list.map(function(o){return '<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>'}).join('')}
+
+function renderPreview(){
+  var vals={},seen={},ok=0;mapping.forEach(function(r){var k=r[0]+'|'+r[1];if(seen[k]||!r[2])return;seen[k]=1;ok++;vals[r[2]]=(vals[r[2]]||0)+1});
+  var names=Object.keys(vals), parts=[];
+  names.forEach(function(n,i){parts.push([n,ok?vals[n]/ok*91:0,COLORS[i%COLORS.length]])});
+  parts.push(['Unmatched',100-parts.reduce(function(a,p){return a+p[1]},0),'#C9D1D9']);
+  $('pv-bar').innerHTML=parts.map(function(p){return '<i style="width:'+p[1].toFixed(1)+'%;background:'+p[2]+'"></i>'}).join('');
+  $('pv-legend').innerHTML=parts.map(function(p){return '<span><i style="background:'+p[2]+'"></i>'+esc(p[0])+' · '+p[1].toFixed(0)+'%</span>'}).join('');
+}
+
+function renderUsage(){
+  var rows=usage[gb], grand=rows.reduce(function(a,r){return a+r[1]+r[2]+r[3]},0), max=0;
+  rows.forEach(function(r){max=Math.max(max,r[1]+r[2]+r[3])});
+  $('gb-head').textContent=gb;
+  $('gb-current').className='tag '+(gbVirtual[gb]?'vl':'ph');
+  $('gb-current').textContent=gb+(gbVirtual[gb]?' · virtual':'');
+  $('chart').innerHTML=rows.map(function(r){
+    var t=r[1]+r[2]+r[3], h=Math.round(t/max*120);
+    return '<div class="col"><div class="stack" style="height:'+h+'px">'+
+      [[r[1],'#3B82C4'],[r[2],'#8E5BE8'],[r[3],'#3CC67E']].map(function(s){return '<i style="height:'+(t?s[0]/t*100:0)+'%;background:'+s[1]+'"></i>'}).join('')+
+      '</div><small title="'+esc(r[0])+'">'+esc(r[0])+'</small></div>';
+  }).join('');
+  var body=rows.map(function(r){
+    var t=r[1]+r[2]+r[3];
+    return '<tr class="row'+(r[0]==='Unmatched'?' unmatched':'')+'"><td>'+esc(r[0])+'</td><td class="num">'+fmt(r[1])+'</td><td class="num">'+fmt(r[2])+'</td><td class="num">'+fmt(r[3])+'</td><td class="num">'+fmt(t)+'</td><td class="num">'+(t/grand*100).toFixed(1)+'%</td></tr>';
+  }).join('');
+  var L=0,S=0,M=0;rows.forEach(function(r){L+=r[1];S+=r[2];M+=r[3]});
+  $('usage-rows').innerHTML=body+'<tr class="total"><td>Total</td><td class="num">'+fmt(L)+'</td><td class="num">'+fmt(S)+'</td><td class="num">'+fmt(M)+'</td><td class="num">'+fmt(grand)+'</td><td class="num">100%</td></tr>';
+}
+
+function show(screen){
+  Array.prototype.forEach.call(document.querySelectorAll('.screens button'),function(b){b.classList.toggle('on',b.dataset.screen===screen)});
+  $('s-list').hidden=screen==='usage';
+  $('s-usage').hidden=screen!=='usage';
+  $('tab-vl').classList.toggle('on',screen!=='usage');
+  $('tab-usage').classList.toggle('on',screen==='usage');
+  $('drawer').hidden=screen!=='edit';
+}
+function openDrawer(title){$('dr-title').textContent=title;show('edit')}
+
+Array.prototype.forEach.call(document.querySelectorAll('.screens button'),function(b){b.onclick=function(){show(b.dataset.screen)}});
+$('new-vl').onclick=function(){openDrawer('New virtual label')};
+$('dr-close').onclick=$('dr-cancel').onclick=$('dr-save').onclick=function(){show('list')};
+$('add-row').onclick=function(){mapping.push(['prod','ingest-gw',''] );renderMap();};
+$('gb-toggle').onclick=function(e){e.stopPropagation();$('gb-menu').hidden=!$('gb-menu').hidden};
+Array.prototype.forEach.call(document.querySelectorAll('#gb-menu button'),function(b){b.onclick=function(){gb=b.dataset.gb;$('gb-menu').hidden=true;renderUsage();}});
+document.addEventListener('click',function(){$('gb-menu').hidden=true});
+
+renderList();renderMap();renderUsage();
+var q=location.hash.replace('#','');if(q==='edit'||q==='usage')show(q);
+</script>
+</body>
+</html>
