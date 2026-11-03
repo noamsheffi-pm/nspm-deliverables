@@ -442,7 +442,7 @@
       <div class="f-left">
         <div class="f-tag"><span class="chip or">Behind a flag</span><span class="f-name">TCO for Metrics</span></div>
         <h3 class="f-h cl">Want to stop paying for a metric nobody uses? Open TCO, go to Metrics, block it.</h3>
-        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>Metrics cost control moves into the TCO screen: All metrics and Adaptive rules.</p></div><div class="ba-row now"><span class="k">What you get</span><p>See each metric's share of usage and block a costly one, on the same screen as logs, traces and RUM.</p></div><div class="ba-row"><span class="k">Before</span><p>Metrics cost lived on a separate Metric Data page, with a different look.</p></div><div class="ba-row ask"><span class="k">Related asks</span><p>Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics</p></div></div>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>Metrics cost control moves into the TCO screen: All metrics and Dynamic TCO rules.</p></div><div class="ba-row now"><span class="k">What you get</span><p>See each metric's share of usage and block a costly one, on the same screen as logs, traces and RUM.</p></div><div class="ba-row"><span class="k">Before</span><p>Metrics cost lived on a separate Metric Data page, with a different look.</p></div><div class="ba-row ask"><span class="k">Related asks</span><p>Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics</p></div></div>
         <div class="gtk"><div class="k">Good to know</div><ul><li>Behind a flag for now</li><li>Block is the only action</li></ul></div>
       </div>
       <div class="f-right">
@@ -450,7 +450,7 @@
 <div class="tco-g">
   <div class="tco-rail"><span>Overview</span><span>Logs</span><span>Traces</span><span class="on">Metrics</span><span>RUM</span></div>
   <div class="tco-main">
-    <div class="tabs"><span class="on">All metrics</span><span>Adaptive rules</span></div>
+    <div class="tabs"><span class="on">All metrics</span><span>Dynamic TCO rules</span></div>
     <div class="mt-row"><span class="sk" style="width:200px"></span><span class="mt-u">31%</span><span class="mt-b">Block</span></div>
     <div class="mt-row hot"><span class="sk" style="width:160px"></span><span class="mt-u">24%</span><span class="mt-b on">Blocked</span></div>
     <div class="mt-row"><span class="sk" style="width:220px"></span><span class="mt-u">12%</span><span class="mt-b">Block</span></div>
@@ -460,7 +460,7 @@
 <span class="note-tag up" style="left:230px;bottom:30px">Find the costly metric. Block it here.</span></div></div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-61259" target="_blank" rel="noopener">CX-61259</a><a href="https://coralogix.atlassian.net/browse/CX-61262" target="_blank" rel="noopener">CX-61262</a><a href="https://coralogix.atlassian.net/browse/CX-61260" target="_blank" rel="noopener">CX-61260</a></div></div>
       </div>
     </div>
-    <div class="notes-data" hidden><b>SHOW:</b> Data Flow &gt; TCO Optimizer &gt; Metrics &gt; All metrics. Point at the usage share, block one metric. Then the Adaptive rules tab. <b>Needs the flag TCO-V2-metrics on for the demo tenant</b> (Adaptive rules has its own flag). <b>Status:</b> Iulian 02-11: "Yes, metrics on TCO Screen is ready to demo. under FF for now." Jira Feature CX-61259 In Progress, Nimbus CX-61262 In Progress, design done. <b>&#9888; Do not promise:</b> on for all customers (flag). Edit, reorder or enable/disable a rule (block only). That a blocked metric costs nothing: block is a soft block, still metered, about 8% (open with Mohan and Halo). Cardinality in the stats. View as Code for metric rules (CX-63874, Backlog). Removing the old Metric Data page (CX-65411, To Do). <b>Owner split:</b> the backend stays with Mohan (Chrono, CX-46362). We own the screen. <b>Asks:</b> no PIPE linked. Accounts from the Q3 signal sweep, metrics cost theme: Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics.</div>
+    <div class="notes-data" hidden><b>SHOW:</b> Data Flow &gt; TCO Optimizer &gt; Metrics &gt; All metrics. Point at the usage share, block one metric. Then the Dynamic TCO rules tab. <b>Needs the flag TCO-V2-metrics on for the demo tenant</b> (Dynamic TCO rules has its own flag). <b>Status:</b> Iulian 02-11: "Yes, metrics on TCO Screen is ready to demo. under FF for now." Jira Feature CX-61259 In Progress, Nimbus CX-61262 In Progress, design done. <b>&#9888; Do not promise:</b> on for all customers (flag). Edit, reorder or enable/disable a rule (block only). That a blocked metric costs nothing: block is a soft block, still metered, about 8% (open with Mohan and Halo). Cardinality in the stats. View as Code for metric rules (CX-63874, Backlog). Removing the old Metric Data page (CX-65411, To Do). <b>Owner split:</b> the backend stays with Mohan (Chrono, CX-46362). We own the screen. <b>Asks:</b> no PIPE linked. Accounts from the Q3 signal sweep, metrics cost theme: Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics.</div>
   </section>
 
   <section class="slide" data-screen-label="05 TCO screen" data-id="tco" data-step="2">
