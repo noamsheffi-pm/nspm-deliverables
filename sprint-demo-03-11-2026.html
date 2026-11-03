@@ -309,6 +309,41 @@
   .p-row.ds .mono { font-family: var(--mono); font-size: 20px; }
   .p-row.ds.hl { background: var(--mint-soft); border-radius: 8px; }
   .p-row.ds .mb { color: var(--mint); font-weight: 700; }
+  .map-cols.four { grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .four .fs { flex-direction: column; gap: 14px; }
+  .four .fcard { padding: 18px 22px; }
+  .four .fcard .t { font-size: 23px; margin: 10px 0 6px; }
+  .four .fcard p { font-size: 19px; }
+  .four .stop .q { margin: 26px 0 6px; font-size: 23px; }
+  .four .stop .h { font-size: 32px; margin-bottom: 20px; }
+  .s-map h2 { font-size: 58px; }
+  .map { margin-top: 44px; }
+  button.next-bar { all: unset; cursor: pointer; margin-top: auto; display: flex; align-items: center; gap: 36px; border: 1.5px dashed var(--line-2); border-radius: 18px; padding: 22px 34px; background: var(--card); }
+  button.next-bar:hover { border-color: var(--orange-line); }
+  .tco-g { display: grid; grid-template-columns: 170px 1fr; gap: 26px; flex: 1; min-height: 0; }
+  .tco-rail { display: flex; flex-direction: column; gap: 8px; border-right: 1.5px solid var(--line); padding-right: 18px; }
+  .tco-rail span { font-size: 20px; font-weight: 600; color: var(--text-3); padding: 10px 14px; border-radius: 10px; }
+  .tco-rail span.on { color: var(--mint); background: var(--mint-soft); }
+  .tco-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .mt-row { display: grid; grid-template-columns: 1fr 80px 120px; gap: 16px; align-items: center; padding: 14px 12px; border-bottom: 1.5px solid var(--line); }
+  .mt-row.hot { background: var(--orange-soft); border-radius: 10px; }
+  .mt-u { font-size: 20px; color: var(--text-2); font-variant-numeric: tabular-nums; text-align: right; }
+  .mt-b { font-size: 17px; font-weight: 700; text-align: center; padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--line-2); color: var(--text-2); }
+  .mt-b.on { color: var(--bg); background: var(--orange); border-color: var(--orange); }
+  .lb-h { font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+  .lb-ln { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: center; font-family: var(--mono); font-size: 22px; padding: 12px 16px; border-radius: 10px; background: #0a0c10; border: 1.5px solid var(--line); }
+  .lb-k { color: var(--text-2); }
+  .lb-v { color: var(--text); }
+  .lb-ln.new { border-color: var(--mint-line); background: var(--mint-soft); }
+  .lb-ln.new .lb-k { color: var(--mint); font-weight: 700; }
+  .lb-arrow { font-size: 19px; font-weight: 700; color: var(--mint); display: flex; align-items: center; gap: 12px; padding-left: 16px; }
+  .lb-arrow::before { content: ""; border-top: 12px solid var(--mint); border-left: 8px solid transparent; border-right: 8px solid transparent; }
+  .s-more .eyebrow.gr { color: var(--orange); }
+  .more h3 { color: var(--text); font-size: 34px; letter-spacing: -.01em; text-transform: none; }
+  .nx-n { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--orange); color: var(--orange); display: inline-flex; align-items: center; justify-content: center; font-size: 22px; }
+  .m-item h4 { font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); font-weight: 800; }
+  .m-item.big p.pitch { color: var(--orange); }
+  .m-item p b { color: var(--text); }
 </style>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -318,37 +353,43 @@
   <section class="slide s-map" data-screen-label="01 Customer path">
     <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><span class="pno"></span></div>
     <div class="eyebrow">Sprint demo &middot; 03-11-2026 &middot; Noam Sheffi</div>
-    <h2>Three questions customers ask. What we shipped to answer them.</h2>
+    <h2>Four questions customers ask, and what we built.</h2>
     <div class="map">
       <div class="map-line"></div>
-      <div class="map-cols">
+      <div class="map-cols four">
         <div class="stop">
           <span class="n">1</span>
-          <span class="q">"Where do my units go, and why am I blocked?"</span>
+          <span class="q">"Why am I blocked?"</span>
           <span class="h">See and cap what you use</span>
-          <span class="fs"><span class="fcard" data-go="overview"><span class="chip sm or">Rolling Out</span><div class="t">Usage Overview, full page</div><p>Why a team is blocked, and when it lifts.</p></span><span class="fcard" data-go="ai"><span class="chip sm">Live</span><div class="t">AI units: monthly, and the limit blocks</div><p>A monthly AI limit per team.</p></span></span>
+          <span class="fs"><span class="fcard" data-go="overview"><span class="chip sm or">Rolling Out</span><div class="t">Usage Overview, full page</div><p>Which quota, and when it lifts.</p></span><span class="fcard" data-go="ai"><span class="chip sm">Live</span><div class="t">AI units: monthly, team limit</div><p>The limit blocks, per team.</p></span></span>
         </div>
         <div class="stop">
           <span class="n">2</span>
-          <span class="q">"Where do I control cost for every signal?"</span>
+          <span class="q">"Where do I cut cost?"</span>
           <span class="h">One TCO screen</span>
-          <span class="fs"><span class="fcard" data-go="tco"><span class="chip sm">Shipped</span><div class="t">TCO side rail and Overview</div><p>Logs, traces, metrics and RUM in one place.</p></span><span class="fcard" data-go="tco"><span class="chip sm">Shipped</span><div class="t">Frequent Search as a destination</div><p>One name for this data on every screen.</p></span></span>
+          <span class="fs"><span class="fcard" data-go="metrics"><span class="chip sm or">Behind a flag</span><div class="t">TCO for Metrics</div><p>Block a costly metric in TCO.</p></span><span class="fcard" data-go="tco"><span class="chip sm">Shipped</span><div class="t">Side rail and Frequent Search</div><p>Every signal, one screen.</p></span></span>
         </div>
         <div class="stop">
           <span class="n">3</span>
-          <span class="q">"Does a new feature work on day one?"</span>
-          <span class="h">Datasets that are already there</span>
-          <span class="fs"><span class="fcard" data-go="dataset"><span class="chip sm">Shipped</span><div class="t">Predefined User Dataset</div><p>Coralogix creates it. You set retention and quota.</p></span></span>
+          <span class="q">"Which service sent this?"</span>
+          <span class="h">Labels on every log and span</span>
+          <span class="fs"><span class="fcard" data-go="labels"><span class="chip sm or">Rolling Out</span><div class="t">Pipeline Default Labels</div><p>Service and environment, no setup.</p></span></span>
+        </div>
+        <div class="stop">
+          <span class="n">4</span>
+          <span class="q">"Does it work on day one?"</span>
+          <span class="h">Datasets already there</span>
+          <span class="fs"><span class="fcard" data-go="dataset"><span class="chip sm">Shipped</span><div class="t">Predefined User Dataset</div><p>Coralogix creates it. You set the rules.</p></span></span>
         </div>
       </div>
-      <div class="next-bar">
-        <span class="eyebrow gr" style="font-size:20px;white-space:nowrap">Next</span>
+      <button class="next-bar" data-go="next">
+        <span class="eyebrow gr" style="font-size:20px;white-space:nowrap">Coming next</span>
         <span class="nb-i"><b>Virtual Datasets</b></span>
         <span class="nb-i"><b>Data Pipelines</b> <small>the new name for Traffic Management</small></span>
         <span class="chip gr sm" style="margin-left:auto">In build &middot; no date</span>
-      </div>
+      </button>
     </div>
-    <div class="notes-data" hidden>Open here, no title slide. <b>Say:</b> "This cycle answers three questions customers ask. Where do my units go, and why am I blocked? Where do I control cost for every signal? Does a new feature work on day one?" Each feature slide answers the same four things from the customer's seat: what is it, what do I get, how is it different, and the one line if I want to do X. Close the map with Next: Virtual Datasets first, then Data Pipelines. Both in build, no date.</div>
+    <div class="notes-data" hidden>Open here, no title slide. <b>Say:</b> "This cycle answers four questions customers ask. Why am I blocked? Where do I cut cost? Which service sent this? Does a new feature work on day one?" Each feature slide answers the same four things from the customer's seat: what is it, what do I get, how is it different, and the one line if I want to do X. Then a Coming next slide: Virtual Datasets first, then Data Pipelines.</div>
   </section>
 
   <section class="slide" data-screen-label="02 Usage Overview" data-id="overview" data-step="1">
@@ -375,7 +416,7 @@
     <div class="notes-data" hidden><b>SHOW:</b> Settings &gt; Organization &gt; Usage &amp; Quota, open the full page. <b>Needs the feature flag on for the demo tenant.</b> Then Group by &gt; Feature. <b>Status:</b> Iulian 02-11: "Everything is done, except the part with Move units history." On for customers this week. Jira Feature CX-61836 still In Progress (Nimbus CX-61841, Halo block history CX-61839). <b>&#9888; Do not promise:</b> Units moved history (no backend stores past moves, API CX-66173 parked). AI units forecast (use comes in bursts). A daily or monthly switch on the chart (Rafael asked 02-11, Iulian: maybe phase 2). Quota change history. <b>Group by feature</b> (CX-66626, Completed 10-30) splits usage that differs only by feature, for example backfill from regular ingestion. Hidden for IBM Cloud Logs. Default group by on Total CX units is now Pillar, then Priority (CX-63354, changed by CX-65441: Measurement was dropped). <b>PIPE:</b> none linked. Related: PIPEV2-4049, PIPEV2-4099 (customer field empty).</div>
   </section>
 
-  <section class="slide" data-screen-label="03 AI units" data-id="ai" data-step="2">
+  <section class="slide" data-screen-label="03 AI units" data-id="ai" data-step="1">
     <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
     <div class="feat">
       <div class="f-left">
@@ -395,14 +436,41 @@
     <div class="notes-data" hidden><b>SHOW:</b> Usage &amp; Quota &gt; AI units tab. Then Quota Rules &gt; AI units section to show where the team limit is set. <b>Status:</b> Gaspare 02-11: "we are already live with the AI units on monthly cycle (plus the blocker), it has been more than 1 week now." Missing items are cosmetic (better dataset events for customers). Rafael 02-11: "AI Units block is per team. It starts as soon as they reach their monthly quota." <b>Pricing test:</b> AI units were already charged. The story is control, the limit now blocks, not price. <b>Good to know:</b> CX units keep their own cycle. No grace on AI units, on purpose. <b>&#9888; Do not promise:</b> moving AI units on a monthly plan (Nimbus build CX-67007 starts this sprint). Top-up mid month (open with Rafael). Seeing blocked AI units in the product (CX-60469, MoneyGram PIPEV2-4230 waits on it). Per-user Olly caps (FactSet asked, not built). <b>&#9888; Open case:</b> Tekion POC hit a 20 per day AI block (CX-65792, Blocked, no owner). If asked, say we are on it; do not claim every account is clean. <b>PIPE (related by text, not linked):</b> PIPEV2-4230 MoneyGram, PIPEV2-4123 Orcid, PIPEV2-4143 H2O.ai.</div>
   </section>
 
-  <section class="slide" data-screen-label="04 One TCO screen" data-id="tco" data-step="3">
+  <section class="slide" data-screen-label="04 TCO for Metrics" data-id="metrics" data-step="2">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="feat">
+      <div class="f-left">
+        <div class="f-tag"><span class="chip or">Behind a flag</span><span class="f-name">TCO for Metrics</span></div>
+        <h3 class="f-h cl">Want to stop paying for a metric nobody uses? Open TCO, go to Metrics, block it.</h3>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>Metrics cost control moves into the TCO screen: All metrics and Adaptive rules.</p></div><div class="ba-row now"><span class="k">What you get</span><p>See each metric's share of usage and block a costly one, on the same screen as logs, traces and RUM.</p></div><div class="ba-row"><span class="k">Before</span><p>Metrics cost lived on a separate Metric Data page, with a different look.</p></div><div class="ba-row ask"><span class="k">Related asks</span><p>Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics</p></div></div>
+        <div class="gtk"><div class="k">Good to know</div><ul><li>Behind a flag for now</li><li>Block is the only action</li></ul></div>
+      </div>
+      <div class="f-right">
+        <div class="mock"><div class="mock-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="path">Data Flow &rsaquo; TCO Optimizer &rsaquo; <b>Metrics</b></span></div><div class="mock-body">
+<div class="tco-g">
+  <div class="tco-rail"><span>Overview</span><span>Logs</span><span>Traces</span><span class="on">Metrics</span><span>RUM</span></div>
+  <div class="tco-main">
+    <div class="tabs"><span class="on">All metrics</span><span>Adaptive rules</span></div>
+    <div class="mt-row"><span class="sk" style="width:200px"></span><span class="mt-u">31%</span><span class="mt-b">Block</span></div>
+    <div class="mt-row hot"><span class="sk" style="width:160px"></span><span class="mt-u">24%</span><span class="mt-b on">Blocked</span></div>
+    <div class="mt-row"><span class="sk" style="width:220px"></span><span class="mt-u">12%</span><span class="mt-b">Block</span></div>
+    <div class="mt-row"><span class="sk" style="width:140px"></span><span class="mt-u">7%</span><span class="mt-b">Block</span></div>
+  </div>
+</div>
+<span class="note-tag up" style="left:230px;bottom:30px">Find the costly metric. Block it here.</span></div></div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-61259" target="_blank" rel="noopener">CX-61259</a><a href="https://coralogix.atlassian.net/browse/CX-61262" target="_blank" rel="noopener">CX-61262</a><a href="https://coralogix.atlassian.net/browse/CX-61260" target="_blank" rel="noopener">CX-61260</a></div></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> Data Flow &gt; TCO Optimizer &gt; Metrics &gt; All metrics. Point at the usage share, block one metric. Then the Adaptive rules tab. <b>Needs the flag TCO-V2-metrics on for the demo tenant</b> (Adaptive rules has its own flag). <b>Status:</b> Iulian 02-11: "Yes, metrics on TCO Screen is ready to demo. under FF for now." Jira Feature CX-61259 In Progress, Nimbus CX-61262 In Progress, design done. <b>&#9888; Do not promise:</b> on for all customers (flag). Edit, reorder or enable/disable a rule (block only). That a blocked metric costs nothing: block is a soft block, still metered, about 8% (open with Mohan and Halo). Cardinality in the stats. View as Code for metric rules (CX-63874, Backlog). Removing the old Metric Data page (CX-65411, To Do). <b>Owner split:</b> the backend stays with Mohan (Chrono, CX-46362). We own the screen. <b>Asks:</b> no PIPE linked. Accounts from the Q3 signal sweep, metrics cost theme: Armis, Netskope, Deel, Xplor, Mobileye, Pacvue, Leadsquared, Echo Global Logistics.</div>
+  </section>
+
+  <section class="slide" data-screen-label="05 TCO screen" data-id="tco" data-step="2">
     <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
     <div class="duo">
         <div class="col">
-          <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">TCO Screen: Side Rail, Overview, Metrics</span></div>
-          <h3 class="d-h">Want to control cost for every signal? Open one screen.</h3>
-          <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>A side rail on the TCO screen: Overview, Logs, Traces, Metrics, RUM.</p></div><div class="ba-row now"><span class="k">What you get</span><p>Every signal's cost controls in one place. Block a costly metric from the Metrics tab.</p></div><div class="ba-row"><span class="k">Before</span><p>No navigation by signal. Metrics cost lived on a separate page with a different look.</p></div><div class="ba-row ask"><span class="k">Related asks</span><p>Armis, Netskope, Deel, Xplor, Mobileye, Pacvue (metrics cost)</p></div></div>
-          <div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-62727" target="_blank" rel="noopener">CX-62727</a><a href="https://coralogix.atlassian.net/browse/CX-62728" target="_blank" rel="noopener">CX-62728</a><a href="https://coralogix.atlassian.net/browse/CX-61259" target="_blank" rel="noopener">CX-61259</a><a href="https://coralogix.atlassian.net/browse/CX-61262" target="_blank" rel="noopener">CX-61262</a></div></div>
+          <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">TCO Side Rail and Overview</span></div>
+          <h3 class="d-h">Want every signal's cost controls in one place? Use the side rail.</h3>
+          <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>A side rail on the TCO screen: Overview, Logs, Traces, Metrics, RUM.</p></div><div class="ba-row now"><span class="k">What you get</span><p>An Overview first, then each signal one click away, with shared filters.</p></div><div class="ba-row"><span class="k">Before</span><p>No navigation by signal. Each signal's cost page had its own path and look.</p></div><div class="ba-row ask"><span class="k">Built for</span><p>One TCO screen for every signal. A new signal gets a tab, not a new page.</p></div></div>
+          <div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-62727" target="_blank" rel="noopener">CX-62727</a><a href="https://coralogix.atlassian.net/browse/CX-62728" target="_blank" rel="noopener">CX-62728</a></div></div>
         </div>
         <div class="col">
           <div class="f-tag"><span class="chip">Shipped</span><span class="f-name">Frequent Search as a TCO Destination</span></div>
@@ -411,10 +479,34 @@
           <div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-42711" target="_blank" rel="noopener">CX-42711</a><a href="https://coralogix.atlassian.net/browse/CX-54199" target="_blank" rel="noopener">CX-54199</a></div><div class="grp"><span class="lbl">PIPE</span><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-3416" target="_blank" rel="noopener">PIPEV2-3416</a><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-2975" target="_blank" rel="noopener">PIPEV2-2975</a></div></div>
         </div>
     </div>
-    <div class="notes-data" hidden><b>Left, TCO screen.</b> <b>SHOW:</b> Data Flow &gt; TCO Optimizer. Click through the rail: Overview, Logs, Traces, RUM. Then Metrics &gt; All metrics, block one metric. <b>Metrics needs the flag TCO-V2-metrics on for the demo tenant.</b> Iulian 02-11: "metrics on TCO Screen is ready to demo. under FF for now." Rail and Overview released 12-10, no flag. <b>&#9888; Do not promise:</b> Metrics for all customers yet (flag). Block is the only metric action: no edit, no reorder. Old Metric Data page stays for now (removal CX-65411). Last-tab memory: CX-64751 was closed by Iulian as "already works as intended". Check it once on the tenant before saying it. <b>PIPE:</b> none linked. Related accounts come from the Q3 signal sweep (metrics cost theme). <br><br><b>Right, Frequent Search.</b> <b>SHOW:</b> TCO &gt; open a policy with High priority, point at the destination: Frequent Search. Never shown in a demo before (01-09 and 06-10 left it out while the Nimbus epic was open). <b>&#9888; Do not promise:</b> high tier on S3 (only default/logs has OpenSearch behind it). Metrics in Frequent Search (logs and spans only). Frequent Search as a quota destination (dropped by design). Billing: default/ and frequentsearch/ bill as one unit. <b>PIPE (related by text):</b> PIPEV2-3416 dLocal, PIPEV2-2975 dLocal, Fourthline, SpinCity, Tenable. They ask about the Explore choice more than the TCO destination.</div>
+    <div class="notes-data" hidden><b>Left, side rail.</b> <b>SHOW:</b> Data Flow &gt; TCO Optimizer. Click through the rail: Overview, Logs, Traces, RUM. Rail and Overview released 12-10, no flag. Metrics has its own slide before this one. <b>&#9888; Do not promise:</b> new tabs with dates (Profiling is talked about, not planned here). Last-tab memory: CX-64751 was closed by Iulian as "already works as intended". Check it once on the tenant before saying it. <b>PIPE:</b> none. Started from the Nimbus TCO redesign. <br><br><b>Right, Frequent Search.</b> <b>SHOW:</b> TCO &gt; open a policy with High priority, point at the destination: Frequent Search. Never shown in a demo before (01-09 and 06-10 left it out while the Nimbus epic was open). <b>&#9888; Do not promise:</b> high tier on S3 (only default/logs has OpenSearch behind it). Metrics in Frequent Search (logs and spans only). Frequent Search as a quota destination (dropped by design). Billing: default/ and frequentsearch/ bill as one unit. <b>PIPE (related by text):</b> PIPEV2-3416 dLocal, PIPEV2-2975 dLocal, Fourthline, SpinCity, Tenable. They ask about the Explore choice more than the TCO destination.</div>
   </section>
 
-  <section class="slide" data-screen-label="05 Predefined User Dataset" data-id="dataset" data-step="4">
+  <section class="slide" data-screen-label="06 Pipeline Default Labels" data-id="labels" data-step="3">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="feat">
+      <div class="f-left">
+        <div class="f-tag"><span class="chip or">Rolling Out</span><span class="f-name">Pipeline Default Labels</span></div>
+        <h3 class="f-h cl">Filter by service and environment? The labels are already there.</h3>
+        <div class="ba lens"><div class="ba-row"><span class="k">What it is</span><p>On ingest, every log and span gets three labels: env, envType and serviceName.</p></div><div class="ba-row now"><span class="k">What you get</span><p>No setup. The same label names on logs and spans, ready for queries, filters and alerts.</p></div><div class="ba-row"><span class="k">Before</span><p>Service and environment sat in a different field for each source.</p></div><div class="ba-row ask"><span class="k">Related asks</span><p><b>GoFundMe</b> (PIPE, service as a usage label)</p></div></div>
+        <div class="gtk"><div class="k">Good to know</div><ul><li>Live in EU2, other regions follow</li><li>Logs and spans, not metrics</li></ul></div>
+      </div>
+      <div class="f-right">
+        <div class="mock"><div class="mock-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="path">Explore &rsaquo; <b>Logs</b></span></div><div class="mock-body">
+<div class="lb-h">One log record</div>
+<div class="lb-ln"><span class="lb-k">$l.applicationName</span><span class="lb-v">payments-prod</span></div>
+<div class="lb-ln"><span class="lb-k">$l.subsystemName</span><span class="lb-v">checkout-api</span></div>
+<div class="lb-arrow">Added on ingest</div>
+<div class="lb-ln new"><span class="lb-k">$l.env</span><span class="lb-v">payments-prod</span></div>
+<div class="lb-ln new"><span class="lb-k">$l.serviceName</span><span class="lb-v">checkout-api</span></div>
+<div class="lb-ln new"><span class="lb-k">$l.envType</span><span class="lb-v sk" style="width:120px;height:14px"></span></div>
+<span class="note-tag up" style="left:34px;bottom:30px">Same names on every log and span</span></div></div><div class="track"><span class="k">Tracked in</span><div class="grp"><span class="lbl">Jira</span><a href="https://coralogix.atlassian.net/browse/CX-62294" target="_blank" rel="noopener">CX-62294</a><a href="https://coralogix.atlassian.net/browse/CX-62295" target="_blank" rel="noopener">CX-62295</a><a href="https://coralogix.atlassian.net/browse/CX-62299" target="_blank" rel="noopener">CX-62299</a></div><div class="grp"><span class="lbl">PIPE</span><a class="pipe" href="https://coralogix.atlassian.net/browse/PIPEV2-3299" target="_blank" rel="noopener">PIPEV2-3299</a></div></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>SHOW:</b> only on an EU2 tenant. Explore &gt; Logs, open a record, point at $l.env and $l.serviceName. If the demo tenant is not EU2, show the slide only. <b>Status (02-11):</b> Tamir Guez is the feature owner. APIs and protos delivered to Nimbus, Wiktor updates the canary, e2e on staging. Marcel deployed bulks-ingester in EU2, other environments follow. Rafael rolled out the labels in EU2 and is watching cardinality protection. Before the ingester sync, Tamir saw the label missing in Frequent Search on EU2. Check it once. <b>&#9888; Do not promise:</b> other regions on a date. Metrics (Radiant does not touch metrics, owner open). The Pipeline Label Mapping screen where an admin sets the source order: not shown today. Labels in usage reports (Custom Usage Dimensions, CX-59797, is the next step). Cardinality limits (Harel 01-11: protection belongs in Radiant, release gate not decided). <b>Mapping:</b> non-OTel takes applicationName and subsystemName; OTel takes the OTel attributes. camelCase on logs and spans. $l.serviceName is new on logs; spans already had it. The mock values are illustrative. <b>PIPE:</b> PIPEV2-3299 (GoFundMe, add service name as a usage label), related by text, not linked.</div>
+  </section>
+
+  <section class="slide" data-screen-label="07 Predefined User Dataset" data-id="dataset" data-step="4">
     <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
     <div class="feat">
       <div class="f-left">
@@ -436,7 +528,34 @@
     <div class="notes-data" hidden><b>SHOW:</b> Dataset Management, dataspace default, point at the Managed by column. Open a Coralogix-managed dataset and show retention and quota. Verify the menu on the tenant first. <b>Status:</b> Feature CX-44513 Completed 11-10. Citadel CX-44514, Phoenix CX-44515, design and docs all Completed. It was Coming Next on 06-10, so this closes that promise. <b>&#9888; Do not promise:</b> users never see the word "predefined", the UI says Managed by. Users cannot change the schema, create, delete or rename these datasets. Routing into them is Radiant's TCO rule, not this Feature. Some predefined datasets stay hidden. Quota and billing follow default/logs. <b>Maybe say:</b> default/transactions may move from predefined to user-defined (CX-64362, Citadel, Pending Review). Only say it after Asaf confirms. <b>PIPE:</b> none. Internal driver, not a customer ask. The mock rows are illustrative.</div>
   </section>
 
-  <section class="slide s-thanks" data-screen-label="06 Thank you">
+  <section class="slide s-more" data-screen-label="08 Coming next" data-id="next" data-step="5">
+    <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><div class="rail"></div><span class="pno"></span></div>
+    <div class="eyebrow gr">Coming next &middot; in build &middot; no date</div>
+    <h2>Two things we are building now</h2>
+    <div class="more">
+      <div>
+        <h3><span class="nx-n">1</span>Virtual Datasets</h3>
+        <div class="m-item big">
+          <p class="pitch">Many datasets, one name.</p>
+          <p>Define a virtual dataset once: its sources and one filter. Query it by one name in DataPrime and Explore. Your users stop joining datasets by hand.</p>
+        </div>
+        <div class="m-item"><h4>Why</h4><p>Teams split data into many datasets. Every query then lists them all, and a rename breaks saved queries.</p></div>
+        <div class="m-item"><h4>Asked by</h4><p><b>Via Transportation</b> (PIPE), Gong.io, Kotak Mahindra Bank, Tango.me</p></div>
+      </div>
+      <div>
+        <h3><span class="nx-n">2</span>Data Pipelines</h3>
+        <div class="m-item big">
+          <p class="pitch">See how your data flows, and change it in one place.</p>
+          <p>A visual builder for routing, fan-out and transforms, from source to dataset. The new name for Traffic Management.</p>
+        </div>
+        <div class="m-item"><h4>Why</h4><p>Routing rules sit in TCO, parsing rules and dataset settings. Nobody sees the full path of a log.</p></div>
+        <div class="m-item"><h4>Looking for</h4><p>Design partners. Bring us an account that wants to try the builder early.</p></div>
+      </div>
+    </div>
+    <div class="notes-data" hidden><b>Say:</b> two items, in this order. Both in build, no date. <b>Virtual Datasets (CX-37168), priority 1:</b> phase 1 = sources plus one DPXL filter; no aggregations or group by. The query is rejected if the user cannot read every source. Same-name syntax: transactions(virtual=false) reads the dataset itself. <b>&#9888; Blocked:</b> the DLI RFC (CX-41805) had no owner on 20-10; Citadel CX-37170 started its part. Do not give a date. PIPE: PIPEV2-4006 (Via Transportation, nine datasets unioned by hand, escalated by the TAM). Gong.io wants it for its dataset migration; Kotak asked in May. <b>Data Pipelines (CX-49207), priority 2:</b> renamed from Traffic Management on 02-11. Radiant (Anton, Naor) drafted the proto models, not blocked. Nimbus: overview, pipeline list and a first graph. Builder-first, n8n-style canvas. TCO logs and spans policies become two pipelines later. <b>&#9888; Do not promise:</b> a date, or the migration of existing TCO policies. Design-partner kit went to the field on 09-10. </div>
+  </section>
+
+  <section class="slide s-thanks" data-screen-label="09 Thank you">
     <div class="top"><div class="brand"><i></i>Coralogix &middot; Data Pipeline</div><span class="pno"></span></div>
     <div class="eyebrow">Thank you</div>
     <h2>This cycle was powered by these teams</h2>
@@ -450,8 +569,8 @@
       <div class="tc"><b>Technical Writing</b><span>Maya</span></div>
       <div class="tc" style="background:none;border-style:dashed"><b>Questions?</b><span>Noam Sheffi</span></div>
     </div>
-    <p class="also"><b>Also this cycle:</b> edit a dataset description &middot; a quota rejection now names the quota and the team &middot; a limit cannot be saved at 0 units by mistake &middot; default RUM priority in TCO settings &middot; TCO Quota % fix and tooltip. <b>Next:</b> Virtual Datasets, then Data Pipelines. In build, no date.</p>
-    <div class="notes-data" hidden>Read the "Also this cycle" line fast, no demo. Keys: dataset description CX-51157, quota rejection CX-59858, 0-unit block CX-60120 (Nimbus) and CX-60233 (Phoenix), RUM priority CX-59303 / CX-59311, TCO Quota % CX-65914 / CX-65915 (tooltip ships today). <b>Next:</b> Virtual Datasets is priority 1. Data Pipelines is the new name for Traffic Management (renamed 02-11): Radiant started the proto models, no date. <b>If asked about Pipeline Default Labels (CX-62294):</b> rolling out by region. EU2 is live (Rafael and Marcel 02-11), other environments follow. Not shown today. Team names come from Jira assignees of tickets completed 06-10 to 03-11. Then hand over to questions.</div>
+    <p class="also"><b>Also this cycle:</b> edit a dataset description &middot; a quota rejection now names the quota and the team &middot; a limit cannot be saved at 0 units by mistake &middot; default RUM priority in TCO settings &middot; TCO Quota % fix and tooltip.</p>
+    <div class="notes-data" hidden>Read the "Also this cycle" line fast, no demo. Keys: dataset description CX-51157, quota rejection CX-59858, 0-unit block CX-60120 (Nimbus) and CX-60233 (Phoenix), RUM priority CX-59303 / CX-59311, TCO Quota % CX-65914 / CX-65915 (tooltip ships today). Team names come from Jira assignees of tickets completed 06-10 to 03-11. Then hand over to questions.</div>
   </section>
 
 </div></div>
@@ -462,7 +581,7 @@
   <button id="prev">&larr;</button>
   <div class="dots" id="dots"></div>
   <button id="next">&rarr;</button>
-  <span class="hint">&larr; &rarr; move &middot; 1 to 4 jump &middot; M map &middot; N notes &middot; F fullscreen</span>
+  <span class="hint">&larr; &rarr; move &middot; 1 to 5 jump &middot; M map &middot; N notes &middot; F fullscreen</span>
 </div>
 
 <script>
@@ -472,7 +591,7 @@
   const total = slides.length;
   const byId = {};
   slides.forEach((s, k) => { if (s.dataset.id) byId[s.dataset.id] = k; });
-  const order = ['overview', 'ai', 'tco', 'dataset'];
+  const order = ['overview', 'metrics', 'labels', 'dataset', 'next'];
   const KEY = 'sd-deck-0311';
   let i = 0;
   try { const s = parseInt(localStorage.getItem(KEY), 10); if (!isNaN(s)) i = Math.max(0, Math.min(total - 1, s)); } catch (e) {}
@@ -482,10 +601,11 @@
 
   // path rail on feature slides
   const railSteps = [
-    { n: 1, label: 'Usage Overview', go: 'overview' },
-    { n: 2, label: 'AI units', go: 'ai' },
-    { n: 3, label: 'TCO screen', go: 'tco' },
-    { n: 4, label: 'Datasets', go: 'dataset' }
+    { n: 1, label: 'Usage', go: 'overview' },
+    { n: 2, label: 'TCO', go: 'metrics' },
+    { n: 3, label: 'Labels', go: 'labels' },
+    { n: 4, label: 'Datasets', go: 'dataset' },
+    { n: '+', label: 'Next', go: 'next', or: true }
   ];
   slides.forEach(s => {
     const r = s.querySelector('.rail'); if (!r) return;
@@ -538,7 +658,7 @@
     else if (k === 'ArrowLeft' || k === 'PageUp') go(i - 1);
     else if (k === 'Home') go(0);
     else if (k === 'End') go(total - 1);
-    else if (/^[1-4]$/.test(k)) go(byId[order[+k - 1]]);
+    else if (/^[1-5]$/.test(k)) go(byId[order[+k - 1]]);
     else if (k.toLowerCase() === 'm') go(0);
     else if (k.toLowerCase() === 'n') notes.classList.toggle('show');
     else if (k.toLowerCase() === 'f') toggleFs();
