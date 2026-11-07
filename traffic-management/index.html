@@ -3,138 +3,119 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Traffic Management | Coralogix</title>
+<title>Traffic Management</title>
 <meta name="robots" content="noindex">
+<meta name="description" content="Traffic Management gives each business unit its own data pipeline and its own share of the company quota.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/replays/replay.css">
 <style>
-  /* Layout: one left-aligned column (68ch) for words, the app window wider beneath the headline; status as a mono strip. */
-  :root {
-    --bg: #f6f7f5; --bg-2: #ffffff; --fg: #12161a; --fg-2: #4a535c; --fg-3: #77808a;
-    --line: rgb(18 22 26 / .10); --line-2: rgb(18 22 26 / .18);
-    --accent: #0a9d5c; --accent-ink: #ffffff; --warn: #9a6400;
-    --ink: 18 22 26;
-    --font: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --ease: cubic-bezier(.2, .7, .2, 1);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0b0d0e; --bg-2: #14181a; --fg: #eef1ee; --fg-2: #a9b2ad; --fg-3: #7d8681;
-      --line: rgb(238 241 238 / .10); --line-2: rgb(238 241 238 / .18);
-      --accent: #13e989; --accent-ink: #04140c; --warn: #f2b84b;
-      --ink: 238 241 238; color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0b0d0e; --bg-2: #14181a; --fg: #eef1ee; --fg-2: #a9b2ad; --fg-3: #7d8681;
-    --line: rgb(238 241 238 / .10); --line-2: rgb(238 241 238 / .18);
-    --accent: #13e989; --accent-ink: #04140c; --warn: #f2b84b;
-    --ink: 238 241 238; color-scheme: dark;
-  }
-  body {
-    background: var(--bg); color: var(--fg); font: 400 16px/1.6 var(--font);
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1040px; margin: 0 auto; padding-block: 48px 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; }
-  .wrap > *, .hero-shot > * { min-width: 0; }
-  .prose { max-width: 68ch; }
-  h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; letter-spacing: -0.02em; }
-  h1 { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; }
-  h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.2; }
-  h3 { font-size: 1.05rem; line-height: 1.35; letter-spacing: -0.01em; }
-  p { margin: 0; }
-  .lead { font-size: 1.15rem; color: var(--fg-2); margin-top: 16px; }
-  .label { font: 500 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--fg-3); }
-
-  /* status strip: the facts every reader must carry away */
-  .status { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .chip { font: 500 12px/1 var(--mono); letter-spacing: .04em; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--fg-2); }
-  .chip.is-state { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
-
-  .hero-shot { display: grid; gap: 12px; }
-  .hero-shot .note { font-size: 13px; color: var(--fg-3); }
-  .cxw { max-width: 100%; margin: 0; }
-  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; } /* the site reset replay.css expects */
-
-  section { display: grid; gap: 24px; }
-  .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  .cell { display: grid; gap: 8px; align-content: start; padding: 20px; border-top: 2px solid var(--line-2); min-width: 0; }
-  .cell p { color: var(--fg-2); font-size: 15px; }
-  .usecase .cell:nth-child(3) { border-top-color: var(--accent); }
-
-  .ask { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: start; padding: 28px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); }
-  .ask ul { margin: 12px 0 0; padding-left: 18px; color: var(--fg-2); display: grid; gap: 6px; }
-  .links { display: grid; gap: 10px; }
-  .btn { display: inline-flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; text-decoration: none; font-weight: 500; border: 1px solid var(--line-2); color: var(--fg); }
-  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-  .btn:hover { border-color: var(--accent); }
-  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .btn span { font: 400 12px var(--mono); opacity: .75; }
-  .fine { font-size: 13px; color: var(--fg-3); }
-
-  @media (max-width: 760px) {
-    .wrap { padding-block: 28px 48px; gap: 48px; }
-    .cols, .ask { grid-template-columns: minmax(0, 1fr); }
-    .ask { padding: 20px; gap: 20px; }
-  }
+/* Layout: Coralogix brand, always dark (black, #13E989, #86FFC9); one column; their October as the centre of the page */
+:root{
+  --bg:#000; --bg-1:#0b0b0c; --bg-2:#121214; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg-0:#fff; --fg:#f2f2f2; --fg-2:#a9a9a9; --fg-3:#6e6e6e; --accent:#13E989; --mint:#86FFC9;
+  --grad:linear-gradient(90deg,#e6fff4 0%,#86FFC9 35%,#13E989 100%); --card:#0d0d0e;
+  --bar:#13E989; --bar-quiet:#2c6e4e; --limit:#fbbf24; --ink:255 255 255;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{max-width:1040px;margin:0 auto;padding-block:40px 72px;display:grid;gap:88px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{height:24px;width:auto}
+.mono{font-family:var(--mono);font-size:13px;color:var(--fg-3)}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.02em}
+.hero{display:grid;gap:22px;text-align:center;justify-items:center;padding-top:40px}
+h1{font-size:clamp(38px,7vw,72px);line-height:1.04;letter-spacing:-.035em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2.2vw,20px);color:var(--fg-2);max-width:60ch;margin:0}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.12;letter-spacing:-.025em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+section{display:grid;gap:24px;min-width:0}
+.head{display:grid;gap:10px;justify-items:center;text-align:center}
+.head p{margin:0;color:var(--fg-2);max-width:62ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:4px}
+.stat .n{font-family:var(--mono);font-size:34px;font-weight:500;color:var(--fg-0);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat .n small{font-size:15px;color:var(--fg-3);margin-left:4px}
+.stat .l{color:var(--fg-2);font-size:14px}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;min-width:0}
+.svgwrap{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:560px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--fg-2)}
+.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:middle}
+.legend i.line{height:0;width:18px;border-top:2px solid var(--c);background:none;border-radius:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:8px;align-content:start}
+.card h3{margin:0;font-size:18px;font-weight:600;color:var(--fg-0)}
+.card p{margin:0;color:var(--fg-2);font-size:15px}
+.card .k{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.shot{min-width:0}
+.cxw button{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.fine{font-size:13px;color:var(--fg-3);text-align:center;margin:0}
+.trade{display:grid;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.trade div{display:grid;grid-template-columns:minmax(160px,240px) 1fr;gap:16px;padding:16px 22px;border-top:1px solid var(--line)}
+.trade div:first-child{border-top:0}
+.trade b{color:var(--fg-0);font-weight:600}.trade span{color:var(--fg-2)}
+@media (max-width:600px){.trade div{grid-template-columns:1fr;gap:2px}.page{gap:64px}}
+.final{text-align:center;display:grid;gap:12px;justify-items:center;padding:48px 20px;border:1px solid var(--line);border-radius:20px;
+  background:radial-gradient(ellipse at top,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),var(--bg-1)}
+.final p{margin:0;color:var(--fg-2)}
+footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--fg-2)}
+.chip.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.cxw{margin:0}
 </style>
-
 </head>
 <body>
-<div class="wrap">
-  <header class="prose">
-    <div class="status" aria-label="Status">
-      <span class="chip is-state">Coming soon</span>
-      <span class="chip">Design preview</span>
-    </div>
-    <p class="label">Traffic Management</p>
-    <h1 style="margin-top:12px">One noisy business unit no longer spends everyone's quota</h1>
-    <p class="lead">Traffic Management gives each business unit its own data pipeline and its own share of the company quota.</p>
-  </header>
+<div class="page">
+<header class="top">
+  <svg class="logo" viewBox="0 0 1018 221" role="img" aria-label="Coralogix"><path fill="#86ffc9" d="M188.8 112.5a93.8 93.8 0 1 1-187.5 0 93.8 93.8 0 0 1 187.6 0Z"/><path fill="#13e989" d="M162.9 112.5a67.7 67.7 0 1 1-135.5 0 67.7 67.7 0 0 1 135.5 0Z"/><path fill="currentColor" style="color:var(--fg-0)" d="M301.3 181.1a63.6 63.6 0 0 1-64.1-66.4c0-9.5 1.5-18.3 4.6-26.3a62.3 62.3 0 0 1 59.4-39.8 62 62 0 0 1 24.7 4.6 56.2 56.2 0 0 1 18.6 12.4c5 5 8.7 10.7 10.9 16.7l-21 9.9a34 34 0 0 0-33-22.2c-8.3 0-15.3 1.8-21.5 5.6-6.1 3.8-10.9 9-14.3 15.7-3.4 6.7-5 14.5-5 23.4s1.6 16.9 5 23.7a39.4 39.4 0 0 0 14.3 15.6c6.2 3.8 13.3 5.7 21.4 5.7s15-2 20.8-6.2a35 35 0 0 0 12.2-16l21 9.8a46.2 46.2 0 0 1-10.8 17 62 62 0 0 1-43.3 16.9Zm111.6 0a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49 49 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.4-13.6c2.2-4.4 3.4-9.2 3.4-14.6s-1.1-10.4-3.5-14.5a24.8 24.8 0 0 0-22.3-13.8 26 26 0 0 0-23 13.8c-2.1 4.1-3.2 9-3.2 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6Zm62.7 18.6V85.3h21.2V106l-1.7-3c2.2-7 5.6-12 10.2-14.7a32.8 32.8 0 0 1 16.9-4.1h5.5v20h-8.1c-6.4 0-11.6 2-15.5 6-4 3.9-5.9 9.4-5.9 16.5V179h-22.6Zm89.1 2.1c-6.5 0-12.2-1-17-3.3s-8.6-5.3-11.2-9.3c-2.7-4.1-4-8.9-4-14.3a26.7 26.7 0 0 1 14.1-24.1c4.9-2.8 11-4.7 18.3-5.9l30.7-5v17.3l-26.4 4.4c-4.5.8-7.8 2.3-10 4.3-2.2 2.1-3.3 4.8-3.3 8.1s1.2 5.8 3.7 7.8c2.5 1.8 5.6 2.8 9.3 2.8 4.7 0 8.8-1 12.4-3a20 20 0 0 0 8.4-8.4c2-3.6 3.1-7.5 3.1-11.7v-24.1c0-4-1.6-7.4-4.8-10a18 18 0 0 0-12.4-4.2 22.1 22.1 0 0 0-21 14.1l-18.5-9c1.9-4.9 4.7-9.1 8.6-12.7a44 44 0 0 1 14.2-8.6c5.4-2 11.2-3 17.5-3a47 47 0 0 1 20.4 4.2 31.6 31.6 0 0 1 18.6 29.2V179H594v-16l4.8-.3c-2.4 4-5.2 7.4-8.6 10.1a38.8 38.8 0 0 1-25.5 8.3Zm67.8-2.1V48.6H655V179h-22.5Zm85.5 2.1a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49.2 49.2 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.3-13.6c2.3-4.4 3.5-9.2 3.5-14.6s-1.2-10.4-3.5-14.5a24.8 24.8 0 0 0-22.4-13.8 26 26 0 0 0-23 13.8c-2 4.1-3.1 9-3.1 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6ZM826.2 217c-7 0-13.5-1.2-19.5-3.5s-11-5.5-15.5-9.7a36 36 0 0 1-9.3-14.3l21-7.9c1.4 4.4 4.1 7.9 8.2 10.5 4 2.8 9.1 4.2 15.1 4.2 4.6 0 8.6-.9 12-2.6 3.6-1.7 6.4-4.3 8.3-7.6 2-3.2 3-7.1 3-11.7V153l4.3 5.2a32.1 32.1 0 0 1-13 12.7 45.7 45.7 0 0 1-41.9-1.7c-6.8-4-12.2-9.5-16.1-16.5-4-7-5.9-14.9-5.9-23.6s2-16.8 5.9-23.6a44.4 44.4 0 0 1 57.6-17.8 36 36 0 0 1 13.4 12.6l-3.1 5.7V85.3H872v89a41.4 41.4 0 0 1-22.2 37 48.7 48.7 0 0 1-23.6 5.6Zm-1-62.6c4.8 0 9-1 12.6-3.1a23 23 0 0 0 8.6-9c2-3.8 3-8.1 3-13s-1-9.2-3.2-13a23.3 23.3 0 0 0-21-12.4c-4.7 0-9 1-12.8 3.3a23.6 23.6 0 0 0-9 9.1c-2 3.8-3 8.1-3 13s1 9 3 12.9c2.2 3.8 5.2 6.7 8.9 9 3.7 2.1 8 3.2 12.9 3.2Zm64.2 24.6V85.3h22.5V179h-22.5Zm0-104.2V50.7h22.5v24h-22.5ZM920.5 179l32.8-47-33-46.7H947l25.7 37.9h-12l25.8-38h26.3L980 132l32.6 47h-26.4l-25.3-37.7h11.5L947.1 179h-26.6Z"/></svg>
+  <span class="mono">Traffic Management · November 2026</span>
+</header>
 
-  <div class="hero-shot">
-    <figure data-title="Data flow · traffic management · metrics pipeline" class="cxw" aria-label="Traffic Management design preview: the metrics pipeline sends cluster metrics down their own route, drops debug metrics, and caps the platform business unit's share at 12 CxU a day, with the rest blocked"><div class="cxr" data-replay="assets/replays/tm-noisy-team.json"></div></figure>
-    <p class="note">Design preview with sample data. The final product may differ. Hover the window to pause it; the corner button opens it larger.</p>
+<section class="hero">
+  <div class="chips"><span class="chip on">Coming soon</span><span class="chip">Design preview</span></div>
+  <span class="kicker">Traffic Management</span>
+  <h1>One noisy business unit <span class="g">no longer spends everyone's quota</span></h1>
+  <p class="lead">Traffic Management gives each business unit its own data pipeline and its own share of the company quota.</p>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">See it in the design</span><h2>Each business unit gets its own share</h2>
+  <p>The metrics pipeline sends cluster metrics down their own route, drops debug metrics, and caps the platform business unit at 12 CxU a day.</p></div>
+  <div class="shot"><figure class="cxw" data-title="Data flow · traffic management · metrics pipeline" aria-label="Traffic Management design preview: the metrics pipeline sends cluster metrics down their own route, drops debug metrics, and caps the platform business unit&#x27;s share at 12 CxU a day, with the rest blocked"><div class="cxr" data-replay="assets/replays/tm-noisy-team.json"></div></figure></div>
+  <p class="fine">Design preview with sample data. The final product may differ. Hover the window to pause it; the corner button opens it larger.</p>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">The problem today</span><h2>One business unit&#x27;s spike blocks data for the others</h2></div>
+  <div class="cards">
+    <div class="card"><h3>One shared pool</h3><p>The quota is set for the whole company, not per business unit. The one that spikes first uses what the others need.</p></div>
+    <div class="card"><h3>Extra teams as a workaround</h3><p>Companies split into more Coralogix teams just to get separate budgets. Queries across those teams then break.</p></div>
+    <div class="card"><h3>Three screens, one decision</h3><p>Routing, TCO and quota sit in different places. No one sees where data goes and what it costs in one view.</p></div>
   </div>
+</section>
 
-  <section>
-    <div class="prose">
-      <p class="label">The problem today</p>
-      <h2 style="margin-top:8px">One business unit's spike blocks data for the others</h2>
-    </div>
-    <div class="cols">
-      <div class="cell"><h3>One shared pool</h3><p>The quota is set for the whole company, not per business unit. The one that spikes first uses what the others need.</p></div>
-      <div class="cell"><h3>Extra teams as a workaround</h3><p>Companies split into more Coralogix teams just to get separate budgets. Queries across those teams then break.</p></div>
-      <div class="cell"><h3>Three screens, one decision</h3><p>Routing, TCO and quota sit in different places. No one sees where data goes and what it costs in one view.</p></div>
-    </div>
-  </section>
+<section>
+  <div class="head"><span class="kicker">Use case</span><h2>Cluster metrics stop eating the quota payments needs</h2></div>
+  <div class="cards">
+    <div class="card"><span class=k>what happened</span><h3>The cluster spikes</h3><p>The platform business unit runs the Kubernetes clusters, and their metrics grow every week. All business units share one metrics quota. When the cluster spikes, metrics from payments stop arriving.</p></div>
+    <div class="card"><span class=k>what the page shows</span><h3>Its own route and cap</h3><p>The metrics pipeline. A route sends cluster metrics down their own path. A block drops debug metrics. A Set quota, &quot;Platform share&quot;, lets 12 CxU a day through to platform. Payments keeps its own route.</p></div>
+    <div class="card"><span class=k>what the admin knows</span><h3>The spike stays inside</h3><p>The spike stays inside the business unit that made it. Platform has its own share and its own data flow. No extra Coralogix team was created to get a separate budget.</p></div>
+  </div>
+</section>
 
-  <section class="usecase">
-    <div class="prose">
-      <p class="label">Use case</p>
-      <h2 style="margin-top:8px">Cluster metrics stop eating the quota payments needs</h2>
-    </div>
-    <div class="cols">
-      <div class="cell"><h3>What happened</h3><p>The platform business unit runs the Kubernetes clusters, and their metrics grow every week. All business units share one metrics quota. When the cluster spikes, metrics from payments stop arriving.</p></div>
-      <div class="cell"><h3>What the page shows</h3><p>The metrics pipeline. A route sends cluster metrics down their own path. A block drops debug metrics. A Set quota, "Platform share", lets 12 CxU a day through to platform. Payments keeps its own route.</p></div>
-      <div class="cell"><h3>What the admin knows</h3><p>The spike stays inside the business unit that made it. Platform has its own share and its own data flow. No extra Coralogix team was created to get a separate budget.</p></div>
-    </div>
-  </section>
+<section class="final">
+  <span class="kicker">Coming soon</span>
+  <h2>Do your business units share one quota?</h2>
+  <p>Talk to your Coralogix contact about how your business units split data and quota today. We are shaping this feature with customers now.</p>
+</section>
 
-  <section class="ask">
-    <div>
-      <p class="label">Coming soon</p>
-      <h2 style="margin-top:8px">Do your business units share one quota?</h2>
-      <p style="margin-top:12px;color:var(--fg-2)">Talk to your Coralogix contact about how your business units split data and quota today. We are shaping this feature with customers now.</p>
-    </div>
-  </section>
+<footer><span class="mono">Design preview with sample data. The final product may differ.</span><span class="mono">© Coralogix 2026</span></footer>
 </div>
-
 <script>document.body.dataset.replays = "lean";</script>
 <script src="assets/vendor/rrweb-replay-1.1.3.min.js"></script>
 <script src="assets/replays/replay.js"></script>
