@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traffic Management | Coralogix</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/replays/replay.css">
+<style>
+  /* Layout: one left-aligned column (68ch) for words, the app window wider beneath the headline; status as a mono strip. */
+  :root {
+    --bg: #f6f7f5; --bg-2: #ffffff; --fg: #12161a; --fg-2: #4a535c; --fg-3: #77808a;
+    --line: rgb(18 22 26 / .10); --line-2: rgb(18 22 26 / .18);
+    --accent: #0a9d5c; --accent-ink: #ffffff; --warn: #9a6400;
+    --ink: 18 22 26;
+    --font: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0d0e; --bg-2: #14181a; --fg: #eef1ee; --fg-2: #a9b2ad; --fg-3: #7d8681;
+      --line: rgb(238 241 238 / .10); --line-2: rgb(238 241 238 / .18);
+      --accent: #13e989; --accent-ink: #04140c; --warn: #f2b84b;
+      --ink: 238 241 238; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0d0e; --bg-2: #14181a; --fg: #eef1ee; --fg-2: #a9b2ad; --fg-3: #7d8681;
+    --line: rgb(238 241 238 / .10); --line-2: rgb(238 241 238 / .18);
+    --accent: #13e989; --accent-ink: #04140c; --warn: #f2b84b;
+    --ink: 238 241 238; color-scheme: dark;
+  }
+  body {
+    background: var(--bg); color: var(--fg); font: 400 16px/1.6 var(--font);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-block: 48px 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; }
+  .wrap > *, .hero-shot > * { min-width: 0; }
+  .prose { max-width: 68ch; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; letter-spacing: -0.02em; }
+  h1 { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; }
+  h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.2; }
+  h3 { font-size: 1.05rem; line-height: 1.35; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  .lead { font-size: 1.15rem; color: var(--fg-2); margin-top: 16px; }
+  .label { font: 500 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--fg-3); }
+
+  /* status strip: the facts every reader must carry away */
+  .status { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { font: 500 12px/1 var(--mono); letter-spacing: .04em; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--fg-2); }
+  .chip.is-state { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+
+  .hero-shot { display: grid; gap: 12px; }
+  .hero-shot .note { font-size: 13px; color: var(--fg-3); }
+  .cxw { max-width: 100%; margin: 0; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; } /* the site reset replay.css expects */
+
+  section { display: grid; gap: 24px; }
+  .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .cell { display: grid; gap: 8px; align-content: start; padding: 20px; border-top: 2px solid var(--line-2); min-width: 0; }
+  .cell p { color: var(--fg-2); font-size: 15px; }
+  .usecase .cell:nth-child(3) { border-top-color: var(--accent); }
+
+  .ask { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: start; padding: 28px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); }
+  .ask ul { margin: 12px 0 0; padding-left: 18px; color: var(--fg-2); display: grid; gap: 6px; }
+  .links { display: grid; gap: 10px; }
+  .btn { display: inline-flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; text-decoration: none; font-weight: 500; border: 1px solid var(--line-2); color: var(--fg); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn:hover { border-color: var(--accent); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn span { font: 400 12px var(--mono); opacity: .75; }
+  .fine { font-size: 13px; color: var(--fg-3); }
+
+  @media (max-width: 760px) {
+    .wrap { padding-block: 28px 48px; gap: 48px; }
+    .cols, .ask { grid-template-columns: minmax(0, 1fr); }
+    .ask { padding: 20px; gap: 20px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="prose">
+    <div class="status" aria-label="Status">
+      <span class="chip is-state">Coming soon</span>
+      <span class="chip">Design preview</span>
+    </div>
+    <p class="label">Traffic Management</p>
+    <h1 style="margin-top:12px">One noisy business unit no longer spends everyone's quota</h1>
+    <p class="lead">Traffic Management gives each business unit its own data pipeline and its own share of the company quota.</p>
+  </header>
+
+  <div class="hero-shot">
+    <figure data-title="Data flow · traffic management · metrics pipeline" class="cxw" aria-label="Traffic Management design preview: the metrics pipeline sends cluster metrics down their own route, drops debug metrics, and caps the platform business unit's share at 12 CxU a day, with the rest blocked"><div class="cxr" data-replay="assets/replays/tm-noisy-team.json"></div></figure>
+    <p class="note">Design preview with sample data. The final product may differ. Hover the window to pause it; the corner button opens it larger.</p>
+  </div>
+
+  <section>
+    <div class="prose">
+      <p class="label">The problem today</p>
+      <h2 style="margin-top:8px">One business unit's spike blocks data for the others</h2>
+    </div>
+    <div class="cols">
+      <div class="cell"><h3>One shared pool</h3><p>The quota is set for the whole company, not per business unit. The one that spikes first uses what the others need.</p></div>
+      <div class="cell"><h3>Extra teams as a workaround</h3><p>Companies split into more Coralogix teams just to get separate budgets. Queries across those teams then break.</p></div>
+      <div class="cell"><h3>Three screens, one decision</h3><p>Routing, TCO and quota sit in different places. No one sees where data goes and what it costs in one view.</p></div>
+    </div>
+  </section>
+
+  <section class="usecase">
+    <div class="prose">
+      <p class="label">Use case</p>
+      <h2 style="margin-top:8px">Cluster metrics stop eating the quota payments needs</h2>
+    </div>
+    <div class="cols">
+      <div class="cell"><h3>What happened</h3><p>The platform business unit runs the Kubernetes clusters, and their metrics grow every week. All business units share one metrics quota. When the cluster spikes, metrics from payments stop arriving.</p></div>
+      <div class="cell"><h3>What the page shows</h3><p>The metrics pipeline. A route sends cluster metrics down their own path. A block drops debug metrics. A Set quota, "Platform share", lets 12 CxU a day through to platform. Payments keeps its own route.</p></div>
+      <div class="cell"><h3>What the admin knows</h3><p>The spike stays inside the business unit that made it. Platform has its own share and its own data flow. No extra Coralogix team was created to get a separate budget.</p></div>
+    </div>
+  </section>
+
+  <section class="ask">
+    <div>
+      <p class="label">Coming soon</p>
+      <h2 style="margin-top:8px">Do your business units share one quota?</h2>
+      <p style="margin-top:12px;color:var(--fg-2)">Talk to your Coralogix contact about how your business units split data and quota today. We are shaping this feature with customers now.</p>
+    </div>
+  </section>
+</div>
+
+<script>document.body.dataset.replays = "lean";</script>
+<script src="assets/vendor/rrweb-replay-1.1.3.min.js"></script>
+<script src="assets/replays/replay.js"></script>
+</body>
+</html>
