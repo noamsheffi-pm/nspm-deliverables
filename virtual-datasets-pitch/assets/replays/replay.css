@@ -1,0 +1,142 @@
+/* DOM replay frames (assets/replays/replay.js) */
+.cxw { position: relative; isolation: isolate; border-radius: 16px; border: 1px solid var(--line-2); background: #0b0b0c;
+  box-shadow: 0 40px 90px -40px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.05); }
+.cxw-bar { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #161618, #111113); }
+.cxw-bar i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .25); }
+.cxw-bar i:nth-child(2) { background: #febc2e; }
+.cxw-bar i:nth-child(3) { background: #28c840; }
+.cxw-bar span { margin-left: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cxr { position: relative; aspect-ratio: var(--ar, 16 / 9); overflow: hidden; background: #0f1011; }
+:root[data-theme="light"] .cxr { background: #f7f8f8; }
+.cxr-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: 0; } /* shown at once when ready: a fade on every (re)build read as flicker */
+.cxr.is-ready:not(.is-styling) .cxr-stage { opacity: 1; } /* is-styling: the app's stylesheet is still on its way (replay.js styled) */
+.cxr iframe { border: 0; display: block; pointer-events: none; }
+.cxr .replayer-wrapper { position: relative; }
+/* the pointer is placed by replay.js, every frame, from the clip's own path (see "the pointer" there): rrweb's
+   inline left/top would put it back on the capture's ~15 samples a second, and a transition would lag behind it */
+.cxr .replayer-mouse { position: absolute; width: 20px; height: 20px; z-index: 2;
+  left: 0 !important; top: 0 !important; transition: none; translate: var(--cxr-mx, -40px) var(--cxr-my, -40px);
+  background: no-repeat 2px 1px / 16px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 1.5v12.2l3.3-3.1 2.2 4.9 2.1-.9-2.2-4.8h4.5z' fill='%23111' stroke='%23fff' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.cxr .replayer-mouse::after { content: ""; position: absolute; left: -16px; top: -16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(19,233,137,.45); opacity: 0; transform: scale(.3); }
+.cxr .replayer-mouse.active::after { animation: cxrClick .5s ease-out; }
+@keyframes cxrClick { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.4); } }
+@media (max-width: 560px) { .cxr:not([data-still]) { aspect-ratio: 4 / 3 !important; } } /* stills keep their exact framing */ /* phones: a taller window, so the camera can frame a readable region */
+
+/* Light/Dark toggle for the app inside a replay window */
+.cxw-bar span { flex: 1; min-width: 0; }
+.cxw-theme { margin-left: auto; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; color: var(--fg-3); transition: color .2s, background .2s; }
+.cxw-theme:hover { color: var(--fg); background: rgb(var(--ink) / .08); }
+.cxw-theme svg { grid-area: 1 / 1; width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.cxw-theme[data-mode="dark"] .i-moon, .cxw-theme[data-mode="light"] .i-sun { display: none; } /* shows the theme you'd switch to */
+
+/* a window in light mode: light chrome around the light app */
+.cxw, .cxw-bar, .cxr { transition: background-color .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease); }
+.cxw[data-skin="light"] { background: #fff; border-color: rgba(10,12,11,.14); box-shadow: 0 40px 90px -40px rgba(0,0,0,.2), inset 0 1px 0 #fff; }
+.cxw[data-skin="light"] .cxw-bar { background: linear-gradient(180deg, #f6f7f7, #eceeed); border-bottom-color: rgba(10,12,11,.1); }
+.cxw[data-skin="light"] .cxw-bar span { color: #6b706f; }
+.cxw[data-skin="light"] .cxw-theme { color: #6b706f; }
+.cxw[data-skin="light"] .cxw-theme:hover { color: #0b0c0c; background: rgba(10,12,11,.07); }
+.cxw[data-skin="light"] .cxr { background: #f7f8f8; }
+
+.cxr[data-still] .replayer-mouse { display: none; } /* stills are product shots: no pointer */
+
+.cxr[data-interactive] iframe { pointer-events: auto !important; } /* rrweb sets pointer-events:none inline */ /* interactive stills take the pointer */
+.cxw-live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10.5px; font-style: normal; color: var(--accent); }
+.cxw-live i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.cxw-live + .cxw-theme { margin-left: 12px; }
+@media (max-width: 560px) { .cxw-live { display: none; } }
+/* the clip's pre-rendered still: shown only instead of the replay while a phone is
+   pinch-zoomed (the live app is taken down then: iOS would run out of memory redrawing it) */
+.cxr > .cxr-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; -webkit-mask-image: none; mask-image: none; } /* beats .hero-shot img */
+.cxr.is-zoomed > .cxr-poster { display: block; }
+/* a playing clip with data-interactive: paused under the pointer, the app is the visitor's to explore */
+@media (hover: none) { .cxr[data-interactive]:not([data-still]) iframe { pointer-events: none !important; } }
+.cxr.is-live .replayer-mouse { display: none; }
+/* the window's own pause state: a small bar at the bottom left (play/pause and a line saying what's going on),
+   shown on hover and kept while paused; a pause sign flashes in the middle at the moment the clip stops */
+.cxr-hold { position: absolute; left: 12px; bottom: 12px; z-index: 4; display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px); padding: 4px 12px 4px 4px; border-radius: 10px;
+  background: rgb(14 15 16 / .86); border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 10px 30px rgb(0 0 0 / .45); color: #f2f3f3; cursor: auto;
+  opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s; pointer-events: none; }
+.cxr:hover > .cxr-hold, .cxr.is-held > .cxr-hold, .cxr-hold:focus-within { opacity: 1; transform: none; pointer-events: auto; }
+.cxr-hold .cxr-pp { width: 28px; height: 28px; border-radius: 7px; }
+.cxr-hold-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 11.5px/1 var(--mono, monospace); letter-spacing: .02em; color: rgb(255 255 255 / .8); }
+.cxr.is-held .cxr-hold-t { color: #86ffc9; }
+.cxr:not(.is-held) > .cxr-hold .i-play, .cxr.is-held > .cxr-hold .i-pause { display: none; }
+.cxr[data-done] > .cxr-hold { display: none; } /* played through: the replay button takes over */
+.cxr-sign { position: absolute; left: 50%; top: 50%; z-index: 4; display: grid; place-items: center; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+  background: rgb(0 0 0 / .62); color: #fff; pointer-events: none; opacity: 0; }
+.cxr-sign svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.cxr-sign.is-on { animation: cxrSign .9s ease-out both; }
+@keyframes cxrSign { 0% { opacity: 0; transform: scale(.8); } 20% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; transform: scale(1.12); } }
+@media (hover: none) { .cxr > .cxr-hold { opacity: 1; transform: none; pointer-events: auto; padding-right: 4px; } .cxr-hold-t { display: none; } }
+@media (prefers-reduced-motion: reduce) { .cxr-sign.is-on { animation: none; } }
+/* Corners: each part rounds itself instead of the window clipping its children. iOS Safari drew the window's
+   rounded clip onto the replay's own layer (a rounded notch and a gap at the top right of the app, under the bar). */
+.cxw-bar { border-radius: 15px 15px 0 0; }
+.cxw > .cxr, .cxw > video { border-radius: 0 0 15px 15px; }
+.cxw > video { display: block; width: 100%; height: auto; }
+@media (hover: none), (pointer: coarse) { .cxw-live-hover { display: none; } } /* clips are explorable with a mouse only */
+
+/* ───── Zoom: title-bar button and the large view over the page ───── */
+.cxw-zoom { display: grid; place-items: center; width: 26px; height: 26px; margin-left: 4px; border-radius: 7px; color: var(--fg-3); transition: color .2s, background .2s; }
+.cxw-bar > span + .cxw-zoom { margin-left: auto; } /* a bar with no other buttons */
+.cxw-zoom:hover { color: var(--fg); background: rgb(var(--ink) / .08); }
+.cxw-zoom svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.cxw[data-skin="light"] .cxw-zoom { color: #6b706f; }
+.cxw[data-skin="light"] .cxw-zoom:hover { color: #0b0c0c; background: rgba(10,12,11,.07); }
+html.cxz-open { overflow: hidden; }
+.cxz { position: fixed; inset: 0; z-index: 1000; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 24px; background: rgb(0 0 0 / .78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: cxzIn .2s ease-out; }
+@keyframes cxzIn { from { opacity: 0; } }
+.cxz-win { width: min(1600px, 100%, calc((100svh - 48px - 40px) * 16 / 9)); box-shadow: 0 40px 120px -20px rgb(0 0 0 / .8); animation: cxzWin .25s cubic-bezier(.2,.8,.2,1); }
+@keyframes cxzWin { from { transform: scale(.96); opacity: 0; } }
+.cxz .cxr { aspect-ratio: 1600 / 900 !important; } /* the zoom view keeps the full 16:9 app, phones included */
+.cxz .cxw-bar span { font-size: 12.5px; }
+@media (max-width: 560px) { .cxz { padding: 8px; } .cxz .cxw-live { display: none; } }
+
+/* the player bar in the zoom view (data-controls): shown on hover, always while paused */
+.cxr[data-controls] { cursor: pointer; }
+.cxr[data-controls].is-live { cursor: auto; }
+.cxr[data-controls]:not(.is-live) iframe { pointer-events: none !important; } /* playing: a click pauses, like a video */
+.cxr-ctl { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 4; display: flex; align-items: center; gap: 12px; padding: 8px 14px 8px 8px; border-radius: 12px;
+  background: rgb(14 15 16 / .86); border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 10px 30px rgb(0 0 0 / .45); color: #f2f3f3; cursor: auto;
+  opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s; }
+.cxr[data-controls]:hover .cxr-ctl, .cxr.is-paused .cxr-ctl, .cxr-ctl:focus-within { opacity: 1; transform: none; }
+@media (hover: none) { .cxr-ctl { opacity: 1; transform: none; } }
+.cxr-pp { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; color: #fff; background: rgb(255 255 255 / .1); }
+.cxr-pp:hover { background: rgb(255 255 255 / .18); }
+.cxr-pp svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cxr-pp .i-play { fill: currentColor; stroke-width: 1.2; }
+.cxr:not(.is-paused) > .cxr-ctl .i-play, .cxr.is-paused > .cxr-ctl .i-pause { display: none; }
+.cxr-ctl input { flex: 1; min-width: 0; height: 4px; accent-color: var(--accent, #13e989); cursor: pointer; }
+.cxr-time { flex: none; font: 500 11.5px/1 var(--mono, monospace); color: rgb(255 255 255 / .75); font-variant-numeric: tabular-nums; }
+
+/* tips (data-tips): pulsing dots on the replayed app that open a short card */
+.cxr-tips { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .4s; }
+.cxr-tips.is-ready { opacity: 1; }
+.cxr-tip { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; padding: 0; border: 0; border-radius: 50%; cursor: help; pointer-events: auto;
+  background: radial-gradient(circle, #13e989 0 5px, rgb(19 233 137 / .28) 6px 11px); }
+.cxr-tip::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgb(19 233 137 / .7); animation: cxrTip 2.2s ease-out infinite; }
+.cxr-tip:hover, .cxr-tip.is-on, .cxr-tip:focus-visible { background: radial-gradient(circle, #86ffc9 0 6px, rgb(19 233 137 / .45) 7px 11px); outline: none; }
+.cxr-tip:focus-visible { box-shadow: 0 0 0 2px #fff; }
+@keyframes cxrTip { from { transform: scale(.6); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
+.cxr-tip-card { position: absolute; left: 0; top: 0; display: grid; gap: 4px; width: max-content; padding: 10px 12px; border-radius: 10px; pointer-events: none;
+  background: rgb(12 13 14 / .94); border: 1px solid rgb(134 255 201 / .28); box-shadow: 0 14px 34px rgb(0 0 0 / .5); color: #e9ecea;
+  font: 400 12.5px/1.45 var(--font, system-ui, sans-serif); text-align: left; opacity: 0; transform: translateY(4px); transition: opacity .18s, transform .18s; }
+.cxr-tips.is-open .cxr-tip-card { opacity: 1; transform: none; }
+.cxr-tip-card b { font-weight: 600; color: #86ffc9; font-size: 12.5px; }
+@media (prefers-reduced-motion: reduce) { .cxr-tip::after { animation: none; opacity: 0; } }
+.cxr-tip.is-hint { pointer-events: none; } /* a hint: the live tooltip under it answers the pointer */
+.cxr.is-hovering .cxr-tip.is-hint { opacity: 0; transition: opacity .15s; }
+
+/* lean pages (<body data-replays="lean">): a clip that played through holds its payoff; this plays it again */
+.cxr-again { position: absolute; right: 12px; bottom: 12px; z-index: 4; display: none; place-items: center; width: 36px; height: 36px; border-radius: 10px;
+  background: rgb(14 15 16 / .86); border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 10px 30px rgb(0 0 0 / .45); color: #f2f3f3; cursor: pointer; }
+.cxr-again svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cxr-again:hover { background: rgb(40 42 44 / .92); }
+.cxr[data-done] .cxr-again { display: grid; }
+
+/* Light skin: small green text uses --mint (≥4.5:1 on the light surfaces); --accent stays for dots, fills,
+   borders and large numbers. Light only, so the dark skin is unchanged. */
+:root[data-theme="light"] /* rrweb sets pointer-events:none inline */ /* interactive stills take the pointer */
+.cxw-live { color: var(--mint); }
