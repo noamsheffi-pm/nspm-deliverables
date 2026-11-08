@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Usage Metrics V2</title>
+<style>
+:root {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --border: #1f1f1f;
+  --border-strong: #2a2a2a;
+  --text: #ffffff;
+  --text-2: #a1a1aa;
+  --text-muted: #71717a;
+  --mint: #22dd92;
+  --mint-dim: #1ab677;
+  --mint-faint: rgba(34, 221, 146, 0.06);
+  --warning: #f59e0b;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --max-width: 820px;
+  --radius: 12px;
+  --gap: 16px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg) radial-gradient(ellipse at top, rgba(34,221,146,0.05), transparent 60%) no-repeat;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.wrap { max-width: var(--max-width); margin: 0 auto; padding: 56px 16px 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 22px; }
+.dot { width: 18px; height: 18px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 16px rgba(34,221,146,.5); }
+h1 { font-size: 38px; line-height: 1.15; margin: 0 0 16px; font-weight: 700; }
+h1 .accent { color: var(--mint); }
+.sub { font-size: 19px; color: var(--text-2); margin: 0; }
+.sub b { color: var(--text); }
+
+.story { position: relative; margin-top: 52px; padding-left: 34px; }
+.story::before { content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px; background: var(--border-strong); }
+.ch { position: relative; margin-bottom: 44px; }
+.ch::before { content: ""; position: absolute; left: -31px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--warning); }
+.ch.turn::before { border-color: var(--mint); background: var(--mint); box-shadow: 0 0 12px rgba(34,221,146,.5); }
+.when { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--warning); margin-bottom: 4px; }
+.ch.turn .when { color: var(--mint); }
+h2 { font-size: 24px; margin: 0 0 10px; line-height: 1.25; }
+p { margin: 0 0 12px; color: var(--text-2); }
+p b { color: var(--text); }
+.say { font-size: 22px; color: var(--text); border-left: 3px solid var(--warning); padding: 4px 0 4px 16px; margin: 14px 0; }
+.ch.turn .say { border-color: var(--mint); }
+
+.promises { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+.pr { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.pr .m { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.pr .t { font-size: 16px; color: var(--text); margin-top: 4px; }
+
+.stake { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+.st { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.st .n { font-size: 28px; font-weight: 700; }
+.st .l { font-size: 13px; color: var(--text-2); }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-top: 8px; }
+.bets { list-style: none; padding: 0; margin: 0; }
+.bets li { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text-2); }
+.bets li:last-child { border-bottom: 0; }
+.bets li b { color: var(--mint); font-weight: 600; }
+
+.choice { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 14px; }
+.opt { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.opt.rec { border-color: var(--mint-dim); background: linear-gradient(var(--mint-faint), var(--surface)); }
+.opt .letter { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); }
+.opt.rec .letter { color: var(--mint); }
+.opt h3 { margin: 6px 0 6px; font-size: 20px; }
+.opt p { font-size: 15px; margin: 0; }
+.final { font-size: 22px; color: var(--text); font-weight: 600; margin-top: 22px; }
+
+footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+footer a { color: var(--text-2); }
+
+@media (max-width: 680px) {
+  h1 { font-size: 28px; }
+  .promises, .stake, .choice { grid-template-columns: 1fr; }
+}
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand"><span class="dot" aria-hidden="true"></span>Coralogix · Monetization</div>
+  <h1>The usage number we sell against should never move because we deployed<span class="accent">.</span></h1>
+  <p class="sub"><b>The ask:</b> one usage meter. V2 replaces V1, and V1 gets an end date.</p>
+</header>
+
+<div class="story">
+
+  <div class="ch">
+    <div class="when">April · Conviva</div>
+    <h2>An alert fires on usage the customer never sent.</h2>
+    <p>Conviva's usage alert goes off. Their traffic did not change. The spike does not match their own Data Usage tab. They open a ticket. Our support engineer looks and writes back:</p>
+    <div class="say">"That spike is on us, due to a deployment."</div>
+  </div>
+
+  <div class="ch">
+    <div class="when">May to June · Elsevier, Connecteam, Kotak, Dazn</div>
+    <h2>It is not one customer. It becomes a P0.</h2>
+    <p>Elsevier sees the same spikes across all its applications. More accounts report it, and it becomes P0 BUGV2-6332. We patch it in June. The spikes get rarer. They do not stop, because the old meter recounts the whole day every minute, so any change on our side can double it.</p>
+  </div>
+
+  <div class="ch">
+    <div class="when">July · Kotak</div>
+    <h2>Then the spike shows up while a customer's data is blocked.</h2>
+    <p>Kotak's Dynamic TCO alert fires on a spike that no graph can show, and their data is blocked. The customer cannot tell what is real usage and what is our meter. The number they use to manage their quota is no longer something they can trust.</p>
+  </div>
+
+  <div class="ch">
+    <div class="when">May to November · what we told them</div>
+    <h2>Our answer to all of them was "wait for V2."</h2>
+    <div class="promises">
+      <div class="pr"><div class="m">May</div><div class="t">"V2 in the following months"</div></div>
+      <div class="pr"><div class="m">June</div><div class="t">"ETA 1 month or so"</div></div>
+      <div class="pr"><div class="m">July</div><div class="t">"Implementation plan in place for a permanent fix"</div></div>
+    </div>
+    <p>Each month the promise had fewer specifics. Six months later it is still the answer.</p>
+    <div class="stake">
+      <div class="st"><div class="n">7+</div><div class="l">named accounts with false alerts or billing-trust escalations</div></div>
+      <div class="st"><div class="n">~$11.1M</div><div class="l">ARR behind the "Usage Metrics You Can Trust" roadmap item</div></div>
+      <div class="st"><div class="n">6 mo</div><div class="l">of "fixed in V2"</div></div>
+    </div>
+  </div>
+
+  <div class="ch">
+    <div class="when">September · Euronext</div>
+    <h2>Meanwhile, we start selling AI units, and the meter cannot follow.</h2>
+    <p>AI units are now a separate pool and a separate line on the order form. Euronext has 260 CX + 10 AI units per day. They ask why the unit count differs between screens. The V1 metric mixes everything into one units number: Olly use is missing, and AI evaluations are counted as spans. A customer can see AI units on the usage screen, but cannot put AI use on a dashboard or an alert.</p>
+    <p>And the next question every large account asks, <b>"which team spent it?"</b>, cannot ship on V1. V1 is frozen, because any change to it makes a spike.</p>
+  </div>
+
+  <div class="ch turn">
+    <div class="when">Today</div>
+    <h2>V2 is built. It is waiting for one decision, not for engineering.</h2>
+    <p>V2 counts only what was used in each short window, from the same events that feed billing. A change on our side cannot replay the day, so it cannot make a spike. It runs next to V1 on eu2 today, and over 24 hours units differ by less than 0.1% on spans, logs and metrics. It shows AI use separately, and it can carry team and service labels.</p>
+    <div class="say">The open question is not "can we". It is "do we run one meter or two".</div>
+  </div>
+
+</div>
+
+<section>
+  <div class="panel">
+    <div class="when" style="color:var(--mint)">The bet, and how we will know</div>
+    <ul class="bets">
+      <li>False-spike escalations go to <b>0</b> in the quarter after V1 is off.</li>
+      <li><b>Every</b> account with an AI quota can put AI use on a dashboard or an alert, apart from CX use.</li>
+      <li>Usage by env, type and service <b>ships</b>, instead of waiting on V1.</li>
+    </ul>
+    <p style="margin-top:12px">What it costs: customers rewrite their usage dashboards and alerts once (we ship the new dashboard and a guide; the count of affected accounts is in progress). While both meters run, a customer pays about twice for this metric, so the end date matters. A few V1 views still need a V2 version. Halo and I own those, and none needs a decision from you.</p>
+  </div>
+
+  <div class="choice">
+    <div class="opt rec">
+      <div class="letter">A · recommended</div>
+      <h3>One meter</h3>
+      <p>Set a V1 end date. We move every account and own the migration.</p>
+    </div>
+    <div class="opt">
+      <div class="letter">B</div>
+      <h3>Two meters</h3>
+      <p>Keep a reduced V1 next to V2 with no end date. Lower migration cost. Customers keep seeing two numbers, and we support both.</p>
+    </div>
+  </div>
+  <p class="final">I recommend A. Conviva got "that spike is on us" from our support. Our next answer to customers should be an end date for V1.</p>
+</section>
+
+<footer>
+  Sources: <a href="denis-metrics-v2-why-we-rebuilt-2026-10-21.md">Denis Zolkin, Metrics v2 brief (21-10-2026)</a>, customer threads in #halo-interface and BUGV2-6332 as listed there ·
+  <a href="meeting-summary-dumv2-release-migration-2026-10-21.md">V2 release and migration meeting (21-10-2026)</a> ·
+  <a href="../../aporia-cxai/cx-ai-units/00-workplan.md">AI Units workplan</a> (separate pool, order form line) ·
+  Parity: eu2, 24 h, 21-10-2026.
+</footer>
+
+</div>
+</body>
+</html>
