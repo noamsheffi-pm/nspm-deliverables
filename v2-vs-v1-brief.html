@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usage Metric V2 Brief</title>
+<style>
+:root {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --border: #1f1f1f;
+  --border-strong: #2a2a2a;
+  --text: #ffffff;
+  --text-2: #a1a1aa;
+  --text-muted: #71717a;
+  --mint: #22dd92;
+  --mint-dim: #1ab677;
+  --mint-faint: rgba(34, 221, 146, 0.06);
+  --warning: #f59e0b;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --max-width: 860px;
+  --radius: 12px;
+  --gap: 14px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg) radial-gradient(ellipse at top, rgba(34,221,146,0.05), transparent 60%) no-repeat;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.55;
+}
+.wrap { max-width: var(--max-width); margin: 0 auto; padding: 56px 16px 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 22px; }
+.dot { width: 18px; height: 18px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 16px rgba(34,221,146,.5); }
+h1 { font-size: 34px; line-height: 1.2; margin: 0 0 14px; font-weight: 700; }
+h1 .accent { color: var(--mint); }
+.sub { font-size: 18px; color: var(--text-2); margin: 0 0 8px; }
+.sub b { color: var(--text); }
+.kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin: 44px 0 12px; }
+
+.rows { display: grid; gap: var(--gap); }
+.row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; transition: border-color .15s; }
+.row:hover { border-color: var(--border-strong); }
+.row h2 { font-size: 19px; margin: 0 0 10px; }
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 15px; }
+.vs div { padding-left: 12px; }
+.v1 { border-left: 2px solid var(--border-strong); color: var(--text-2); }
+.v2 { border-left: 2px solid var(--mint); color: var(--text); }
+.lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 2px; }
+.v2 .lbl { color: var(--mint); }
+
+.proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+.pf { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.pf .n { font-size: 26px; font-weight: 700; }
+.pf .l { font-size: 13px; color: var(--text-2); }
+
+.limits { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.limits li { padding: 12px 18px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 15px; }
+.limits li:last-child { border-bottom: 0; }
+.limits li b { color: var(--text); }
+
+footer { margin-top: 52px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+footer a { color: var(--text-2); }
+
+@media (max-width: 680px) {
+  h1 { font-size: 26px; }
+  .vs, .proof { grid-template-columns: 1fr; }
+}
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand"><span class="dot" aria-hidden="true"></span>Coralogix · Monetization</div>
+  <h1>Usage Metric V2: the usage number moves only when the customer's usage moves<span class="accent">.</span></h1>
+  <p class="sub">V2 gives the same unit totals as V1. The difference is that customers can trust it, alert on it, and split it the way they pay for it: CX vs AI, and soon by team and service.</p>
+</header>
+
+<div class="kicker">What V2 gives that V1 does not</div>
+<div class="rows">
+
+  <div class="row">
+    <h2>No false spikes from our deploys</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>Counts the whole day again every minute. A change on our side can double it for a few minutes and fire customer alerts (P0 BUGV2-6332: Conviva, Kotak, Elsevier, Connecteam, Dazn).</div>
+      <div class="v2"><span class="lbl">V2</span>Counts only what was used in each short window. A change on our side has nothing to recount, so it cannot make a spike.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>AI use shown separately from CX use</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>One units number. Olly use is missing, and AI evaluations are counted as spans.</div>
+      <div class="v2"><span class="lbl">V2</span>AI tokens and AI evaluations are separate. Customers can put AI use on a dashboard or an alert next to their AI quota.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>A path to "which team spent it"</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>Frozen: any new label makes a spike. Application and subsystem point to our own exporter, not the customer's workload.</div>
+      <div class="v2"><span class="lbl">V2</span>Labels can be added safely. Env, type and service labels are next, so customers can see usage per team and service.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>Trends and forecasts customers can alert on</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>Resets at midnight and grows all day. Rates, forecasts and anomaly alerts are wrong around midnight (JFrog prediction alerts broke).</div>
+      <div class="v2"><span class="lbl">V2</span>Each point is real usage, so rates, period-over-period views and forecasts are correct, also across midnight.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>Breakdowns that add up</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>Drops series over a cardinality cap with no warning. A breakdown can miss slices while the total looks fine.</div>
+      <div class="v2"><span class="lbl">V2</span>No silent drop. Any overflow goes to a visible "other" bucket. Adds record counts (logs, spans, events) next to bytes and units.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <h2>Fewer holes after our outages</h2>
+    <div class="vs">
+      <div class="v1"><span class="lbl">V1</span>If the job is late or down, those minutes are missing for good (Payoneer, dLocal).</div>
+      <div class="v2"><span class="lbl">V2</span>Events wait in the stream until they are published. Data up to 2 minutes late goes in its own window; later data goes in the next one. Full catch-up after a long outage is not verified yet.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="kicker">Proof it counts the same</div>
+<div class="proof">
+  <div class="pf"><div class="n">&lt;0.1%</div><div class="l">unit difference vs V1 on spans, logs and metrics (eu2, 24 h, 21-10)</div></div>
+  <div class="pf"><div class="n">Live</div><div class="l">running next to V1 on eu2 and staging today</div></div>
+  <div class="pf"><div class="n">Same</div><div class="l">event stream that feeds billing</div></div>
+</div>
+
+<div class="kicker">What V2 does not change</div>
+<ul class="limits">
+  <li><b>Billing truth stays the usage reports and the invoice.</b> The metric is for dashboards and alerts. Late data counts in the window it arrives in, so near midnight it can land on the earlier day.</li>
+  <li><b>Customers rewrite their usage dashboards and alerts once.</b> The metric names and the meaning of a point change. We ship a new dashboard and a guide.</li>
+  <li><b>Some V1 series are not in V2 yet:</b> the daily quota number, PAYG overage, egress and infra events. Halo and product own closing these before V1 is turned off.</li>
+</ul>
+
+<footer>
+  Sources: <a href="denis-metrics-v2-why-we-rebuilt-2026-10-21.md">Denis Zolkin, Metrics v2 brief (21-10-2026)</a> ·
+  <a href="meeting-summary-dumv2-release-migration-2026-10-21.md">V2 release and migration meeting (21-10-2026)</a> ·
+  Epic <a href="https://coralogix.atlassian.net/browse/CX-56915">CX-56915</a>.
+</footer>
+
+</div>
+</body>
+</html>
