@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Remove the logs you should never have kept</title>
+<meta name="description" content="Delete specific records from your archive with one query, and see how many logs match before anything runs. For security, compliance and platform teams.">
+<meta property="og:title" content="Remove the logs you should never have kept">
+<meta property="og:description" content="Delete specific records from your archive with one query, and see how many logs match before anything runs. For security, compliance and platform teams.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/replays/replay.css">
+<style>
+/* Layout: Coralogix brand, always dark (black, #13E989, #86FFC9), as in the reserved field suggestions pitch.
+   One centred column; the two replays sit side by side in a wider band and stack on phones. */
+:root{
+  --bg:#000; --bg-1:#0b0b0c; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg-0:#fff; --fg:#f2f2f2; --fg-2:#a9a9a9; --fg-3:#6e6e6e; --accent:#13E989; --mint:#86FFC9;
+  --grad:linear-gradient(90deg,#e6fff4 0%,#86FFC9 35%,#13E989 100%); --card:#0d0d0e; --ink:255 255 255;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --font:var(--sans); --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0}
+a{color:var(--accent)}
+.page{max-width:1240px;margin:0 auto;padding-block:40px 80px;display:grid;gap:88px}
+.page>*{min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{height:24px;width:auto}
+.mono{font-family:var(--mono);font-size:13px;color:var(--fg-3)}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.02em}
+.hero{display:grid;gap:22px;text-align:center;justify-items:center;padding-top:40px}
+h1{font-size:clamp(38px,7vw,70px);line-height:1.04;letter-spacing:-.035em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance;max-width:16ch}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2.2vw,20px);color:var(--fg-2);max-width:60ch;margin:0}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.12;letter-spacing:-.025em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+section{display:grid;gap:24px;min-width:0}
+.head{display:grid;gap:10px;justify-items:center;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{margin:0;font-size:18px;font-weight:600;color:var(--fg-0)}
+.card p{margin:0;color:var(--fg-2);font-size:15px}
+.card .k{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+.option{min-width:0;display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:6px}
+/* subgrid lines the two windows up when one caption wraps to two lines */
+.option h3{margin:0;font-size:20px;font-weight:600;color:var(--fg-0)}
+.option p{margin:0 0 10px;color:var(--fg-2);font-size:15px}
+.cxw{margin:0}
+.cxw button{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.fine{font-size:13px;color:var(--fg-3);text-align:center;margin:0}
+.internal{border:1px dashed var(--line-2);border-radius:16px;padding:16px 20px;color:var(--fg-2);font-size:15px;margin:0}
+.final{text-align:center;display:grid;gap:12px;justify-items:center;padding:48px 20px;border:1px solid var(--line);border-radius:20px;
+  background:radial-gradient(ellipse at top,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),var(--bg-1)}
+.final p{margin:0;color:var(--fg-2)}
+footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--fg-2)}
+.chip.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+@media (max-width:900px){.cards,.options{grid-template-columns:minmax(0,1fr)}.option+.option{margin-top:32px}}
+@media (max-width:600px){.page{gap:64px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+  <svg class="logo" viewBox="0 0 1018 221" role="img" aria-label="Coralogix"><path fill="#86ffc9" d="M188.8 112.5a93.8 93.8 0 1 1-187.5 0 93.8 93.8 0 0 1 187.6 0Z"/><path fill="#13e989" d="M162.9 112.5a67.7 67.7 0 1 1-135.5 0 67.7 67.7 0 0 1 135.5 0Z"/><path fill="currentColor" style="color:var(--fg-0)" d="M301.3 181.1a63.6 63.6 0 0 1-64.1-66.4c0-9.5 1.5-18.3 4.6-26.3a62.3 62.3 0 0 1 59.4-39.8 62 62 0 0 1 24.7 4.6 56.2 56.2 0 0 1 18.6 12.4c5 5 8.7 10.7 10.9 16.7l-21 9.9a34 34 0 0 0-33-22.2c-8.3 0-15.3 1.8-21.5 5.6-6.1 3.8-10.9 9-14.3 15.7-3.4 6.7-5 14.5-5 23.4s1.6 16.9 5 23.7a39.4 39.4 0 0 0 14.3 15.6c6.2 3.8 13.3 5.7 21.4 5.7s15-2 20.8-6.2a35 35 0 0 0 12.2-16l21 9.8a46.2 46.2 0 0 1-10.8 17 62 62 0 0 1-43.3 16.9Zm111.6 0a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49 49 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.4-13.6c2.2-4.4 3.4-9.2 3.4-14.6s-1.1-10.4-3.5-14.5a24.8 24.8 0 0 0-22.3-13.8 26 26 0 0 0-23 13.8c-2.1 4.1-3.2 9-3.2 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6Zm62.7 18.6V85.3h21.2V106l-1.7-3c2.2-7 5.6-12 10.2-14.7a32.8 32.8 0 0 1 16.9-4.1h5.5v20h-8.1c-6.4 0-11.6 2-15.5 6-4 3.9-5.9 9.4-5.9 16.5V179h-22.6Zm89.1 2.1c-6.5 0-12.2-1-17-3.3s-8.6-5.3-11.2-9.3c-2.7-4.1-4-8.9-4-14.3a26.7 26.7 0 0 1 14.1-24.1c4.9-2.8 11-4.7 18.3-5.9l30.7-5v17.3l-26.4 4.4c-4.5.8-7.8 2.3-10 4.3-2.2 2.1-3.3 4.8-3.3 8.1s1.2 5.8 3.7 7.8c2.5 1.8 5.6 2.8 9.3 2.8 4.7 0 8.8-1 12.4-3a20 20 0 0 0 8.4-8.4c2-3.6 3.1-7.5 3.1-11.7v-24.1c0-4-1.6-7.4-4.8-10a18 18 0 0 0-12.4-4.2 22.1 22.1 0 0 0-21 14.1l-18.5-9c1.9-4.9 4.7-9.1 8.6-12.7a44 44 0 0 1 14.2-8.6c5.4-2 11.2-3 17.5-3a47 47 0 0 1 20.4 4.2 31.6 31.6 0 0 1 18.6 29.2V179H594v-16l4.8-.3c-2.4 4-5.2 7.4-8.6 10.1a38.8 38.8 0 0 1-25.5 8.3Zm67.8-2.1V48.6H655V179h-22.5Zm85.5 2.1a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49.2 49.2 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.3-13.6c2.3-4.4 3.5-9.2 3.5-14.6s-1.2-10.4-3.5-14.5a24.8 24.8 0 0 0-22.4-13.8 26 26 0 0 0-23 13.8c-2 4.1-3.1 9-3.1 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6ZM826.2 217c-7 0-13.5-1.2-19.5-3.5s-11-5.5-15.5-9.7a36 36 0 0 1-9.3-14.3l21-7.9c1.4 4.4 4.1 7.9 8.2 10.5 4 2.8 9.1 4.2 15.1 4.2 4.6 0 8.6-.9 12-2.6 3.6-1.7 6.4-4.3 8.3-7.6 2-3.2 3-7.1 3-11.7V153l4.3 5.2a32.1 32.1 0 0 1-13 12.7 45.7 45.7 0 0 1-41.9-1.7c-6.8-4-12.2-9.5-16.1-16.5-4-7-5.9-14.9-5.9-23.6s2-16.8 5.9-23.6a44.4 44.4 0 0 1 57.6-17.8 36 36 0 0 1 13.4 12.6l-3.1 5.7V85.3H872v89a41.4 41.4 0 0 1-22.2 37 48.7 48.7 0 0 1-23.6 5.6Zm-1-62.6c4.8 0 9-1 12.6-3.1a23 23 0 0 0 8.6-9c2-3.8 3-8.1 3-13s-1-9.2-3.2-13a23.3 23.3 0 0 0-21-12.4c-4.7 0-9 1-12.8 3.3a23.6 23.6 0 0 0-9 9.1c-2 3.8-3 8.1-3 13s1 9 3 12.9c2.2 3.8 5.2 6.7 8.9 9 3.7 2.1 8 3.2 12.9 3.2Zm64.2 24.6V85.3h22.5V179h-22.5Zm0-104.2V50.7h22.5v24h-22.5ZM920.5 179l32.8-47-33-46.7H947l25.7 37.9h-12l25.8-38h26.3L980 132l32.6 47h-26.4l-25.3-37.7h11.5L947.1 179h-26.6Z"/></svg>
+  <span class="mono">Data Flow · Delete records</span>
+</header>
+<section class="hero">
+  <div class="chips"><span class="chip on">Coming soon</span><span class="chip">Design preview</span></div>
+  <h1>Remove the logs <span class="g">you should never have kept.</span></h1>
+  <p class="lead">Delete specific records from your archive with one query, and see how many logs match before anything runs. For security, compliance and platform teams.</p>
+</section>
+<section>
+  <div class="head"><span class="kicker">The problem today</span></div>
+  <div class="cards">
+    <div class="card"><h3>A support ticket for every delete.</h3><p>You fill a form and wait. The answer can take days.</p></div>
+    <div class="card"><h3>No count up front.</h3><p>You find out how big the delete is only after someone runs it for you.</p></div>
+    <div class="card"><h3>No proof at the end.</h3><p>Your auditor asks when the data was removed. You have a chat thread, not a record.</p></div>
+  </div>
+</section>
+<section>
+  <div class="head"><span class="kicker">Use case</span><h2>Private keys in six months of archived logs</h2></div>
+  <div class="cards">
+    <div class="card"><span class="k">what happened</span><p>A security company found private keys in six months of archived logs (121.5M logs). To remove them, they filed a support request and waited. Nobody could tell them up front how many logs matched.</p></div>
+    <div class="card"><span class="k">what the page shows</span><p>The same request done in the product. You write one DataPrime query and see the log count before anything runs. Then either Coralogix runs it (A) or you run it yourself (B).</p></div>
+    <div class="card"><span class="k">what the person now knows</span><p>How many logs match, and when the keys are gone. With option B, there is an audit record to show the auditor.</p></div>
+  </div>
+  <div class="options">
+    <div class="option">
+      <h3>Option A: we run it for you</h3>
+      <p>Define the delete, see the estimate, submit. Track it until done.</p>
+      <figure class="cxw" data-title="Delete records · Option A" aria-label="Replay of option A: a delete request with a DataPrime query is checked, the estimate shows 121,511,705 matched logs and 2.4 TB to rewrite, the request is submitted, and its status moves to Done"><div class="cxr" data-theme="dark" data-replay="assets/replays/record-deletion-a.json"></div></figure>
+    </div>
+    <div class="option">
+      <h3>Option B: you run it yourself</h3>
+      <p>Define the delete, preview matching logs, choose archive and live index, approve, delete. Get an audit record.</p>
+      <figure class="cxw" data-title="Delete records · Option B" aria-label="Replay of option B: a delete request with a DataPrime query shows sample matching logs with the key masked, archive and live index are chosen, the delete is approved and confirmed, and it ends on an audit record of 121,511,705 deleted logs"><div class="cxr" data-theme="dark" data-replay="assets/replays/record-deletion-b.json"></div></figure>
+    </div>
+  </div>
+  <p class="fine">Design preview with sample data. The final product may differ. Names are changed.</p>
+</section>
+<section class="final">
+  <span class="kicker">Coming soon</span>
+  <h2>Which option fits how you work?</h2>
+  <p>Tell your Coralogix contact.</p>
+</section>
+<footer><span class="mono">Design preview with sample data. The final product may differ.</span><span class="mono">© Coralogix 2026</span></footer>
+</div>
+
+<script>document.body.dataset.replays = "lean";</script>
+<script src="assets/vendor/rrweb-replay-1.1.3.min.js"></script>
+<script src="assets/replays/replay.js"></script>
+</body>
+</html>
