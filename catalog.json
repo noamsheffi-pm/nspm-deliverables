@@ -1,0 +1,191 @@
+{
+  "00-roadmap-page.html": {
+    "tag": "prd",
+    "title": "Bros Family — Agent Roadmap",
+    "meta": "AI PM Agents · May 2026"
+  },
+  "COMMANDS-REVIEW-page.html": {
+    "title": "Commands Review",
+    "meta": "Product Org OS · Apr 2026"
+  },
+  "agent-control-room-guide.html": {
+    "tag": "flow",
+    "title": "Agent Control Room — How to Read It",
+    "meta": "NSPM Operating System · May 2026"
+  },
+  "ai-center-migration-gap-diagram.html": {
+    "tag": "flow",
+    "title": "AI Center units: the accounts with no bucket",
+    "meta": "AI unit pool migration gap · September 2026"
+  },
+  "ai-units-billing-and-cx-catalog-gap-diagram.html": {
+    "tag": "flow",
+    "title": "AI Units: billing, cx-catalog gap, V2 plan",
+    "meta": "AI Units and CS visibility · September 2026"
+  },
+  "claude-layer.html": {
+    "tag": "flow",
+    "title": "The Claude Layer",
+    "meta": "PM onboarding, part 2 · August 2026"
+  },
+  "commands-review-page.html": {
+    "tag": "review",
+    "title": "Commands Arsenal — 9 May 2026",
+    "meta": "AI PM Command Catalog · May 2026"
+  },
+  "cs-briefing-2026-05-28.html": {
+    "tag": "flow",
+    "title": "S3 External ID / ARN — CS Briefing",
+    "meta": "Setup Archive · May 2026"
+  },
+  "dataset-alias-screen.html": {
+    "tag": "design",
+    "title": "Dataset Alias",
+    "meta": "Concept screen v1 · shown to the 16-08 room · superseded"
+  },
+  "eventtype-vs-entitytype-diagram.html": {
+    "tag": "flow",
+    "title": "eventType vs entityType — how the type is carried at ingest",
+    "meta": "Operational logs vs custom events forum · August 2026"
+  },
+  "generic-events-v2-citadel-flow-diagram.html": {
+    "tag": "flow",
+    "title": "Generic Events V2 — Citadel Ingestion Flow",
+    "meta": "Citadel ingestion architecture · July 2026"
+  },
+  "how-i-use-my-agents-deck.html": {
+    "tag": "flow",
+    "title": "How I Use My Agents",
+    "meta": "Friends edition · 9 slides · Jul 2026"
+  },
+  "initiative-tracking-cheatsheet-diagram.html": {
+    "tag": "flow",
+    "title": "Initiative Tracking — Workplan Frontmatter as Source of Truth",
+    "meta": "Internal PM ops · May 2026"
+  },
+  "kpi-framework-approval-2026-07-02.html": {
+    "tag": "review",
+    "title": "Product KPI Framework — Approval",
+    "meta": "Q3 KPI Framework · July 2026"
+  },
+  "lifecycle-next-step-chain.html": {
+    "tag": "flow",
+    "title": "Initiative Lifecycle — Next-Step Chain Map",
+    "meta": "AI PM workflow · May 2026"
+  },
+  "mario-agents.html": {
+    "tag": "prd",
+    "title": "Mario Agents — PM Operating System",
+    "meta": "AI PM · May 2026"
+  },
+  "meeting-finonex-coralogix-sync-part2-2026-08-16-page.html": {
+    "tag": "flow",
+    "title": "Finonex Historical Import",
+    "meta": "Customer sync · August 2026"
+  },
+  "obsidian-pack.html": {
+    "tag": "flow",
+    "title": "Obsidian Starter Pack",
+    "meta": "PM onboarding, part 1 · August 2026"
+  },
+  "omer-obsidian-onboarding.html": {
+    "tag": "flow",
+    "title": "Obsidian Onboarding — Omer",
+    "meta": "Obsidian Setup · April 2026"
+  },
+  "quota-flow-map-v2.html": {
+    "tag": "flow",
+    "title": "Quota Flow Map v2",
+    "meta": "Shared CxuiChart sankey · concept · Aug 2026"
+  },
+  "quota-flow-map.html": {
+    "tag": "flow",
+    "title": "Quota Flow Map",
+    "meta": "Reservations vs limits · concept · Jul 2026"
+  },
+  "sprint-demo-01-09-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 01-09-2026",
+    "meta": "Pipeline · Governance · Monetization · Sep 2026"
+  },
+  "sprint-demo-03-11-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 03-11-2026",
+    "meta": "Pipeline · Governance · Monetization · Nov 2026"
+  },
+  "sprint-demo-04-08-2026-slides.html": {
+    "tag": "review",
+    "title": "Sprint Demo 04-08-2026 · Slides",
+    "meta": "Pipeline · Governance · Monetization · Aug 2026"
+  },
+  "sprint-demo-04-08-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 04-08-2026",
+    "meta": "Pipeline · Governance · Monetization · Aug 2026"
+  },
+  "sprint-demo-05-05-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 05-05-2026",
+    "meta": "Pipeline · Governance · Monetization · May 2026"
+  },
+  "sprint-demo-06-10-2026-customer-lens.html": {
+    "tag": "review",
+    "title": "Sprint Demo 06-10-2026 - Customer Lens",
+    "meta": "Pipeline · Governance · Monetization · Oct 2026"
+  },
+  "sprint-demo-06-10-2026-customer-value.html": {
+    "tag": "review",
+    "title": "Sprint Demo 06-10-2026 - Customer Value",
+    "meta": "Pipeline · Governance · Monetization · Oct 2026"
+  },
+  "sprint-demo-06-10-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 06-10-2026",
+    "meta": "Pipeline · Governance · Monetization · Oct 2026"
+  },
+  "sprint-demo-30-06-2026.html": {
+    "tag": "review",
+    "title": "Sprint Demo 30-06-2026",
+    "meta": "Pipeline · Governance · Monetization · Jun 2026"
+  },
+  "tco-entitytype-routing-screen.html": {
+    "tag": "design",
+    "title": "TCO Entity Type Routing",
+    "meta": "Concept screen · operational logs vs log events · Aug 2026"
+  },
+  "three-layer-model-ibm-diagram.html": {
+    "tag": "flow",
+    "title": "Dataspaces and datasets: the three layers",
+    "meta": "IBM Cloud Logs concept · Sep 2026"
+  },
+  "v1-to-v2-gap-page.html": {
+    "tag": "review",
+    "title": "Usage Metric V2: one meter",
+    "meta": "Data Usage Metric V2 · Nov 2026"
+  },
+  "v2-vs-v1-brief.html": {
+    "tag": "review",
+    "title": "Usage Metric V2 vs V1",
+    "meta": "Data Usage Metric V2 · Nov 2026"
+  },
+  "virtual-datasets-screen.html": {
+    "tag": "design",
+    "title": "Virtual Datasets",
+    "meta": "Concept screen v2 · list, pattern, entity type, query · Aug 2026"
+  },
+  "workflows-map-page.html": {
+    "tag": "flow",
+    "title": "AI PM Workflows Map",
+    "meta": "How I actually use the agent · April 2026"
+  },
+  "yoshi-cheatsheet-diagram.html": {
+    "tag": "flow",
+    "title": "Yoshi Flow — Slack Follow-up Agent",
+    "meta": "Agent docs · May 2026"
+  },
+  "yoshi-cheatsheet-page.html": {
+    "tag": "flow",
+    "title": "Yoshi Cheatsheet — Slack Follow-up Agent",
+    "meta": "Agent docs · May 2026"
+  }
+}
