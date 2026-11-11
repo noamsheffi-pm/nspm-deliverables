@@ -71,64 +71,65 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
 </header>
 
 <section class="hero">
-  <span class="kicker">Your monthly quota</span>
+  <span class="kicker">Monthly quota</span>
   <h1>Pay for your month, <span class="g">not your busiest day</span></h1>
-  <p class="lead">A monthly CX units quota for teams whose usage goes up and down. This page shows what changes, using one real team's usage from October.</p>
+  <p class="lead">A daily quota must fit your worst day, so you pay for that room every day. In October, one team used 35% of the quota it paid for. A monthly total lets quiet days pay for busy days.</p>
 </section>
 
 <section>
-  <div class="head"><span class="kicker">One team's October</span><h2>Busy on workdays, quiet at the weekend</h2>
-  <p>A daily quota has to fit your busiest day. So most of it went unused on every other day, and the unused part was lost at midnight.</p></div>
+  <div class="head"><span class="kicker">The problem today</span><h2>A daily quota starts again every midnight</h2></div>
+  <div class="cards">
+    <div class="card"><span class="k">worst day</span><h3>You size for your peak</h3><p>A day over the line is blocked. So the quota is set for the busiest day, and you pay for that room on every quiet day too.</p></div>
+    <div class="card"><span class="k">00:00 UTC</span><h3>Quiet days do not help busy days</h3><p>Units you do not use are lost at midnight. A quiet Sunday gives no room on a busy Tuesday.</p></div>
+    <div class="card"><span class="k">by hand</span><h3>A busy day needs a manual fix</h3><p>Someone asks for a one-day increase, then removes it after the reset. It is slow, and it often comes after the block.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">One team's October</span><h2>It paid for 5,580 units and used 1,977</h2>
+  <p>The quota fit the busiest day. On a normal workday the team used less than half of it, and at the weekend about a tenth. The rest was lost each night.</p></div>
   <div class="stats">
-    <div class="stat"><span class="n">84<small>units</small></span><span class="l">a day on average, on workdays</span></div>
-    <div class="stat"><span class="n">21<small>units</small></span><span class="l">a day on average, at the weekend</span></div>
-    <div class="stat"><span class="n">133<small>units</small></span><span class="l">its busiest day in October</span></div>
-    <div class="stat"><span class="n">180<small>units</small></span><span class="l">its daily quota</span></div>
+    <div class="stat"><span class="n">180<small>units</small></span><span class="l">daily quota</span></div>
+    <div class="stat"><span class="n">133<small>units</small></span><span class="l">busiest day in October</span></div>
+    <div class="stat"><span class="n">84<small>units</small></span><span class="l">a workday, on average</span></div>
+    <div class="stat"><span class="n">35<small>%</small></span><span class="l">of the month's quota used</span></div>
   </div>
   <div class="chart">
     <div class="svgwrap"><svg id="oct" viewBox="0 0 900 300" role="img" aria-label="One team's daily units in October 2026 against the daily quota of 180"></svg></div>
-    <div class="legend"><span><i style="--c:var(--bar)"></i>Workdays</span><span><i style="--c:var(--bar-quiet)"></i>Weekend</span><span><i class="line" style="--c:var(--limit)"></i>Daily quota today (180)</span></div>
+    <div class="legend"><span><i style="--c:var(--bar)"></i>Workdays</span><span><i style="--c:var(--bar-quiet)"></i>Weekend</span><span><i class="line" style="--c:var(--limit)"></i>Daily quota (180)</span></div>
   </div>
 </section>
 
 <section>
-  <div class="head"><span class="kicker">What changes</span><h2>Quiet days make room for busy days</h2></div>
+  <div class="head"><span class="kicker">What changes</span><h2>One total for the month. Quiet days pay for busy days.</h2>
+  <p>Example: you buy 300 units a day. In a 31-day month you have 9,300 units. Any one day can use up to 900.</p></div>
   <div class="cards">
-    <div class="card"><span class="k">daily rate × days</span><h3>One total for the month</h3><p>Your month total is your daily rate times the days in that month. 31 days in October, 30 in November.</p></div>
-    <div class="card"><span class="k">up to 3×</span><h3>Room for a busy day</h3><p>Any one day can use up to 3 times your daily rate. A release or an incident day is not blocked at midnight.</p></div>
-    <div class="card"><span class="k">1 month</span><h3>Only the month has to hold</h3><p>Quiet days leave units in the month for your busy workdays.</p></div>
+    <div class="card"><span class="k">daily rate × days</span><h3>One month total</h3><p>Your daily rate times the days in that month. Only the month has to hold.</p></div>
+    <div class="card"><span class="k">3× vs 1.1×</span><h3>More room on a bad day</h3><p>Up to 900 units on one day, not 330 with a 10% daily grace. A release or incident day is not blocked at midnight.</p></div>
+    <div class="card"><span class="k">1 month</span><h3>The unit your budget uses</h3><p>Your budget and your invoice are monthly. Now your quota is too.</p></div>
   </div>
 </section>
 
 <section>
   <div class="head"><span class="kicker">See it in Coralogix</span><h2>Your month on one screen</h2>
-  <p>Settings, Usage &amp; Quota shows units a month, where you are in the cycle, today's room, a forecast for month end and a safe daily spend.</p></div>
+  <p>See where you are in the month, today's room, and whether the month will hold.</p></div>
   <div class="shot"><figure class="cxw" data-title="Settings · usage &amp; quota · CX units, monthly" aria-label="Usage and quota overview on a monthly plan"><div class="cxr" data-replay="assets/replays/monthly-quota.json"></div></figure></div>
   <p class="fine">Demo account with example numbers. Names are changed.</p>
 </section>
 
 <section>
-  <div class="head"><span class="kicker">For your team</span><h2>What it means for each role</h2></div>
-  <div class="cards">
-    <div class="card"><h3>Budget owner</h3><p>Plan by the month, the same unit as your budget and your invoice.</p></div>
-    <div class="card"><h3>DevOps</h3><p>A busy day has 3 times the room. One heavy day does not block your data at midnight.</p></div>
-    <div class="card"><h3>R&amp;D leads</h3><p>No one needs to watch the quota every day. The limit that counts is the month.</p></div>
-  </div>
-</section>
-
-<section>
-  <div class="head"><span class="kicker">Good to know</span><h2>How the month works in practice</h2></div>
+  <div class="head"><span class="kicker">The trade</span><h2>What you give up, said plainly</h2></div>
   <div class="trade">
-    <div><b>Unused units</b><span>Units you do not use in a month do not carry over to the next month.</span></div>
-    <div><b>If the month runs out</b><span>You get a warning before the month total is used. If it runs out, new data stops until the 1st. Your account manager can add units before that.</span></div>
-    <div><b>One cycle</b><span>All teams in your account use the same cycle, from the 1st to the last day of the month.</span></div>
-    <div><b>Your usage view</b><span>Usage &amp; Quota still shows usage per day, so you can see which days were busy.</span></div>
+    <div><b>No free overage grace</b><span>The room is now in the plan: 3 times your rate on any day, and a full month to even out.</span></div>
+    <div><b>No carry-over</b><span>Units you do not use in a month do not move to the next month.</span></div>
+    <div><b>If the month runs out</b><span>You get a warning first. If it runs out, new data stops until the 1st. Your account manager can add units before that. Pay-as-you-go is not part of the monthly plan at launch.</span></div>
+    <div><b>One cycle</b><span>All teams in your account share one cycle, from the 1st to the last day of the month.</span></div>
   </div>
 </section>
 
 <section class="final">
-  <h2>Questions about your plan?</h2>
-  <p>Talk to your Coralogix account manager.</p>
+  <h2>Is your usage busy some days and quiet on others?</h2>
+  <p>Which is the better first step for you: a page like this one built on your own usage, or a short call with your account manager?</p>
 </section>
 
 <footer><span class="mono">Usage: one real team, 1 to 31 October 2026, production. The team is not named.</span><span class="mono">© Coralogix 2026</span></footer>
