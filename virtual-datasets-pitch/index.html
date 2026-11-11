@@ -66,6 +66,15 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
 .chip.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 @media (max-width:900px){.cards{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:600px){.page{gap:64px}}
+.sub{color:var(--fg-2);max-width:62ch;margin:0;font-size:17px}
+.query.small{font-size:12.5px;padding:14px 18px}
+.query i{color:var(--fg-3);font-style:normal}
+.query .mint{color:var(--mint)}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:12px;align-content:start;min-width:0}
+.step .k{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.step p{margin:0;color:var(--fg-2);font-size:15px}
+@media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -76,34 +85,53 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
 </header>
 <section class="hero">
   <div class="chips"><span class="chip on">Coming soon</span><span class="chip">Design preview</span></div>
-  <h1>Add a dataset once. <span class="g">Every query that uses the name gets it.</span></h1>
-  <p class="lead">A virtual dataset is a saved DataPrime query that reads like a dataset, for anyone whose data sits in many datasets.</p>
+  <h1>Your data lives in many datasets. <span class="g">Your queries should need one name.</span></h1>
+  <p class="lead">Define a group of datasets once, with DataPrime. Give it a name. Every query, dashboard and alert uses that name, and stays right when your datasets change.</p>
 </section>
 <section>
-  <div class="head"><span class="kicker">The problem today</span><h2>Every query has to name every dataset.</h2></div>
+  <div class="head"><span class="kicker">The problem today</span><h2>Nine datasets. Every query lists all nine.</h2>
+    <p class="sub">A transportation company split its platform data into nine datasets, one per service. It was the right call for cost and access. Then every investigation started like this:</p></div>
   <div class="query" role="img" aria-label="A DataPrime query that names nine datasets">source <b>platform-api-logs</b>, <b>platform-auth-logs</b>, <b>platform-billing-logs</b>,
        <b>platform-dispatch-logs</b>, <b>platform-gateway-logs</b>, <b>platform-matching-logs</b>,
        <b>platform-notify-logs</b>, <b>platform-payments-logs</b>, <b>platform-routing-logs</b></div>
   <div class="cards">
-    <div class="card"><h3>Every query lists every dataset.</h3><p>One customer writes the same nine dataset names into each query.</p></div>
-    <div class="card"><h3>A new dataset breaks the list.</h3><p>Each query, dashboard and alert must be edited by hand to add it. Missing one means missing data, with no error.</p></div>
-    <div class="card"><h3>A saved query does not fix it.</h3><p>It is a copy. When the list changes, every copy is still out of date.</p></div>
+    <div class="card"><span class="k">every day</span><h3>Nine names in every query.</h3><p>Each engineer types or copies the same list. Each dashboard and alert carries its own copy.</p></div>
+    <div class="card"><span class="k">when data moves</span><h3>A tenth dataset breaks the list.</h3><p>Someone must find and edit every query, dashboard and alert by hand.</p></div>
+    <div class="card"><span class="k">the real cost</span><h3>A missed copy fails in silence.</h3><p>The query still runs. It just leaves data out. An alert that should fire stays quiet, and nobody knows why.</p></div>
   </div>
 </section>
 <section>
-  <div class="head"><span class="kicker">Use case</span><h2>Nine datasets, one name: <code class="g">platform_data</code></h2></div>
-  <div class="cards">
-    <div class="card"><span class="k">what happened</span><p>A transportation customer split platform data into nine datasets. Every query, dashboard and alert lists all nine. A tenth dataset means editing all of them.</p></div>
-    <div class="card"><span class="k">what the page shows</span><p>An admin creates <code>platform_data</code> from the nine datasets. A user runs <code>source platform_data</code> in Explore and gets rows from all nine.</p></div>
-    <div class="card"><span class="k">what the admin now knows</span><p>One name covers the nine. The next dataset is added in one place, and every query that uses the name picks it up.</p></div>
+  <div class="head"><span class="kicker">The idea</span><h2>A virtual dataset is a saved DataPrime query <span class="g">that reads like a dataset.</span></h2>
+    <p class="sub">You write the definition once: which datasets to read, and which data to keep. After that, it is just a name.</p></div>
+  <div class="split">
+    <div class="step"><span class="k">1 · define it once</span>
+      <div class="query small" role="img" aria-label="Definition of platform_data: nine sources and a filter for production"><i># platform_data</i>
+source <b>platform-api-logs</b>, <b>platform-auth-logs</b>, … <b>platform-routing-logs</b>
+| filter <b>$d.env == 'production'</b></div>
+      <p>Pick the sources. Add a DataPrime filter to keep only the data that matters, for example production only.</p></div>
+    <div class="step"><span class="k">2 · use the name everywhere</span>
+      <div class="query small" role="img" aria-label="A query that reads platform_data">source <b class="mint">platform_data</b>
+| filter $m.severity == ERROR</div>
+      <p>Explore, dashboards and alerts read it like any dataset. Add your own DataPrime on top, as you do today.</p></div>
   </div>
+</section>
+<section>
+  <div class="head"><span class="kicker">See it</span><h2>Nine datasets, one name: <code class="g">platform_data</code></h2></div>
   <figure class="cxw" data-title="Virtual datasets &middot; platform_data" aria-label="Replay: nine dataset names in one query, then an admin creates platform_data, which resolves to the nine datasets, and Explore runs source platform_data"><div class="cxr" data-theme="dark" data-replay="assets/replays/virtual-datasets-pitch.json"></div></figure>
   <p class="fine">Design preview with sample data. The final product may differ. Names are changed.</p>
 </section>
+<section>
+  <div class="head"><span class="kicker">What changes for you</span><h2>Change your data layout. Not your queries.</h2></div>
+  <div class="cards">
+    <div class="card"><h3>One change, every query.</h3><p>Add or remove a dataset in the definition. Every query, dashboard and alert that uses the name follows at once.</p></div>
+    <div class="card"><h3>One definition of the data.</h3><p>The sources and the filter live in one place. Every team reads the same data, not their own copy of the list.</p></div>
+    <div class="card"><h3>Access stays as it is.</h3><p>A virtual dataset does not copy data. The access rules of each dataset it reads still apply.</p></div>
+  </div>
+</section>
 <section class="final">
   <span class="kicker">Coming soon</span>
-  <h2>Does this cover your case?</h2>
-  <p>Talk to your Coralogix contact about how you query many datasets today.</p>
+  <h2>Which group of datasets would you name first?</h2>
+  <p>Tell your Coralogix contact how you query many datasets today.</p>
 </section>
 <footer><span class="mono">Design preview with sample data. The final product may differ.</span><span class="mono">© Coralogix 2026</span></footer>
 </div>
