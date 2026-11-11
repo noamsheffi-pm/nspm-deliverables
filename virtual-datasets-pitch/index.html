@@ -5,194 +5,122 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Virtual Datasets Pitch</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="A virtual dataset is a saved DataPrime query that reads like a dataset, for anyone whose data sits in many datasets.">
+<meta property="og:title" content="Add a dataset once. Every query that uses the name gets it.">
+<meta property="og:description" content="A virtual dataset is a saved DataPrime query that reads like a dataset, for anyone whose data sits in many datasets.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/replays/replay.css">
 <style>
-/* Layout: one reading column (copy at ~65ch) with a wide band for the live replay; problem cards in a 3-up grid that stacks. */
-/* Colors: Coralogix dark tokens from Brainy generated-tokens.scss. The page is dark only, like the product. */
-:root {
-  --bg: #1c1c1c;            /* --c-background-surface-primary */
-  --surface: #262628;       /* --c-background-card */
-  --fg: #ffffff;            /* --c-text-primary */
-  --fg-2: #ababb1;          /* --c-text-secondary */
-  --fg-3: #8a8a92;          /* --c-text-placeholder */
-  --line: #2d2d2e;          /* --c-border-subtle */
-  --line-2: #68686d;        /* --c-border-strong */
-  --accent: #2aa968;        /* --c-text-interactive */
-  --btn: #029449;           /* --c-button-primary */
-  --btn-hover: #2aa968;     /* --c-button-primary-hover */
-  --accent-ink: #ffffff;    /* --c-text-on-color */
-  --accent-soft: #042e18;   /* --c-background-success */
-  --virtual: #c195ee;       /* --c-border-virtual */
-  --virtual-soft: #7c3caf;  /* --c-background-virtual */
-  --warn: #e4b83c;          /* --c-border-warning */
-  --warn-soft: #432009;     /* --c-background-warning */
-  --ink: 255 255 255;
-  --font: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --display: "Fraunces", Georgia, "Times New Roman", serif;
-  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-  --ease: cubic-bezier(.2, .7, .2, 1);
-  color-scheme: dark;
+/* Layout: Coralogix brand, always dark (black, #13E989, #86FFC9), as in the reserved field suggestions pitch.
+   One centred column; the replay sits in a wide band next to the use-case beats and stacks on phones. */
+:root{
+  --bg:#000; --bg-1:#0b0b0c; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg-0:#fff; --fg:#f2f2f2; --fg-2:#a9a9a9; --fg-3:#6e6e6e; --accent:#13E989; --mint:#86FFC9;
+  --grad:linear-gradient(90deg,#e6fff4 0%,#86FFC9 35%,#13E989 100%); --card:#0d0d0e; --ink:255 255 255;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --font:var(--sans); --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
 }
-body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--font); }
-button { font: inherit; color: inherit; background: none; border: 0; }
-a { color: var(--accent); }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 72px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 72px; }
-.wrap > * { min-width: 0; }
-.col { max-width: 68ch; min-width: 0; }
-.crumb { font-size: 13px; color: var(--fg-3); letter-spacing: .02em; }
-.crumb span + span::before { content: "/"; margin: 0 8px; color: var(--line-2); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-.chip { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--fg-2); }
-.chip.on { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
-.waiting { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 18px; }
-.waiting h2 { font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3); }
-.waiting ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
-.waiting li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 4px 16px; font-size: 15px; }
-.waiting .acct { font-weight: 600; }
-.waiting .tier { display: block; font-size: 12px; font-weight: 500; color: var(--fg-3); }
-.waiting .ask { color: var(--fg-2); }
-@media (max-width: 520px) { .waiting li { grid-template-columns: minmax(0, 1fr); } }
-h2 .mono { color: var(--virtual); }
-h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; letter-spacing: -.01em; margin: 0; }
-h1 { font-size: clamp(34px, 5.2vw, 56px); line-height: 1.06; margin-top: 22px; max-width: 18ch; }
-h2 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.15; }
-.lead { font-size: 19px; color: var(--fg-2); margin: 18px 0 0; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 28px; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 8px;
-  background: var(--btn); color: var(--accent-ink); font-weight: 600; text-decoration: none; }
-.btn:hover { background: var(--btn-hover); }
-.link { font-weight: 600; text-decoration: none; }
-.link:hover { text-decoration: underline; }
-.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
-code, .mono { font-family: var(--mono); font-size: .9em; }
-.query { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: var(--fg-2);
-  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px;
-  overflow-x: auto; margin-top: 24px; white-space: pre; }
-.query b { color: var(--fg); font-weight: 500; }
-.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
-.card h3 { font-size: 17px; margin: 0 0 8px; line-height: 1.35; }
-.card p { margin: 0; color: var(--fg-2); font-size: 15px; }
-.usecase { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.1fr); gap: 32px; margin-top: 28px; align-items: start; }
-.beats { display: grid; gap: 22px; min-width: 0; }
-.beat dt { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
-.beat dd { margin: 4px 0 0; color: var(--fg); }
-.shot { min-width: 0; }
-.cxw { margin: 0; }
-.note { font-size: 13px; color: var(--fg-3); margin: 12px 0 0; }
-.limits { border-top: 1px solid var(--line); padding-top: 28px; }
-.limits ul { margin: 14px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--fg-2); }
-.final { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 32px;
-  display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
-.final h2 { font-size: clamp(22px, 2.8vw, 28px); max-width: 26ch; }
-@media (max-width: 860px) {
-  .cards { grid-template-columns: minmax(0, 1fr); }
-  .usecase { grid-template-columns: minmax(0, 1fr); }
-  .final { padding: 22px; }
-}
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0}
+a{color:var(--accent)}
+.page{max-width:1240px;margin:0 auto;padding-block:40px 80px;display:grid;gap:88px}
+.page>*{min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{height:24px;width:auto}
+.mono{font-family:var(--mono);font-size:13px;color:var(--fg-3)}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.02em}
+.hero{display:grid;gap:22px;text-align:center;justify-items:center;padding-top:40px}
+h1{font-size:clamp(38px,7vw,70px);line-height:1.04;letter-spacing:-.035em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance;max-width:16ch}
+h1 .g,h2 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2.2vw,20px);color:var(--fg-2);max-width:60ch;margin:0}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.12;letter-spacing:-.025em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+h2 code{font-family:var(--mono);font-size:.85em;letter-spacing:-.01em}
+section{display:grid;gap:24px;min-width:0}
+.head{display:grid;gap:10px;justify-items:center;text-align:center}
+.query{font-family:var(--mono);font-size:13px;line-height:1.75;color:var(--fg-2);background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:18px 22px;overflow-x:auto;white-space:pre;margin:0;max-width:100%}
+.query b{color:var(--fg-0);font-weight:500}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{margin:0;font-size:18px;font-weight:600;color:var(--fg-0)}
+.card p{margin:0;color:var(--fg-2);font-size:15px}
+.card .k{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.card code{font-family:var(--mono);font-size:.9em;color:var(--mint)}
+.cxw{margin:0}
+.cxw button{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.fine{font-size:13px;color:var(--fg-3);text-align:center;margin:0}
+.limits{list-style:none;margin:0 auto;padding:0;display:grid;gap:10px;max-width:640px;width:100%}
+.limits li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;color:var(--fg-2);font-size:15px}
+.final{text-align:center;display:grid;gap:12px;justify-items:center;padding:48px 20px;border:1px solid var(--line);border-radius:20px;
+  background:radial-gradient(ellipse at top,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),var(--bg-1)}
+.final p{margin:0;color:var(--fg-2)}
+footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--fg-2)}
+.chip.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+@media (max-width:900px){.cards{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){.page{gap:64px}}
 </style>
 </head>
 <body>
-<main class="wrap">
-  <header class="col">
-    <div class="crumb"><span>Data flow</span><span>Datasets</span><span>Virtual datasets</span></div>
-    <div class="chips" aria-label="Status">
-      <span class="chip on">Coming soon</span>
-      <span class="chip">Design preview</span>
-      <span class="chip">No price</span>
-    </div>
-    <h1>Add a dataset once. Every query that uses the name gets it.</h1>
-    <p class="lead">A virtual dataset is a saved DataPrime query that reads like a dataset, for anyone whose data sits in many datasets.</p>
-    <div class="actions">
-      <a class="btn" href="https://coralogix-dev.slack.com/archives/C0ARB0MTC8H" target="_blank" rel="noopener">Give feedback in Slack</a>
-      <a class="link" href="https://nspm-deliverables.vercel.app/virtual-datasets-screen-v5.html" target="_blank" rel="noopener">Open the full design mockup</a>
-    </div>
-    <section class="waiting" aria-labelledby="waiting">
-      <h2 id="waiting">Customers waiting for it</h2>
-      <ul>
-        <li><span class="acct">Diamond account<span class="tier">Software</span></span><span class="ask">Joins old and new datasets by hand during their dataset migration.</span></li>
-        <li><span class="acct">Diamond account<span class="tier">Banking</span></span><span class="ask">Needs one name across datasets to follow traces in Explore.</span></li>
-        <li><span class="acct">Platinum account<span class="tier">Transportation</span></span><span class="ask">Names nine datasets in every query. Raised as urgent.</span></li>
-        <li><span class="acct">Platinum account<span class="tier">Media</span></span><span class="ask">Wants datasets found by a readable name.</span></li>
-        <li><span class="acct">Enterprise account</span><span class="ask">Waiting for a time estimate.</span></li>
-      </ul>
-    </section>
-  </header>
-
-  <section aria-labelledby="problem">
-   <div class="col">
-    <p class="eyebrow">Problem today</p>
-    <h2 id="problem">Every query has to name every dataset.</h2>
-    <div class="query" role="img" aria-label="A DataPrime query that names nine datasets">source <b>platform-api-logs</b>, <b>platform-auth-logs</b>, <b>platform-billing-logs</b>,
+<div class="page">
+<header class="top">
+  <svg class="logo" viewBox="0 0 1018 221" role="img" aria-label="Coralogix"><path fill="#86ffc9" d="M188.8 112.5a93.8 93.8 0 1 1-187.5 0 93.8 93.8 0 0 1 187.6 0Z"/><path fill="#13e989" d="M162.9 112.5a67.7 67.7 0 1 1-135.5 0 67.7 67.7 0 0 1 135.5 0Z"/><path fill="currentColor" style="color:var(--fg-0)" d="M301.3 181.1a63.6 63.6 0 0 1-64.1-66.4c0-9.5 1.5-18.3 4.6-26.3a62.3 62.3 0 0 1 59.4-39.8 62 62 0 0 1 24.7 4.6 56.2 56.2 0 0 1 18.6 12.4c5 5 8.7 10.7 10.9 16.7l-21 9.9a34 34 0 0 0-33-22.2c-8.3 0-15.3 1.8-21.5 5.6-6.1 3.8-10.9 9-14.3 15.7-3.4 6.7-5 14.5-5 23.4s1.6 16.9 5 23.7a39.4 39.4 0 0 0 14.3 15.6c6.2 3.8 13.3 5.7 21.4 5.7s15-2 20.8-6.2a35 35 0 0 0 12.2-16l21 9.8a46.2 46.2 0 0 1-10.8 17 62 62 0 0 1-43.3 16.9Zm111.6 0a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49 49 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.4-13.6c2.2-4.4 3.4-9.2 3.4-14.6s-1.1-10.4-3.5-14.5a24.8 24.8 0 0 0-22.3-13.8 26 26 0 0 0-23 13.8c-2.1 4.1-3.2 9-3.2 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6Zm62.7 18.6V85.3h21.2V106l-1.7-3c2.2-7 5.6-12 10.2-14.7a32.8 32.8 0 0 1 16.9-4.1h5.5v20h-8.1c-6.4 0-11.6 2-15.5 6-4 3.9-5.9 9.4-5.9 16.5V179h-22.6Zm89.1 2.1c-6.5 0-12.2-1-17-3.3s-8.6-5.3-11.2-9.3c-2.7-4.1-4-8.9-4-14.3a26.7 26.7 0 0 1 14.1-24.1c4.9-2.8 11-4.7 18.3-5.9l30.7-5v17.3l-26.4 4.4c-4.5.8-7.8 2.3-10 4.3-2.2 2.1-3.3 4.8-3.3 8.1s1.2 5.8 3.7 7.8c2.5 1.8 5.6 2.8 9.3 2.8 4.7 0 8.8-1 12.4-3a20 20 0 0 0 8.4-8.4c2-3.6 3.1-7.5 3.1-11.7v-24.1c0-4-1.6-7.4-4.8-10a18 18 0 0 0-12.4-4.2 22.1 22.1 0 0 0-21 14.1l-18.5-9c1.9-4.9 4.7-9.1 8.6-12.7a44 44 0 0 1 14.2-8.6c5.4-2 11.2-3 17.5-3a47 47 0 0 1 20.4 4.2 31.6 31.6 0 0 1 18.6 29.2V179H594v-16l4.8-.3c-2.4 4-5.2 7.4-8.6 10.1a38.8 38.8 0 0 1-25.5 8.3Zm67.8-2.1V48.6H655V179h-22.5Zm85.5 2.1a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49.2 49.2 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.3-13.6c2.3-4.4 3.5-9.2 3.5-14.6s-1.2-10.4-3.5-14.5a24.8 24.8 0 0 0-22.4-13.8 26 26 0 0 0-23 13.8c-2 4.1-3.1 9-3.1 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6ZM826.2 217c-7 0-13.5-1.2-19.5-3.5s-11-5.5-15.5-9.7a36 36 0 0 1-9.3-14.3l21-7.9c1.4 4.4 4.1 7.9 8.2 10.5 4 2.8 9.1 4.2 15.1 4.2 4.6 0 8.6-.9 12-2.6 3.6-1.7 6.4-4.3 8.3-7.6 2-3.2 3-7.1 3-11.7V153l4.3 5.2a32.1 32.1 0 0 1-13 12.7 45.7 45.7 0 0 1-41.9-1.7c-6.8-4-12.2-9.5-16.1-16.5-4-7-5.9-14.9-5.9-23.6s2-16.8 5.9-23.6a44.4 44.4 0 0 1 57.6-17.8 36 36 0 0 1 13.4 12.6l-3.1 5.7V85.3H872v89a41.4 41.4 0 0 1-22.2 37 48.7 48.7 0 0 1-23.6 5.6Zm-1-62.6c4.8 0 9-1 12.6-3.1a23 23 0 0 0 8.6-9c2-3.8 3-8.1 3-13s-1-9.2-3.2-13a23.3 23.3 0 0 0-21-12.4c-4.7 0-9 1-12.8 3.3a23.6 23.6 0 0 0-9 9.1c-2 3.8-3 8.1-3 13s1 9 3 12.9c2.2 3.8 5.2 6.7 8.9 9 3.7 2.1 8 3.2 12.9 3.2Zm64.2 24.6V85.3h22.5V179h-22.5Zm0-104.2V50.7h22.5v24h-22.5ZM920.5 179l32.8-47-33-46.7H947l25.7 37.9h-12l25.8-38h26.3L980 132l32.6 47h-26.4l-25.3-37.7h11.5L947.1 179h-26.6Z"/></svg>
+  <span class="mono">Data Flow · Virtual datasets</span>
+</header>
+<section class="hero">
+  <div class="chips"><span class="chip on">Coming soon</span><span class="chip">Design preview</span></div>
+  <h1>Add a dataset once. <span class="g">Every query that uses the name gets it.</span></h1>
+  <p class="lead">A virtual dataset is a saved DataPrime query that reads like a dataset, for anyone whose data sits in many datasets.</p>
+</section>
+<section>
+  <div class="head"><span class="kicker">The problem today</span><h2>Every query has to name every dataset.</h2></div>
+  <div class="query" role="img" aria-label="A DataPrime query that names nine datasets">source <b>platform-api-logs</b>, <b>platform-auth-logs</b>, <b>platform-billing-logs</b>,
        <b>platform-dispatch-logs</b>, <b>platform-gateway-logs</b>, <b>platform-matching-logs</b>,
        <b>platform-notify-logs</b>, <b>platform-payments-logs</b>, <b>platform-routing-logs</b></div>
-   </div>
-    <div class="cards">
-      <article class="card">
-        <h3>Every query lists every dataset.</h3>
-        <p>One customer writes the same nine dataset names into each query.</p>
-      </article>
-      <article class="card">
-        <h3>A new dataset breaks the list.</h3>
-        <p>Each query, dashboard and alert must be edited by hand to add it. Missing one means missing data, with no error.</p>
-      </article>
-      <article class="card">
-        <h3>A saved query does not fix it.</h3>
-        <p>It is a copy. When the list changes, every copy is still out of date.</p>
-      </article>
-    </div>
-  </section>
-
-  <section aria-labelledby="usecase">
-    <div class="col">
-      <p class="eyebrow">Use case</p>
-      <h2 id="usecase">Nine datasets, one name: <span class="mono">platform_data</span></h2>
-    </div>
-    <div class="usecase">
-      <dl class="beats">
-        <div class="beat"><dt>What happened</dt><dd>A transportation customer split platform data into nine datasets. Every query, dashboard and alert lists all nine. A tenth dataset means editing all of them.</dd></div>
-        <div class="beat"><dt>What the page shows</dt><dd>An admin creates <span class="mono">platform_data</span> from the nine datasets. A user runs <span class="mono">source platform_data</span> in Explore and gets rows from all nine.</dd></div>
-        <div class="beat"><dt>What the admin knows</dt><dd>One name covers the nine. The next dataset is added in one place, and every query that uses the name picks it up.</dd></div>
-      </dl>
-      <div class="shot">
-        <figure class="cxw" data-title="Virtual datasets &middot; platform_data" aria-label="Replay: nine dataset names in one query, then an admin creates platform_data, which resolves to the nine datasets, and Explore runs source platform_data">
-          <div class="cxr" data-theme="dark" data-replay="assets/replays/virtual-datasets-pitch.json"></div>
-        </figure>
-        <p class="note">Design preview with sample data. The final product may differ. Names are changed.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="col limits" aria-labelledby="limits">
-    <p class="eyebrow">Set expectations</p>
-    <h2 id="limits">What v1 does not do yet</h2>
-    <ul>
-      <li>No virtual dataset built from other virtual datasets. This is still open.</li>
-      <li>No ready-made "all logs" set. This is still open.</li>
-      <li>The definition can show in query errors.</li>
-      <li>No writes to a virtual dataset.</li>
-    </ul>
-  </section>
-
-  <section class="final" aria-labelledby="ask">
-    <h2 id="ask">Does this cover your account's case?</h2>
-    <a class="btn" href="https://coralogix-dev.slack.com/archives/C0ARB0MTC8H" target="_blank" rel="noopener">Tell us in #epic-virtual-datasets-alias-and-more</a>
-  </section>
-</main>
+  <div class="cards">
+    <div class="card"><h3>Every query lists every dataset.</h3><p>One customer writes the same nine dataset names into each query.</p></div>
+    <div class="card"><h3>A new dataset breaks the list.</h3><p>Each query, dashboard and alert must be edited by hand to add it. Missing one means missing data, with no error.</p></div>
+    <div class="card"><h3>A saved query does not fix it.</h3><p>It is a copy. When the list changes, every copy is still out of date.</p></div>
+  </div>
+</section>
+<section>
+  <div class="head"><span class="kicker">Use case</span><h2>Nine datasets, one name: <code class="g">platform_data</code></h2></div>
+  <div class="cards">
+    <div class="card"><span class="k">what happened</span><p>A transportation customer split platform data into nine datasets. Every query, dashboard and alert lists all nine. A tenth dataset means editing all of them.</p></div>
+    <div class="card"><span class="k">what the page shows</span><p>An admin creates <code>platform_data</code> from the nine datasets. A user runs <code>source platform_data</code> in Explore and gets rows from all nine.</p></div>
+    <div class="card"><span class="k">what the admin now knows</span><p>One name covers the nine. The next dataset is added in one place, and every query that uses the name picks it up.</p></div>
+  </div>
+  <figure class="cxw" data-title="Virtual datasets &middot; platform_data" aria-label="Replay: nine dataset names in one query, then an admin creates platform_data, which resolves to the nine datasets, and Explore runs source platform_data"><div class="cxr" data-theme="dark" data-replay="assets/replays/virtual-datasets-pitch.json"></div></figure>
+  <p class="fine">Design preview with sample data. The final product may differ. Names are changed.</p>
+</section>
+<section>
+  <div class="head"><span class="kicker">Set expectations</span><h2>What v1 does not do yet</h2></div>
+  <ul class="limits">
+    <li>No virtual dataset built from other virtual datasets. This is still open.</li>
+    <li>No ready-made "all logs" set. This is still open.</li>
+    <li>The definition can show in query errors.</li>
+    <li>No writes to a virtual dataset.</li>
+  </ul>
+</section>
+<section class="final">
+  <span class="kicker">Coming soon</span>
+  <h2>Does this cover your case?</h2>
+  <p>Talk to your Coralogix contact about how you query many datasets today.</p>
+</section>
+<footer><span class="mono">Design preview with sample data. The final product may differ.</span><span class="mono">© Coralogix 2026</span></footer>
+</div>
 
 <script>document.body.dataset.replays = "lean";</script>
 <script src="assets/vendor/rrweb-replay-1.1.3.min.js"></script>
 <script src="assets/replays/replay.js"></script>
-
 </body>
 </html>
