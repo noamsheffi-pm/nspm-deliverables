@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monthly Quota</title>
+<meta name="robots" content="noindex">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/replays/replay.css">
+<style>
+/* Layout: Coralogix brand, always dark (black, #13E989, #86FFC9); one column; their October as the centre of the page */
+:root{
+  --bg:#000; --bg-1:#0b0b0c; --bg-2:#121214; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --fg-0:#fff; --fg:#f2f2f2; --fg-2:#a9a9a9; --fg-3:#6e6e6e; --accent:#13E989; --mint:#86FFC9;
+  --grad:linear-gradient(90deg,#e6fff4 0%,#86FFC9 35%,#13E989 100%); --card:#0d0d0e;
+  --bar:#13E989; --bar-quiet:#2c6e4e; --limit:#fbbf24; --ink:255 255 255;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{max-width:1040px;margin:0 auto;padding-block:40px 72px;display:grid;gap:88px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{height:24px;width:auto}
+.mono{font-family:var(--mono);font-size:13px;color:var(--fg-3)}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.02em}
+.hero{display:grid;gap:22px;text-align:center;justify-items:center;padding-top:40px}
+h1{font-size:clamp(38px,7vw,72px);line-height:1.04;letter-spacing:-.035em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2.2vw,20px);color:var(--fg-2);max-width:60ch;margin:0}
+h2{font-size:clamp(26px,4vw,38px);line-height:1.12;letter-spacing:-.025em;font-weight:600;margin:0;color:var(--fg-0);text-wrap:balance}
+section{display:grid;gap:24px;min-width:0}
+.head{display:grid;gap:10px;justify-items:center;text-align:center}
+.head p{margin:0;color:var(--fg-2);max-width:62ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:4px}
+.stat .n{font-family:var(--mono);font-size:34px;font-weight:500;color:var(--fg-0);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat .n small{font-size:15px;color:var(--fg-3);margin-left:4px}
+.stat .l{color:var(--fg-2);font-size:14px}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;min-width:0}
+.svgwrap{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:560px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--fg-2)}
+.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:middle}
+.legend i.line{height:0;width:18px;border-top:2px solid var(--c);background:none;border-radius:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:8px;align-content:start}
+.card h3{margin:0;font-size:18px;font-weight:600;color:var(--fg-0)}
+.card p{margin:0;color:var(--fg-2);font-size:15px}
+.card .k{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.shot{min-width:0}
+.cxw button{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.fine{font-size:13px;color:var(--fg-3);text-align:center;margin:0}
+.trade{display:grid;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.trade div{display:grid;grid-template-columns:minmax(160px,240px) 1fr;gap:16px;padding:16px 22px;border-top:1px solid var(--line)}
+.trade div:first-child{border-top:0}
+.trade b{color:var(--fg-0);font-weight:600}.trade span{color:var(--fg-2)}
+@media (max-width:600px){.trade div{grid-template-columns:1fr;gap:2px}.page{gap:64px}}
+.final{text-align:center;display:grid;gap:12px;justify-items:center;padding:48px 20px;border:1px solid var(--line);border-radius:20px;
+  background:radial-gradient(ellipse at top,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),var(--bg-1)}
+.final p{margin:0;color:var(--fg-2)}
+footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+</style>
+
+<div class="page">
+<header class="top">
+  <svg class="logo" viewBox="0 0 1018 221" role="img" aria-label="Coralogix"><path fill="#86ffc9" d="M188.8 112.5a93.8 93.8 0 1 1-187.5 0 93.8 93.8 0 0 1 187.6 0Z"/><path fill="#13e989" d="M162.9 112.5a67.7 67.7 0 1 1-135.5 0 67.7 67.7 0 0 1 135.5 0Z"/><path fill="currentColor" style="color:var(--fg-0)" d="M301.3 181.1a63.6 63.6 0 0 1-64.1-66.4c0-9.5 1.5-18.3 4.6-26.3a62.3 62.3 0 0 1 59.4-39.8 62 62 0 0 1 24.7 4.6 56.2 56.2 0 0 1 18.6 12.4c5 5 8.7 10.7 10.9 16.7l-21 9.9a34 34 0 0 0-33-22.2c-8.3 0-15.3 1.8-21.5 5.6-6.1 3.8-10.9 9-14.3 15.7-3.4 6.7-5 14.5-5 23.4s1.6 16.9 5 23.7a39.4 39.4 0 0 0 14.3 15.6c6.2 3.8 13.3 5.7 21.4 5.7s15-2 20.8-6.2a35 35 0 0 0 12.2-16l21 9.8a46.2 46.2 0 0 1-10.8 17 62 62 0 0 1-43.3 16.9Zm111.6 0a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49 49 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.4-13.6c2.2-4.4 3.4-9.2 3.4-14.6s-1.1-10.4-3.5-14.5a24.8 24.8 0 0 0-22.3-13.8 26 26 0 0 0-23 13.8c-2.1 4.1-3.2 9-3.2 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6Zm62.7 18.6V85.3h21.2V106l-1.7-3c2.2-7 5.6-12 10.2-14.7a32.8 32.8 0 0 1 16.9-4.1h5.5v20h-8.1c-6.4 0-11.6 2-15.5 6-4 3.9-5.9 9.4-5.9 16.5V179h-22.6Zm89.1 2.1c-6.5 0-12.2-1-17-3.3s-8.6-5.3-11.2-9.3c-2.7-4.1-4-8.9-4-14.3a26.7 26.7 0 0 1 14.1-24.1c4.9-2.8 11-4.7 18.3-5.9l30.7-5v17.3l-26.4 4.4c-4.5.8-7.8 2.3-10 4.3-2.2 2.1-3.3 4.8-3.3 8.1s1.2 5.8 3.7 7.8c2.5 1.8 5.6 2.8 9.3 2.8 4.7 0 8.8-1 12.4-3a20 20 0 0 0 8.4-8.4c2-3.6 3.1-7.5 3.1-11.7v-24.1c0-4-1.6-7.4-4.8-10a18 18 0 0 0-12.4-4.2 22.1 22.1 0 0 0-21 14.1l-18.5-9c1.9-4.9 4.7-9.1 8.6-12.7a44 44 0 0 1 14.2-8.6c5.4-2 11.2-3 17.5-3a47 47 0 0 1 20.4 4.2 31.6 31.6 0 0 1 18.6 29.2V179H594v-16l4.8-.3c-2.4 4-5.2 7.4-8.6 10.1a38.8 38.8 0 0 1-25.5 8.3Zm67.8-2.1V48.6H655V179h-22.5Zm85.5 2.1a49 49 0 0 1-43-23.8c-4.5-7.3-6.7-15.7-6.7-25.1s2.2-17.8 6.6-25.2a49 49 0 0 1 43-23.8 49.3 49.3 0 0 1 42.8 23.8c4.5 7.2 6.7 15.6 6.7 25.2s-2.2 17.8-6.7 25.1a49.2 49.2 0 0 1-42.8 23.8Zm0-20.7a24.2 24.2 0 0 0 22.3-13.6c2.3-4.4 3.5-9.2 3.5-14.6s-1.2-10.4-3.5-14.5a24.8 24.8 0 0 0-22.4-13.8 26 26 0 0 0-23 13.8c-2 4.1-3.1 9-3.1 14.5s1 10.2 3.2 14.6a25.4 25.4 0 0 0 23 13.6ZM826.2 217c-7 0-13.5-1.2-19.5-3.5s-11-5.5-15.5-9.7a36 36 0 0 1-9.3-14.3l21-7.9c1.4 4.4 4.1 7.9 8.2 10.5 4 2.8 9.1 4.2 15.1 4.2 4.6 0 8.6-.9 12-2.6 3.6-1.7 6.4-4.3 8.3-7.6 2-3.2 3-7.1 3-11.7V153l4.3 5.2a32.1 32.1 0 0 1-13 12.7 45.7 45.7 0 0 1-41.9-1.7c-6.8-4-12.2-9.5-16.1-16.5-4-7-5.9-14.9-5.9-23.6s2-16.8 5.9-23.6a44.4 44.4 0 0 1 57.6-17.8 36 36 0 0 1 13.4 12.6l-3.1 5.7V85.3H872v89a41.4 41.4 0 0 1-22.2 37 48.7 48.7 0 0 1-23.6 5.6Zm-1-62.6c4.8 0 9-1 12.6-3.1a23 23 0 0 0 8.6-9c2-3.8 3-8.1 3-13s-1-9.2-3.2-13a23.3 23.3 0 0 0-21-12.4c-4.7 0-9 1-12.8 3.3a23.6 23.6 0 0 0-9 9.1c-2 3.8-3 8.1-3 13s1 9 3 12.9c2.2 3.8 5.2 6.7 8.9 9 3.7 2.1 8 3.2 12.9 3.2Zm64.2 24.6V85.3h22.5V179h-22.5Zm0-104.2V50.7h22.5v24h-22.5ZM920.5 179l32.8-47-33-46.7H947l25.7 37.9h-12l25.8-38h26.3L980 132l32.6 47h-26.4l-25.3-37.7h11.5L947.1 179h-26.6Z"/></svg>
+  <span class="mono">Coralogix · Monthly quota · November 2026</span>
+</header>
+
+<section class="hero">
+  <span class="kicker">Your monthly quota</span>
+  <h1>Pay for your month, <span class="g">not your busiest day</span></h1>
+  <p class="lead">A monthly CX units quota for teams whose usage goes up and down. This page shows what changes, using one real team's usage from October.</p>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">One team's October</span><h2>Busy on workdays, quiet at the weekend</h2>
+  <p>A daily quota has to fit your busiest day. So most of it went unused on every other day, and the unused part was lost at midnight.</p></div>
+  <div class="stats">
+    <div class="stat"><span class="n">84<small>units</small></span><span class="l">a day on average, on workdays</span></div>
+    <div class="stat"><span class="n">21<small>units</small></span><span class="l">a day on average, at the weekend</span></div>
+    <div class="stat"><span class="n">133<small>units</small></span><span class="l">its busiest day in October</span></div>
+    <div class="stat"><span class="n">180<small>units</small></span><span class="l">its daily quota</span></div>
+  </div>
+  <div class="chart">
+    <div class="svgwrap"><svg id="oct" viewBox="0 0 900 300" role="img" aria-label="One team's daily units in October 2026 against the daily quota of 180"></svg></div>
+    <div class="legend"><span><i style="--c:var(--bar)"></i>Workdays</span><span><i style="--c:var(--bar-quiet)"></i>Weekend</span><span><i class="line" style="--c:var(--limit)"></i>Daily quota today (180)</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">What changes</span><h2>Quiet days make room for busy days</h2></div>
+  <div class="cards">
+    <div class="card"><span class="k">daily rate × days</span><h3>One total for the month</h3><p>Your month total is your daily rate times the days in that month. 31 days in October, 30 in November.</p></div>
+    <div class="card"><span class="k">up to 3×</span><h3>Room for a busy day</h3><p>Any one day can use up to 3 times your daily rate. A release or an incident day is not blocked at midnight.</p></div>
+    <div class="card"><span class="k">1 month</span><h3>Only the month has to hold</h3><p>Quiet days leave units in the month for your busy workdays.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">See it in Coralogix</span><h2>Your month on one screen</h2>
+  <p>Settings, Usage &amp; Quota shows units a month, where you are in the cycle, today's room, a forecast for month end and a safe daily spend.</p></div>
+  <div class="shot"><figure class="cxw" data-title="Settings · usage &amp; quota · CX units, monthly" aria-label="Usage and quota overview on a monthly plan"><div class="cxr" data-replay="assets/replays/monthly-quota.json"></div></figure></div>
+  <p class="fine">Demo account with example numbers. Names are changed.</p>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">For your team</span><h2>What it means for each role</h2></div>
+  <div class="cards">
+    <div class="card"><h3>Budget owner</h3><p>Plan by the month, the same unit as your budget and your invoice.</p></div>
+    <div class="card"><h3>DevOps</h3><p>A busy day has 3 times the room. One heavy day does not block your data at midnight.</p></div>
+    <div class="card"><h3>R&amp;D leads</h3><p>No one needs to watch the quota every day. The limit that counts is the month.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="kicker">Good to know</span><h2>How the month works in practice</h2></div>
+  <div class="trade">
+    <div><b>Unused units</b><span>Units you do not use in a month do not carry over to the next month.</span></div>
+    <div><b>If the month runs out</b><span>You get a warning before the month total is used. If it runs out, new data stops until the 1st. Your account manager can add units before that.</span></div>
+    <div><b>One cycle</b><span>All teams in your account use the same cycle, from the 1st to the last day of the month.</span></div>
+    <div><b>Your usage view</b><span>Usage &amp; Quota still shows usage per day, so you can see which days were busy.</span></div>
+  </div>
+</section>
+
+<section class="final">
+  <h2>Questions about your plan?</h2>
+  <p>Talk to your Coralogix account manager.</p>
+</section>
+
+<footer><span class="mono">Usage: one real team, 1 to 31 October 2026, production. The team is not named.</span><span class="mono">© Coralogix 2026</span></footer>
+</div>
+
+<script>
+(function(){
+  const data=[["01",100.6,0],["02",21.7,1],["03",31.8,1],["04",105.6,0],["05",110.6,0],["06",133.3,0],["07",114.9,0],["08",108.2,0],["09",22.8,1],["10",20.6,1],["11",85.6,0],["12",85.4,0],["13",100,0],["14",85.5,0],["15",105.5,0],["16",20.4,1],["17",19.7,1],["18",129.8,0],["19",58.1,0],["20",82,0],["21",75.9,0],["22",74.1,0],["23",17.8,1],["24",19.2,1],["25",40.4,0],["26",42.5,0],["27",22,0],["28",53.3,0],["29",49.5,0],["30",21.2,1],["31",19.4,1]];
+  const s=document.getElementById('oct'),W=900,H=300,L=44,R=12,T=16,B=34,ymax=200,pw=W-L-R,ph=H-T-B,bw=pw/data.length,y=v=>T+ph*(1-v/ymax);
+  const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function draw(){
+    let g='';
+    for(let t=0;t<=ymax;t+=50)g+=`<line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="${css('--line')}"/><text x="${L-8}" y="${y(t)+4}" fill="${css('--fg-3')}" font-size="11" text-anchor="end" font-family="Geist Mono, monospace">${t}</text>`;
+    data.forEach((d,i)=>{const x=L+i*bw+bw*.17,w=bw*.66;
+      g+=`<rect x="${x}" y="${y(d[1])}" width="${w}" height="${T+ph-y(d[1])}" rx="2" fill="${d[2]?css('--bar-quiet'):css('--bar')}"><title>${+d[0]} Oct: ${d[1]} units</title></rect>`;
+      if(i%5===0||i===data.length-1)g+=`<text x="${x+w/2}" y="${H-12}" fill="${css('--fg-3')}" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">${+d[0]} Oct</text>`});
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(180)}" y2="${y(180)}" stroke="${css('--limit')}" stroke-width="2"/>`;
+    g+=`<text x="${W-R}" y="${y(180)-7}" fill="${css('--limit')}" font-size="12" font-weight="600" text-anchor="end" font-family="Geist, sans-serif">Daily quota today: 180</text>`;
+    s.innerHTML=g;
+  }
+  draw();
+  
+  // The recording names its media by site path (/assets/replays/media/...). Point those at this page's own files.
+  const MEDIA=new URL('assets/replays/media/',location.href).href, f0=window.fetch.bind(window);
+  window.fetch=async(u,o)=>{const url=String(u&&u.url||u);
+    if(/monthly-quota\.json(\?|$)/.test(url)){const t=await (await f0(u,o)).text();return new Response(t.split('/assets/replays/media/').join(MEDIA),{headers:{'content-type':'application/json'}})}
+    return f0(u,o)};
+})();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="assets/vendor/rrweb-replay-1.1.3.min.js"></script>
+<script src="assets/replays/replay.js"></script>
+
+</html>
