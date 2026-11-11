@@ -86,13 +86,13 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
 </section>
 
 <section>
-  <div class="head"><span class="kicker">One team's October</span><h2>It paid for 5,580 units and used 1,977</h2>
-  <p>The quota fit the busiest day. On a normal workday the team used less than half of it, and at the weekend about a tenth. The rest was lost each night.</p></div>
+  <div class="head"><span class="kicker">One team's October</span><h2>A quota of 180 a day. The busiest day used 133.</h2>
+  <p>The quota is set for the busiest day, so most days use much less. Units not used by midnight are lost. In October, 65% of this team's quota was lost this way.</p></div>
   <div class="stats">
     <div class="stat"><span class="n">180<small>units</small></span><span class="l">daily quota</span></div>
     <div class="stat"><span class="n">133<small>units</small></span><span class="l">busiest day in October</span></div>
     <div class="stat"><span class="n">84<small>units</small></span><span class="l">a workday, on average</span></div>
-    <div class="stat"><span class="n">35<small>%</small></span><span class="l">of the month's quota used</span></div>
+    <div class="stat"><span class="n">21<small>units</small></span><span class="l">a weekend day, on average</span></div>
   </div>
   <div class="chart">
     <div class="svgwrap"><svg id="oct" viewBox="0 0 900 300" role="img" aria-label="One team's daily units in October 2026 against the daily quota of 180"></svg></div>
@@ -120,7 +120,7 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
 <section>
   <div class="head"><span class="kicker">The trade</span><h2>What you give up, said plainly</h2></div>
   <div class="trade">
-    <div><b>No free overage grace</b><span>The room is now in the plan: 3 times your rate on any day, and a full month to even out.</span></div>
+    <div><b>No overage grace</b><span>The room is now in the plan: 3 times your rate on any day, and a full month to even out.</span></div>
     <div><b>No carry-over</b><span>Units you do not use in a month do not move to the next month.</span></div>
     <div><b>If the month runs out</b><span>You get a warning first. If it runs out, new data stops until the 1st. Your account manager can add units before that. Pay-as-you-go is not part of the monthly plan at launch.</span></div>
     <div><b>One cycle</b><span>All teams in your account share one cycle, from the 1st to the last day of the month.</span></div>
@@ -147,7 +147,7 @@ footer{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:
       g+=`<rect x="${x}" y="${y(d[1])}" width="${w}" height="${T+ph-y(d[1])}" rx="2" fill="${d[2]?css('--bar-quiet'):css('--bar')}"><title>${+d[0]} Oct: ${d[1]} units</title></rect>`;
       if(i%5===0||i===data.length-1)g+=`<text x="${x+w/2}" y="${H-12}" fill="${css('--fg-3')}" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">${+d[0]} Oct</text>`});
     g+=`<line x1="${L}" x2="${W-R}" y1="${y(180)}" y2="${y(180)}" stroke="${css('--limit')}" stroke-width="2"/>`;
-    g+=`<text x="${W-R}" y="${y(180)-7}" fill="${css('--limit')}" font-size="12" font-weight="600" text-anchor="end" font-family="Geist, sans-serif">Daily quota today: 180</text>`;
+    g+=`<text x="${W-R}" y="${y(180)-7}" fill="${css('--limit')}" font-size="12" font-weight="600" text-anchor="end" font-family="Geist, sans-serif">Daily quota: 180</text>`;
     s.innerHTML=g;
   }
   draw();
