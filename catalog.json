@@ -103,6 +103,11 @@
     "title": "Quota Flow Map",
     "meta": "Reservations vs limits · concept · Jul 2026"
   },
+  "reserved-column-schema-explorer-options.html": {
+    "title": "Schema Explorer Reserved Column: options A and B",
+    "tag": "design",
+    "meta": "Schema Manager · Nov 2026"
+  },
   "sprint-demo-01-09-2026.html": {
     "tag": "review",
     "title": "Sprint Demo 01-09-2026",

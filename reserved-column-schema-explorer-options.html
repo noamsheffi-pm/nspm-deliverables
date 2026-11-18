@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reserved Column Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: two stacked option panels, each a mock Schema Explorer table with a dataset switch */
+:root{
+  --bg:#f5f6f8; --panel:#ffffff; --fg:#1b1f2a; --muted:#5f6878; --line:#e2e5eb;
+  --accent:#3a5bd9; --accent-soft:#e7ecfc;
+  --ok:#1f8a5b; --ok-soft:#e2f4ea; --no:#b4452f; --no-soft:#fbe9e5; --unk:#6d7383; --unk-soft:#eceef2;
+  --res:#7a4cc2; --res-soft:#efe7fa; --new:#c98a12; --new-soft:#fdf3dc;
+  --f-display:"Space Grotesk",system-ui,sans-serif; --f-body:"Inter",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151c; --panel:#1a1e27; --fg:#e6e9f0; --muted:#98a0b0; --line:#2b313d;
+  --accent:#7d97f0; --accent-soft:#232c48;
+  --ok:#5cc495; --ok-soft:#173326; --no:#ec8a74; --no-soft:#3a201a; --unk:#a2a8b6; --unk-soft:#262b35;
+  --res:#b694ec; --res-soft:#2c2340; --new:#f0b84a; --new-soft:#3a2e14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151c; --panel:#1a1e27; --fg:#e6e9f0; --muted:#98a0b0; --line:#2b313d;
+  --accent:#7d97f0; --accent-soft:#232c48;
+  --ok:#5cc495; --ok-soft:#173326; --no:#ec8a74; --no-soft:#3a201a; --unk:#a2a8b6; --unk-soft:#262b35;
+  --res:#b694ec; --res-soft:#2c2340; --new:#f0b84a; --new-soft:#3a2e14; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:28px}
+h1{font-family:var(--f-display);font-size:1.6rem;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:1.2rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:68ch}
+.muted{color:var(--muted)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.legend div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:grid;gap:4px;min-width:0}
+.legend b{font-family:var(--f-display);font-weight:600}
+.opt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+.opt header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px}
+.tag{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px}
+.switch{display:flex;flex-wrap:wrap;gap:6px}
+.switch button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:transparent;color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+.switch button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.switch button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.86rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+th.newcol{color:var(--new);background:var(--new-soft)}
+td.newcol{background:var(--new-soft)}
+tr:last-child td{border-bottom:none}
+.kp{font-family:var(--f-mono);font-size:.82rem}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--accent);vertical-align:middle;margin-right:6px}
+.num{font-variant-numeric:tabular-nums;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:.76rem;font-weight:500;padding:2px 8px;border-radius:999px}
+.ok{color:var(--ok);background:var(--ok-soft)} .no{color:var(--no);background:var(--no-soft)} .unk{color:var(--unk);background:var(--unk-soft)}
+.res{color:var(--res);background:var(--res-soft)}
+.hidden-col{color:var(--muted);font-style:italic;font-size:.78rem}
+.note{font-size:.84rem;color:var(--muted)}
+.fresh{font-size:.74rem;color:var(--muted);margin-left:6px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.toolbar input{font:inherit;font-size:.85rem;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);min-width:0;flex:0 1 220px}
+.chip{font:inherit;font-size:.82rem;font-weight:500;padding:5px 12px;border-radius:999px;border:1px solid var(--res);color:var(--res);background:transparent;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--res);color:#fff}
+.chip:focus-visible{outline:2px solid var(--res);outline-offset:2px}
+ul.pc{margin:0;padding-left:18px;display:grid;gap:4px;font-size:.88rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <div style="display:grid;gap:8px">
+    <h1>Reserved column: two options</h1>
+    <p class="muted">Mock of the Schema Explorer table. Example fields, not real data. Use the switch to compare a frequent search dataset with an archive dataset. New parts are shaded yellow.</p>
+  </div>
+
+  <section class="legend" aria-label="What each word means">
+    <div><b>Reserved</b><span class="muted">The user put the field on the reserved list. This is the cause.</span></div>
+    <div><b>Mapped</b><span class="muted">The field is in the OpenSearch index. Frequent search datasets only. This is today's Mapping Status column.</span></div>
+    <div><b>Materialized</b><span class="muted">The field has its own column in the archive Parquet files, so queries read it fast. Archive datasets. Nothing shows this today.</span></div>
+  </section>
+
+  <section class="opt" id="optA">
+    <header><span class="tag">Option A</span><h2>Keep Mapping Status, add a new Reserved column</h2></header>
+    <div class="switch" role="group" aria-label="Dataset for option A">
+      <button id="a-fs" aria-pressed="true" data-ds="fs">Frequent search dataset</button>
+      <button id="a-ar" aria-pressed="false" data-ds="ar">Archive dataset</button>
+    </div>
+    <div class="tbl"><table><thead id="a-head"></thead><tbody id="a-body"></tbody></table></div>
+    <ul class="pc">
+      <li>Two columns describe speed: one for the index, one for the archive.</li>
+      <li>On frequent search the user sees Mapping and Reserved side by side.</li>
+      <li>On archive, Mapping is hidden (CX-70168), so only the new column shows.</li>
+    </ul>
+  </section>
+
+  <section class="opt" id="optB">
+    <header><span class="tag">Option B</span><h2>One "Fast to query" column plus a Reserved badge</h2></header>
+    <div class="switch" role="group" aria-label="Dataset for option B">
+      <button id="b-fs" aria-pressed="true" data-ds="fs">Frequent search dataset</button>
+      <button id="b-ar" aria-pressed="false" data-ds="ar">Archive dataset</button>
+    </div>
+    <div class="toolbar">
+      <input id="b-search" type="search" placeholder="Search keypath" aria-label="Search keypath">
+      <button id="b-resonly" class="chip" aria-pressed="false">Reserved only</button>
+      <span class="note" id="b-count"></span>
+    </div>
+    <div class="tbl"><table><thead id="b-head"></thead><tbody id="b-body"></tbody></table></div>
+    <ul class="pc">
+      <li>Mapping Status is renamed and works on every dataset: Mapped on frequent search, Materialized on archive.</li>
+      <li>Reserved is a small badge on the field name, not a column. A "Reserved only" chip above the table filters to reserved fields.</li>
+      <li>One place to answer "is this field fast?". Needs Phoenix to change an existing column.</li>
+    </ul>
+  </section>
+
+  <p class="note">"Not known": we have not collected archive data for this field yet, so we cannot say. It must never show as "Not materialized". The time in the column header is when the archive was last checked.</p>
+</div>
+
+<script>
+const rows=[
+  {kp:"$d.user_id",type:"string",pop:92,card:"48.2K",res:true, map:true, mat:"yes"},
+  {kp:"$d.http.status_code",type:"number",pop:88,card:"14",res:true, map:true, mat:"yes"},
+  {kp:"$d.trace_id",type:"string",pop:75,card:"1.1M",res:false,map:true, mat:"no"},
+  {kp:"$d.query_params.utm_source",type:"string",pop:31,card:"212",res:false,map:false,mat:"no"},
+  {kp:"$d.kubernetes.pod_name",type:"string",pop:64,card:"3.4K",res:true, map:false,mat:"unk"},
+];
+const pill=(c,t)=>`<span class="pill ${c}">${t}</span>`;
+const matPill=m=>m==="yes"?pill("ok","Materialized"):m==="no"?pill("no","Not materialized"):pill("unk","Not known");
+const fresh='';
+const hdrFresh='<br><span class="fresh" style="margin:0;text-transform:none;letter-spacing:0">checked 06:00 UTC</span>';
+function base(r){return `<td class="kp">${r.kp}</td><td>${r.type}</td><td><span class="bar" style="width:${r.pop*0.6}px"></span><span class="num">${r.pop}%</span></td><td class="num">${r.card}</td>`}
+function renderA(ds){
+  const fs=ds==="fs";
+  document.getElementById("a-head").innerHTML=`<tr><th>Keypath</th><th>Type</th><th>Popularity</th><th>Cardinality</th><th>Mapping status</th><th class="newcol">Reserved (new)${fs?"":hdrFresh}</th></tr>`;
+  document.getElementById("a-body").innerHTML=rows.map(r=>{
+    const mapCell=fs?(r.map?pill("ok","Mapped"):pill("no","Unmapped")):'<span class="hidden-col">hidden on archive</span>';
+    const newCell=fs?(r.res?pill("res","Reserved"):'<span class="num">—</span>')
+      :(r.res?pill("res","Reserved")+" ":"")+matPill(r.mat)+fresh;
+    return `<tr>${base(r)}<td>${mapCell}</td><td class="newcol">${newCell}</td></tr>`}).join("");
+}
+let bDs="fs";
+function renderB(ds){
+  if(ds) bDs=ds; const fs=bDs==="fs";
+  const resOnly=document.getElementById("b-resonly").getAttribute("aria-pressed")==="true";
+  const q=(document.getElementById("b-search").value||"").toLowerCase();
+  const list=rows.filter(r=>(!resOnly||r.res)&&r.kp.toLowerCase().includes(q));
+  document.getElementById("b-count").textContent=`${list.length} of ${rows.length} fields`;
+  document.getElementById("b-head").innerHTML=`<tr><th>Keypath</th><th>Type</th><th>Popularity</th><th>Cardinality</th><th class="newcol">Fast to query (was Mapping status)${fs?"":hdrFresh}</th></tr>`;
+  document.getElementById("b-body").innerHTML=list.map(r=>{
+    const name=`<td class="kp${r.res?" newcol":""}">${r.kp}${r.res?" "+pill("res","Reserved"):""}</td>`;
+    const cell=fs?(r.map?pill("ok","Mapped"):pill("no","Unmapped")):matPill(r.mat)+fresh;
+    return `<tr>${name}<td>${r.type}</td><td><span class="bar" style="width:${r.pop*0.6}px"></span><span class="num">${r.pop}%</span></td><td class="num">${r.card}</td><td class="newcol">${cell}</td></tr>`}).join("");
+}
+function wire(prefix,render){
+  const btns=document.querySelectorAll(`#opt${prefix.toUpperCase()} .switch button`);
+  btns.forEach(b=>b.addEventListener("click",()=>{btns.forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));render(b.dataset.ds)}));
+  render("fs");
+}
+wire("a",renderA); wire("b",renderB);
+document.getElementById("b-resonly").addEventListener("click",e=>{const b=e.currentTarget;b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true");renderB()});
+document.getElementById("b-search").addEventListener("input",()=>renderB());
+</script>
+</body>
+</html>
