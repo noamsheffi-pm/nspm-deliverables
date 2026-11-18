@@ -153,6 +153,11 @@
     "title": "Sprint Demo 30-06-2026",
     "meta": "Pipeline · Governance · Monetization · Jun 2026"
   },
+  "suggested-reserved-fields-options.html": {
+    "title": "Suggested Reserved Fields: options",
+    "tag": "design",
+    "meta": "Schema · Nov 2026"
+  },
   "tco-entitytype-routing-screen.html": {
     "tag": "design",
     "title": "TCO Entity Type Routing",

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suggested Reserved Fields Options</title>
+<style>
+:root{--bg:#f5f6f8;--panel:#fff;--fg:#1b1f2a;--muted:#5f6878;--line:#e2e5eb;--accent:#3a5bd9;--accent-soft:#e7ecfc;
+--res:#7a4cc2;--res-soft:#efe7fa;--sug:#c98a12;--sug-soft:#fdf3dc;--ok:#1f8a5b;--ok-soft:#e2f4ea}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;padding:28px 16px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:28px}
+h1{font-size:1.5rem;margin:0}h2{font-size:1.15rem;margin:0}p{margin:0;max-width:72ch}
+.muted{color:var(--muted)}
+.opt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+.tag{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;margin-right:8px}
+.screen{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:#fafbfc;font-size:.85rem}
+.crumb{color:var(--muted);margin-right:auto}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.8rem;background:#fff}
+.chip.on{border-color:var(--sug);background:var(--sug-soft);color:#7a5308;font-weight:600}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.86rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:none}
+.kp{font-family:ui-monospace,Menlo,monospace;font-size:.82rem}
+.num{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:.74rem;font-weight:500;padding:1px 8px;border-radius:999px;margin-left:8px}
+.res{color:var(--res);background:var(--res-soft)}.sug{color:#7a5308;background:var(--sug-soft)}.ok{color:var(--ok);background:var(--ok-soft)}
+.banner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px;background:var(--sug-soft);border-bottom:1px solid var(--line);font-size:.88rem}
+.banner b{margin-right:auto}
+.btn{font:inherit;font-size:.82rem;border:1px solid var(--accent);background:var(--accent);color:#fff;padding:5px 12px;border-radius:6px}
+.btn.ghost{background:#fff;color:var(--accent)}
+.dialog{margin:12px;border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.dialog header{padding:12px;border-bottom:1px solid var(--line);font-weight:600}
+.dialog footer{display:flex;gap:8px;justify-content:flex-end;padding:12px;border-top:1px solid var(--line)}
+select{font:inherit;font-size:.8rem;padding:2px 4px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:.88rem}
+.facts div{border-top:1px solid var(--line);padding-top:8px}
+.facts b{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+</style>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<div class="wrap">
+<header style="display:grid;gap:8px">
+<h1>Suggested reserved fields: where the admin sees them</h1>
+<p class="muted">Same data in both options: fields that queries had to read from JSON in the last 7 days on <span class="kp">default/logs</span>, ranked by count. Numbers are example values. In both options nothing is reserved until an admin approves.</p>
+</header>
+
+<section class="opt">
+<h2><span class="tag">Option A</span>Suggested badge in Schema Explorer</h2>
+<p>A "Suggested" badge sits next to the Reserved badge on the field name, with a filter. Schema Explorer stays read only: "Review" opens the Reserved Fields screen with the fields filled in.</p>
+<div class="screen">
+<div class="bar"><span class="crumb">Data Flow › Schema Manager › Schema Explorer · default/logs · Last 7 days</span><span class="chip">Reserved</span><span class="chip on">Suggested (4)</span><button class="btn ghost">Review in Reserved Fields</button></div>
+<div class="tbl"><table>
+<thead><tr><th>Field</th><th>Types</th><th>Mapping</th><th>Read from JSON</th><th>Used in queries</th></tr></thead>
+<tbody>
+<tr><td class="kp">$d.http.status_code<span class="pill sug">Suggested · Number</span></td><td>number 100%</td><td>Not materialized</td><td class="num">18,420</td><td class="num">21,300</td></tr>
+<tr><td class="kp">$d.user.account_id<span class="pill sug">Suggested · String</span></td><td>string 100%</td><td>Not materialized</td><td class="num">9,850</td><td class="num">12,010</td></tr>
+<tr><td class="kp">$d.error<span class="pill sug">Suggested · pick type</span></td><td>object 62% · number 38%</td><td>Not materialized</td><td class="num">4,200</td><td class="num">6,900</td></tr>
+<tr><td class="kp">$d.region<span class="pill sug">Suggested · String</span></td><td>string 100%</td><td>Not materialized</td><td class="num">320</td><td class="num">5,100</td></tr>
+<tr><td class="kp">$d.service<span class="pill res">Reserved</span></td><td>string 100%</td><td>Materialized</td><td class="num">0</td><td class="num">40,200</td></tr>
+</tbody></table></div>
+</div>
+<div class="facts">
+<div><b>What changes for the user</b>Finds slow fields where they already read the schema, then reserves on the Reserved Fields screen.</div>
+<div><b>Trade-off</b>Adds a second badge and a new column next to the Reserved column (CX-70443). Two screens to finish one task.</div>
+</div>
+</section>
+
+<section class="opt">
+<h2><span class="tag">Option B</span>Suggestions on the Reserved Fields screen</h2>
+<p>A banner on the Reserved Fields screen, where reserving already happens. "Review" opens a dialog: pick fields, check the type, reserve. Shape of the design preview (PR #1178).</p>
+<div class="screen">
+<div class="bar"><span class="crumb">Data Flow › Schema Manager › Reserved Fields · default/logs</span><span class="chip">Reserved</span><span class="chip on">Suggested (4)</span></div>
+<div class="banner"><b>4 fields were read from JSON in the last 7 days. Reserving them makes those queries faster.</b><button class="btn">Review</button></div>
+<div class="dialog">
+<header>Review suggested fields · default/logs · Last 7 days</header>
+<div class="tbl"><table>
+<thead><tr><th></th><th>Field</th><th>Types</th><th>Read from JSON</th><th>Used in queries</th><th>Reserve as</th></tr></thead>
+<tbody>
+<tr><td>☑</td><td class="kp">$d.http.status_code</td><td>number 100%</td><td class="num">18,420</td><td class="num">21,300</td><td><select><option>Number</option></select></td></tr>
+<tr><td>☑</td><td class="kp">$d.user.account_id</td><td>string 100%</td><td class="num">9,850</td><td class="num">12,010</td><td><select><option>String</option></select></td></tr>
+<tr><td>☐</td><td class="kp">$d.error</td><td>object 62% · number 38%</td><td class="num">4,200</td><td class="num">6,900</td><td><select><option>Pick a type</option></select></td></tr>
+<tr><td>☑</td><td class="kp">$d.region</td><td>string 100%</td><td class="num">320</td><td class="num">5,100</td><td><select><option>String</option></select></td></tr>
+</tbody></table></div>
+<footer><button class="btn ghost">Cancel</button><button class="btn">Reserve 3 fields</button></footer>
+</div>
+</div>
+<div class="facts">
+<div><b>What changes for the user</b>Sees the suggestion where they reserve, and finishes in one dialog.</div>
+<div><b>Trade-off</b>Only admins who open Reserved Fields see it. Schema Explorer users do not.</div>
+</div>
+</section>
+</div>
+</body>
+</html>
