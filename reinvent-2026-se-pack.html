@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>re:Invent 2026 SE Pack</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: #0b1210; overflow: hidden; }
+:root {
+  --ink: #0b1210;
+  --ink-soft: #4a5568;
+  --paper: #f8fafc;
+  --white: #ffffff;
+  --green: #02763a;
+  --green-bright: #029449;
+  --amber: #e4b83c;
+  --red: #eb6166;
+  --purple: #b273ee;
+  --line: #dedee0;
+  --line-soft: #ececee;
+  --muted: #68686d;
+}
+
+body {
+  font-family: "Nunito Sans", Verdana, sans-serif;
+  color: var(--ink);
+}
+
+section {
+  background: var(--paper);
+  padding: 128px;
+}
+
+section.dark { background: var(--ink); color: #e9efec; }
+section.white { background: var(--white); }
+
+h1 { font-size: 112px; font-weight: 800; line-height: 1.04; letter-spacing: -2px; }
+h2 { font-size: 68px; font-weight: 700; line-height: 1.1; letter-spacing: -1px; }
+h3 { font-size: 32px; font-weight: 700; line-height: 1.25; }
+p { font-size: 32px; line-height: 1.4; }
+
+.eyebrow {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--green-bright);
+  text-transform: uppercase;
+}
+.dark .eyebrow { color: #5cd38f; }
+
+.lede { font-size: 44px; line-height: 1.35; font-weight: 600; }
+.body { font-size: 30px; color: var(--ink-soft); line-height: 1.45; }
+.dark .body { color: #b4c4bd; }
+
+.gap-s { height: 24px; }
+.gap-m { height: 44px; }
+.gap-l { height: 72px; }
+
+.row { display: flex; gap: 32px; }
+.col { display: flex; flex-direction: column; }
+.grow { flex: 1; }
+.split { display: flex; gap: 56px; }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 32px;
+  flex: 1;
+}
+.dark .card { background: #16211d; border-color: #2b3a34; }
+.card h3 { font-size: 30px; margin-bottom: 0; }
+.card .body { font-size: 26px; }
+
+.say {
+  background: #eaf6ef;
+  border: 1px solid #b9ddc8;
+  border-radius: 8px;
+  padding: 32px 36px;
+}
+.say p { font-size: 30px; line-height: 1.45; color: #0b3b22; }
+.say .label {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.warn {
+  background: #fdf4e0;
+  border: 1px solid #ecd79b;
+  border-radius: 8px;
+  padding: 28px 32px;
+}
+.warn p { font-size: 28px; color: #5a4209; }
+.warn .label {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #8a6a0c;
+  text-transform: uppercase;
+}
+
+.steps { display: flex; flex-direction: column; gap: 20px; }
+.step { display: flex; gap: 24px; align-items: flex-start; }
+.num {
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  background: var(--green);
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step .what { font-size: 28px; line-height: 1.35; }
+
+.state {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  display: inline-block;
+}
+.live { background: #d9f0e3; color: #0b5a31; }
+.preview { background: #f1e4fb; color: #5b2b8a; }
+
+table { font-size: 28px; font-family: "Nunito Sans", Verdana, sans-serif; }
+td, th { padding: 16px 18px; }
+
+.foot {
+  position: absolute;
+  left: 128px;
+  bottom: 64px;
+  width: 1664px;
+  font-size: 24px;
+  color: var(--muted);
+}
+.dark .foot { color: #7f938a; }
+.foot-pad { padding: 128px 128px 160px; }
+
+.mono { font-family: "JetBrains Mono", "Courier New", monospace; font-size: 26px; }
+
+#stage { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; }
+#stage > section { position: absolute; inset: 0; width: 1920px; height: 1080px; display: none; }
+#stage > section.on { display: block; }
+table { border-collapse: collapse; }
+th { text-align: left; background: #eaf6ef; color: #0b3b22; }
+td, th { border-bottom: 1px solid var(--line); vertical-align: top; }
+aside.notes { display: none; }
+body.shownotes aside.notes { display: block; position: absolute; left: 0; right: 0; bottom: 0; background: #fff8e1; color: #3a2e05; font-size: 26px; line-height: 1.4; padding: 24px 128px; border-top: 2px solid #ecd79b; }
+#hud { position: fixed; right: 16px; bottom: 12px; font: 13px "Nunito Sans", sans-serif; color: #9fb3aa; user-select: none; }
+#hud button { background: none; border: 1px solid #3b4a44; color: #cfe0d8; border-radius: 4px; padding: 2px 8px; margin-left: 6px; cursor: pointer; font: inherit; }
+</style></head>
+<body>
+<div id="stage">
+<section id="cover" class="dark foot-pad" data-transition="fade">
+<p class="eyebrow">AWS re:Invent 2026 · Sales Engineer pack</p>
+<div class="gap-m"></div>
+<h1>Four demos.<br>One story.</h1>
+<div class="gap-m"></div>
+<p class="lede" style="width:1200px;color:#cfe0d8">You control what your data costs: see it, pay for your real use, shape it, organize it.</p>
+<div class="gap-l"></div>
+<div class="row" style="width:1664px">
+<div class="card"><h3>1 · Usage &amp; Quota Overview</h3><div class="gap-s"></div><p class="state live">LIVE</p></div>
+<div class="card"><h3>2 · Monthly plan</h3><div class="gap-s"></div><p class="state live">LIVE, ON REQUEST</p></div>
+<div class="card"><h3>3 · Traffic Management</h3><div class="gap-s"></div><p class="state preview">PREVIEW, BEHIND A FLAG</p></div>
+<div class="card"><h3>4 · Virtual datasets</h3><div class="gap-s"></div><p class="state preview">PREVIEW, BEHIND A FLAG</p></div>
+</div>
+<p class="foot">Noam Sheffi · Analytics and Data Products · 24 November 2026</p>
+<aside class="notes">Open with the story, not the feature list. Say: these four demos are one message. A customer walks away knowing they can see what they spend, pay for what they really use, shape the data before it lands, and organize it after. Two are live today. Two are a preview you can show and must never date.</aside>
+</section>
+<section id="story" data-transition="fade">
+<p class="eyebrow">The through line</p>
+<div class="gap-s"></div>
+<h2>Four demos, one sentence</h2>
+<div class="gap-m"></div>
+<div class="row" style="width:1664px">
+<div class="card"><p class="eyebrow" style="font-size:22px">See it</p><div class="gap-s"></div><h3>Usage &amp; Quota Overview</h3><div class="gap-s"></div><p class="body">Where your quota stands right now: who is blocked, why, and when data flows again.</p></div>
+<div class="card"><p class="eyebrow" style="font-size:22px">Pay for real use</p><div class="gap-s"></div><h3>Monthly plan</h3><div class="gap-s"></div><p class="body">Pay for your normal day, not your worst day.</p></div>
+<div class="card"><p class="eyebrow" style="font-size:22px">Shape it</p><div class="gap-s"></div><h3>Traffic Management</h3><div class="gap-s"></div><p class="body">Design the pipeline. One per business unit, each with its own route, shape and budget.</p></div>
+<div class="card"><p class="eyebrow" style="font-size:22px">Organize it</p><div class="gap-s"></div><h3>Virtual datasets</h3><div class="gap-s"></div><p class="body">One name over many datasets, so a data split breaks nothing.</p></div>
+</div>
+<div class="gap-l"></div>
+<div class="say">
+<p class="label">Say</p>
+<p>“All four answer the same question. Who decides what your observability data costs, and on what information.”</p>
+</div>
+<aside class="notes">Use this slide to pick a demo for the visitor in front of you. A FinOps or procurement visitor starts at 1 and 2. A platform or SRE lead starts at 3. A team drowning in dashboards after splitting data starts at 4. Never walk all four in order unless they ask. The bet behind the show: these demos bring us named design partners for Traffic Management and Virtual datasets.</aside>
+</section>
+<section id="rules" class="white" data-transition="fade">
+<p class="eyebrow">Before you open a laptop</p>
+<div class="gap-s"></div>
+<h2>Five rules at the booth</h2>
+<div class="gap-m"></div>
+<div class="steps" style="width:1500px">
+<div class="step"><div class="num">1</div><p class="what"><b>No dates.</b> Not a quarter, not “end of year”, not “early next year”. Say “coming, we are taking design partners”.</p></div>
+<div class="step"><div class="num">2</div><p class="what"><b>No price.</b> Not a unit price, not a discount, not a comparison to a bill.</p></div>
+<div class="step"><div class="num">3</div><p class="what"><b>No customer names.</b> Say “a healthcare customer”, never the account.</p></div>
+<div class="step"><div class="num">4</div><p class="what"><b>Two are live, two are a preview.</b> Traffic Management and Virtual datasets are design previews. Never say they are live.</p></div>
+<div class="step"><div class="num">5</div><p class="what"><b>“I do not know yet” is a good answer.</b> Take the name and the question. We follow up.</p></div>
+</div>
+<div class="gap-m"></div>
+<div class="warn">
+<p class="label">Why rule 1 matters</p>
+<p>Customers were already told “end of Q4” for virtual datasets. A second date from a booth becomes the commitment they hold us to.</p>
+</div>
+<aside class="notes">Read rule 5 out loud in the training. The failure mode at a booth is not a missing answer, it is an invented date. A question you take away is a lead. A date you guess is a problem for the account team in January.</aside>
+</section>
+<section id="d1-pain" data-transition="fade">
+<p class="eyebrow">Demo 1 · Usage &amp; Quota Overview · Live</p>
+<div class="gap-s"></div>
+<h2>Customers find out they are blocked<br>from a support ticket.</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<h3>What the day looks like now</h3>
+<div class="gap-s"></div>
+<p class="body">Data stops arriving. Nobody in the app can say which quota caused it, when it started, or when it lifts.</p>
+<div class="gap-s"></div>
+<p class="body">Quota is enforced in four places: quota rules, TCO quota, dataset quota, team quota. Each had its own screen.</p>
+<div class="gap-s"></div>
+<p class="body">When the shared pool runs out, the app said nothing at all. The customer learned it from email.</p>
+</div>
+<div class="col grow">
+<h3>Why the obvious fix fails</h3>
+<div class="gap-s"></div>
+<p class="body">An alert tells you after the fact. It does not say which of the four limits fired, or what to change.</p>
+<div class="gap-s"></div>
+<p class="body">A dashboard of raw usage does not answer the only question that matters at 3am: am I about to be blocked, and by how much.</p>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="say">
+<p class="label">Open with</p>
+<p>“When a team of yours stops sending data, how do they find out, and how long does it take?”</p>
+</div>
+<aside class="notes">Ask the opening question before you show anything. Many visitors will answer with a story about a support ticket or a Slack message from a developer. That story is your demo script. Do not lead with the page.</aside>
+</section>
+<section id="d1-show" class="white" data-transition="fade">
+<p class="eyebrow">Demo 1 · Click path · 3 minutes</p>
+<div class="gap-s"></div>
+<h2>One page, four answers</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<div class="steps">
+<div class="step"><div class="num">1</div><p class="what"><b>Open Usage &amp; Quota, Overview tab.</b> Say: this is the whole cycle on one page.</p></div>
+<div class="step"><div class="num">2</div><p class="what"><b>Point at the plan snapshot.</b> What they committed, what is left, how many days remain.</p></div>
+<div class="step"><div class="num">3</div><p class="what"><b>Walk the burn chart.</b> CX units and AI units are separate, never added together.</p></div>
+<div class="step"><div class="num">4</div><p class="what"><b>Open allocations.</b> Per team, plus the unallocated pool.</p></div>
+<div class="step"><div class="num">5</div><p class="what"><b>Open blocks this cycle.</b> Which limit, when it started, when it ends.</p></div>
+</div>
+</div>
+<div class="col" style="width:620px">
+<div class="say">
+<p class="label">60 second version</p>
+<p>“Here is the cycle. Here is what each team is burning. Here is who got blocked and why. One page, no support ticket.”</p>
+</div>
+<div class="gap-m"></div>
+<div class="warn">
+<p class="label">Do not show</p>
+<p>Units moved history, it is behind a flag. Insight cards, they are not built.</p>
+</div>
+</div>
+</div>
+<aside class="notes">Do not narrate every widget. Three beats win the demo: the cycle, the per team split, and the block with its reason. If they ask for anything deeper, that is a follow up call, not a booth conversation.</aside>
+</section>
+<section id="d1-qa" data-transition="fade">
+<p class="eyebrow">Demo 1 · Hard questions</p>
+<div class="gap-s"></div>
+<h2>What they will ask</h2>
+<div class="gap-m"></div>
+<table style="width:1664px">
+<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
+<tr><td>Can it tell me how many units to add so I am not blocked today?</td><td>Not yet on this page. The forecast shows a percentage. The number of units is planned, no date. Take their name, this is a real request from this booth.</td></tr>
+<tr><td>Do AI units have a forecast too?</td><td>No. AI units show use and a warning. Their use comes in bursts, so a forecast would mislead.</td></tr>
+<tr><td>Does it mix my data units and my AI units?</td><td>Never. No number on the page adds them together.</td></tr>
+<tr><td>I am on a daily plan. Does this still help?</td><td>Yes. The page shows the current cycle, daily or monthly.</td></tr>
+<tr><td>Can I see it per team?</td><td>Yes. Org level shows every team. Team level shows each allocation and the unallocated pool.</td></tr>
+<tr><td>Can the block email link here?</td><td>Yes, that is the point of a full page.</td></tr>
+</table>
+<p class="foot">If you get the forecast in units question, write down the account. We are counting this ask.</p>
+<aside class="notes">The first row is the question the SE team raised in the handover. Answer it straight: it is planned, it has no date, and we are counting the asks. Do not promise it for re:Invent and do not say it was never there.</aside>
+</section>
+<section id="d2-pain" data-transition="fade">
+<p class="eyebrow">Demo 2 · Monthly plan · Live, on request</p>
+<div class="gap-s"></div>
+<h2>They buy for the worst day<br>and use it twice a week.</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<h3>What the day looks like now</h3>
+<div class="gap-s"></div>
+<p class="body">A daily plan is enforced every single day. So the customer sizes for their busiest Monday, or they get blocked on it.</p>
+<div class="gap-s"></div>
+<p class="body">Every quiet Friday and every weekend is entitlement they paid for and threw away.</p>
+</div>
+<div class="col grow">
+<h3>Why the obvious fixes fail</h3>
+<div class="gap-s"></div>
+<p class="body">Buy for the peak: they pay for the peak all month.</p>
+<div class="gap-s"></div>
+<p class="body">Buy for the average on a daily plan: they get blocked on the day they most need the data.</p>
+<div class="gap-s"></div>
+<p class="body">Overage: it turns a sizing problem into a bill they cannot predict.</p>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="say">
+<p class="label">Open with</p>
+<p>“Does your data volume look the same on a Tuesday and on a Saturday? What did you size for?”</p>
+</div>
+<aside class="notes">This is the easiest pain in the pack to make a visitor feel. Once they say their weekend is quiet, they have made your argument for you.</aside>
+</section>
+<section id="d2-proof" class="white" data-transition="fade">
+<p class="eyebrow">Demo 2 · The idea and the proof</p>
+<div class="gap-s"></div>
+<h2>Commit to your month,<br>not to your worst day</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<div class="steps">
+<div class="step"><div class="num">1</div><p class="what"><b>The month is the budget.</b> Daily rate multiplied by the days in that month. February and March differ.</p></div>
+<div class="step"><div class="num">2</div><p class="what"><b>One day can go to three times the daily rate.</b> We call it the daily burst. It stops one incident from eating the month.</p></div>
+<div class="step"><div class="num">3</div><p class="what"><b>Warn before the limit, block at it.</b> The burst is enforced, not advisory.</p></div>
+<div class="step"><div class="num">4</div><p class="what"><b>Pay as you go starts only when the month is used up.</b> Never on a single day.</p></div>
+</div>
+</div>
+<div class="col" style="width:600px">
+<div class="card">
+<h3>Our first monthly account</h3>
+<div class="gap-s"></div>
+<p class="body">Daily quota sized for the worst day: <b>180 units</b></p>
+<div class="gap-s"></div>
+<p class="body">October average: <b>64 units a day</b></p>
+<div class="gap-s"></div>
+<p class="body">Busiest day in October: <b>133 units</b></p>
+<div class="gap-s"></div>
+<p class="body">On a daily plan they paid for 180 every day, including the days they used a third of it.</p>
+</div>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="warn">
+<p class="label">Guardrail</p>
+<p>Do not name the account. Say “a healthcare customer”. Do not show or claim a block on a real account.</p>
+</div>
+<aside class="notes">Show the Usage and Quota screen with the three numbers: daily pace, monthly for this month, daily burst. If no demo environment is on monthly, tell the story with the slide and offer a follow up call. Sizing guidance for your own deals: size on a percentile such as P80, not on an average.</aside>
+</section>
+<section id="d2-qa" data-transition="fade">
+<p class="eyebrow">Demo 2 · Hard questions</p>
+<div class="gap-s"></div>
+<h2>What they will ask</h2>
+<div class="gap-m"></div>
+<table style="width:1664px">
+<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
+<tr><td>What exactly is the daily burst?</td><td>Three times the daily rate, in one day. It protects the customer from spending the month on one spike, and it lets us plan capacity.</td></tr>
+<tr><td>Can I change it myself?</td><td>Not in the product. We can set 2x, 3x or 4x for an account. Self service is not planned for this quarter.</td></tr>
+<tr><td>I size wrong and run out on day 29. Then what?</td><td>Blocked until the month ends, unless pay as you go is on. That is why sizing uses a percentile, not an average.</td></tr>
+<tr><td>I add units mid month. Full month or the rest?</td><td>The rest of the month. The rate times the days that remain.</td></tr>
+<tr><td>Does the burst apply to AI units?</td><td>No. AI units are a separate monthly budget with no burst.</td></tr>
+<tr><td>Can I carry unused units into next month?</td><td>Not today. Contract terms like carryover have to be modeled before we can enforce them. No date.</td></tr>
+<tr><td>How do I switch a customer?</td><td>It is on request today, not open to everyone. Bring the account to us.</td></tr>
+</table>
+<aside class="notes">Two traps here. First, do not call the burst a soft limit: it blocks. Second, do not promise carryover, spillover, quarterly or yearly enforcement. The honest line is that we cannot enforce what is not modeled in the contract system yet, and that work is underway.</aside>
+</section>
+<section id="d3-pain" data-transition="fade">
+<p class="eyebrow">Demo 3 · Traffic Management · Preview</p>
+<div class="gap-s"></div>
+<h2>Every event gets<br>the same treatment.</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<h3>What the day looks like now</h3>
+<div class="gap-s"></div>
+<p class="body">One fixed pipeline: parse, TCO, enrich, categorize, store. In that order, for everything.</p>
+<div class="gap-s"></div>
+<p class="body">So a log cannot be kept for a year for compliance and also trimmed to three fields for a week.</p>
+<div class="gap-s"></div>
+<p class="body">A business unit cannot own its own budget and see its own traffic.</p>
+<div class="gap-s"></div>
+<p class="body">Nobody can see the pipeline at all. “Why did my logs go to the expensive tier when I set no rule?” had no answer in the product.</p>
+</div>
+<div class="col grow">
+<h3>Why the obvious fixes fail</h3>
+<div class="gap-s"></div>
+<p class="body">More TCO rules: one budget per subsystem, when the customer wants one budget per application.</p>
+<div class="gap-s"></div>
+<p class="body">Filter at the agent: the decision moves out of the platform, and nothing is visible or auditable.</p>
+<div class="gap-s"></div>
+<p class="body">Two pipelines at the source: they pay to ship the same data twice.</p>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="say">
+<p class="label">Open with</p>
+<p>“Who in your company decides what gets kept, and can they see what the pipeline does today?”</p>
+</div>
+<aside class="notes">The strongest version of this pain is ownership, not cost. Large accounts have several internal groups funding one observability bill, and none of them can see or control their own share. Let the visitor describe that before you open the builder.</aside>
+</section>
+<section id="d3-show" class="white" data-transition="fade">
+<p class="eyebrow">Demo 3 · Click path · 4 minutes</p>
+<div class="gap-s"></div>
+<h2>Two use cases win this demo</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<div class="card">
+<h3>A · Keep one copy with PII, one without</h3>
+<div class="gap-s"></div>
+<p class="body">Add a fan out. On one branch, a parsing step that removes the personal fields, going to the general dataset. On the other, the full event to a security dataset with its own access.</p>
+<div class="gap-s"></div>
+<p class="body"><b>Say:</b> “Same event, two shapes, two sets of permissions, one pipeline.”</p>
+</div>
+</div>
+<div class="col grow">
+<div class="card">
+<h3>B · Give a business unit its own budget</h3>
+<div class="gap-s"></div>
+<p class="body">Route a branch to that unit’s own pipeline. Set a quota on it. They become the admin of their pipeline and see their own usage.</p>
+<div class="gap-s"></div>
+<p class="body"><b>Say:</b> “Their budget, their rules, their visibility. Not a spreadsheet at the end of the month.”</p>
+</div>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="steps" style="width:1664px">
+<div class="step"><div class="num">1</div><p class="what">Open the default pipeline for logs. Say: this is what happens today, it was just never visible.</p></div>
+<div class="step"><div class="num">2</div><p class="what">Add a router, then a fan out. Drag a parse step after the fan out, not before it. Order is yours.</p></div>
+<div class="step"><div class="num">3</div><p class="what">Set a quota on one branch, and a destination on the other. Save as a draft.</p></div>
+</div>
+<p class="foot">Confirm each screen in your environment before the show. The flag is <span class="mono">traffic-management</span>.</p>
+<aside class="notes">This is a front end. Do not click anything that implies data is flowing through it, and do not volunteer that the backend is not ready. If asked directly whether it is running in production, say it is a design preview and we are taking design partners.</aside>
+</section>
+<section id="d3-qa" data-transition="fade">
+<p class="eyebrow">Demo 3 · Hard questions</p>
+<div class="gap-s"></div>
+<h2>What they will ask</h2>
+<div class="gap-m"></div>
+<table style="width:1664px">
+<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
+<tr><td>When can I have it?</td><td>It is coming and we are taking design partners. Put their name down. No date, no quarter.</td></tr>
+<tr><td>Does it replace TCO?</td><td>TCO moves into it first. How today’s TCO rules carry over is still being designed.</td></tr>
+<tr><td>If I fan out, do I pay twice?</td><td>If you send the same event to two destinations, yes, you are keeping two copies. That is your choice to make, and now it is visible before you make it.</td></tr>
+<tr><td>Does order matter?</td><td>Only inside a routing step, which matches and exits like TCO. The pipeline itself is a graph, so parse, enrich and fan out go in any order.</td></tr>
+<tr><td>Can I pick which parsing rules run on which branch?</td><td>Yes. A parsing step sits on a branch, so one branch can remove fields the other keeps.</td></tr>
+<tr><td>API, Terraform, CLI?</td><td>Planned. No date.</td></tr>
+<tr><td>Is it called Data Pipelines or Traffic Management?</td><td>Say Traffic Management for now and tell them the name may change. It is not decided.</td></tr>
+</table>
+<aside class="notes">Expect the pay twice question. It is not an objection, it is a buying question. Answer it plainly. The answer that lands is that the cost of a second copy becomes a choice they can see at the moment they make it, instead of a surprise on the bill.</aside>
+</section>
+<section id="d4-pain" data-transition="fade">
+<p class="eyebrow">Demo 4 · Virtual datasets · Preview</p>
+<div class="gap-s"></div>
+<h2>Splitting your data<br>breaks everything<br>that points at it.</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<h3>What the day looks like now</h3>
+<div class="gap-s"></div>
+<p class="body">Datasets are how a customer organizes and controls cost. So they split <span class="mono">default logs</span> into real datasets.</p>
+<div class="gap-s"></div>
+<p class="body">Every dashboard, alert and saved query that named the old dataset now points at the wrong place.</p>
+<div class="gap-s"></div>
+<p class="body">And any question that crosses the split date needs a union of the old and the new, written by hand, by someone who remembers the date.</p>
+</div>
+<div class="col grow">
+<h3>Why the obvious fixes fail</h3>
+<div class="gap-s"></div>
+<p class="body">Rewrite everything on the day of the split: a migration project nobody will fund.</p>
+<div class="gap-s"></div>
+<p class="body">Write the union in every query: it works until the next change, and every user has to know the history.</p>
+<div class="gap-s"></div>
+<p class="body">Do not split at all: many customers choose this for exactly this reason.</p>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="say">
+<p class="label">Open with</p>
+<p>“If you reorganized your data tomorrow, how many dashboards and alerts would you have to rewrite?”</p>
+</div>
+<aside class="notes">This is the quietest pain of the four and the easiest to confirm. Any customer who has already split data has lived it. Any customer who has not split has been avoiding it for this exact reason.</aside>
+</section>
+<section id="d4-show" class="white" data-transition="fade">
+<p class="eyebrow">Demo 4 · Click path · 3 minutes</p>
+<div class="gap-s"></div>
+<h2>One name, many datasets</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<div class="steps">
+<div class="step"><div class="num">1</div><p class="what"><b>Show a query against several datasets.</b> The one written as a long list of names. Say: everyone writes this, and keeps writing it.</p></div>
+<div class="step"><div class="num">2</div><p class="what"><b>Open the virtual datasets screen.</b> A virtual dataset is a saved query with a name.</p></div>
+<div class="step"><div class="num">3</div><p class="what"><b>Show the definition.</b> It can union, filter and reshape. It is a name over real datasets.</p></div>
+<div class="step"><div class="num">4</div><p class="what"><b>Query it by the short name.</b> Same answer, one word.</p></div>
+<div class="step"><div class="num">5</div><p class="what"><b>Land the point.</b> Keep the old name alive after a split, and nothing that points at it breaks.</p></div>
+</div>
+</div>
+<div class="col" style="width:620px">
+<div class="say">
+<p class="label">60 second version</p>
+<p>“Think of a shortcut. No data is copied, nothing is stored twice, no extra ingest. It is a name, and permissions sit on it.”</p>
+</div>
+<div class="gap-m"></div>
+<div class="warn">
+<p class="label">Do not show</p>
+<p>One virtual dataset inside another. Whether that ships first is still open. Stay on one level.</p>
+</div>
+</div>
+</div>
+<p class="foot">Front end behind a flag from the end of this week. Confirm each screen in your environment. Until the flag is on, use the SE copy of the mockups.</p>
+<aside class="notes">Say no extra ingest and no extra storage. Do not say free: price and quota handling are not decided. If a visitor asks whether it costs anything, say the data is not copied, so there is no second ingest or storage charge, and the commercial detail is not settled.</aside>
+</section>
+<section id="d4-qa" data-transition="fade">
+<p class="eyebrow">Demo 4 · Hard questions</p>
+<div class="gap-s"></div>
+<h2>What they will ask</h2>
+<div class="gap-m"></div>
+<table style="width:1664px">
+<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
+<tr><td>When can I have it?</td><td>Coming, and we are taking design partners. No date from this booth.</td></tr>
+<tr><td>Does it copy my data?</td><td>No. It is a saved query with a name. Nothing is duplicated and nothing is ingested twice.</td></tr>
+<tr><td>What does it cost?</td><td>No extra ingest and no extra storage, because there is no second copy. The commercial detail is not settled yet.</td></tr>
+<tr><td>Who can see it?</td><td>It has its own permissions, on top of the permissions of every dataset underneath. A user cannot reach data through it that they could not reach directly.</td></tr>
+<tr><td>Can one contain another?</td><td>We are still deciding what ships first. Stay on one level today.</td></tr>
+<tr><td>Can I define it by a pattern, like all datasets starting with logs?</td><td>Not decided yet.</td></tr>
+<tr><td>How is this different from querying several datasets at once?</td><td>That is a query you write every time. This is a name your whole team uses, that you can change in one place.</td></tr>
+</table>
+<aside class="notes">The permissions answer matters more than it looks. Governance buyers assume a shortcut is a way around access control. Say plainly that it reads the permissions of every dataset underneath, so it cannot widen anyone's access.</aside>
+</section>
+<section id="booth" class="dark" data-transition="fade">
+<p class="eyebrow">At the booth</p>
+<div class="gap-s"></div>
+<h2>Sixty seconds each</h2>
+<div class="gap-m"></div>
+<div class="row" style="width:1664px">
+<div class="card">
+<h3>Overview</h3>
+<div class="gap-s"></div>
+<p class="body">“Here is the cycle, here is what each team burns, here is who got blocked and why. One page.”</p>
+</div>
+<div class="card">
+<h3>Monthly</h3>
+<div class="gap-s"></div>
+<p class="body">“Commit to your month, not your worst day. One day can go to three times your rate, so an incident does not cost you the month.”</p>
+</div>
+<div class="card">
+<h3>Traffic Management</h3>
+<div class="gap-s"></div>
+<p class="body">“Design the pipeline. Same event, two shapes. Each business unit with its own route and budget.”</p>
+</div>
+<div class="card">
+<h3>Virtual datasets</h3>
+<div class="gap-s"></div>
+<p class="body">“One name over many datasets. Split your data and nothing that points at the old name breaks.”</p>
+</div>
+</div>
+<div class="gap-l"></div>
+<h3 style="font-size:36px">Then ask one question and stop talking</h3>
+<div class="gap-s"></div>
+<p class="lede" style="color:#cfe0d8;width:1400px">“Which of these is a problem for you this quarter?”</p>
+<aside class="notes">A booth conversation is a qualification, not a presentation. One minute, one question, then listen. If they pick demo 3 or 4, they are a design partner lead: get the name, the company and what they would use it for.</aside>
+</section>
+<section id="open" data-transition="fade">
+<p class="eyebrow">Not decided yet</p>
+<div class="gap-s"></div>
+<h2>What we owe you before the show</h2>
+<div class="gap-m"></div>
+<div class="split" style="width:1664px">
+<div class="col grow">
+<div class="card">
+<h3>Blocking the demos</h3>
+<div class="gap-s"></div>
+<p class="body">The name: Traffic Management or Data Pipelines.</p>
+<div class="gap-s"></div>
+<p class="body">Which screens are really in the flagged build, walked with one SE.</p>
+<div class="gap-s"></div>
+<p class="body">Which virtual dataset screens are in the flagged build.</p>
+<div class="gap-s"></div>
+<p class="body">Which environment shows a monthly plan.</p>
+</div>
+</div>
+<div class="col grow">
+<div class="card">
+<h3>Answers we are chasing</h3>
+<div class="gap-s"></div>
+<p class="body">The warning level on monthly, stated as one number.</p>
+<div class="gap-s"></div>
+<p class="body">Forecast in units on the Overview: a ticket, not a promise.</p>
+<div class="gap-s"></div>
+<p class="body">Virtual datasets: nesting and name patterns in the first release.</p>
+<div class="gap-s"></div>
+<p class="body">Who presents each demo, and who collects design partner leads.</p>
+</div>
+</div>
+</div>
+<div class="gap-m"></div>
+<div class="say">
+<p class="label">The ask</p>
+<p>Tell us which of these blocks you. We close them before the training, not during the show.</p>
+</div>
+<aside class="notes">Show this slide in the training, not at the booth. It is the honest list of what is still open on our side. An SE who knows what is undecided will not invent an answer in front of a customer.</aside>
+</section>
+<section id="close" class="dark foot-pad" data-transition="fade">
+<p class="eyebrow">Before you fly</p>
+<div class="gap-m"></div>
+<h1>Take the name.<br>Never the date.</h1>
+<div class="gap-m"></div>
+<div class="row" style="width:1664px">
+<div class="card">
+<h3>Live, demo freely</h3>
+<div class="gap-s"></div>
+<p class="body">Usage &amp; Quota Overview. Monthly plan, available on request.</p>
+</div>
+<div class="card">
+<h3>Preview, say “coming”</h3>
+<div class="gap-s"></div>
+<p class="body">Traffic Management. Virtual datasets. Design partners welcome.</p>
+</div>
+<div class="card">
+<h3>Bring back</h3>
+<div class="gap-s"></div>
+<p class="body">Design partner leads. Questions we could not answer. Anything a customer asked twice.</p>
+</div>
+</div>
+<div class="gap-l"></div>
+<p class="lede" style="color:#cfe0d8;width:1400px">The measure: named design partner leads, per demo. Post them, and any question, in #reinvent-2026-demos.</p>
+<p class="foot">re:Invent 2026 SE pack · full briefs and demo scripts in the vault · Noam Sheffi</p>
+<aside class="notes">Close the training here. The two things that come back from the booth and change the roadmap are the design partner leads and the repeated questions. Make both easy to send: one channel.</aside>
+</section>
+</div>
+<div id="hud"><span id="pos"></span><button id="prev" aria-label="Previous slide">&#8592;</button><button id="next" aria-label="Next slide">&#8594;</button><button id="nt">Notes (N)</button></div>
+<script>
+const S=[...document.querySelectorAll('#stage > section')]; let i=0;
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${k})`;}
+function go(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('on',j===i));document.getElementById('pos').textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1));}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))go(i+1);else if(['ArrowLeft','PageUp'].includes(e.key))go(i-1);else if(e.key==='n'||e.key==='N')document.body.classList.toggle('shownotes');else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);});
+document.getElementById('prev').onclick=()=>go(i-1);document.getElementById('next').onclick=()=>go(i+1);
+document.getElementById('nt').onclick=()=>document.body.classList.toggle('shownotes');
+document.getElementById('stage').addEventListener('click',e=>{if(e.target.closest('a'))return;go(e.clientX>innerWidth/2?i+1:i-1);});
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body></html>
