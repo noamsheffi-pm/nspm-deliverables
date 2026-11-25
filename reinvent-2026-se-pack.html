@@ -245,22 +245,6 @@ body.shownotes aside.notes { display: block; position: absolute; left: 0; right:
 </div>
 <aside class="notes">Three beats carry the demo: the cycle, the per team split, and the block with its reason.</aside>
 </section>
-<section id="d1-qa" data-transition="fade">
-<p class="eyebrow">Demo 1 · Hard questions</p>
-<div class="gap-s"></div>
-<h2>What they will ask</h2>
-<div class="gap-m"></div>
-<table style="width:1664px">
-<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
-<tr><td>Can it tell me how many units to add so I am not blocked today?</td><td>Not as one number yet. The CX chart shows units left and units left at today's rate. A number of units to add is planned, no date.</td></tr>
-<tr><td>Do AI units have a forecast too?</td><td>The Rate card shows % used against % of the month gone, and the days left. The burn-down shows units left against the warning level, and the last 3 cycles against the plan.</td></tr>
-<tr><td>Does it mix my data units and my AI units?</td><td>No. CX units and AI units each have their own section on the Overview and their own tab.</td></tr>
-<tr><td>I am on a daily plan. Does this still help?</td><td>Yes. A daily plan sees the daily view of the current cycle.</td></tr>
-<tr><td>Can I see it per team?</td><td>Yes. The page shows one team at a time: its share and the unallocated pool. The org view is a short summary across teams.</td></tr>
-<tr><td>Can the block email link here?</td><td>Not confirmed yet.</td></tr>
-</table>
-<aside class="notes">The first row is the question the SE team raised in the handover. Ticket CX-69481 is open; the front end ticket is blocked.</aside>
-</section>
 <section id="d2-pain" data-transition="fade">
 <p class="eyebrow">Demo 2 · Monthly plan · Live, on request</p>
 <div class="gap-s"></div>
@@ -322,23 +306,6 @@ body.shownotes aside.notes { display: block; position: absolute; left: 0; right:
 <p>Do not name the account. Say “one of our customers”. Do not show or claim a block on a real account.</p>
 </div>
 <aside class="notes">Show the Usage and Quota screen with the three numbers: daily pace, monthly for this month, daily burst. If no demo environment is on monthly, tell the story with the slide and offer a follow up call. SE advice from the 12-11 handover, not a policy: size on a percentile such as P80, not on an average.</aside>
-</section>
-<section id="d2-qa" data-transition="fade">
-<p class="eyebrow">Demo 2 · Hard questions</p>
-<div class="gap-s"></div>
-<h2>What they will ask</h2>
-<div class="gap-m"></div>
-<table style="width:1664px">
-<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
-<tr><td>What exactly is the daily burst?</td><td>Three times the daily rate, in one day. It protects the customer from spending the month on one spike, and it lets us plan capacity.</td></tr>
-<tr><td>Can I change it myself?</td><td>Not today. We set it per team, 3x by default. A customer setting is being built. No date.</td></tr>
-<tr><td>I size wrong and run out on day 29. Then what?</td><td>The account team can add units. Pay as you go on monthly is not available yet. That is why sizing matters.</td></tr>
-<tr><td>I add units mid month. Full month or the rest?</td><td>Not final yet. Bring the case to us.</td></tr>
-<tr><td>Does the burst apply to AI units?</td><td>No. AI units are a separate monthly budget with no burst.</td></tr>
-<tr><td>Can I carry unused units, or go over a little?</td><td>Not today. Monthly has no carryover and no overage grace. Raise this before a customer switches.</td></tr>
-<tr><td>How do I switch a customer?</td><td>It is on request today, not open to everyone. Bring the account to us.</td></tr>
-</table>
-<aside class="notes">The burst blocks; it is not a soft limit. Carryover, spillover, quarterly or yearly enforcement need the contract terms modeled first. That work is underway.</aside>
 </section>
 <section id="d3-pain" data-transition="fade">
 <p class="eyebrow">Demo 3 · Traffic Management · Preview</p>
@@ -406,23 +373,6 @@ body.shownotes aside.notes { display: block; position: absolute; left: 0; right:
 <p class="foot">Confirm each screen in your environment before the show. The flag is <span class="mono">traffic-management</span>.</p>
 <aside class="notes">This is a front end; data does not flow through it yet. Per the 12-11 handover, we do not raise the backend status. If asked whether it runs in production: it is a preview and we are taking design partners.</aside>
 </section>
-<section id="d3-qa" data-transition="fade">
-<p class="eyebrow">Demo 3 · Hard questions</p>
-<div class="gap-s"></div>
-<h2>What they will ask</h2>
-<div class="gap-m"></div>
-<table style="width:1664px">
-<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
-<tr><td>When can I have it?</td><td>Coming, and we are taking design partners. No date yet.</td></tr>
-<tr><td>Does it replace TCO?</td><td>Today’s TCO and parsing rules keep working. How they move into pipelines is still being designed.</td></tr>
-<tr><td>If I fan out, do I pay twice?</td><td>Two copies are two copies. How they are counted is not final, so do not quote a number.</td></tr>
-<tr><td>Does order matter?</td><td>Only inside a routing step, which matches and exits like TCO. The pipeline itself is a graph, so parse and fan out go in any order.</td></tr>
-<tr><td>Can I pick which parsing rules run on which branch?</td><td>Yes. A parsing step sits on a branch, so one branch can remove fields the other keeps.</td></tr>
-<tr><td>API, Terraform, CLI?</td><td>Planned. No date.</td></tr>
-<tr><td>Is it called Data Pipelines or Traffic Management?</td><td>Say Traffic Management for now and tell them the name may change. It is not decided.</td></tr>
-</table>
-<aside class="notes">The pay twice question is a buying question. Two copies are two copies, and the customer chooses that on purpose.</aside>
-</section>
 <section id="d4-pain" data-transition="fade">
 <p class="eyebrow">Demo 4 · Virtual datasets · Preview</p>
 <div class="gap-s"></div>
@@ -483,23 +433,6 @@ body.shownotes aside.notes { display: block; position: absolute; left: 0; right:
 </div>
 <p class="foot">Front end behind a flag from the end of this week. Confirm each screen in your environment. Until the flag is on, use the SE copy of the mockups and stay on what this slide shows.</p>
 <aside class="notes">Price and quota handling are not decided. What holds: the data is not copied, so there is no second ingest or storage charge.</aside>
-</section>
-<section id="d4-qa" data-transition="fade">
-<p class="eyebrow">Demo 4 · Hard questions</p>
-<div class="gap-s"></div>
-<h2>What they will ask</h2>
-<div class="gap-m"></div>
-<table style="width:1664px">
-<tr><th style="width:38%">Question</th><th style="width:62%">Answer</th></tr>
-<tr><td>When can I have it?</td><td>Coming, and we are taking design partners. No date from this booth.</td></tr>
-<tr><td>Does it copy my data?</td><td>No. It is a saved query with a name. Nothing is duplicated and nothing is ingested twice.</td></tr>
-<tr><td>What does it cost?</td><td>No extra ingest and no extra storage, because there is no second copy. The commercial detail is not settled yet.</td></tr>
-<tr><td>Who can see it?</td><td>Only what they can already read. Each dataset underneath keeps its own permissions, so it cannot widen anyone’s access.</td></tr>
-<tr><td>Can one contain another?</td><td>Not in the first build.</td></tr>
-<tr><td>Can I define it by a pattern, like all datasets starting with logs?</td><td>Not in the first build.</td></tr>
-<tr><td>How is this different from querying several datasets at once?</td><td>That is a query you write every time. This is a name everyone uses, and you change it in one place.</td></tr>
-</table>
-<aside class="notes">The permissions answer matters more than it looks. Governance buyers assume a shortcut is a way around access control. Every dataset underneath keeps its own permissions, so it cannot widen anyone's access.</aside>
 </section>
 <section id="booth" class="dark" data-transition="fade">
 <p class="eyebrow">At the booth</p>
